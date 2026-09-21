@@ -77,3 +77,6 @@ BOARD_BOOTCONFIG += androidboot.hardware=qcom androidboot.fstab_suffix=qcom
 SOONG_CONFIG_NAMESPACES += ufsbsg
 SOONG_CONFIG_ufsbsg += ufsframework
 SOONG_CONFIG_ufsbsg_ufsframework := bsg
+
+# Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
+CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext

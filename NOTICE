@@ -1,0 +1,16 @@
+DiamaneOS Fairphone 6 device configuration
+
+Original integration files: Copyright 2026 The DiamaneOS Project, Apache-2.0.
+
+boot/fstab.qcom derives from Fairphone vendor/fairphone/fps
+revision 51648f54c2a7d31fc24833adcae3758cb251966f, default/fstab.qcom,
+and the corresponding FP6.QREL.16.100.0 EU vendor ramdisk configuration.
+Upstream: https://gerrit-public.fairphone.software/vendor/fairphone/fps
+Copyright (c) 2019-2020 The Linux Foundation. All rights reserved.
+The full upstream redistribution conditions and disclaimer are preserved in
+boot/fstab.qcom and apply to that file; LICENSE does not relicense it.
+
+Downstream changes: retain the shipped early /odm/persist mount, identify the
+FP6 configuration and remove the optional Google GSI public-key fallback list.
+Partition paths, filesystem options and encryption parameters retain their
+upstream meaning. No upstream author attribution has been removed.

@@ -8,7 +8,7 @@ This is initial integration source, not a qualified bootable product. The
 Android graph has not yet been resolved. Required generated inputs are:
 
 - `vendor/fairphone/FP6`: selected stock-derived inputs and reviewed source HAL,
-  init, VINTF, fstab and policy integration.
+  init, VINTF and policy integration.
 - `device/fairphone/FP6-kernel`: matched kernel, module and device-tree artifacts,
   generated product/board definitions and load lists.
 
@@ -49,3 +49,10 @@ Android graph has not yet been resolved. Required generated inputs are:
 - Recovery (`boot/init.recovery.qcom.rc`): USB peripheral mode, modem firmware
   mounted read-only before ADSP boot, platform wipe hooks only. Includes
   fastbootd.
+
+## Services
+
+This mount configuration still requires native fs_mgr, SELinux, encryption and
+image verification before a device boot. Recovery fstab and image integration
+remain separate pending work. Existing formattable flags for writable device
+partitions are preserved from the pinned source; this is not a flashing command.

@@ -61,3 +61,14 @@ include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096
+
+# Match the fstab's system-side AVB chain. The location is the published FP6
+# system-chain slot; generated vendor inputs must not redefine this identity.
+BOARD_AVB_VBMETA_SYSTEM := system system_ext product
+BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
+
+# Deterministic fstab lookup without the stock runtime fstab-copy helper.
+BOARD_BOOTCONFIG += androidboot.hardware=qcom androidboot.fstab_suffix=qcom

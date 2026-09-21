@@ -2,6 +2,10 @@
 # Copyright 2026 The DiamaneOS Project
 
 PRODUCT_SHIPPING_API_LEVEL := 35
+# The matched Fairphone 6.1 kernel uses 4 KiB pages. Validate every selected
+# prebuilt against this size rather than the generic ARM64 16 KiB default.
+PRODUCT_MAX_PAGE_SIZE_SUPPORTED := 4096
+PRODUCT_CHECK_PREBUILT_MAX_PAGE_SIZE := true
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_BUILD_SUPER_PARTITION := true
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)

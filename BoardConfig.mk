@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+DEVICE_PATH := device/fairphone/FP6
+
+TARGET_ARCH := arm64
+TARGET_ARCH_VARIANT := armv8-a-branchprot
+TARGET_CPU_ABI := arm64-v8a
+TARGET_CPU_VARIANT := generic
+TARGET_BOARD_PLATFORM := volcano
+TARGET_BOOTLOADER_BOARD_NAME := fps
+# Keep the authenticated device bootloader; this product builds Android images.
+TARGET_NO_BOOTLOADER := true
+
+TARGET_COPY_OUT_VENDOR := vendor
+TARGET_COPY_OUT_ODM := odm
+TARGET_COPY_OUT_PRODUCT := product
+TARGET_COPY_OUT_SYSTEM_EXT := system_ext
+TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
+TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
+
+# These are device partition capacities, not workstation paths or output sizes.
+BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
+BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 8388608
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
+BOARD_DTBOIMG_PARTITION_SIZE := 31457280
+BOARD_SUPER_PARTITION_SIZE := 9663676416
+BOARD_SUPER_PARTITION_GROUPS := diamaneos_dynamic_partitions
+BOARD_DIAMANEOS_DYNAMIC_PARTITIONS_SIZE := 9659482112
+BOARD_DIAMANEOS_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor odm vendor_dlkm system_dlkm
+
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
+BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_USES_VENDOR_DLKMIMAGE := true
+BOARD_USES_SYSTEM_DLKMIMAGE := true
+BOARD_USES_METADATA_PARTITION := true
+# Userdata is formatted through recovery; never package a reference userdata.img.
+PRODUCT_BUILD_USERDATA_IMAGE := false
+
+BOARD_BOOT_HEADER_VERSION := 4
+BOARD_INIT_BOOT_HEADER_VERSION := 4
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_RAMDISK_USE_LZ4 := true
+
+# Device-specific fstab, HAL manifests and policy are reviewed with the selected
+# vendor closure. Kernel offsets, DT packing and module load lists belong to
+# the generated kernel integration. Neither include is optional.
+include vendor/fairphone/FP6/BoardConfigVendor.mk
+include device/fairphone/FP6-kernel/BoardConfigKernel.mk
+
+# Development identity only. AVB remains enabled; a later signing workflow
+# replaces test identities rather than relabelling these artifacts.
+BOARD_AVB_ENABLE := true
+BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_ALGORITHM := SHA256_RSA4096

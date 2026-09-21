@@ -9,6 +9,8 @@ PRODUCT_CHECK_PREBUILT_MAX_PAGE_SIZE := true
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_BUILD_SUPER_PARTITION := true
 PRODUCT_BUILD_RECOVERY_IMAGE := true
+# Userdata is formatted through recovery, never packaged from a reference image.
+PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
 # Keep one reviewed UFS fstab for early and late mounting.

@@ -72,3 +72,8 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 
 # Deterministic fstab lookup without the stock runtime fstab-copy helper.
 BOARD_BOOTCONFIG += androidboot.hardware=qcom androidboot.fstab_suffix=qcom
+
+# The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
+SOONG_CONFIG_NAMESPACES += ufsbsg
+SOONG_CONFIG_ufsbsg += ufsframework
+SOONG_CONFIG_ufsbsg_ufsframework := bsg

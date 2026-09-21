@@ -39,3 +39,10 @@ This mount configuration still requires native fs_mgr, SELinux, encryption and
 image verification before a device boot. Recovery fstab and image integration
 remain separate pending work. Existing formattable flags for writable device
 partitions are preserved from the pinned source; this is not a flashing command.
+
+Boot-control services come from pinned Fairphone `hardware/qcom/bootctrl` and
+`vendor/qcom/opensource/recovery-ext` projects. The FP6 UFS BSG configuration
+is selected explicitly. Their original notices remain in those projects.
+The recovery extension's kernel-header/ION dependencies and upstream CFI
+exception need native integration review before the boot-control path is
+accepted; selecting these modules does not establish safe slot switching.

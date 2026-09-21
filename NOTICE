@@ -14,3 +14,11 @@ Downstream changes: retain the shipped early /odm/persist mount, identify the
 FP6 configuration and remove the optional Google GSI public-key fallback list.
 Partition paths, filesystem options and encryption parameters retain their
 upstream meaning. No upstream author attribution has been removed.
+
+boot/init.qcom.usb.rc derives from Qualcomm's USB setup at Fairphone
+vendor/qcom-opensource/usb revision
+7e65693c12f98c3aca9721287dc2c648ea83e65a, etc/init.qcom.usb.rc.
+Upstream: https://gerrit-public.fairphone.software/platform/vendor/qcom-opensource/usb
+Its BSD-3-Clause and BSD-3-Clause-Clear notices remain in the file.
+The adaptation selects one controller and ordinary Android gadget functions,
+uses the product model directly and leaves compositions to the gadget HAL.

@@ -11,6 +11,7 @@ TARGET_BOARD_PLATFORM := volcano
 TARGET_BOOTLOADER_BOARD_NAME := fps
 # Keep the authenticated device bootloader; this product builds Android images.
 TARGET_NO_BOOTLOADER := true
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_ODM := odm
@@ -49,6 +50,15 @@ BOARD_BOOT_HEADER_VERSION := 4
 BOARD_INIT_BOOT_HEADER_VERSION := 4
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_RAMDISK_USE_LZ4 := true
+# Stock boot v4 carries the kernel; init_boot and recovery carry ramdisks only.
+BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
+BOARD_KERNEL_BASE := 0x00000000
+BOARD_MKBOOTIMG_ARGS += --header_version 4 --kernel_offset 0x00008000
+BOARD_MKBOOTIMG_ARGS += --ramdisk_offset 0x01000000 --tags_offset 0x00000100
+BOARD_MKBOOTIMG_ARGS += --dtb_offset 0x01f00000
+BOARD_MKBOOTIMG_INIT_ARGS += --header_version 4
+# Keep recovery and Android on the same mount and encryption definitions.
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/boot/fstab.qcom
 
 # Device-specific fstab, HAL manifests and policy are reviewed with the selected
 # vendor closure. Kernel offsets, DT packing and module load lists belong to

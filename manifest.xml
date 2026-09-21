@@ -1,0 +1,10 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- Remaining selected HAL declarations are installed with their providers. -->
+<manifest version="7.0" type="device" target-level="8">
+    <hal format="aidl">
+        <name>android.hardware.gatekeeper</name>
+        <version>1</version>
+        <fqname>IGatekeeper/default</fqname>
+    </hal>
+</manifest>

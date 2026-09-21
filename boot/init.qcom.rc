@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Initial hardware setup for the pinned FP6 kernel and selected vendor services.
+
+on early-init
+    symlink /vendor/firmware_mnt /firmware
+    symlink /vendor/bt_firmware /bt_firmware
+    symlink /vendor/dsp /dsp
+
+on init
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+
+on early-fs
+    start vold
+
+on fs
+    mount_all --early
+    # Firmware mounts precede vendor drivers which may request firmware at probe.
+    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /system/lib/modules --all=/system/lib/modules/modules.load
+    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load
+    chown root system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/secnvm 0770 system system
+    mkdir /mnt/vendor/persist/data 0700 system system
+
+on late-fs
+    mount_all --late
+
+on post-fs-data
+    mkdir /data/vendor/display 0770 system graphics
+    mkdir /data/vendor/tzstorage 0770 system system
+    mkdir /data/vendor/qtee 0770 system system
+    mkdir /data/vendor/pwr 0700 root root
+    mkdir /data/vendor/perfd 2770 root system
+
+on early-boot
+    verity_update_state

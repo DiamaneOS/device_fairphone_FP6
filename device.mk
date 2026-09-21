@@ -8,18 +8,33 @@ PRODUCT_MAX_PAGE_SIZE_SUPPORTED := 4096
 PRODUCT_CHECK_PREBUILT_MAX_PAGE_SIZE := true
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_BUILD_SUPER_PARTITION := true
+PRODUCT_BUILD_RECOVERY_IMAGE := true
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
 # Keep one reviewed UFS fstab for early and late mounting.
 PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/init.qcom.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.rc \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
-# Published Qualcomm boot control owns GPT slot attributes and UFS selection.
-# Use its normal and recovery variants; never substitute the generic HAL.
+# Source-built hardware services. Boot control owns GPT slot attributes and
+# UFS selection in both normal Android and recovery.
 PRODUCT_PACKAGES += \
+    toolbox_vendor \
     android.hardware.boot-service.qti \
-    android.hardware.boot-service.qti.recovery
+    android.hardware.boot-service.qti.recovery \
+    android.hardware.power-service \
+    android.hardware.thermal-service.qti \
+    vendor.qti.hardware.lights.service \
+    vendor.qti.hardware.vibrator.service \
+    android.hardware.usb-service.qti \
+    android.hardware.usb.gadget-service.qti \
+    usb_compositions.conf \
+    android.hardware.health-service.qti \
+    android.hardware.health-service.qti_recovery
+
+# Match the trusted-execution backend selected by the authenticated stock image.
+PRODUCT_VENDOR_PROPERTIES += vendor.gatekeeper.is_security_level_spu=0
 
 # The generated selection owns remaining HAL packages, dependencies, properties and
 # notices. Absence is an error: do not silently omit required hardware inputs.

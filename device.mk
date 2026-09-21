@@ -11,7 +11,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
-# The generated selection owns HAL packages, dependencies, properties and
+# Published Qualcomm boot control owns GPT slot attributes and UFS selection.
+# Use its normal and recovery variants; never substitute the generic HAL.
+PRODUCT_PACKAGES += \
+    android.hardware.boot-service.qti \
+    android.hardware.boot-service.qti.recovery
+
+# The generated selection owns remaining HAL packages, dependencies, properties and
 # notices. Absence is an error: do not silently omit required hardware inputs.
 $(call inherit-product, vendor/fairphone/FP6/device-vendor.mk)
 # Kernel artifacts are produced from the independently pinned kernel workspace.

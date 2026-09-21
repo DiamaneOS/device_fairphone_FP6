@@ -52,14 +52,32 @@ Android graph has not yet been resolved. Required generated inputs are:
 
 ## Services
 
-This mount configuration still requires native fs_mgr, SELinux, encryption and
-image verification before a device boot. Recovery fstab and image integration
-remain separate pending work. Existing formattable flags for writable device
-partitions are preserved from the pinned source; this is not a flashing command.
+- Thermal, lights, vibrator, USB and health: the Qualcomm HALs listed in
+  `device.mk`, built from source.
+- Power: LineageOS libperfmgr (unmodified) with `power/powerhint.json`, as
+  system with CAP_SYS_NICE.
+  - Camera hints reach it through `libqti-perfd-client`.
+  - Qualcomm's perf daemon is not installed.
+- Power stats: DiamaneOS's own HAL.
+  - It reports SoC and subsystem sleep times from `/dev/stats`.
+  - There are no energy meters: the phone has no on-device power monitor.
 
 Boot-control services come from pinned Fairphone `hardware/qcom/bootctrl` and
 `vendor/qcom/opensource/recovery-ext` projects. The FP6 UFS BSG configuration
 is selected explicitly. Their original notices remain in those projects.
-The recovery extension's kernel-header/ION dependencies and upstream CFI
-exception need native integration review before the boot-control path is
-accepted; selecting these modules does not establish safe slot switching.
+The normal and recovery implementations compile with CFI enabled. Their UFS
+header layouts match the pinned kernel interfaces. Runtime slot switching still
+requires device verification.
+
+The product uses the published FP6 power, thermal, lights, vibrator, USB and
+health services. Power has a small Soong build adaptation; the implementations
+remain separate from the device configuration. Required runtime dependencies,
+firmware and policy belong to the generated integration and must be checked
+before boot acceptance.
+
+The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
+enabled. Boot, init_boot and recovery use header version 4; recovery excludes the
+kernel, matching the stock bootloader layout. Android and recovery use the same
+fstab so encryption definitions cannot drift. Vendor drivers are loaded after
+their firmware mounts. Image-header, policy and native product checks remain
+mandatory before flashing.

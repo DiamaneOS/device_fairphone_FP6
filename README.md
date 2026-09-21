@@ -4,11 +4,13 @@ Android product `diamaneos_FP6`, installed at `device/fairphone/FP6` in the
 pinned GrapheneOS source workspace. Shared product configuration belongs at
 `vendor/diamaneos`.
 
-This is initial integration source, not a qualified bootable product. The
-Android graph has not yet been resolved. Required generated inputs are:
+This is integration source, not a qualified bootable product. Native product
+graph, selected source HAL compilation and enforcing USER policy checks have
+passed with recorded candidate inputs. Combined installed artifacts and device
+behavior still require verification. Required generated inputs are:
 
 - `vendor/fairphone/FP6`: selected stock-derived inputs and reviewed source HAL,
-  init, VINTF and policy integration.
+  init and VINTF integration. Device policy is maintained under `sepolicy/`.
 - `device/fairphone/FP6-kernel`: matched kernel, module and device-tree artifacts,
   generated product/board definitions and load lists.
 

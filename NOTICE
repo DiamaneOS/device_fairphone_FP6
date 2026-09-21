@@ -22,3 +22,16 @@ Upstream: https://gerrit-public.fairphone.software/platform/vendor/qcom-opensour
 Its BSD-3-Clause and BSD-3-Clause-Clear notices remain in the file.
 The adaptation selects one controller and ordinary Android gadget functions,
 uses the product model directly and leaves compositions to the gadget HAL.
+
+sepolicy/ contains selected policy from Fairphone's device/qcom/sepolicy_vndr
+and device/qcom/sepolicy. Exact upstream revisions, paths, original and derived
+hashes are recorded in sepolicy/provenance.json. Each consumed file retains
+its upstream copyright and licence. The project LICENSE does not relicense
+those files. See sepolicy/README.md for the downstream adaptation.
+
+boot/ueventd.rc selects graphics, trusted-execution and Type-C ownership rules
+from the FP6.QREL.16.100.0 EU vendor/etc/ueventd.rc, SHA-256
+7d738ab1b09e2e1014d7949fd69217a3055b0a389a0e73c4f15ec8a74a405f24.
+Its original Linux Foundation and Qualcomm notices are retained in the file.
+The selection does not import the stock diagnostic configuration or firmware
+handler list. Standard device rules remain owned by the platform.

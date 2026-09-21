@@ -15,6 +15,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 
 # Keep one reviewed UFS fstab for early and late mounting.
 PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/init.qcom.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.qcom.usb.rc \
     device/fairphone/FP6/boot/init.qcom.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.rc \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
@@ -60,3 +61,11 @@ AB_OTA_PARTITIONS += \
     vendor \
     vendor_boot \
     vendor_dlkm
+
+# FP6 controller and the native gadget service, with FunctionFS MTP/PTP.
+PRODUCT_VENDOR_PROPERTIES += \
+    vendor.usb.controller=a600000.dwc3 \
+    vendor.usb.use_ffs_mtp=1 \
+    vendor.usb.use_gadget_hal=1 \
+    vendor.usb.rndis.func.name=rndis \
+    vendor.usb.ncm.func.name=ncm

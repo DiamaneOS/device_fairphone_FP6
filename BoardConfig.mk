@@ -64,6 +64,13 @@ TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/boot/fstab.qcom
 include vendor/fairphone/FP6/BoardConfigVendor.mk
 include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 
+# Reviewed source policy belongs to the device tree, not generated stock files.
+BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
+PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
+PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
+
 # Development identity only. AVB remains enabled; a later signing workflow
 # replaces test identities rather than relabelling these artifacts.
 BOARD_AVB_ENABLE := true

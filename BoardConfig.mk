@@ -57,6 +57,11 @@ BOARD_MKBOOTIMG_ARGS += --dtb_offset 0x01f00000
 BOARD_MKBOOTIMG_INIT_ARGS += --header_version 4
 # Keep recovery and Android on the same mount and encryption definitions.
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/boot/fstab.qcom
+TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+TARGET_RECOVERY_UI_SCREEN_WIDTH := 1080
+TARGET_RECOVERY_UI_MARGIN_HEIGHT := 75
+TARGET_RECOVERY_UI_BRIGHTNESS_FILE := /sys/class/backlight/panel0-backlight/brightness
+TARGET_RECOVERY_UI_MAX_BRIGHTNESS_FILE := /sys/class/backlight/panel0-backlight/max_brightness
 
 # Device-specific fstab, HAL manifests and policy are reviewed with the selected
 # vendor closure. Kernel offsets, DT packing and module load lists belong to

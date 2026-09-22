@@ -61,3 +61,13 @@ kernel, matching the stock bootloader layout. Android and recovery use the same
 fstab so encryption definitions cannot drift. Vendor drivers are loaded after
 their firmware mounts. Image-header, policy and native product checks remain
 mandatory before flashing.
+
+Recovery has its own `boot/init.recovery.qcom.rc`, imported by the platform
+recovery as `init.recovery.qcom.rc`. It selects configfs and the FP6 controller,
+sets peripheral mode and mounts the current-slot modem firmware read-only before
+requesting ADSP boot. The platform owns ADB/sideload/fastboot compositions;
+normal Android's zygote-triggered gadget setup is not used in recovery. The
+recovery UI uses the panel backlight/max-brightness nodes and RGBX layout.
+First-stage init owns the generated `modules.load.recovery` list. Recovery uses
+the default platform wipe hooks; it adds no device-specific erase operation.
+Native packaging/policy checks and an actual recovery boot are separate gates.

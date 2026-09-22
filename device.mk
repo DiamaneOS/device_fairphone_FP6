@@ -14,6 +14,10 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
+# Generate the standard device compatibility matrix and system SDK requirements.
+# generic_system does not inherit the base_vendor package selection.
+PRODUCT_PACKAGES += vendor_compatibility_matrix.xml
+
 # Select the platform recovery runtime explicitly: image generation alone does
 # not select these packages when generic_system is used without base_vendor.
 # This follows base_vendor.mk's recovery group; fastbootd serves dynamic partitions.

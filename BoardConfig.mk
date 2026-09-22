@@ -50,6 +50,8 @@ BOARD_KERNEL_PAGESIZE := 4096
 BOARD_RAMDISK_USE_LZ4 := true
 # Stock boot v4 carries the kernel; init_boot and recovery carry ramdisks only.
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
+# Recovery is a complete A/B partition image, not an imgdiff patch from boot.
+BOARD_USES_FULL_RECOVERY_IMAGE := true
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_MKBOOTIMG_ARGS += --header_version 4 --kernel_offset 0x00008000
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset 0x01000000 --tags_offset 0x00000100

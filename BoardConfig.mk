@@ -12,6 +12,7 @@ TARGET_BOOTLOADER_BOARD_NAME := fps
 # Keep the authenticated device bootloader; this product builds Android images.
 TARGET_NO_BOOTLOADER := true
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/framework_compatibility_matrix.xml
 
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_ODM := odm

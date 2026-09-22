@@ -50,17 +50,9 @@ allow hal_bootctl_default vendor_mdtp_device:blk_file getattr;
 allow hal_bootctl_default misc_block_device:blk_file rw_file_perms;
 allow hal_bootctl_default vendor_uefi_block_device:blk_file getattr;
 
-# Access /dev/sgN or /dev/ufs-bsg* devices (generic SCSI) to write the
-# A/B slot selection for the XBL partition. Allow also to issue a
-# UFS_IOCTL_QUERY or SG_IO ioctl.
-allow hal_bootctl_default vendor_sg_device:chr_file rw_file_perms;
+# The selected BSG implementation opens /dev/ufs-bsg*, not legacy /dev/sg*.
+# Keep sysfs discovery below: gpt-utils still locates the XBL SCSI node.
 allow hal_bootctl_default vendor_bsg_device:chr_file rw_file_perms;
-
-# The sys_rawio denial message is benign, and shows up due to a capability()
-# call made by the scsi driver to check for CAP_SYS_RAWIO. Not having this
-# does not result in a error
-dontaudit hal_bootctl_default self:capability sys_rawio;
-
 
 #scsi driver does a capability check (CAP_SYS_RAWIO) when bootctl does
 # an ioctl to /dev/ufs-bsg .Adding this rule to avoid ioctl error.

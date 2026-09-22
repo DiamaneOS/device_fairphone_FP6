@@ -13,6 +13,10 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
+# Recovery has no zygote or normal vendor init; platform recovery imports this.
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc
+
 # Keep one reviewed UFS fstab for early and late mounting.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \

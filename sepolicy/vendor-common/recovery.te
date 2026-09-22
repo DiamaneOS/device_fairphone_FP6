@@ -25,6 +25,8 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Boot slot operations are IPC to the boot-control service, which owns BSG.
+# The platform recovery binary does not link the legacy Qualcomm updater.
 recovery_only(`
  # Search and Read access for vendor_sysfs_graphics for backlight
  allow recovery vendor_sysfs_graphics:dir search;
@@ -38,10 +40,6 @@ recovery_only(`
  allow recovery system_data_file:file r_file_perms;
  allow recovery system_data_file:dir r_dir_perms;
  allow recovery cache_file:dir mounton;
- allow recovery vendor_sg_device:chr_file rw_file_perms;
- allow recovery vendor_bsg_device:chr_file rw_file_perms;
- allow recovery self:capability sys_rawio;
- allow recovery vendor_sg_device:chr_file ioctl;
  allow recovery sysfs_dm:dir r_dir_perms;
  allow recovery sysfs_dm:file r_file_perms;
  allow recovery proc_bootconfig:file r_file_perms;

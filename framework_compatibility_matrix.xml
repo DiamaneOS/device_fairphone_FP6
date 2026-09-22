@@ -1,0 +1,45 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- Device-specific interfaces supplied by the selected FP6 vendor services. -->
+<compatibility-matrix version="1.0" type="framework">
+    <hal format="aidl">
+        <name>vendor.qti.hardware.display.color</name>
+        <version>1</version>
+        <interface>
+            <name>IDisplayColor</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.display.config</name>
+        <version>11</version>
+        <interface>
+            <name>IDisplayConfig</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.display.postproc</name>
+        <version>1</version>
+        <interface>
+            <name>IDisplayPostproc</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.perf2</name>
+        <version>1</version>
+        <interface>
+            <name>IPerf</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.qseecom</name>
+        <version>1</version>
+        <interface>
+            <name>IQSEECom</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

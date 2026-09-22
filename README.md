@@ -76,3 +76,16 @@ The minimal product explicitly selects the platform recovery runtime group and
 fastbootd. Enabling recovery image generation does not select those packages by
 itself. Image verification must check the recovery/init executables, main init
 script, USB properties and runtime dependencies as well as the image header.
+
+The generic ramdisk is selected separately through the platform's
+`generic_ramdisk.mk`. Verify the actual `init_boot` ramdisk contains an executable,
+statically linked ARM64 `/init`, `snapuserd_ramdisk` and its build properties;
+an image with a valid header and AVB hash can still lack its runtime. The GKI v4
+boot, init_boot and recovery headers carry zero OS-version fields. Version and
+patch information remains in AVB properties. Boot's patch level follows the
+selected vendor/kernel baseline; init_boot follows the platform.
+
+AVB uses the published FP6 chain locations: recovery 1, vbmeta_system 2,
+boot 3 and init_boot 4. Verify all four signatures and child descriptors against
+the selected development key, with verification flags zero. Matching this
+layout and passing host checks do not establish that the device boots.

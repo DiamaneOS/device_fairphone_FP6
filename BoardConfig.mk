@@ -47,6 +47,7 @@ BOARD_USES_METADATA_PARTITION := true
 
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_INIT_BOOT_HEADER_VERSION := 4
+BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_RAMDISK_USE_LZ4 := true
 # Stock boot v4 carries the kernel; init_boot and recovery carry ramdisks only.
@@ -58,6 +59,10 @@ BOARD_MKBOOTIMG_ARGS += --header_version 4 --kernel_offset 0x00008000
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 BOARD_MKBOOTIMG_ARGS += --dtb_offset 0x01f00000
 BOARD_MKBOOTIMG_INIT_ARGS += --header_version 4
+# GKI v4 loaders obtain versions from AVB; stock uses zero in these headers.
+# These trailing arguments override the platform's legacy header defaults.
+BOARD_MKBOOTIMG_ARGS += --os_version 0 --os_patch_level 0
+BOARD_MKBOOTIMG_INIT_ARGS += --os_version 0 --os_patch_level 0
 # Keep recovery and Android on the same mount and encryption definitions.
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/boot/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
@@ -84,6 +89,24 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096
+
+# Preserve the published FP6 boot/recovery chains and rollback locations.
+# The kernel follows the selected vendor source baseline; the generic ramdisk
+# follows the platform. Header zeros must not erase their AVB version metadata.
+BOOT_SECURITY_PATCH := $(VENDOR_SECURITY_PATCH)
+INIT_BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+BOARD_AVB_RECOVERY_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_RECOVERY_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 3
+BOARD_AVB_INIT_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_INIT_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 4
 
 # Match the fstab's system-side AVB chain. The location is the published FP6
 # system-chain slot; generated vendor inputs must not redefine this identity.

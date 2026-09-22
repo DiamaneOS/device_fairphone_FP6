@@ -27,6 +27,7 @@ BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 8388608
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
 BOARD_DTBOIMG_PARTITION_SIZE := 31457280
+BOARD_PVMFWIMAGE_PARTITION_SIZE := 1048576
 BOARD_SUPER_PARTITION_SIZE := 9663676416
 BOARD_SUPER_PARTITION_GROUPS := diamaneos_dynamic_partitions
 BOARD_DIAMANEOS_DYNAMIC_PARTITIONS_SIZE := 9659482112
@@ -110,7 +111,9 @@ BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 4
 
 # Match the fstab's system-side AVB chain. The location is the published FP6
 # system-chain slot; generated vendor inputs must not redefine this identity.
-BOARD_AVB_VBMETA_SYSTEM := system system_ext product
+# The FP6 bootloader requests pvmfw whenever its partition exists and rejects a
+# verified slot that does not describe it, so the chain must include pvmfw.
+BOARD_AVB_VBMETA_SYSTEM := system system_ext product pvmfw
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)

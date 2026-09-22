@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Stop setting androidboot.fstab_suffix in the vendor bootconfig; the bootloader
+  already appends it, and the duplicate made the kernel reject all bootconfig.
 - Build protected VM firmware from source and describe it in the system AVB
   chain, which the FP6 bootloader requires before loading a slot.
 - Select the generic first-stage ramdisk, zero GKI header version fields and

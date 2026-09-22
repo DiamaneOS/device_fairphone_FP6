@@ -119,8 +119,11 @@ BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 
-# Deterministic fstab lookup without the stock runtime fstab-copy helper.
-BOARD_BOOTCONFIG += androidboot.hardware=qcom androidboot.fstab_suffix=qcom
+# The FP6 bootloader appends androidboot.fstab_suffix itself, and the kernel
+# rejects the whole bootconfig when a key is defined twice. Provide only the
+# hardware name; fstab lookup falls back from the bootloader's suffix to
+# fstab.qcom.
+BOARD_BOOTCONFIG += androidboot.hardware=qcom
 
 # The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
 SOONG_CONFIG_NAMESPACES += ufsbsg

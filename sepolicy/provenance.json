@@ -75,7 +75,7 @@
       "source": "generic/vendor/common/hal_bootctl.te",
       "source_sha256": "9deffc390d83b16494ba52ec277a5b4f7163d517423b6eb03ccbc7930df08a62",
       "path": "vendor-common/hal_bootctl.te",
-      "sha256": "62e9afe14b065e671805688bd0b34029dfe5e7db984a7e2c769c3b8612f8065a"
+      "sha256": "fc0eabceac50c1492f904171736536732ca904b88cbe8aa7bc5de9c02363129f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -251,7 +251,7 @@
       "source": "generic/vendor/common/recovery.te",
       "source_sha256": "9bf06a4c2416c5b76bd578e870ee0f9c4e94c643a2bcc78895a3cd2a93517220",
       "path": "vendor-common/recovery.te",
-      "sha256": "9bf06a4c2416c5b76bd578e870ee0f9c4e94c643a2bcc78895a3cd2a93517220"
+      "sha256": "cba2294063407e1e45c4fd8b2fee0fd5fba9e94f2818d18aa539755b5b2ed31b"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

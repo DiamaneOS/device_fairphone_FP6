@@ -35,3 +35,12 @@ from the FP6.QREL.16.100.0 EU vendor/etc/ueventd.rc, SHA-256
 Its original Linux Foundation and Qualcomm notices are retained in the file.
 The selection does not import the stock diagnostic configuration or firmware
 handler list. Standard device rules remain owned by the platform.
+
+boot/init.recovery.qcom.rc adapts the Linux Foundation recovery initialization
+published in CalyxOS/device_fairphone_FP6 at
+ d2c4950eff6d99fc6473419fbbd0b55d42ec9035,
+rootdir/etc/init.recovery.qcom.rc. The original BSD redistribution notice is
+retained. The adaptation selects the matched FP6 USB controller, bounds waits,
+uses the platform recovery's gadget compositions and leaves brightness control
+to the recovery UI. Recovery UI geometry and pixel-format settings were compared
+with that same device configuration; runtime validation remains required.

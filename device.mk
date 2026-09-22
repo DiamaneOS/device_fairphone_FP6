@@ -77,6 +77,9 @@ $(call inherit-product, vendor/fairphone/FP6/device-vendor.mk)
 # Kernel artifacts are produced from the independently pinned kernel workspace.
 $(call inherit-product, device/fairphone/FP6-kernel/device-kernel.mk)
 
+# Source-built protected VM firmware for the FP6 pvmfw partitions.
+PRODUCT_BUILD_PVMFW_IMAGE := true
+
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \
@@ -84,6 +87,7 @@ AB_OTA_PARTITIONS += \
     init_boot \
     odm \
     product \
+    pvmfw \
     recovery \
     system \
     system_dlkm \

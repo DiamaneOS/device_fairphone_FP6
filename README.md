@@ -71,3 +71,8 @@ recovery UI uses the panel backlight/max-brightness nodes and RGBX layout.
 First-stage init owns the generated `modules.load.recovery` list. Recovery uses
 the default platform wipe hooks; it adds no device-specific erase operation.
 Native packaging/policy checks and an actual recovery boot are separate gates.
+
+The minimal product explicitly selects the platform recovery runtime group and
+fastbootd. Enabling recovery image generation does not select those packages by
+itself. Image verification must check the recovery/init executables, main init
+script, USB properties and runtime dependencies as well as the image header.

@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// FP6 hardware configuration as static vendor runtime resource overlays, so the
+// generic system image stays device independent.
+
+runtime_resource_overlay {
+    name: "FP6FrameworksOverlay",
+    vendor: true,
+    manifest: "FP6FrameworksOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6FrameworksOverlay/res"],
+}
+
+runtime_resource_overlay {
+    name: "FP6SettingsOverlay",
+    vendor: true,
+    manifest: "FP6SettingsOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6SettingsOverlay/res"],
+}

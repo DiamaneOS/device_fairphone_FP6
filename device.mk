@@ -13,7 +13,6 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
-DEVICE_PACKAGE_OVERLAYS += device/fairphone/FP6/overlay
 
 # The stock GPU driver and graphics mapper are HIDL HALs. Android only includes
 # hwservicemanager by default for devices shipping at API 34 or older, and
@@ -171,7 +170,18 @@ PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 
 # The FP6 panel is 1116x2484 at 480 dpi on stock Android 16. Without an
 # explicit density, Android 17 chooses 213 dpi and renders the UI too small.
-PRODUCT_SYSTEM_PROPERTIES += ro.sf.lcd_density=480
+# A panel property, so it belongs to the vendor partition.
+PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
+
+# Framework and Settings hardware configuration (rro/): display cutout, corners,
+# status bar, 120 Hz refresh rate and the Smooth display switch.
+PRODUCT_PACKAGES += \
+    FP6FrameworksOverlay \
+    FP6SettingsOverlay
+
+# The stock fingerprint HAL is installed as fingerprint.fp6 so it cannot collide
+# with AOSP's reference fingerprint modules; hw_get_module finds it through this.
+PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect (identical to the stock vendor build.prop).

@@ -142,6 +142,7 @@ PRODUCT_PACKAGES += libtxml2v34
 # 14 userspace executables. Runtime radio support remains a bring-up gate.
 $(call soong_config_set,wifi,board_wlan_device,qcwcn)
 $(call soong_config_set,wpa_supplicant_8,wifi_hidl_unified_supplicant_service_rc_entry,true)
+$(call soong_config_set,wpa_supplicant_8,wpa_build_hostapd,true)
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
     wpa_supplicant \

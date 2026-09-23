@@ -33,6 +33,9 @@
             </routes>
         </module>
         <xi:include href="r_submix_audio_policy_configuration.xml"/>
+        <!-- The HAL's VINTF declares IModule/bluetooth; audioserver waits for every
+             declared module, so it must be configured and registered. -->
+        <xi:include href="bluetooth_with_le_audio_policy_configuration_7_0.xml"/>
     </modules>
     <xi:include href="audio_policy_volumes.xml"/>
     <xi:include href="default_volume_tables.xml"/>

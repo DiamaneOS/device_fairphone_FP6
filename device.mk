@@ -24,6 +24,14 @@ PRODUCT_PACKAGES += hwservicemanager
 # older, and this product does not inherit base_vendor.mk.
 PRODUCT_PACKAGES += vndservicemanager
 
+# Diagnostic (non-user) builds only: trust a developer adb key kept outside
+# version control, so adb works before the setup UI exists. Inert for user builds.
+ifneq ($(TARGET_BUILD_VARIANT),user)
+  ifneq ($(wildcard vendor/diamaneos-diag/adb_keys),)
+    PRODUCT_ADB_KEYS := vendor/diamaneos-diag/adb_keys
+  endif
+endif
+
 # Generate the standard device compatibility matrix and system SDK requirements.
 # generic_system does not inherit the base_vendor package selection.
 PRODUCT_PACKAGES += vendor_compatibility_matrix.xml

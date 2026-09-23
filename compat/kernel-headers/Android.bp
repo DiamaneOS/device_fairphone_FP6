@@ -12,10 +12,9 @@ package {
 
 license {
     name: "fp6_kernel_uapi_headers_license",
-    license_kinds: [
-        "SPDX-license-identifier-GPL-2.0-only",
-        "SPDX-license-identifier-Linux-syscall-note",
-    ],
+    // GPL-2.0-only WITH Linux-syscall-note (see each header); AOSP restricts the
+    // syscall-note license kind to bionic.
+    license_kinds: ["SPDX-license-identifier-GPL-2.0-only"],
 }
 
 cc_defaults {

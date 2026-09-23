@@ -125,6 +125,11 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 # fstab.qcom.
 BOARD_BOOTCONFIG += androidboot.hardware=qcom
 
+# The placeholder reference audio HAL must never drive the FP6 sound card.
+BOARD_BOOTCONFIG += \
+    androidboot.audio.tinyalsa.ignore_output=1 \
+    androidboot.audio.tinyalsa.simulate_input=1
+
 # Debuggable bring-up builds only: boot SELinux permissive so denials are logged
 # without blocking boot. Android ignores this key on user builds.
 ifneq ($(TARGET_BUILD_VARIANT),user)

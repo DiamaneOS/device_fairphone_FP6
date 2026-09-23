@@ -70,13 +70,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
-# The vendor image is read-only, so the firmware, DSP and Bluetooth mount points
-# from fstab.qcom must exist at build time. Without them the modem partition is
-# never mounted and the ADSP, CDSP and modem cannot load their firmware.
-PRODUCT_COPY_FILES += \
-    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/firmware_mnt/.mountpoint \
-    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/dsp/.mountpoint \
-    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/bt_firmware/.mountpoint
+# Firmware, DSP and Bluetooth mount points from fstab.qcom (see Android.mk).
+# Without them the modem partition is never mounted and the ADSP, CDSP and
+# modem cannot load their firmware.
+PRODUCT_PACKAGES += \
+    fp6_vendor_mount_point_firmware_mnt \
+    fp6_vendor_mount_point_dsp \
+    fp6_vendor_mount_point_bt_firmware
 
 # Source-built hardware services. Boot control owns GPT slot attributes and
 # UFS selection in both normal Android and recovery.

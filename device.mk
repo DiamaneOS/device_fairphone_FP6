@@ -95,6 +95,10 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.qti \
     android.hardware.health-service.qti_recovery
 
+# tinyxml2 with the Android 14 ABI for the stock display color manager (see
+# compat/tinyxml2-v34).
+PRODUCT_PACKAGES += libtxml2v34
+
 # Placeholder audio: the AOSP reference HAL with stub streams, so audioserver
 # and the framework audio service can start. Replace with the Qualcomm stack.
 PRODUCT_PACKAGES += com.android.hardware.audio

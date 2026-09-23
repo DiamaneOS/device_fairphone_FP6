@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// tinyxml2 9.0.0 with the ABI of the Android 14 VNDK copy the Qualcomm display
+// color manager was built against. Android 17 ships tinyxml2 11, whose ABI
+// differs, so the prebuilt's dependency is renamed to this library by the tools
+// renderer. Sources are the unmodified AOSP files listed in provenance.json.
+
+package {
+    default_applicable_licenses: ["fp6_tinyxml2_v34_license"],
+}
+
+license {
+    name: "fp6_tinyxml2_v34_license",
+    license_kinds: ["SPDX-license-identifier-Zlib"],
+    license_text: ["LICENSE.txt"],
+}
+
+cc_library_shared {
+    name: "libtxml2v34",
+    vendor: true,
+    srcs: ["tinyxml2.cpp"],
+    // Flags match the AOSP libtinyxml2 definition at the pinned revision.
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wno-implicit-fallthrough",
+        "-DDEBUG",
+        "-DANDROID_NDK",
+    ],
+    shared_libs: ["liblog"],
+}

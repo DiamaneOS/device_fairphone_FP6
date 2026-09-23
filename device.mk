@@ -140,11 +140,13 @@ PRODUCT_PACKAGES += libtxml2v34
 # Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
 # driver; start with AOSP's qcwcn/legacy HAL path rather than the stock Android
 # 14 userspace executables. Runtime radio support remains a bring-up gate.
+PRODUCT_SOONG_NAMESPACES += hardware/qcom/wlan/legacy
 $(call soong_config_set,wifi,board_wlan_device,qcwcn)
 $(call soong_config_set,wpa_supplicant_8,wifi_hidl_unified_supplicant_service_rc_entry,true)
 $(call soong_config_set_bool,wpa_supplicant_8,wpa_build_hostapd,true)
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
+    libcld80211 \
     wpa_supplicant \
     hostapd \
     wificond

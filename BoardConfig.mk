@@ -143,3 +143,10 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
+
+# Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
+# node and waits for the driver to finish probing before bringing up wlan0.
+BOARD_WLAN_DEVICE := qcwcn
+WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
+WIFI_DRIVER_STATE_ON := "ON"
+WIFI_DRIVER_STATE_OFF := "OFF"

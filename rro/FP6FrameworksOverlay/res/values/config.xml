@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay. -->
+    <dimen name="status_bar_height_portrait">48dp</dimen>
+    <string name="config_mainBuiltInDisplayCutout" translatable="false">M -30,0 L -30,110 L 30,110 L 30,0 Z</string>
+
+    <!-- Stock leaves the default refresh rate unset (0) and the peak uncapped, so
+         the 120 Hz panel mode is used. Android's default of 60 caps every mode. -->
+    <integer name="config_defaultRefreshRate">0</integer>
+    <integer name="config_defaultPeakRefreshRate">120</integer>
+
+    <!-- FP6.QREL.16.100.0 factory FrameworksResTarget_Vendor overlay. -->
+    <dimen name="rounded_corner_radius">20dp</dimen>
+    <string name="config_mainDisplayShape" translatable="false">M20 0h1040s20 0 20 20v2360s0 20 -20 20h-1040s-20 0 -20 -20v-2360s0 -20 20 -20</string>
+
+    <!-- Stock uses 0dp, which puts the status bar clock and battery inside the
+         physical screen corners; keep them clear of the corners. -->
+    <dimen name="rounded_corner_content_padding">24dp</dimen>
+</resources>

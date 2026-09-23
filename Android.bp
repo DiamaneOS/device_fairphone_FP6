@@ -523,3 +523,13 @@ install_symlink {
     installed_location: "firmware/wlan/qca_cld/qca6750/wlan_mac.bin",
     symlink_target: "/mnt/vendor/persist/qca6750/wlan_mac.bin",
 }
+
+// The stock fingerprint module is installed under its own SONAME
+// (libfingerprint.default.so). hw_get_module("fingerprint") with
+// ro.hardware.fingerprint=fp6 opens this link.
+install_symlink {
+    name: "fp6_fingerprint_hw_module",
+    vendor: true,
+    installed_location: "lib64/hw/fingerprint.fp6.so",
+    symlink_target: "libfingerprint.default.so",
+}

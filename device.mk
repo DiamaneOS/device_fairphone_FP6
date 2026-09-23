@@ -152,6 +152,10 @@ $(call inherit-product, hardware/interfaces/audio/aidl/default/audio_effects.mk)
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 
+# The FP6 panel is 1116x2484 at 480 dpi on stock Android 16. Without an
+# explicit density, Android 17 chooses 213 dpi and renders the UI too small.
+PRODUCT_SYSTEM_PROPERTIES += ro.sf.lcd_density=480
+
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect (identical to the stock vendor build.prop).
 PRODUCT_VENDOR_PROPERTIES += \

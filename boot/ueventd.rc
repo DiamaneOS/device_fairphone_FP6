@@ -108,3 +108,5 @@
 /sys/class/leds/blue   repeat       0640    system    system
 /sys/class/leds/blue   hw_pattern   0640    system    system
 /sys/class/leds/blue   trigger      0640    system    system
+# The Wi-Fi HAL (wifi) switches the QCA6750 host driver on and off (stock).
+/dev/wlan                 0660   wifi       wifi

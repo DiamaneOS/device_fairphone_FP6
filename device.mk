@@ -137,18 +137,21 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += libtxml2v34
 
 # Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
-# driver; start with AOSP's qcwcn/legacy HAL path rather than the stock Android
-# 14 userspace executables. Runtime radio support remains a bring-up gate.
-PRODUCT_SOONG_NAMESPACES += hardware/qcom/wlan/legacy
-$(call soong_config_set,wifi,board_wlan_device,qcwcn)
+# driver; the vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
+# fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
+# (BoardConfig.mk). Station mode only: hostapd (hotspot) is deferred until
+# station mode is validated, and the stock cnss-daemon is not selected.
+PRODUCT_SOONG_NAMESPACES += \
+    hardware/qcom/wlan/cld80211-lib \
+    hardware/qcom/wlan/qcwcn
 $(call soong_config_set,wpa_supplicant_8,wifi_hidl_unified_supplicant_service_rc_entry,true)
-$(call soong_config_set_bool,wpa_supplicant_8,wpa_build_hostapd,true)
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
     libcld80211 \
     wpa_supplicant \
-    hostapd \
-    wificond
+    wificond \
+    fp6_wlan_cfg_ini \
+    fp6_wlan_mac_bin
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml
 

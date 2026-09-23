@@ -23,6 +23,9 @@ Downstream adaptations:
   selected common AIDL power service.
 - Omit the peripheral manager's binder call into the WLAN service domain; that
   service is not installed.
+- Label the stock FP6 fingerprint wrapper (`android.hardware.biometrics.
+  fingerprint-service`) `hal_fingerprint_default_exec`, as on the stock image;
+  its FocalTech node and QSEECom grants are an enforcing-mode follow-up.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

@@ -19,6 +19,11 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 # without it HIDL, including passthrough HALs, is unavailable.
 PRODUCT_PACKAGES += hwservicemanager
 
+# The stock display composer registers its QService on /dev/vndbinder.
+# Android only includes vndservicemanager for devices shipping at API 29 or
+# older, and this product does not inherit base_vendor.mk.
+PRODUCT_PACKAGES += vndservicemanager
+
 # Generate the standard device compatibility matrix and system SDK requirements.
 # generic_system does not inherit the base_vendor package selection.
 PRODUCT_PACKAGES += vendor_compatibility_matrix.xml

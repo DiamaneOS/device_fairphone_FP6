@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source": "https://android.googlesource.com/platform/external/tinyxml2",
+  "revision": "a4df2ce1d64963cb4af3d07d51b35c9aef85ac8a",
+  "upstream_version": "9.0.0",
+  "note": "Identical tinyxml2.cpp/tinyxml2.h/LICENSE.txt blobs from 485aed9 (2022) through 9fef8e2 (2024-03, before the 10.0.0 upgrade); the Android 14 VNDK copy was built from these sources.",
+  "abi_reference": {
+    "file": "lib64/libtinyxml2.so in stock FP6.QREL.16.100.0 system_ext/apex/com.android.vndk.v34.apex",
+    "sha256": "9dfa7dd223dccb8d0fc80c23aff491feb4f413af0ea1e43af43609c1dfa30996"
+  },
+  "files": [
+    {
+      "path": "tinyxml2.cpp",
+      "sha256": "a275884f4a27ac3d4e19f24b709382212cba01b8a1e4126b40a26dae844469ed"
+    },
+    {
+      "path": "tinyxml2.h",
+      "sha256": "1502ad96ecc759ec351811ef505f5451b56a377ad08ad7864c3e498121e2a5a1"
+    },
+    {
+      "path": "LICENSE.txt",
+      "sha256": "9332252e9b9e46db8285d4a3f0bf25f139bf1dca6781b956d57f2302efca6432"
+    }
+  ]
+}

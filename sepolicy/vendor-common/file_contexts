@@ -497,3 +497,7 @@
 
 #MMITest download_mode
 /sys/module/qcom_dload_mode/parameters/download_mode		u:object_r:fp_mmitest_sysfs:s0
+
+# FP6 stock fingerprint wrapper (FocalTech via QSEECom), labelled as on the
+# stock FP6 vendor image so init can start it in hal_fingerprint_default.
+/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint-service u:object_r:hal_fingerprint_default_exec:s0

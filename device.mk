@@ -111,6 +111,62 @@ $(call inherit-product, hardware/interfaces/audio/aidl/default/audio_effects.mk)
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 
+# Display composition settings the selected Qualcomm composer and SurfaceFlinger
+# expect (identical to the stock vendor build.prop).
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.surface_flinger.use_color_management=true \
+    ro.surface_flinger.protected_contents=true \
+    ro.surface_flinger.use_content_detection_for_refresh_rate=true \
+    ro.surface_flinger.set_touch_timer_ms=3500000 \
+    ro.surface_flinger.set_idle_timer_ms=3500 \
+    ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
+    ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
+    ro.surface_flinger.max_virtual_display_dimension=4096 \
+    ro.surface_flinger.clear_slots_with_set_layer_buffer=false \
+    ro.surface_flinger.supports_background_blur=0 \
+    ro.surface_flinger.has_wide_color_display=true \
+    ro.surface_flinger.has_HDR_display=true \
+    ro.surface_flinger.wcg_composition_dataspace=143261696 \
+    persist.sys.sf.color_saturation=1.0 \
+    persist.sys.sf.color_mode=9 \
+    debug.sf.hw=0 \
+    debug.sf.latch_unsignaled=1 \
+    debug.sf.auto_latch_unsignaled=1 \
+    debug.sf.disable_client_composition_cache=0 \
+    debug.sf.enable_gl_backpressure=1 \
+    debug.sf.enable_advanced_sf_phase_offset=1 \
+    debug.sf.use_phase_offsets_as_durations=1 \
+    debug.sf.late.app.duration=13666666 \
+    debug.sf.early.app.duration=13666666 \
+    debug.sf.earlyGl.app.duration=13666666 \
+    debug.sf.early.sf.duration=10500000 \
+    debug.sf.earlyGl.sf.duration=10500000 \
+    debug.sf.late.sf.duration=10500000 \
+    debug.sf.predict_hwc_composition_strategy=0 \
+    debug.sf.treat_170m_as_sRGB=1 \
+    vendor.gralloc.disable_ubwc=0 \
+    vendor.display.disable_scaler=0 \
+    vendor.display.disable_excl_rect=0 \
+    vendor.display.disable_excl_rect_partial_fb=1 \
+    vendor.display.comp_mask=0 \
+    vendor.display.enable_optimize_refresh=0 \
+    vendor.display.use_smooth_motion=1 \
+    vendor.display.disable_stc_dimming=1 \
+    vendor.display.enable_dpps_dynamic_fps=1 \
+    vendor.display.vds_allow_hwc=1 \
+    vendor.display.enable_async_vds_creation=1 \
+    vendor.display.enable_rounded_corner=1 \
+    vendor.display.disable_3d_adaptive_tm=1 \
+    vendor.display.disable_sdr_dimming=0 \
+    vendor.display.enable_rc_support=1 \
+    vendor.display.disable_sdr_histogram=1 \
+    vendor.display.enable_hdr10_gpu_target=1 \
+    vendor.display.enable_display_extensions=1 \
+    vendor.display.disable_offline_rotator=1 \
+    vendor.display.enable_async_powermode=0 \
+    vendor.display.disable_hw_recovery_dump=1 \
+    vendor.display.enable_early_wakeup=1
+
 # Declare the phone baseline and only the hardware that currently works; add
 # radio, camera, sensor and other features as their stacks are brought up.
 PRODUCT_COPY_FILES += \

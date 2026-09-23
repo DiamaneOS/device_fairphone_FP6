@@ -70,6 +70,9 @@
 /dev/qseecom              0660   system     drmrpc
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
+# The stock FP6 RPMB rule lets the system-owned qseecomd listener serve
+# hardware-backed Gatekeeper and KeyMint requests.
+/dev/0:0:0:49476          0600   system     system
 /sys/class/typec/port0		data_role	0660	system	usb
 /sys/class/typec/port0		power_role	0660	system	usb
 /sys/class/typec/port0		port_type	0660	system	usb

@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Placeholder that makes the build create this directory as an fstab mount point.

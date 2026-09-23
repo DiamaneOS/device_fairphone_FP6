@@ -28,6 +28,11 @@ on fs
 on late-fs
     mount_all --late
 
+# Boot the ADSP once its firmware is mounted, as recovery does. It provides USB
+# role detection, charging and audio.
+on property:dev.mnt.blk.vendor.firmware_mnt=*
+    write /sys/kernel/boot_adsp/boot 1
+
 on post-fs-data
     mkdir /data/vendor/display 0770 system graphics
     mkdir /data/vendor/tzstorage 0770 system system

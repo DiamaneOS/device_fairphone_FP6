@@ -70,6 +70,14 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
+# The vendor image is read-only, so the firmware, DSP and Bluetooth mount points
+# from fstab.qcom must exist at build time. Without them the modem partition is
+# never mounted and the ADSP, CDSP and modem cannot load their firmware.
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/firmware_mnt/.mountpoint \
+    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/dsp/.mountpoint \
+    device/fairphone/FP6/boot/mountpoint:$(TARGET_COPY_OUT_VENDOR)/bt_firmware/.mountpoint
+
 # Source-built hardware services. Boot control owns GPT slot attributes and
 # UFS selection in both normal Android and recovery.
 PRODUCT_PACKAGES += \
@@ -92,6 +100,7 @@ PRODUCT_PACKAGES += com.android.hardware.audio
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/bluetooth_with_le_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_with_le_audio_policy_configuration_7_0.xml \
     frameworks/av/services/audiopolicy/config/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml
 $(call inherit-product, hardware/interfaces/audio/aidl/default/audio_effects.mk)

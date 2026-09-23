@@ -507,3 +507,19 @@ install_symlink {
     installed_location: "rfs/msm/wpss/shared",
     symlink_target: "/mnt/vendor/persist/rfs/shared",
 }
+
+// The QCA6750 host driver requests its configuration and MAC address through
+// the kernel firmware loader, at the paths the stock vendor image links.
+install_symlink {
+    name: "fp6_wlan_cfg_ini",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/qca6750/WCNSS_qcom_cfg.ini",
+    symlink_target: "/vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini",
+}
+
+install_symlink {
+    name: "fp6_wlan_mac_bin",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/qca6750/wlan_mac.bin",
+    symlink_target: "/mnt/vendor/persist/qca6750/wlan_mac.bin",
+}

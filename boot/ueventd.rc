@@ -73,6 +73,8 @@
 # The stock FP6 RPMB rule lets the system-owned qseecomd listener serve
 # hardware-backed Gatekeeper and KeyMint requests.
 /dev/0:0:0:49476          0600   system     system
+# The stock FP6 FocalTech node is owned by the system fingerprint service.
+/dev/focaltech_fp          0660   system     system
 /sys/class/typec/port0		data_role	0660	system	usb
 /sys/class/typec/port0		power_role	0660	system	usb
 /sys/class/typec/port0		port_type	0660	system	usb

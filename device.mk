@@ -77,6 +77,7 @@ PRODUCT_PACKAGES += \
     fp6_vendor_mount_point_firmware_mnt \
     fp6_vendor_mount_point_dsp \
     fp6_vendor_mount_point_bt_firmware
+$(call inherit-product, device/fairphone/FP6/rfs-links.mk)
 
 # Source-built hardware services. Boot control owns GPT slot attributes and
 # UFS selection in both normal Android and recovery.

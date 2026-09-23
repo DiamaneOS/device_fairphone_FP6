@@ -21,6 +21,8 @@ Downstream adaptations:
   The USB service receives class-directory enumeration and link traversal.
 - Remove legacy HBTP power access, whose implementation is absent from the
   selected common AIDL power service.
+- Omit the peripheral manager's binder call into the WLAN service domain; that
+  service is not installed.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

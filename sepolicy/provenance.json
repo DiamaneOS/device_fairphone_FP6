@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "78a5758f83cc520063a94d36823c5f64fcf9c8f3ff813b7b5506e3e46cbaa045"
+      "sha256": "39b4cc6bf98dba41108b2c29529757d0772c5d082bed682cac399a7c775d317f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1124,6 +1124,46 @@
       "source_sha256": "c30b77419a9a0a3794b0bf6f40969d056f75acd8d3f369ca79e18651a1a606cd",
       "path": "product-private/property_contexts",
       "sha256": "c30b77419a9a0a3794b0bf6f40969d056f75acd8d3f369ca79e18651a1a606cd"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/pd_services.te",
+      "source_sha256": "e8fa101c7ccf02e2ea7403a9ccbbb81e47c26e1342fb62f2f45658037b9ce5f7",
+      "path": "vendor-common/pd_services.te",
+      "sha256": "e8fa101c7ccf02e2ea7403a9ccbbb81e47c26e1342fb62f2f45658037b9ce5f7"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/per_proxy.te",
+      "source_sha256": "afd3aa135498473190e6ff37f11b2f46a602c3faaabda87147d89e35b4948119",
+      "path": "vendor-common/per_proxy.te",
+      "sha256": "afd3aa135498473190e6ff37f11b2f46a602c3faaabda87147d89e35b4948119"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/peripheral_manager.te",
+      "source_sha256": "d0bb4c01c31e286888d07345530428b02018ecf0bd608e7be801708d3b545183",
+      "path": "vendor-common/peripheral_manager.te",
+      "sha256": "97d44acb5978aeacfc0a8a436fdcde1bf671c3f1ea48abca1e5eefe22b7930e7"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/rfs_access.te",
+      "source_sha256": "d7232088272c308221c84109f0e9a331d5e48ffb4d728d147faa02897c146fb9",
+      "path": "vendor-common/rfs_access.te",
+      "sha256": "d7232088272c308221c84109f0e9a331d5e48ffb4d728d147faa02897c146fb9"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/rmt_storage.te",
+      "source_sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a",
+      "path": "vendor-common/rmt_storage.te",
+      "sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a"
     }
   ]
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay. -->
+    <dimen name="status_bar_height_portrait">48dp</dimen>
+    <string name="config_mainBuiltInDisplayCutout" translatable="false">M -30,0 L -30,110 L 30,110 L 30,0 Z</string>
+
+    <!-- FP6.QREL.16.100.0 factory FrameworksResTarget_Vendor overlay. -->
+    <dimen name="rounded_corner_radius">20dp</dimen>
+    <string name="config_mainDisplayShape" translatable="false">M20 0h1040s20 0 20 20v2360s0 20 -20 20h-1040s-20 0 -20 -20v-2360s0 -20 20 -20</string>
+</resources>

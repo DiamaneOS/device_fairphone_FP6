@@ -54,6 +54,11 @@ on post-fs-data
 on early-boot
     verity_update_state
 
+# The source-built composer runs as system and writes this node for panel
+# brightness. Match the stock FP6 boot-time ownership.
+on boot
+    chown system system /sys/class/backlight/panel0-backlight/brightness
+
 # Remote processors (matches stock init.qti.kernel.rc and init.target.rc): the
 # ADSP provides USB role detection, charging and audio; the CDSP compute.
 # Their firmware is on /vendor/firmware_mnt, mounted by mount_all --early.

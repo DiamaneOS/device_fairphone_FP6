@@ -13,6 +13,7 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
+DEVICE_PACKAGE_OVERLAYS += device/fairphone/FP6/overlay
 
 # The stock GPU driver and graphics mapper are HIDL HALs. Android only includes
 # hwservicemanager by default for devices shipping at API 34 or older, and

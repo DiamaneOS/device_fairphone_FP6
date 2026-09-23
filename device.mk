@@ -137,6 +137,19 @@ PRODUCT_PACKAGES += \
 # compat/tinyxml2-v34).
 PRODUCT_PACKAGES += libtxml2v34
 
+# Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
+# driver; start with AOSP's qcwcn/legacy HAL path rather than the stock Android
+# 14 userspace executables. Runtime radio support remains a bring-up gate.
+$(call soong_config_set,wifi,board_wlan_device,qcwcn)
+$(call soong_config_set,wpa_supplicant_8,wifi_hidl_unified_supplicant_service_rc_entry,true)
+PRODUCT_PACKAGES += \
+    android.hardware.wifi-service \
+    wpa_supplicant \
+    hostapd \
+    wificond
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml
+
 # Placeholder audio: the AOSP reference HAL with stub streams, so audioserver
 # and the framework audio service can start. Replace with the Qualcomm stack.
 PRODUCT_PACKAGES += com.android.hardware.audio

@@ -125,6 +125,12 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 # fstab.qcom.
 BOARD_BOOTCONFIG += androidboot.hardware=qcom
 
+# Debuggable bring-up builds only: boot SELinux permissive so denials are logged
+# without blocking boot. Android ignores this key on user builds.
+ifneq ($(TARGET_BUILD_VARIANT),user)
+BOARD_BOOTCONFIG += androidboot.selinux=permissive
+endif
+
 # The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
 SOONG_CONFIG_NAMESPACES += ufsbsg
 SOONG_CONFIG_ufsbsg += ufsframework

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "kernel_workspace": "FP6 pinned kernel workspace (manual-fp6/prepared-inputs/kernel); msm-kernel is kernel_fairphone_qcom 61e9f54",
+  "generator": {
+    "script": "kernel_platform/msm-kernel/scripts/headers_install.sh",
+    "script_sha256": "cc16bac502ab20fa4774c8fe8da5f47afc485115902ffde296a361839521f361",
+    "unifdef_source_sha256": "1b86c9f64ff2c3333016dbc54345df88f0dd902bf099ab727983d36bd94a1981"
+  },
+  "files": [
+    {
+      "path": "include/display/drm/msm_drm_pp.h",
+      "kernel_tree": "vendor/qcom/opensource/display-drivers",
+      "revision": "a3519ad7b983c6ab59df302243392e34b344a23d",
+      "source": "include/uapi/display/drm/msm_drm_pp.h",
+      "sha256": "481b8e1b35508a37a83b1e6f8900e60a2f9043a7d3a35f804f02cc7f86445588"
+    },
+    {
+      "path": "include/display/drm/sde_drm.h",
+      "kernel_tree": "vendor/qcom/opensource/display-drivers",
+      "revision": "a3519ad7b983c6ab59df302243392e34b344a23d",
+      "source": "include/uapi/display/drm/sde_drm.h",
+      "sha256": "d4a230cb9899a5e34d88fcd2e06f79705476e6b4c43f4e67c610db7ab6a4b254"
+    },
+    {
+      "path": "include/display/media/mmm_color_fmt.h",
+      "kernel_tree": "vendor/qcom/opensource/display-drivers",
+      "revision": "a3519ad7b983c6ab59df302243392e34b344a23d",
+      "source": "include/uapi/display/media/mmm_color_fmt.h",
+      "sha256": "754c6cc59440f41c41c999d2d25f7d2ba86c0ea5d1ed57553a3a4efbfa301534"
+    },
+    {
+      "path": "include/display/media/msm_sde_rotator.h",
+      "kernel_tree": "vendor/qcom/opensource/display-drivers",
+      "revision": "a3519ad7b983c6ab59df302243392e34b344a23d",
+      "source": "include/uapi/display/media/msm_sde_rotator.h",
+      "sha256": "89999df2c996ac8161367e2f45ea2cd4c3b5a8a7c4becc189b366c60060e8579"
+    },
+    {
+      "path": "include/drm/drm.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "revision": "61e9f54d8202e52ac5b2b71ed121efac5e2e807d",
+      "source": "include/uapi/drm/drm.h",
+      "sha256": "e51ac82cadfd341809db83f4f1c81c574e44013c7b039a02dc9cc9cf21053f2f"
+    },
+    {
+      "path": "include/drm/drm_mode.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "revision": "61e9f54d8202e52ac5b2b71ed121efac5e2e807d",
+      "source": "include/uapi/drm/drm_mode.h",
+      "sha256": "90efb544d80e159a66486ead7d8361c73834342d6b57db641c820496eb67b04a"
+    },
+    {
+      "path": "include/drm/msm_drm.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "revision": "61e9f54d8202e52ac5b2b71ed121efac5e2e807d",
+      "source": "include/uapi/drm/msm_drm.h",
+      "sha256": "5ae18671260526b5a429150b8d57899e535ae603a7903510c90d52b9712f1cae"
+    },
+    {
+      "path": "include/linux/msm_ion.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "revision": "61e9f54d8202e52ac5b2b71ed121efac5e2e807d",
+      "source": "include/uapi/linux/msm_ion.h",
+      "sha256": "019750b6d29633f94b869ecc6994c97f537e5fd5e3d710ae749f82b28c600aac"
+    },
+    {
+      "path": "include/linux/msm_ion_ids.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "revision": "61e9f54d8202e52ac5b2b71ed121efac5e2e807d",
+      "source": "include/uapi/linux/msm_ion_ids.h",
+      "sha256": "d5f7f5c3b6676bc6fce031e359517a546f628161d55664cb9f7ede703a30b899"
+    },
+    {
+      "path": "include/linux/qti-smmu-proxy.h",
+      "kernel_tree": "vendor/qcom/opensource/securemsm-kernel",
+      "revision": "171b1607a30954381c2aaab8ab0df84f9a0a0335",
+      "source": "smmu-proxy/include/uapi/linux/qti-smmu-proxy.h",
+      "sha256": "54fffbdc53205074fdedb5e9517ca9327f3eb25dc3642f13b338245848fa0946"
+    }
+  ]
+}

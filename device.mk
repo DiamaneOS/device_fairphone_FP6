@@ -95,6 +95,43 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.qti \
     android.hardware.health-service.qti_recovery
 
+# Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
+# its interface repositories; OP-DISPLAY-HAL-SOURCE). The stock Android 14
+# composer cannot present under Android 17. Configuration values follow
+# LineageOS for 6.1-kernel platforms; stock declares a wide-colour panel.
+$(call soong_config_set,qtidisplay,default,true)
+$(call soong_config_set,qtidisplay,drmpp,true)
+$(call soong_config_set,qtidisplay,gralloc4,true)
+$(call soong_config_set,qtidisplay,headless,false)
+$(call soong_config_set,qtidisplay,llvmcov,false)
+$(call soong_config_set,qtidisplay,llvmsa,false)
+$(call soong_config_set,qtidisplay,smmu_proxy,false)
+$(call soong_config_set,qtidisplay,ubwcp_headers,false)
+$(call soong_config_set,qtidisplay,udfps,false)
+$(call soong_config_set,qtidisplay,var1,false)
+$(call soong_config_set,qtidisplay,var2,false)
+$(call soong_config_set,qtidisplay,var3,false)
+$(call soong_config_set,qtidisplay,wide_color,true)
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.mapper@4.0-impl-qti-display \
+    vendor.qti.hardware.display.allocator-service \
+    vendor.qti.hardware.display.composer-service \
+    vendor.qti.hardware.display.composer-service.rc \
+    vendor.qti.hardware.display.composer-service.xml \
+    vendor.qti.hardware.display.mapper@4.0.vendor \
+    vendor.display.config@2.0.vendor \
+    libdisplayconfig.qti \
+    libdrmutils \
+    libfilefinder \
+    libgpu_tonemapper \
+    libgralloc.qti \
+    libqdMetaData \
+    libqdutils \
+    libsdedrm \
+    libsdmcore \
+    libsdmdal \
+    libsdmutils
+
 # tinyxml2 with the Android 14 ABI for the stock display color manager (see
 # compat/tinyxml2-v34).
 PRODUCT_PACKAGES += libtxml2v34

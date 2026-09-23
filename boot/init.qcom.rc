@@ -34,6 +34,19 @@ on post-fs-data
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
     mkdir /data/vendor/perfd 2770 root system
+    # Vibrator control for the vibrator HAL (matches stock).
+    chown system system /sys/class/leds/aw_vibrator/trigger
+    chown system system /sys/class/leds/aw_vibrator/activate
+    chown system system /sys/class/leds/aw_vibrator/brightness
+    chown system system /sys/class/leds/aw_vibrator/duration
+    chown system system /sys/class/leds/aw_vibrator/state
+    chown system system /sys/class/leds/aw_vibrator/loop
+    chown system system /sys/class/leds/aw_vibrator/seq
+    chown system system /sys/class/leds/aw_vibrator/index
+    chown system system /sys/class/leds/aw_vibrator/enable
+    chown system system /sys/class/leds/aw_vibrator/rtp
+    chown system system /sys/class/leds/aw_vibrator/activate_mode
+    chown system system /sys/class/leds/aw_vibrator/gain
 
 on early-boot
     verity_update_state

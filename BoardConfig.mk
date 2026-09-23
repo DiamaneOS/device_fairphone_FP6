@@ -150,3 +150,7 @@ BOARD_WLAN_DEVICE := qcwcn
 WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
 WIFI_DRIVER_STATE_ON := "ON"
 WIFI_DRIVER_STATE_OFF := "OFF"
+# The QCA6750 driver reports its interface combinations and the Wi-Fi service
+# reloads them into a single combination mode after first configuration; start
+# in that same mode (the legacy STA/AP default modes cannot be re-selected).
+WIFI_HAL_INTERFACE_COMBINATIONS := {{{STA}, 1}, {{AP}, 1}, {{P2P, NAN}, 1}}

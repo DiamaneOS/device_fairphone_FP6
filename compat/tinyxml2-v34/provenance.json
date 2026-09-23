@@ -11,7 +11,8 @@
   "files": [
     {
       "path": "tinyxml2.cpp",
-      "sha256": "a275884f4a27ac3d4e19f24b709382212cba01b8a1e4126b40a26dae844469ed"
+      "sha256": "4507f9d1972d8bf574b21029fa7a8cba09dd686ec9dafe1855c97707895e6b1c",
+      "upstream_sha256": "a275884f4a27ac3d4e19f24b709382212cba01b8a1e4126b40a26dae844469ed"
     },
     {
       "path": "tinyxml2.h",
@@ -20,6 +21,18 @@
     {
       "path": "LICENSE.txt",
       "sha256": "9332252e9b9e46db8285d4a3f0bf25f139bf1dca6781b956d57f2302efca6432"
+    }
+  ],
+  "backports": [
+    {
+      "function": "XMLUtil::GetCharacterRef",
+      "upstream_commits": [
+        "494735d fix the potential overflow in char refs",
+        "ff48ea1 improve fix",
+        "1fadaae another defensive check"
+      ],
+      "source": "AOSP platform/external/tinyxml2 1fadaae0c98941f8d6abec9a9993581dc7823eb7 (function body copied verbatim; ABI unchanged)",
+      "note": "Bounds character references to U+10FFFF, removing the overflow. Upstream 1fadaae compares the pointer (length == 0) rather than *length, so that added check is inert; kept verbatim."
     }
   ]
 }

@@ -14,6 +14,11 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
+# The stock GPU driver and graphics mapper are HIDL HALs. Android only includes
+# hwservicemanager by default for devices shipping at API 34 or older, and
+# without it HIDL, including passthrough HALs, is unavailable.
+PRODUCT_PACKAGES += hwservicemanager
+
 # Generate the standard device compatibility matrix and system SDK requirements.
 # generic_system does not inherit the base_vendor package selection.
 PRODUCT_PACKAGES += vendor_compatibility_matrix.xml

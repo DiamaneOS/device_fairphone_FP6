@@ -63,6 +63,7 @@
 # Platform ueventd supplies standard input, framebuffer, DRM and DMA-heap rules.
 # SELinux remains the authority for access by individual service domains.
 
+/dev/kgsl                 0666   system     system
 /dev/kgsl-3d0             0666   system     system
 /dev/membuf               0664   system     system
 /dev/dma_heap/qcom,*      0444   system     system
@@ -73,3 +74,32 @@
 /sys/class/typec/port0		power_role	0660	system	usb
 /sys/class/typec/port0		port_type	0660	system	usb
 /sys/class/typec/port0-partner	accessory_mode	0440	system	usb
+
+# Display power and HDCP control for the composer (matches stock).
+/sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
+/sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics
+
+# USB controller role and speed for the USB HAL (matches stock).
+/sys/bus/platform/devices/a600000.ssusb	dynamic_disable	0220	root	usb
+/sys/bus/platform/devices/a600000.ssusb    mode        0660  system  usb
+/sys/devices/platform/soc/a600000.ssusb/a600000.dwc3/udc/a600000.dwc3/current_speed     0660   system     system
+
+# Notification LED for the lights HAL (matches stock).
+/sys/class/leds/red    delay_on     0640    system    system
+/sys/class/leds/red    delay_off    0640    system    system
+/sys/class/leds/red    breath       0640    system    system
+/sys/class/leds/red    repeat       0640    system    system
+/sys/class/leds/red    hw_pattern   0640    system    system
+/sys/class/leds/red    trigger      0640    system    system
+/sys/class/leds/green  delay_on     0640    system    system
+/sys/class/leds/green  delay_off    0640    system    system
+/sys/class/leds/green  breath       0640    system    system
+/sys/class/leds/green  repeat       0640    system    system
+/sys/class/leds/green  hw_pattern   0640    system    system
+/sys/class/leds/green  trigger      0640    system    system
+/sys/class/leds/blue   delay_on     0640    system    system
+/sys/class/leds/blue   delay_off    0640    system    system
+/sys/class/leds/blue   breath       0640    system    system
+/sys/class/leds/blue   repeat       0640    system    system
+/sys/class/leds/blue   hw_pattern   0640    system    system
+/sys/class/leds/blue   trigger      0640    system    system

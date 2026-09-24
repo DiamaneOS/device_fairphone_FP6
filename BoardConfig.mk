@@ -80,6 +80,8 @@ include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 
 # Reviewed source policy belongs to the device tree, not generated stock files.
 BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
+# Device-owned grants for the FP6 services, reviewed per denial.
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fp6
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public

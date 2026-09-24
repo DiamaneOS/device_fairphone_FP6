@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "757ec0c7c74fd5e16481aef49253f6e5e924d20e97070a0eb37e334d10ef4bfc"
+      "sha256": "fe49d2ac1bc5435e21dfed1cea56b897c861a33067e1f46aecac61a2cbd06dee"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1164,6 +1164,22 @@
       "source_sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a",
       "path": "vendor-common/rmt_storage.te",
       "sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/sensors.te",
+      "source_sha256": "b9f1cd41bfa05f39b24faf539631a41ab21b3d042d9bb0797547ffe0a51479a3",
+      "path": "fp6/sensors.te",
+      "sha256": "985ff156bc7a0af638d9f999d9b796a1327957babdfac3f1a0cd1272696aeadc"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/hal_sensors_default.te",
+      "source_sha256": "2cc63cb1f84e039c6a8c3f92469bf05e689078ef87345a15445931c7f1278410",
+      "path": "fp6/hal_sensors_default.te",
+      "sha256": "a95c09e4753b45228169ab5f5d25ff0a2f382a8662bb533b34d48462f0c9ffa9"
     }
   ]
 }

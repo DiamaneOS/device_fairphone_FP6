@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Read-only SoC identification and thermal zones.
+allow { hal_thermal_default vendor_thermal-engine vendor_hal_perf_default } vendor_sysfs_soc:dir search;
+allow { hal_thermal_default vendor_thermal-engine vendor_hal_perf_default } vendor_sysfs_public:file r_file_perms;
+allow vendor_thermal-engine vendor_sysfs_soc:file r_file_perms;
+allow vendor_hal_perf_default { vendor_sys_sp_comp vendor_sys_nonsp_comp }:file r_file_perms;
+r_dir_file(hal_thermal_default, sysfs_thermal)
+
+# The peripheral manager maps remote processors by their sysfs names.
+r_dir_file({ vendor_per_mgr vendor_per_proxy }, vendor_sysfs_ssr)
+
+# The Wi-Fi HAL switches the QCA6750 driver on through /dev/wlan and
+# publishes the driver version, as in stock.
+allow hal_wifi_default vendor_wlan_device:chr_file w_file_perms;
+set_prop(hal_wifi_default, vendor_wifi_version)
+
+# KeyMint reports the vendor patch level for key attestation.
+get_prop(vendor_hal_keymint_qti, vendor_security_patch_level_prop)
+
+# The USB HAL reads the negotiated USB speed.
+allow vendor_hal_usb_qti sysfs_udc:dir search;
+allow vendor_hal_usb_qti sysfs_udc:file r_file_perms;
+
+# Vendor init scripts set these vendor properties.
+set_prop(vendor_init, vendor_gralloc_prop)
+set_prop(vendor_init, vendor_display_prop)
+set_prop(vendor_init, vendor_usb_prop)
+set_prop(vendor_init, vendor_disable_spu_prop)

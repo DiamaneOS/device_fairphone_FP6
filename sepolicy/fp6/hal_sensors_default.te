@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Sensors multi-HAL with the Qualcomm and dynamic sub-HALs. Reduced from the
+# pinned Qualcomm generic/vendor/common/hal_sensors_default.te: no diag,
+# sysrq, SLPI/SSR sysfs, persist writes or HID devices; QRTR without ioctls.
+allow hal_sensors_default mnt_vendor_file:dir search;
+r_dir_file(hal_sensors_default, vendor_persist_sensors_file)
+get_prop(hal_sensors_default, vendor_sensors_prop)
+get_prop(hal_sensors_default, vendor_adsprpc_prop)
+get_prop(hal_sensors_default, vendor_dynamic_sensor_prop)
+
+# QMI to the ADSP sensor core over QRTR; the direct channel uses FastRPC on
+# the secure node and gralloc buffers.
+allow hal_sensors_default self:qipcrtr_socket create_socket_perms_no_ioctl;
+allow hal_sensors_default vendor_xdsp_device:chr_file r_file_perms;
+allow hal_sensors_default dmabuf_system_heap_device:chr_file r_file_perms;
+hal_client_domain(hal_sensors_default, hal_graphics_allocator)

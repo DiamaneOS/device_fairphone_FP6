@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# sscrpcd starts the sensors protection domain on the ADSP. Reduced from the
+# pinned Qualcomm generic/vendor/common/sensors.te: no capabilities, QRTR or
+# sysfs/sensors-device grants (sscrpcd only uses FastRPC); widen only on
+# observed need.
+type vendor_sensors, domain;
+type vendor_sensors_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_sensors)
+
+get_prop(vendor_sensors, vendor_sensors_prop)
+get_prop(vendor_sensors, vendor_adsprpc_prop)
+
+# FastRPC to the ADSP through the secure (signed-PD) node only; the Qualcomm
+# neverallows keep sensors off the unsigned node.
+allow vendor_sensors vendor_xdsp_device:chr_file r_file_perms;
+allow vendor_sensors dmabuf_system_heap_device:chr_file r_file_perms;
+r_dir_file(vendor_sensors, adsprpcd_file)
+
+# The ADSP keeps the sensor registry and calibration on persist and state in
+# /data/vendor/sensors through the listener.
+allow vendor_sensors mnt_vendor_file:dir search;
+allow vendor_sensors vendor_persist_sensors_file:dir create_dir_perms;
+allow vendor_sensors vendor_persist_sensors_file:file create_file_perms;
+allow vendor_sensors vendor_sensors_vendor_data_file:dir create_dir_perms;
+allow vendor_sensors vendor_sensors_vendor_data_file:file create_file_perms;
+
+wakelock_use(vendor_sensors)

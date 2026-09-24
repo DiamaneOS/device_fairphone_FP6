@@ -150,10 +150,16 @@ PRODUCT_PACKAGES += \
     libcld80211 \
     wpa_supplicant \
     wificond \
+    wpa_supplicant.conf \
     fp6_wlan_cfg_ini \
     fp6_wlan_mac_bin
+# Supplicant overlays, identical to stock. p2p_disabled keeps P2P off wlan0;
+# otherwise the supplicant registers wlan0 as its P2P interface and the
+# framework cannot add it as a station.
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml
+    frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml \
+    device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
+    device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
 
 # Placeholder audio: the AOSP reference HAL with stub streams, so audioserver
 # and the framework audio service can start. Replace with the Qualcomm stack.

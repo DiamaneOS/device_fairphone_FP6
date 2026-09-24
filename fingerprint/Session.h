@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <mutex>
 #include <vector>
@@ -26,6 +27,11 @@ using keymaster::HardwareAuthToken;
 // terminal result: the module's own (error, success, lockout, ...) or, when
 // the module fails a call without reporting anything, an UNABLE_TO_PROCESS
 // fallback. Cancellation only reaches the operation it was issued for.
+//
+// Authentication honours "Touch to unlock anytime": when SystemUI marks the
+// request press-to-auth and the screen is off (NO_UI or AOD), matches are held
+// back and the sensor is re-armed; a match from the last second is delivered
+// once a context update reports the screen on (the power button woke it).
 class Session : public BnSession {
   public:
     // onDetach is called once when the session is closed or its client dies.
@@ -79,6 +85,12 @@ class Session : public BnSession {
 
   private:
     uint64_t beginOperation();
+    // Records the press-to-auth setting and display state; caller holds mMutex.
+    void updateContextLocked(const OperationContext& context);
+    // True while authentication results must wait for the screen to turn on.
+    bool screenGatedLocked() const;
+    // Starts authentication again after a held match; the module stops after one.
+    void rearm(uint64_t op);
     // Reports UNABLE_TO_PROCESS for `op` unless it already has a terminal result.
     void failOperation(uint64_t op);
     // Marks the running operation finished; the caller holds mMutex.
@@ -100,6 +112,17 @@ class Session : public BnSession {
     bool mDetached = false;
     std::vector<int32_t> mEnumerated;
     std::vector<int32_t> mRemoved;
+
+    // Authentication in progress (mOp) and the context SystemUI gave for it.
+    bool mAuthenticating = false;
+    int64_t mAuthOperationId = 0;
+    bool mPressToAuth = false;
+    common::DisplayState mDisplayState = common::DisplayState::UNKNOWN;
+    // A match that arrived while the screen was off.
+    bool mHeldMatch = false;
+    int32_t mHeldEnrollmentId = 0;
+    HardwareAuthToken mHeldHat;
+    std::chrono::steady_clock::time_point mHeldAt;
 };
 
 }  // namespace aidl::android::hardware::biometrics::fingerprint

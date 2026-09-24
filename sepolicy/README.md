@@ -47,8 +47,12 @@ Downstream adaptations:
     performance and peripheral-manager services; `/dev/wlan` and the driver
     version property for the Wi-Fi HAL; the vendor patch level for KeyMint;
     vendor properties set from vendor init scripts.
-  - The USB speed node is `sysfs_udc`, not the factory-test type
-    `fp_mmitest_sysfs`, which also covers camera calibration and download mode.
+  - The USB speed node is `sysfs_udc` (in the imported file_contexts and
+    genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
+    covers camera calibration and download mode.
+  - The UFS LUN 0 block directory is `sysfs_devices_block`, so platform
+    init.rc can tune userdata's discard size; the NFC controller's wakeup
+    source is `sysfs_wakeup`.
   Not granted: `qseecomd` on the raw UFS LUN node, `rmt_storage` on the
   unlabeled `study` partition and `fsck` on `vm-bootsys`, which need their own
   review.

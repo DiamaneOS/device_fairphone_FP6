@@ -67,7 +67,7 @@
       "source": "generic/vendor/common/genfs_contexts",
       "source_sha256": "8a6d022a56f9b66879a1d4deeac6a9cd129cde965240e0dcd64c93e2bc0994af",
       "path": "vendor-common/genfs_contexts",
-      "sha256": "cdd0f5f25886e56dac5ed85f6d5a7a1b867744aaedd127b24eb93ef2e8578a7d"
+      "sha256": "fb87ba5d1a3f8c3c34e9064ecb6e4ff21c4be1f499a7a3749bd42cb169bcc42f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

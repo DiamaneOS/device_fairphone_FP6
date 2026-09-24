@@ -15,3 +15,9 @@ allow hal_sensors_default self:qipcrtr_socket create_socket_perms_no_ioctl;
 allow hal_sensors_default vendor_xdsp_device:chr_file r_file_perms;
 allow hal_sensors_default dmabuf_system_heap_device:chr_file r_file_perms;
 hal_client_domain(hal_sensors_default, hal_graphics_allocator)
+
+# The dynamic-sensor sub-HAL watches /dev for HID sensors (listing only; no
+# device node access is granted). The Qualcomm sub-HAL reads the AON
+# presence property.
+allow hal_sensors_default device:dir r_dir_perms;
+get_prop(hal_sensors_default, vendor_qc_aon_prop)

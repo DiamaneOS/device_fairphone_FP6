@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- The AOSP text describes Pixel hardware (a flat button next to a
+         raised volume button). Use Settings' own translated right-side
+         message, in every locale. -->
+    <string name="security_settings_sfps_enroll_find_sensor_message">The fingerprint sensor is on the right-hand side of your device</string>
+</resources>

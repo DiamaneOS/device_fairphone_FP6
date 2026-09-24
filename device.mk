@@ -227,6 +227,12 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml
 
+# Sensors: the AOSP multi-HAL loads the sub-HALs in /vendor/etc/sensors/hals.conf
+# (the Qualcomm sub-HAL comes with the generated vendor tree).
+PRODUCT_PACKAGES += \
+    android.hardware.sensors-service.multihal \
+    sensors.dynamic_sensor_hal
+
 # Sensors served by the ADSP through the sensors multi-HAL (the stock set).
 PRODUCT_COPY_FILES += \
     $(foreach f,accelerometer barometer compass dynamic.head_tracker gyroscope light proximity stepcounter stepdetector, \

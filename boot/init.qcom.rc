@@ -24,6 +24,15 @@ on fs
     restorecon_recursive /mnt/vendor/persist
     mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
+    # Sensor registry and calibration written by the ADSP sensors domain
+    # through sscrpcd (stock init.vendor.sensors.rc keeps them system-owned).
+    mkdir /mnt/vendor/persist/sensors 0775 system system
+    mkdir /mnt/vendor/persist/sensors/registry 0775 system system
+    mkdir /mnt/vendor/persist/sensors/registry/registry 0775 system system
+    chown system system /mnt/vendor/persist/sensors/sns.reg
+    chown system system /mnt/vendor/persist/sensors/sensors_list.txt
+    chown system system /mnt/vendor/persist/sensors/registry/registry/sensors_registry
+    chown system system /mnt/vendor/persist/sensors/sensors_settings
 
 on late-fs
     mount_all --late
@@ -38,6 +47,8 @@ on post-fs-data
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
     mkdir /data/vendor/perfd 2770 root system
+    # Sensor stack state (matches stock).
+    mkdir /data/vendor/sensors 0770 system system
     # Remote-processor crash dumps served through tftp_server (matches stock).
     mkdir /data/vendor/tombstones 0771 system system
     mkdir /data/vendor/tombstones/rfs 0771 system system

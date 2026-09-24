@@ -110,3 +110,6 @@
 /sys/class/leds/blue   trigger      0640    system    system
 # The Wi-Fi HAL (wifi) switches the QCA6750 host driver on and off (stock).
 /dev/wlan                 0660   wifi       wifi
+# FastRPC to the ADSP: the sensors multi-HAL and sscrpcd (system) use it (stock).
+/dev/adsprpc-smd          0664   system     system
+/dev/sdsprpc-smd          0660   system     system

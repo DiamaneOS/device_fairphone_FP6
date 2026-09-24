@@ -4,17 +4,10 @@
 // AIDL fingerprint service for the FP6 FocalTech module. It replaces the stock
 // wrapper so the sensor is reported as a power-button sensor; the stock module
 // and its trusted app still do all matching, storage and lockout handling.
-cc_binary {
-    name: "android.hardware.biometrics.fingerprint-service.fp6",
+
+cc_defaults {
+    name: "fp6_fingerprint_defaults",
     vendor: true,
-    relative_install_path: "hw",
-    init_rc: ["android.hardware.biometrics.fingerprint-service.fp6.rc"],
-    vintf_fragments: ["android.hardware.biometrics.fingerprint-service.fp6.xml"],
-    srcs: [
-        "Fingerprint.cpp",
-        "Session.cpp",
-        "main.cpp",
-    ],
     header_libs: ["libhardware_headers"],
     shared_libs: [
         "android.hardware.biometrics.common-V4-ndk",
@@ -22,13 +15,50 @@ cc_binary {
         "android.hardware.keymaster-V4-ndk",
         "libbase",
         "libbinder_ndk",
-        "libhardware",
         "liblog",
     ],
-    required: ["fp6_fingerprint_hw_module"],
+    // The stock wrapper was built with CFI; keep that for the process that
+    // handles biometric operations. Calls into the module's (non-CFI) entry
+    // points go through the cross-DSO slow path.
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+    },
     cflags: [
         "-Wall",
         "-Werror",
         "-Wextra",
     ],
+}
+
+cc_library_static {
+    name: "fp6_fingerprint_session",
+    defaults: ["fp6_fingerprint_defaults"],
+    srcs: ["Session.cpp"],
+    export_include_dirs: ["."],
+}
+
+cc_binary {
+    name: "android.hardware.biometrics.fingerprint-service.fp6",
+    defaults: ["fp6_fingerprint_defaults"],
+    relative_install_path: "hw",
+    init_rc: ["android.hardware.biometrics.fingerprint-service.fp6.rc"],
+    vintf_fragments: ["android.hardware.biometrics.fingerprint-service.fp6.xml"],
+    srcs: [
+        "Fingerprint.cpp",
+        "main.cpp",
+    ],
+    static_libs: ["fp6_fingerprint_session"],
+    shared_libs: ["libhardware"],
+    required: ["fp6_fingerprint_hw_module"],
+}
+
+// Session behaviour against a fake module: one terminal result per
+// operation, fallback errors, stale cancellation, closed sessions.
+cc_test {
+    name: "fp6_fingerprint_session_test",
+    defaults: ["fp6_fingerprint_defaults"],
+    srcs: ["tests/SessionTest.cpp"],
+    static_libs: ["fp6_fingerprint_session"],
+    test_suites: ["device-tests"],
 }

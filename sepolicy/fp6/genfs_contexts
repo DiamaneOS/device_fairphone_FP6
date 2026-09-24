@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Wakeup sources of the fingerprint and hall sensors, read by system_suspend.
+genfscon sysfs /devices/platform/soc/soc:focalfp_ft9362/wakeup u:object_r:sysfs_wakeup:s0
+genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s0

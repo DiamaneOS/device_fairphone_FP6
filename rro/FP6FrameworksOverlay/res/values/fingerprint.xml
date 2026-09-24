@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- Help messages for the vendor codes of the Focaltech fingerprint module,
+         indexed by vendor code. Empty entries show nothing.
+
+         The module rejects an enrollment touch that matches an enrolled
+         finger and reports vendor code 5 ("the enrolling finger has been
+         enrolled"). Stock shows no message for it, so enrollment seems to
+         ignore those touches. The AOSP string is already translated. -->
+    <string-array name="fingerprint_acquired_vendor" translatable="false">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>@*android:string/fingerprint_acquired_already_enrolled</item>
+    </string-array>
+</resources>

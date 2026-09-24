@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Recovery package selection: Copyright (C) 2018 The Android Open Source Project
 
 PRODUCT_SHIPPING_API_LEVEL := 35
 # The matched Fairphone 6.1 kernel uses 4 KiB pages. Validate every selected
@@ -23,40 +22,6 @@ PRODUCT_PACKAGES += hwservicemanager
 # Android only includes vndservicemanager for devices shipping at API 29 or
 # older, and this product does not inherit base_vendor.mk.
 PRODUCT_PACKAGES += vndservicemanager
-
-# Diagnostic (non-user) builds only: trust a developer adb key kept outside
-# version control, so adb works before the setup UI exists. Inert for user builds.
-ifneq ($(TARGET_BUILD_VARIANT),user)
-  ifneq ($(wildcard vendor/diamaneos-diag/adb_keys),)
-    PRODUCT_ADB_KEYS := vendor/diamaneos-diag/adb_keys
-  endif
-endif
-
-# Generate the standard device compatibility matrix and system SDK requirements.
-# generic_system does not inherit the base_vendor package selection.
-PRODUCT_PACKAGES += vendor_compatibility_matrix.xml
-
-# Select the platform recovery runtime explicitly: image generation alone does
-# not select these packages when generic_system is used without base_vendor.
-# This follows base_vendor.mk's recovery group; fastbootd serves dynamic partitions.
-PRODUCT_PACKAGES += \
-    adbd.recovery \
-    cgroups.recovery.json \
-    charger.recovery \
-    fastbootd \
-    init_second_stage.recovery \
-    ld.config.recovery.txt \
-    linker.recovery \
-    otacerts.recovery \
-    recovery \
-    servicemanager.recovery \
-    shell_and_utilities_recovery \
-    watchdogd.recovery
-
-PRODUCT_VENDOR_PROPERTIES += \
-    ro.recovery.usb.vid=18D1 \
-    ro.recovery.usb.adb.pid=D001 \
-    ro.recovery.usb.fastboot.pid=4EE0
 
 # Recovery has no zygote or normal vendor init; platform recovery imports this.
 PRODUCT_COPY_FILES += \
@@ -144,12 +109,9 @@ PRODUCT_PACKAGES += libtxml2v34
 PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom/wlan/cld80211-lib \
     hardware/qcom/wlan/qcwcn
-$(call soong_config_set,wpa_supplicant_8,wifi_hidl_unified_supplicant_service_rc_entry,true)
+$(call inherit-product, vendor/diamaneos/config/wifi.mk)
 PRODUCT_PACKAGES += \
-    android.hardware.wifi-service \
     libcld80211 \
-    wpa_supplicant \
-    wificond \
     wpa_supplicant.conf \
     fp6_wlan_cfg_ini \
     fp6_wlan_mac_bin
@@ -157,7 +119,6 @@ PRODUCT_PACKAGES += \
 # otherwise the supplicant registers wlan0 as its P2P interface and the
 # framework cannot add it as a station.
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml \
     device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
 

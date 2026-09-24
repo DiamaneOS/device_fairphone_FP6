@@ -149,11 +149,12 @@ PRODUCT_PACKAGES += \
     FP6FrameworksOverlay \
     FP6SettingsOverlay
 
-# The stock fingerprint module keeps its own SONAME as file name, so it cannot
-# collide with AOSP's reference fingerprint modules; hw_get_module finds it
-# through ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
+# Fingerprint: our AIDL service (fingerprint/) drives the stock FocalTech
+# module. The module keeps its own SONAME as file name, so it cannot collide
+# with AOSP's reference fingerprint modules; hw_get_module finds it through
+# ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
 PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
-PRODUCT_PACKAGES += fp6_fingerprint_hw_module
+PRODUCT_PACKAGES += android.hardware.biometrics.fingerprint-service.fp6
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect (identical to the stock vendor build.prop).

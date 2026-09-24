@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// AIDL fingerprint service for the FP6 FocalTech module. It replaces the stock
+// wrapper so the sensor is reported as a power-button sensor; the stock module
+// and its trusted app still do all matching, storage and lockout handling.
+cc_binary {
+    name: "android.hardware.biometrics.fingerprint-service.fp6",
+    vendor: true,
+    relative_install_path: "hw",
+    init_rc: ["android.hardware.biometrics.fingerprint-service.fp6.rc"],
+    vintf_fragments: ["android.hardware.biometrics.fingerprint-service.fp6.xml"],
+    srcs: [
+        "Fingerprint.cpp",
+        "Session.cpp",
+        "main.cpp",
+    ],
+    header_libs: ["libhardware_headers"],
+    shared_libs: [
+        "android.hardware.biometrics.common-V4-ndk",
+        "android.hardware.biometrics.fingerprint-V5-ndk",
+        "android.hardware.keymaster-V4-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "libhardware",
+        "liblog",
+    ],
+    required: ["fp6_fingerprint_hw_module"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}

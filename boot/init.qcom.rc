@@ -30,6 +30,10 @@ on late-fs
 
 on post-fs-data
     mkdir /data/vendor/display 0770 system graphics
+    # Supplicant state and control sockets (matches stock).
+    mkdir /data/vendor/wifi 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
     mkdir /data/vendor/tzstorage 0770 system system
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root

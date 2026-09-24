@@ -224,7 +224,7 @@ genfscon sysfs /devices/soc0/gpu u:object_r:vendor_sys_sp_comp:s0
 genfscon sysfs /devices/soc0/npu u:object_r:vendor_sys_sp_comp:s0
 
 
-genfscon sysfs /devices/platform/soc/a600000.ssusb/a600000.dwc3/udc/a600000.dwc3/current_speed	 u:object_r:fp_mmitest_sysfs:s0
+genfscon sysfs /devices/platform/soc/a600000.ssusb/a600000.dwc3/udc/a600000.dwc3/current_speed	 u:object_r:sysfs_udc:s0
 
 genfscon sysfs /bus/spi/drivers/eswin_eph861x	 u:object_r:fp_mmitest_sysfs:s0
 genfscon sysfs /emkit/info/switch_state	 u:object_r:fp_mmitest_sysfs:s0

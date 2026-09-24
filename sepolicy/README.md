@@ -27,6 +27,9 @@ Downstream adaptations:
   fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
   stock wrapper it replaces; its FocalTech node and QSEECom grants are an
   enforcing-mode follow-up.
+- Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_pd_mapper`
+  and `vendor_per_mgr`: their QMI libraries open AF_QIPCRTR sockets, which the
+  upstream rules only grant as generic `socket`.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

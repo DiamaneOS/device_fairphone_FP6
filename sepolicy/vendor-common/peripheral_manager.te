@@ -44,6 +44,9 @@ allow vendor_per_mgr firmware_file:dir search;
 
 allow vendor_per_mgr self:socket create_socket_perms;
 allowxperm vendor_per_mgr self:socket ioctl msm_sock_ipc_ioctls;
+# The QMI libraries also use QRTR sockets (AF_QIPCRTR), a separate class;
+# no ioctls are used on them.
+allow vendor_per_mgr self:qipcrtr_socket create_socket_perms_no_ioctl;
 allow vendor_per_mgr vendor_ssr_device:chr_file rw_file_perms;
 
 # Needed by libmdmdetect to get subsystem info and to check their states

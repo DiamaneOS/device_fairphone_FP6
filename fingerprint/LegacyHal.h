@@ -11,8 +11,15 @@
 
 // The FP6 FocalTech module (libfingerprint.default.so) implements the legacy
 // fingerprint_device_t interface plus three extensions in the reserved slots,
-// and sends two extra message types. The layout matches what the stock FP6
-// fingerprint service expects from the same module.
+// and sends two extra message types.
+//
+// Evidence: the stock FP6 service (sha256 42cd6284...78bbd2) and module
+// (sha256 ae08b39c...a8bedd) from FP6.QREL.16.100.0. The stock service calls
+// reserved[0..2] from invalidateAuthenticatorId, resetLockout and
+// detectInteraction, and decodes message types 7 and 8 as below. The module
+// reports errors and removals through the callback synchronously, before the
+// call returns, and may also return a failure code for the same request.
+// Recheck all of this if the module changes.
 namespace fp6 {
 
 using InvalidateAuthenticatorIdFn = int (*)(fingerprint_device_t* dev, uint64_t* newId);

@@ -479,7 +479,7 @@
 # dali@tcl.com add for motion mode end
 #MMITest usb
 /sys/class/qcom-battery/typec_cc_orientation                  u:object_r:fp_mmitest_sysfs:s0
-/sys/class/udc/a600000.dwc3/current_speed                  u:object_r:fp_mmitest_sysfs:s0
+/sys/class/udc/a600000.dwc3/current_speed                  u:object_r:sysfs_udc:s0
 
 # camerapostproc service
 

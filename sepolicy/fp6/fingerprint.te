@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# FocalTech fingerprint sensor node and the QSEECom path to its trusted app,
+# bound to the fingerprint HAL (stock ff_device label and grants). The
+# module's own debug binder service (ff_service) is not granted.
+type ff_device, dev_type;
+allow hal_fingerprint_default ff_device:chr_file rw_file_perms;
+allow hal_fingerprint_default tee_device:chr_file rw_file_perms;
+allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_qseecom_ta_heap_device }:chr_file r_file_perms;

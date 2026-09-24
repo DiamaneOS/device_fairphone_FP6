@@ -30,6 +30,28 @@ Downstream adaptations:
 - Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_pd_mapper`
   and `vendor_per_mgr`: their QMI libraries open AF_QIPCRTR sockets, which the
   upstream rules only grant as generic `socket`.
+- `fp6/` holds device-owned grants, each bound to the service that showed the
+  denial on a permissive boot:
+  - Sensors: `sensors.te` (sscrpcd) and `hal_sensors_default.te` are reduced
+    from the pinned Qualcomm files. They use FastRPC only through the secure
+    node (`vendor_xdsp_device`), QRTR without ioctls, and have no capabilities,
+    diag, sysrq, SLPI/SSR sysfs, HID or persist writes from the HAL.
+  - Graphics: the in-process Adreno driver reads the GPU model (the Qualcomm
+    domain grant) and its read-only graphics properties; `libllvm-qgl.so` is a
+    same-process HAL library; the composer keeps state in
+    `/data/vendor/display`.
+  - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
+    and its heaps for the fingerprint HAL. The module's own debug binder service
+    is not granted.
+  - Read-only SoC, thermal-zone and remote-processor names for the thermal,
+    performance and peripheral-manager services; `/dev/wlan` and the driver
+    version property for the Wi-Fi HAL; the vendor patch level for KeyMint;
+    vendor properties set from vendor init scripts.
+  - The USB speed node is `sysfs_udc`, not the factory-test type
+    `fp_mmitest_sysfs`, which also covers camera calibration and download mode.
+  Not granted: `qseecomd` on the raw UFS LUN node, `rmt_storage` on the
+  unlabeled `study` partition and `fsck` on `vm-bootsys`, which need their own
+  review.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

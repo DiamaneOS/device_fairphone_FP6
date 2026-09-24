@@ -54,6 +54,13 @@ on post-fs-data
 on early-boot
     verity_update_state
 
+# Interim (FP6-042): in deep suspend the PMIC power-key interrupt is latched but
+# does not wake the SoC (only ADSP/USB wakes it), so the phone cannot be woken
+# unplugged. s2idle keeps the key working. Remove once deep-sleep wake routing
+# for the PMIC arbiter is fixed.
+on boot
+    write /sys/power/mem_sleep s2idle
+
 # The source-built composer runs as system and writes this node for panel
 # brightness. Match the stock FP6 boot-time ownership.
 on boot

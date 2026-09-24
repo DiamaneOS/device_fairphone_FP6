@@ -7,6 +7,7 @@
 
 #include <cerrno>
 #include <string>
+#include <utility>
 #include <sys/stat.h>
 
 #include <android-base/logging.h>
@@ -96,23 +97,35 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
         LOG(ERROR) << "set_active_group(" << userId << "): " << err;
         return ndk::ScopedAStatus::fromServiceSpecificError(err);
     }
-    auto session = ndk::SharedRefBase::make<Session>(mDevice, userId, cb);
+    auto session = ndk::SharedRefBase::make<Session>(mDevice, userId, cb, [this](const Session* s) {
+        std::lock_guard lock(mSessionMutex);
+        if (mSession.get() == s) mSession.reset();
+    });
+    session->watchClient();
+    std::shared_ptr<Session> previous;
     {
         std::lock_guard lock(mSessionMutex);
-        mSession = session;
+        previous = std::exchange(mSession, session);
     }
+    // The framework closes a session before opening the next; if it did not,
+    // the old one must not receive this session's messages or cancel its work.
+    if (previous != nullptr) previous->detach(false);
     *out = session;
     return ndk::ScopedAStatus::ok();
 }
 
 void Fingerprint::notify(const fingerprint_msg_t* msg) {
     if (sInstance == nullptr || msg == nullptr) return;
-    std::lock_guard lock(sInstance->mSessionMutex);
-    if (sInstance->mSession == nullptr) {
-        LOG(WARNING) << "module message " << msg->type << " before any session";
+    std::shared_ptr<Session> session;
+    {
+        std::lock_guard lock(sInstance->mSessionMutex);
+        session = sInstance->mSession;
+    }
+    if (session == nullptr) {
+        LOG(WARNING) << "module message " << msg->type << " without an open session";
         return;
     }
-    sInstance->mSession->onMessage(msg);
+    session->onMessage(msg);
 }
 
 }  // namespace aidl::android::hardware::biometrics::fingerprint

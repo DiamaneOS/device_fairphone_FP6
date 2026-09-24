@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Wakeup sources of the fingerprint and hall sensors, read by system_suspend.
+# Wakeup sources of the fingerprint, hall and NFC devices, read by system_suspend.
 genfscon sysfs /devices/platform/soc/soc:focalfp_ft9362/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s0
+genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_0_geni_se/a84000.i2c/i2c-1/1-0027/wakeup u:object_r:sysfs_wakeup:s0
+# UFS LUN 0 (userdata) queue settings that platform init.rc tunes.
+genfscon sysfs /devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/block u:object_r:sysfs_devices_block:s0

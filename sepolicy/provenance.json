@@ -1131,7 +1131,7 @@
       "source": "generic/vendor/common/pd_services.te",
       "source_sha256": "e8fa101c7ccf02e2ea7403a9ccbbb81e47c26e1342fb62f2f45658037b9ce5f7",
       "path": "vendor-common/pd_services.te",
-      "sha256": "e8fa101c7ccf02e2ea7403a9ccbbb81e47c26e1342fb62f2f45658037b9ce5f7"
+      "sha256": "abbd4cea01d70bef02804782b750eec1c4e7add9257d434bade9cb9c356c7111"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1147,7 +1147,7 @@
       "source": "generic/vendor/common/peripheral_manager.te",
       "source_sha256": "d0bb4c01c31e286888d07345530428b02018ecf0bd608e7be801708d3b545183",
       "path": "vendor-common/peripheral_manager.te",
-      "sha256": "97d44acb5978aeacfc0a8a436fdcde1bf671c3f1ea48abca1e5eefe22b7930e7"
+      "sha256": "b960d5110c63e1723c82f01bc19414f566cb5301e8d3f37624a256dc5cf3f644"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

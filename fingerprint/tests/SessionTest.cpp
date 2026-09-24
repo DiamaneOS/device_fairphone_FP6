@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+#include <atomic>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <aidl/android/hardware/biometrics/fingerprint/BnSessionCallback.h>
@@ -66,6 +69,7 @@ struct FakeModule {
     int syncError = 0;              // FINGERPRINT_ERROR sent before returning, if non-zero
     std::vector<uint32_t> removeFids;  // FINGERPRINT_TEMPLATE_REMOVED sent by remove()
     int cancels = 0;
+    std::atomic<int> authenticates = 0;
 };
 FakeModule* gModule;
 
@@ -82,7 +86,44 @@ int finish() {
 }
 
 int fakeEnroll(fingerprint_device_t*, const hw_auth_token_t*, uint32_t, uint32_t) { return finish(); }
-int fakeAuthenticate(fingerprint_device_t*, uint64_t, uint32_t) { return finish(); }
+int fakeAuthenticate(fingerprint_device_t*, uint64_t, uint32_t) {
+    gModule->authenticates++;
+    return finish();
+}
+
+// Writes the same layout as SystemUI's PressToAuthParcelable.
+struct TestPressToAuth {
+    static constexpr const char* descriptor =
+            "com.google.hardware.biometrics.parcelables.fingerprint.PressToAuthParcelable";
+    static const ndk::parcelable_stability_t _aidl_stability = ndk::STABILITY_VINTF;
+    bool pressToAuthEnabled = false;
+    binder_status_t writeToParcel(AParcel* parcel) const {
+        int32_t start = AParcel_getDataPosition(parcel);
+        AParcel_writeInt32(parcel, 0);
+        AParcel_writeBool(parcel, pressToAuthEnabled);
+        int32_t end = AParcel_getDataPosition(parcel);
+        AParcel_setDataPosition(parcel, start);
+        AParcel_writeInt32(parcel, end - start);
+        return AParcel_setDataPosition(parcel, end);
+    }
+    binder_status_t readFromParcel(const AParcel*) { return STATUS_OK; }
+};
+
+OperationContext context(common::DisplayState display, bool pressToAuth) {
+    OperationContext ctx;
+    ctx.displayState = display;
+    common::AuthenticateReason::Vendor vendor;
+    vendor.extension.setParcelable(TestPressToAuth{.pressToAuthEnabled = pressToAuth});
+    ctx.authenticateReason = common::AuthenticateReason::make<
+            common::AuthenticateReason::Tag::vendorAuthenticateReason>(std::move(vendor));
+    return ctx;
+}
+
+bool waitFor(const std::atomic<int>& value, int expected) {
+    for (int i = 0; i < 100 && value < expected; i++)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    return value >= expected;
+}
 int fakeEnumerate(fingerprint_device_t*) { return finish(); }
 int fakeResetLockout(fingerprint_device_t*, const hw_auth_token_t*) { return finish(); }
 int fakeCancel(fingerprint_device_t*) {
@@ -172,6 +213,35 @@ TEST_F(SessionTest, MatchForAnotherUserIsRejected) {
     mSession->authenticate(1, &mSignal);
     deliver(authenticated(kUser + 1, 3));
     EXPECT_EQ(mCb->events, (Events{"failed"}));
+}
+
+TEST_F(SessionTest, ScreenOffMatchWaitsForScreenOn) {
+    // "Touch to unlock anytime" off: a touch with the screen off does not unlock.
+    mSession->authenticateWithContext(1, context(common::DisplayState::NO_UI, true), &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_TRUE(mCb->events.empty());
+    EXPECT_TRUE(waitFor(mModule.authenticates, 2));  // the sensor listens again
+    // The power press turns the screen on; the match from just before counts.
+    mSession->onContextChanged(context(common::DisplayState::LOCKSCREEN, true));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
+}
+
+TEST_F(SessionTest, ScreenOffFailuresAreSilent) {
+    mSession->authenticateWithContext(1, context(common::DisplayState::AOD, true), &mSignal);
+    deliver(authenticated(kUser, 0));
+    EXPECT_TRUE(mCb->events.empty());
+}
+
+TEST_F(SessionTest, ScreenOnTouchUnlocksWithPressToAuth) {
+    mSession->authenticateWithContext(1, context(common::DisplayState::LOCKSCREEN, true), &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
+}
+
+TEST_F(SessionTest, TouchToUnlockAnytimeUnlocksWithScreenOff) {
+    mSession->authenticateWithContext(1, context(common::DisplayState::NO_UI, false), &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
 }
 
 TEST_F(SessionTest, StaleCancellationIsIgnored) {

@@ -216,7 +216,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.display.enable_early_wakeup=1
 
 # Declare the phone baseline and only the hardware that currently works; add
-# radio, camera, sensor and other features as their stacks are brought up.
+# radio, camera and other features as their stacks are brought up.
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
@@ -226,6 +226,11 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.vulkan.version-1_3.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.version-1_3.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml
+
+# Sensors served by the ADSP through the sensors multi-HAL (the stock set).
+PRODUCT_COPY_FILES += \
+    $(foreach f,accelerometer barometer compass dynamic.head_tracker gyroscope light proximity stepcounter stepdetector, \
+        frameworks/native/data/etc/android.hardware.sensor.$(f).xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.$(f).xml)
 
 # Match the trusted-execution backend selected by the authenticated stock image.
 PRODUCT_VENDOR_PROPERTIES += vendor.gatekeeper.is_security_level_spu=0

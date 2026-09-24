@@ -157,12 +157,18 @@ PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
 PRODUCT_PACKAGES += android.hardware.biometrics.fingerprint-service.fp6
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
-# expect (identical to the stock vendor build.prop).
+# expect, from the stock vendor build.prop, with two exceptions:
+# - no touch timer override: stock's 3500000 ms kept touch boost active for
+#   about 58 minutes and blocked idle refresh-rate drops; SurfaceFlinger's
+#   default (200 ms, as in Qualcomm's display config) applies instead;
+# - debug.sf.hw, debug.sf.latch_unsignaled and
+#   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
+#   platform, the display HAL or the stock vendor files reads them
+#   (unsignaled latching is debug.sf.auto_latch_unsignaled).
 PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.use_color_management=true \
     ro.surface_flinger.protected_contents=true \
     ro.surface_flinger.use_content_detection_for_refresh_rate=true \
-    ro.surface_flinger.set_touch_timer_ms=3500000 \
     ro.surface_flinger.set_idle_timer_ms=3500 \
     ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
     ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
@@ -174,12 +180,9 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.wcg_composition_dataspace=143261696 \
     persist.sys.sf.color_saturation=1.0 \
     persist.sys.sf.color_mode=9 \
-    debug.sf.hw=0 \
-    debug.sf.latch_unsignaled=1 \
     debug.sf.auto_latch_unsignaled=1 \
     debug.sf.disable_client_composition_cache=0 \
     debug.sf.enable_gl_backpressure=1 \
-    debug.sf.enable_advanced_sf_phase_offset=1 \
     debug.sf.use_phase_offsets_as_durations=1 \
     debug.sf.late.app.duration=13666666 \
     debug.sf.early.app.duration=13666666 \

@@ -68,6 +68,10 @@ on boot
 # Their firmware is on /vendor/firmware_mnt, mounted by mount_all --early.
 on early-boot
     start vendor.pd_mapper
+    # Unlike stock, which writes these from a background script, init waits
+    # here: the DSP loaders boot the remote processor synchronously, so a slow
+    # or failing DSP start delays the rest of early-boot and class core.
+    # Measure this on the device before relying on it.
     write /sys/kernel/boot_adsp/boot 1
     write /sys/kernel/boot_cdsp/boot 1
 

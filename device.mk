@@ -143,11 +143,13 @@ PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 # A panel property, so it belongs to the vendor partition.
 PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
 
-# Framework and Settings hardware configuration (rro/): display cutout, corners,
-# status bar, 120 Hz refresh rate and the Smooth display switch.
+# Framework, Settings and SystemUI hardware configuration (rro/): display
+# cutout, corners, status bar, 120 Hz refresh rate, the Smooth display switch
+# and the side fingerprint sensor description.
 PRODUCT_PACKAGES += \
     FP6FrameworksOverlay \
-    FP6SettingsOverlay
+    FP6SettingsOverlay \
+    FP6SystemUIOverlay
 
 # Fingerprint: our AIDL service (fingerprint/) drives the stock FocalTech
 # module. The module keeps its own SONAME as file name, so it cannot collide

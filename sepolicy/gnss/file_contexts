@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock labels (upstream generic/vendor/common/file_contexts lines 298 and 438).
+# /dev/socket/location is already labelled in vendor-common/file_contexts.
+/(vendor|system/vendor)/bin/hw/android\.hardware\.gnss.*-service-qti   u:object_r:vendor_hal_gnss_qti_exec:s0
+/data/vendor/location(/.*)?                                           u:object_r:vendor_location_data_file:s0

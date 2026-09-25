@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Directories used by the stock GNSS HAL (gnss_service, user gps). Stock
+# creates them in loc-launcher.rc and init.qcom.rc, which are not installed.
+# The HAL keeps small AP-side state files in /data/vendor/location (gps.prop,
+# energy.conf; libgps.utils and libgnss path strings) and serves its local IPC
+# socket in /dev/socket/location. The engine's own state lives in the modem
+# and its remote file system on persist, not here. Directories for
+# loc_launcher's daemons (mq, xtwifi, hmac, xtra, ehub, dgnss, qsap_location,
+# location-partner) are not created because those daemons are not installed.
+on post-fs-data
+    mkdir /data/vendor/location 0770 gps gps
+    mkdir /dev/socket/location 0770 gps gps

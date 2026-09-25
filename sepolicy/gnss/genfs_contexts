@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The board type (e.g. "MTP"), read by the GNSS HAL through libgps.utils. It is
+# not an identifier, so it gets the public SoC label like soc_id and family
+# (vendor-common/genfs_contexts lines 118-120). The rest of /sys/devices/soc0,
+# including serial_number, stays vendor_sysfs_soc (line 117). Every domain
+# that reads vendor_sysfs_soc files in this tree also reads
+# vendor_sysfs_public (fp6/platform.te lines 5-6).
+genfscon sysfs /devices/soc0/hw_platform u:object_r:vendor_sysfs_public:s0

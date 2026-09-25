@@ -17,3 +17,10 @@ runtime_resource_overlay {
     manifest: "FP6SettingsOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6SettingsOverlay/res"],
 }
+
+runtime_resource_overlay {
+    name: "FP6SystemUIOverlay",
+    vendor: true,
+    manifest: "FP6SystemUIOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6SystemUIOverlay/res"],
+}

@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock label of the SSR helper (Qualcomm generic/vendor/common/file_contexts;
+# stock FP6 vendor/bin/ssr_setup xattr). The MSS, ADSP, CDSP and WPSS
+# recovery switches are already labelled in vendor-volcano/file_contexts.
+/vendor/bin/ssr_setup                   u:object_r:vendor_ssr_setup_exec:s0

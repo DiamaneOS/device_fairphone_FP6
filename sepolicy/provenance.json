@@ -1196,6 +1196,14 @@
       "source_sha256": "a45518cf9a36d8636fe3f64901c19545e16a349149b57c7d3e1fd8737f81bf31",
       "path": "audio/hal_audio_default.te",
       "sha256": "5fc3e4e2575d89efc7c1ea2bed9583bd36debbcd574f41c3409ac8e96f1478bf"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/ssr_setup.te",
+      "source_sha256": "e640747756a5515fce30d954f4b3c98690c69130ec35ab436794c9efd15e1486",
+      "path": "modem/ssr_setup.te",
+      "sha256": "ab55fe177e93a1131a0f351927b31b0799c92a596767eba3acf536290c2fc785"
     }
   ]
 }

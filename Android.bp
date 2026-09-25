@@ -2,20 +2,14 @@
 // Copyright 2026 The DiamaneOS Project
 
 // Remote file-system paths the ADSP, CDSP, modem and other remote processors
-// use through tftp_server, matching the stock FP6 vendor image exactly.
+// use through tftp_server, matching the stock FP6 vendor image except the
+// ramdumps links: remote-processor error logs are not written to /data.
 
 install_symlink {
     name: "fp6_vendor_rfs_apq_gnss_hlos",
     vendor: true,
     installed_location: "rfs/apq/gnss/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_apq_gnss_ramdumps",
-    vendor: true,
-    installed_location: "rfs/apq/gnss/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/modem",
 }
 
 install_symlink {
@@ -54,13 +48,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_mdm_adsp_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/adsp/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/lpass",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_mdm_adsp_readonly_firmware",
     vendor: true,
     installed_location: "rfs/mdm/adsp/readonly/firmware",
@@ -93,13 +80,6 @@ install_symlink {
     vendor: true,
     installed_location: "rfs/mdm/cdsp/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_mdm_cdsp_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/cdsp/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/cdsp",
 }
 
 install_symlink {
@@ -138,13 +118,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_mdm_mpss_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/mpss/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/modem",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_mdm_mpss_readonly_firmware",
     vendor: true,
     installed_location: "rfs/mdm/mpss/readonly/firmware",
@@ -177,13 +150,6 @@ install_symlink {
     vendor: true,
     installed_location: "rfs/mdm/slpi/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_mdm_slpi_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/slpi/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/slpi",
 }
 
 install_symlink {
@@ -222,13 +188,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_mdm_tn_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/tn/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/tn",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_mdm_tn_readonly_firmware",
     vendor: true,
     installed_location: "rfs/mdm/tn/readonly/firmware",
@@ -261,13 +220,6 @@ install_symlink {
     vendor: true,
     installed_location: "rfs/mdm/wpss/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_mdm_wpss_ramdumps",
-    vendor: true,
-    installed_location: "rfs/mdm/wpss/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/wpss",
 }
 
 install_symlink {
@@ -306,13 +258,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_msm_adsp_ramdumps",
-    vendor: true,
-    installed_location: "rfs/msm/adsp/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/lpass",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_msm_adsp_readonly_firmware",
     vendor: true,
     installed_location: "rfs/msm/adsp/readonly/firmware",
@@ -345,13 +290,6 @@ install_symlink {
     vendor: true,
     installed_location: "rfs/msm/cdsp/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_msm_cdsp_ramdumps",
-    vendor: true,
-    installed_location: "rfs/msm/cdsp/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/cdsp",
 }
 
 install_symlink {
@@ -390,13 +328,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_msm_mpss_ramdumps",
-    vendor: true,
-    installed_location: "rfs/msm/mpss/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/modem",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_msm_mpss_readonly_firmware",
     vendor: true,
     installed_location: "rfs/msm/mpss/readonly/firmware",
@@ -432,13 +363,6 @@ install_symlink {
 }
 
 install_symlink {
-    name: "fp6_vendor_rfs_msm_slpi_ramdumps",
-    vendor: true,
-    installed_location: "rfs/msm/slpi/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/slpi",
-}
-
-install_symlink {
     name: "fp6_vendor_rfs_msm_slpi_readonly_firmware",
     vendor: true,
     installed_location: "rfs/msm/slpi/readonly/firmware",
@@ -471,13 +395,6 @@ install_symlink {
     vendor: true,
     installed_location: "rfs/msm/wpss/hlos",
     symlink_target: "/mnt/vendor/persist/hlos_rfs/shared",
-}
-
-install_symlink {
-    name: "fp6_vendor_rfs_msm_wpss_ramdumps",
-    vendor: true,
-    installed_location: "rfs/msm/wpss/ramdumps",
-    symlink_target: "/data/vendor/tombstones/rfs/wpss",
 }
 
 install_symlink {

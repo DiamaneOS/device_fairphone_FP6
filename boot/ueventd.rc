@@ -113,6 +113,16 @@
 # Secure FastRPC to the ADSP: the sensors multi-HAL and sscrpcd (system) read and
 # write; the audio PD listener (media) opens it read-only, as stock allows.
 /dev/adsprpc-smd-secure   0640   system     media
+# Remote processors. The peripheral manager (pm-service, user system) boots the
+# modem through its remoteproc character device. Owner-only: closing the node
+# after pm-service set shutdown-on-release stops the processor, so no group
+# access (stock uses 0640).
+/dev/remoteproc*          0600   system     system
+# Modem remote storage (EFS) shared memory, mapped by rmt_storage (matches
+# stock ueventd.rc).
+/dev/uio0                 0660   system     system
+/dev/uio1                 0660   system     system
+/dev/uio2                 0660   system     system
 
 # AudioReach GPR/shared memory and PAL speaker protection. ALSA /dev/snd/*
 # permissions are supplied by platform ueventd; legacy MSM codec nodes are unused.

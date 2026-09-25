@@ -122,16 +122,8 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
 
-# Placeholder audio: the AOSP reference HAL with stub streams, so audioserver
-# and the framework audio service can start. Replace with the Qualcomm stack.
-PRODUCT_PACKAGES += com.android.hardware.audio
-PRODUCT_COPY_FILES += \
-    device/fairphone/FP6/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_configuration.xml \
-    frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
-    frameworks/av/services/audiopolicy/config/bluetooth_with_le_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_with_le_audio_policy_configuration_7_0.xml \
-    frameworks/av/services/audiopolicy/config/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
-    frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml
-$(call inherit-product, hardware/interfaces/audio/aidl/default/audio_effects.mk)
+# Audio: the stock AudioReach userspace with AOSP source adapters (audio/audio.mk).
+$(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.

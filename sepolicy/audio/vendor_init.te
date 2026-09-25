@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+allow vendor_init { vendor_audio_data_file vendor_audio_dsp_data_file }:dir create_dir_perms;
+allow vendor_init vendor_sysfs_sndcard:file setattr;

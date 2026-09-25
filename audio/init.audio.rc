@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Stock init.qti.qcv.rc selects this SKU from the SoC name. The curated product
+# does not install that script. Set the same value before the audio service starts;
+# do not duplicate a bootloader-supplied key in the kernel bootconfig.
+on init
+    setprop ro.boot.product.vendor.sku volcano
+
+on post-fs-data
+    mkdir /data/vendor/audio 0770 audio audio
+    mkdir /data/vendor/audio/acdbdata 0770 media audio
+    mkdir /data/vendor/audio/acdbdata/delta 0770 media audio
+    mkdir /data/vendor/audio/memlog 0770 audio audio
+    mkdir /data/vendor/audio_dsp 0770 media media
+    restorecon_recursive /data/vendor/audio
+    restorecon_recursive /data/vendor/audio_dsp
+
+on boot
+    chown media audio /sys/kernel/snd_card/card_state

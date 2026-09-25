@@ -110,5 +110,13 @@
 /sys/class/leds/blue   trigger      0640    system    system
 # The Wi-Fi HAL (wifi) switches the QCA6750 host driver on and off (stock).
 /dev/wlan                 0660   wifi       wifi
-# Secure FastRPC to the ADSP for the sensors multi-HAL and sscrpcd (system).
-/dev/adsprpc-smd-secure   0660   system     system
+# Secure FastRPC to the ADSP: the sensors multi-HAL and sscrpcd (system) read and
+# write; the audio PD listener (media) opens it read-only, as stock allows.
+/dev/adsprpc-smd-secure   0640   system     media
+
+# AudioReach GPR/shared memory and PAL speaker protection. ALSA /dev/snd/*
+# permissions are supplied by platform ueventd; legacy MSM codec nodes are unused.
+/dev/aud_pasthru_adsp     0660   system     audio
+/dev/msm_audio_ion        0660   system     audio
+/dev/aw882xx_smartpa      0660   system     audio
+/dev/msm_adsp_sleepmon    0660   system     audio

@@ -7,8 +7,8 @@
 # generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te
 # (local copies in artifacts/vendor-work/fp6-policy-candidate-v3, hashes in
 # upstream-sepolicy-needed.txt). Omitted: diag and debug properties, executing
-# vendor tools (voice-call logging), the time and SSG TrustZone daemons, TIPC
-# and the legacy MSM IPC-router socket ioctls, the secure-element HAL, the
+# vendor tools (voice-call logging), the time and SSG TrustZone daemons, the
+# legacy MSM IPC-router socket ioctls, the secure-element HAL, the
 # Qualcomm IWLAN and data-connection services, the IMS factory client, the
 # QCRIL client socket (/dev/socket/qcrild; its module is not installed) and
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
@@ -34,6 +34,13 @@ r_dir_file(rild, vendor_mbn_data_file)
 
 # QMI to the modem over QRTR.
 allow rild self:qipcrtr_socket create_socket_perms_no_ioctl;
+
+# The data module asks nicmd to set up the rmnet data interfaces over TIPC
+# (libnicm RequestTIPCMessenger); every data call fails without it. Same as
+# stock (vendor_sepolicy.cil line 6576). TIPC has no network bearer in our
+# kernel and only rild and nicmd may create TIPC sockets.
+allow rild self:tipc_socket create_socket_perms_no_ioctl;
+neverallow { domain -rild -vendor_nicmd } self:tipc_socket create;
 
 # Modem vote through the peripheral manager (libperipheral_client, vndbinder).
 vndbinder_use(rild)

@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The stock CamX/CHI camera provider (vendor.qti.camera.provider-service_64).
+# Reduced from the stock FP6 compiled vendor policy (vendor_sepolicy.cil rules
+# for hal_camera, hal_camera_server and hal_camera_default) and bound to this
+# domain only. The platform hal_camera/hal_camera_default policy already covers
+# the V4L2/media nodes (video_device), gralloc, the GPU node, cameraserver IPC
+# and the provider service registration. Replace with the reduced upstream
+# sepolicy_vndr files listed in upstream-sepolicy-needed.txt when fetched.
+#
+# Not granted (stock grants them for features this product does not install):
+# the TCL algorithm service and its data/dump directories, secure camera
+# (QSEECom/TEE, protected heaps and VM memory-buffer nodes, ssgtzd), the AON
+# service, factory OTP/OIS sysfs (fp_mmitest_sysfs), persist writes and QRTR
+# ioctls.
+
+# Provider rc: capabilities SYS_NICE BLOCK_SUSPEND, group wakelock (stock CIL
+# line 4683 grants capability sys_nice only).
+allow hal_camera_default self:capability sys_nice;
+wakelock_use(hal_camera_default)
+
+# ToF laser autofocus (sensors.vl53l1.so opens /dev/stmvl53l1_ranging).
+allow hal_camera_default vl53l1_device:chr_file rw_file_perms;
+# UBWC-P linear views of compressed camera buffers (libubwcp, /dev/ubwcp).
+allow hal_camera_default vendor_ubwcp_device:chr_file r_file_perms;
+
+# FastRPC (libcdsprpc opens /dev/adsprpc-smd-secure, /dev/cdsprpc-smd and
+# /dev/adsprpc-smd; the kernel creates only adsprpc-smd and adsprpc-smd-secure).
+# - vendor_xdsp_device (/dev/adsprpc-smd-secure): the CamX sensor direct channel
+#   attaches to the ADSP sensors PD (camera.qcom.so "createstaticpd:sensorspd
+#   &_dom=adsp"); the kernel refuses the ADSP and static-PD attach on the
+#   non-secure node (kernel_qcom_dsp android17 dsp/adsprpc.c lines 4105, 4441, 6810).
+# - vendor_qdsp_device (/dev/adsprpc-smd): the CDSP channel is non-secure with
+#   unsigned support (adsprpc.c lines 3211-3213) and serves the FastCV, BitML,
+#   HME, MCTF and ML-AWB offloads when libcdsprpc falls back to it.
+# Read-only opens, as stock (CIL 4693, 4724). Keep only the node the r9p
+# provider actually holds open (see spec.md section 13) before enforcing.
+allow hal_camera_default { vendor_qdsp_device vendor_xdsp_device }:chr_file r_file_perms;
+r_dir_file(hal_camera_default, adsprpcd_file)
+get_prop(hal_camera_default, vendor_adsprpc_prop)
+
+# Qualcomm DMA-BUF heaps used by CamX buffer managers; display-heap
+# allocation only (DMA_HEAP_IOCTL_ALLOC).
+allow hal_camera_default { vendor_dmabuf_system_heap_device vendor_dmabuf_user_contig_heap_device }:chr_file r_file_perms;
+allow hal_camera_default vendor_dmabuf_display_heap_device:chr_file r_file_perms;
+allowxperm hal_camera_default vendor_dmabuf_display_heap_device:chr_file ioctl 0x4800;
+
+# SoC, camera, JPEG and DDR identification read by CamX and the CHI override.
+allow hal_camera_default { vendor_sysfs_camera vendor_sysfs_jpeg vendor_sysfs_ddr vendor_sys_nonsp_comp vendor_sys_sp_comp }:file r_file_perms;
+r_dir_file(hal_camera_default, vendor_sysfs_graphics)
+allow hal_camera_default proc_meminfo:file { open read };
+
+# Gyro/sensor samples for EIS and OIS through the ADSP sensors QMI service
+# (libsnsapi/libqmi_cci). The stock ioctl range 0xc300-0xc305 is not granted.
+allow hal_camera_default self:qipcrtr_socket create_socket_perms_no_ioctl;
+
+# Thermal mitigation client (libthermalclient) talks to thermal-engine.
+unix_socket_connect(hal_camera_default, vendor_thermal, vendor_thermal-engine)
+
+# The display QService lookup of libdisplayconfig on /dev/vndbinder.
+vndbinder_use(hal_camera_default)
+allow hal_camera_default vendor_qdisplay_service:service_manager find;
+
+# CamX runtime caches and dumps in /data/vendor/camera (init.fp6.camera.rc).
+allow hal_camera_default vendor_camera_data_file:dir create_dir_perms;
+allow hal_camera_default vendor_camera_data_file:file create_file_perms;
+
+# Factory calibration kept in persist is read only: dual-camera calibration
+# (camera.qcom.so, CHI override) and the VL53L1 calibration (sensors.vl53l1.so).
+allow hal_camera_default { mnt_vendor_file vendor_persist_file }:dir search;
+r_dir_file(hal_camera_default, persist_camera_file)
+
+# CamX reads and publishes vendor.camera.* / persist.vendor.camera.* state.
+set_prop(hal_camera_default, vendor_camera_prop)
+dontaudit hal_camera_default default_prop:file read;
+# camera.qcom.so also tries to publish the camera module serial numbers as
+# vendor.fp.camera_{main,aux,front}.sn (property.te). No domain may set or
+# read them: no grant here, and the denials stay audited.
+
+# The CHI override registers the offline camera AIDL service in-process
+# (declared by vendor.qti.camera.offlinecamera-impl.xml).
+add_service(hal_camera_default, vendor_hal_offlinecamera_service)

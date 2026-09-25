@@ -144,3 +144,23 @@
 # QCRIL reads the system health monitor (stock ueventd.rc line 230 uses
 # 0644 radio system; only the radio daemon opens it here).
 /dev/system_health_monitor 0600   radio      radio
+
+# Camera (stock FP6 ueventd.rc lines 111, 194, 196, 197): V4L2 video,
+# media-controller and subdevice nodes and UBWC-P for the camera provider
+# (runs as cameraserver in group camera). As on stock, the video nodes include
+# the video codec nodes.
+/dev/video*               0660   system     camera
+/dev/media*               0660   system     camera
+/dev/v4l-subdev*          0660   system     camera
+/dev/ubwcp                0660   root       camera
+# Non-secure FastRPC node. The kernel serves the CDSP (a non-secure channel)
+# through it; the camera offloads (FastCV, BitML, HME, MCTF, ML-AWB) use it when
+# libcdsprpc falls back from the secure node. Stock made it 0664 system system
+# (line 222); only the camera group needs it here, read-only (the stock
+# provider, uid cameraserver, could only open it through the read bit). The
+# secure node keeps its 0640 system media rule; the camera provider reaches it
+# through its media group (reviewed provider rc, tools-edits.md section 7).
+/dev/adsprpc-smd          0640   system     camera
+# VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc made
+# it 0666 system; only the camera group needs it.
+/dev/stmvl53l1_ranging    0660   system     camera

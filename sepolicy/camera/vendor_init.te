@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+allow vendor_init vendor_camera_data_file:dir create_dir_perms;
+# init.fp6.camera.rc tightens the stock 0777 persist camera directories:
+# persist/camera is persist_camera_file (vendor-volcano/file_contexts line 281),
+# persist/cam_cali has no own entry and keeps the mount's mnt_vendor_file label.
+allow vendor_init { persist_camera_file mnt_vendor_file }:dir { search getattr setattr };

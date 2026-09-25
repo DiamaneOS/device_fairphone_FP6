@@ -155,3 +155,49 @@ ramdumps links, no `/data/vendor/tombstones/rfs`); the imported
 `vendor_rfs_access` grants on `vendor_tombstone_data_file` and
 `vendor_pddump_data_file` are to be dropped when enforcing unless a denial shows
 a need. These rules are not yet runtime-qualified under enforcing mode.
+
+## Bluetooth
+
+`bluetooth/hal_bluetooth_default.te` is drafted by DiamaneOS from the stock
+compiled vendor policy of FP6.QREL.16.100.0 (`vendor_sepolicy.cil`, rules for
+`hal_bluetooth_default` and `hal_bluetooth`), for the stock Qualcomm HCI
+service `android.hardware.bluetooth@1.1-service-qti`. It is to be reduced from
+Qualcomm `generic/vendor/common/hal_bluetooth.te` (or `hal_bluetooth_default.te`) at the pinned
+`sepolicy_vndr` revision once that file is fetched; then record it in
+`provenance.json`. `bluetooth/file_contexts` gives the service its stock
+label (stock `vendor_file_contexts` line 1125).
+
+The policy grants the btpower node, read access to the Bluetooth firmware
+partition and to the Bluetooth persist directory, read access to the Bluetooth
+vendor properties and read-only SoC identification. The HAL may set only the
+five properties it writes at run time (SoC name, scram.enabled, a generated
+address and two crash counters); `bluetooth/property_contexts` gives them the
+vendor-internal type `vendor_bluetooth_hal_state_prop`, so no platform domain
+or app can read the address once enforcing. The HCI UART (`hci_attach_dev`)
+comes from platform policy, as in stock. The policy omits persist writes, the
+stock QRTR sockets (only used for the modem-NV address query, which is off),
+`/data/vendor/bluetooth`, diag, the FM radio device, the ssgtzd socket, TPI and
+Xpan service registration and HSUART tracing.
+
+The service links, but does not register, the FM, ANT, SAR, config-store and
+TPI libraries. The imported hwservice_contexts map `com.dsi.ant::IAnt`,
+`com.qualcomm.qti.ant::IAntHci` (vendor-common lines 32-33) and
+`vendor.qti.hardware.bluetooth_sar::IBluetoothSar` (qva-common line 65) to
+`hal_bluetooth_hwservice`, which the HAL may add. Keep those interfaces out of
+the device VINTF manifest.
+
+Before enforcing mode:
+- `/dev/btfmcodec_dev` and `/dev/bt_cp_ctrl` share `hci_attach_dev` with
+  `/dev/ttyHS0`, and `/dev/btfmslim` shares `vendor_bt_device` with
+  `/dev/btpower` (vendor-common/file_contexts lines 65, 152-154). They stay
+  root-only through ueventd today. Give them their own device types that the
+  HAL is not granted.
+- Label the rfkill and `hs_uart_operation` sysfs nodes
+  `sysfs_bluetooth_writable` with device-path genfs rules, and move their
+  ownership from index-based init lines (`rfkill0`) to ueventd device-path
+  lines, once the phone gives the btpower device path.
+- If `hal_audio_default` shows a read of `persist.vendor.qcom.bluetooth.soc`,
+  grant it `get_prop` on `vendor_bluetooth_hal_state_prop` (stock lets the
+  audio HAL read the Bluetooth properties, vendor_sepolicy.cil 4638, 7863).
+
+Not yet runtime-qualified under enforcing mode.

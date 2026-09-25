@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock label of the Qualcomm Bluetooth HCI service (stock vendor_file_contexts
+# line 1125; the image xattr is hal_bluetooth_default_exec).
+/vendor/bin/hw/android\.hardware\.bluetooth@1\.1-service-qti    u:object_r:hal_bluetooth_default_exec:s0

@@ -20,4 +20,8 @@
     <!-- Stock uses 0dp, which puts the status bar clock and battery inside the
          physical screen corners; keep them clear of the corners. -->
     <dimen name="rounded_corner_content_padding">24dp</dimen>
+
+    <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay: the
+         controller supports LE peripheral (advertising) mode. -->
+    <bool name="config_bluetooth_le_peripheral_mode_supported">true</bool>
 </resources>

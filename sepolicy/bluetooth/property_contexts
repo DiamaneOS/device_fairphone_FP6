@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The only properties the stock Bluetooth service and HCI implementation set
+# (property_set calls: service 0x92c8, 0x9478; HCI implementation 0x52918,
+# 0x52ac8, 0x5829c, 0x592ac, 0x5aaf0, 0x5cfcc, 0x5d09c, and Logger::PropertySet
+# at 0x50404 and 0x50694). Exact entries take precedence over the imported
+# vendor_bluetooth_prop prefixes (vendor-common/property_contexts lines 27-33).
+persist.vendor.qcom.bluetooth.soc                         u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
+persist.vendor.qcom.bluetooth.scram.enabled               u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
+persist.vendor.service.bdroid.bdaddr                      u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
+persist.vendor.service.bdroid.system_delay_crash_count    u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
+persist.vendor.service.bdroid.rxthread.stuck.count        u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string

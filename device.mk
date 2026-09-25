@@ -125,6 +125,10 @@ PRODUCT_COPY_FILES += \
 # Audio: the stock AudioReach userspace with AOSP source adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
+# r9p hardware bring-up (reviews/OP-HW-BRINGUP-2026-09-25). Each subsystem
+# makefile documents its stock and source-built parts.
+$(call inherit-product, device/fairphone/FP6/modem/modem.mk)
+
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)

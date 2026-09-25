@@ -49,9 +49,10 @@ on post-fs-data
     mkdir /data/vendor/perfd 2770 root system
     # Sensor stack state (matches stock).
     mkdir /data/vendor/sensors 0770 system system
-    # Remote-processor crash dumps served through tftp_server (matches stock).
     mkdir /data/vendor/tombstones 0771 system system
-    mkdir /data/vendor/tombstones/rfs 0771 system system
+    # Unlike stock, no /data/vendor/tombstones/rfs: remote-processor error logs
+    # are not written to /data (the /vendor/rfs/*/*/ramdumps links are not
+    # installed either; see the modem review).
     # Vibrator control for the vibrator HAL (matches stock).
     chown system system /sys/class/leds/aw_vibrator/trigger
     chown system system /sys/class/leds/aw_vibrator/activate

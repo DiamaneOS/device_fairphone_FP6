@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Modem subsystem support (installed as /vendor/etc/init/init.fp6.modem.rc).
+# pd-mapper, pm-service and pm-proxy are defined in boot/init.qcom.rc;
+# rmt_storage and tftp_server by their selected stock rc files.
+
+# Subsystem restart (matches stock init.qcom.rc). The kernel probes every
+# remote processor with recovery disabled, so a crash would panic the phone.
+# ssr_setup reads persist.vendor.ssr.restart_level (ALL_ENABLE, modem.mk) and
+# writes "enabled" to /sys/class/remoteproc/*/recovery. It must run before
+# class core starts the peripheral manager, which boots the modem. The stock
+# property trigger alone is too late for that: init runs the boot-time property
+# triggers only after the late-init chain (early-fs ... boot) has run. So start
+# it at early-boot, after "on fs" has loaded the remoteproc driver. The
+# property trigger is kept for later changes of the property; a second run only
+# writes "enabled" again. Always start it without arguments (it has a --dump
+# option).
+service vendor.ssr_setup /vendor/bin/ssr_setup
+    user root
+    group root
+    capabilities
+    oneshot
+    disabled
+
+on early-boot
+    start vendor.ssr_setup
+
+on property:persist.vendor.ssr.restart_level=*
+    start vendor.ssr_setup
+
+# Let the remote processors' SMP2P interrupts wake the AP (matches stock
+# vendor.qti.smp2p.rc, which cannot be selected on its own).
+on early-boot
+    write /sys/devices/platform/soc/soc:qcom,smp2p-adsp/power/wakeup "enabled"
+    write /sys/devices/platform/soc/soc:qcom,smp2p-modem/power/wakeup "enabled"
+    write /sys/devices/platform/soc/soc:qcom,smp2p-cdsp/power/wakeup "enabled"

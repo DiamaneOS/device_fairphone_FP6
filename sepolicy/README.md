@@ -133,3 +133,25 @@ The kernel may not search `/mnt/vendor` (a platform neverallow), so it cannot
 follow the amplifier calibration link into persist; the amplifier then uses its
 default calibration. These rules are not yet runtime-qualified under enforcing
 mode; collect denials on the device before adding any grant.
+
+## Modem
+
+The modem (MSS) is booted by the stock peripheral manager through its
+remoteproc character device, which ueventd gives to `system` owner-only.
+`modem/ssr_setup.te` adds the stock subsystem-restart helper domain
+`vendor_ssr_setup`. It is derived from Qualcomm's policy as compiled into the
+stock FP6 image until the Qualcomm `generic/vendor/common/ssr_setup.te` at
+`67fa928299a49374a55281969fee357884c86890` is fetched; then its licence header
+and hashes are recorded in `provenance.json`. It lists `/sys/class/remoteproc`,
+reads processor names and writes the `recovery` switches only
+(`vendor_sysfs_ssr_toggle`), and reads `persist.vendor.ssr.`. Omitted stock
+grants: writes to `vendor_sysfs_ssr` files and links (the legacy
+`msm_subsys` restart_level interface, absent on this kernel) and reads of
+`vendor_sysfs_data`. `modem/file_contexts` labels `/vendor/bin/ssr_setup`; the
+MSS, ADSP, CDSP and WPSS recovery switches are in `vendor-volcano/file_contexts`.
+The full RAM dump collector (`vendor_subsystem_ramdump`) is not installed and
+has no policy. Remote-processor error logs are not written to /data (no
+ramdumps links, no `/data/vendor/tombstones/rfs`); the imported
+`vendor_rfs_access` grants on `vendor_tombstone_data_file` and
+`vendor_pddump_data_file` are to be dropped when enforcing unless a denial shows
+a need. These rules are not yet runtime-qualified under enforcing mode.

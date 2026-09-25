@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="security_settings_sfps_enroll_find_sensor_message">"指紋感應器位於裝置右側"</string>
+</resources>

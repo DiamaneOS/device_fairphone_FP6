@@ -1,0 +1,151 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# CPU, scheduler, sleep and memory tuning for the FP6 (SM7635, 4+3+1 cores,
+# LPDDR5). Values follow the stock Qualcomm volcano scripts
+# (init.kernel.post_boot-volcano_default_4_3_1.sh, init.kernel.post_boot-memory.sh
+# and init.qti.kernel.rc). Without them the kernel stays on its defaults: the
+# performance governor at maximum clocks, sched_boost 1, deep CPU sleep
+# disabled and no swap. Stock's SMEM image-version writes and console settings
+# are left out.
+
+on post-fs
+    # Task placement: colocate the foreground app's threads, keep the stock
+    # boost overrides.
+    write /dev/cpuctl/foreground/cpu.uclamp.sched_boost_no_override 1
+    write /dev/cpuctl/top-app/cpu.uclamp.sched_boost_no_override 1
+    write /dev/cpuctl/background/cpu.uclamp.colocate 0
+    write /dev/cpuctl/foreground/cpu.uclamp.colocate 0
+    write /dev/cpuctl/top-app/cpu.uclamp.colocate 1
+
+on property:sys.boot_completed=1
+    # Real-time throttling window.
+    write /proc/sys/kernel/sched_rt_period_us 1350000
+    write /proc/sys/kernel/sched_rt_runtime_us 1250000
+    write /proc/sys/walt/sched_max_freq_partial_halt 1190400
+
+    # Core parking: silver always on, gold keeps two cores, prime parks.
+    write /sys/devices/system/cpu/cpu0/core_ctl/nrrun_cpu_mask 0xFF
+    write /sys/devices/system/cpu/cpu0/core_ctl/nrrun_cpu_misfit_mask 0x00
+    write /sys/devices/system/cpu/cpu0/core_ctl/assist_cpu_mask 0x00
+    write /sys/devices/system/cpu/cpu0/core_ctl/assist_cpu_misfit_mask 0x00
+    write /sys/devices/system/cpu/cpu4/core_ctl/min_cpus 2
+    write /sys/devices/system/cpu/cpu4/core_ctl/busy_up_thres 60
+    write /sys/devices/system/cpu/cpu4/core_ctl/busy_down_thres 30
+    write /sys/devices/system/cpu/cpu4/core_ctl/offline_delay_ms 100
+    write /sys/devices/system/cpu/cpu4/core_ctl/task_thres 3
+    write /sys/devices/system/cpu/cpu4/core_ctl/not_preferred "0 0 0"
+    write /sys/devices/system/cpu/cpu4/core_ctl/nrrun_cpu_mask 0xF0
+    write /sys/devices/system/cpu/cpu4/core_ctl/nrrun_cpu_misfit_mask 0x0F
+    write /sys/devices/system/cpu/cpu4/core_ctl/assist_cpu_mask 0x00
+    write /sys/devices/system/cpu/cpu4/core_ctl/assist_cpu_misfit_mask 0x00
+    write /sys/devices/system/cpu/cpu7/core_ctl/min_cpus 0
+    write /sys/devices/system/cpu/cpu7/core_ctl/busy_up_thres 60
+    write /sys/devices/system/cpu/cpu7/core_ctl/busy_down_thres 30
+    write /sys/devices/system/cpu/cpu7/core_ctl/offline_delay_ms 100
+    write /sys/devices/system/cpu/cpu7/core_ctl/task_thres 1
+    write /sys/devices/system/cpu/cpu7/core_ctl/not_preferred 1
+    write /sys/devices/system/cpu/cpu7/core_ctl/nrrun_cpu_mask 0x80
+    write /sys/devices/system/cpu/cpu7/core_ctl/nrrun_cpu_misfit_mask 0x70
+    write /sys/devices/system/cpu/cpu7/core_ctl/assist_cpu_mask 0x70
+    write /sys/devices/system/cpu/cpu7/core_ctl/assist_cpu_misfit_mask 0x0F
+    write /sys/devices/system/cpu/cpu0/core_ctl/enable 0
+    write /sys/devices/system/cpu/cpu4/core_ctl/enable 1
+    write /sys/devices/system/cpu/cpu7/core_ctl/enable 1
+
+    # WALT scheduler thresholds.
+    write /proc/sys/walt/sched_downmigrate "65 85"
+    write /proc/sys/walt/sched_upmigrate "71 95"
+    write /proc/sys/walt/sched_group_downmigrate 85
+    write /proc/sys/walt/sched_group_upmigrate 100
+    write /proc/sys/walt/sched_walt_rotate_big_tasks 1
+    write /proc/sys/walt/sched_min_task_util_for_boost 51
+    write /proc/sys/walt/sched_min_task_util_for_colocation 35
+    write /proc/sys/walt/sched_coloc_busy_hysteresis_enable_cpus 0
+    write /proc/sys/walt/sched_util_busy_hyst_cpu_ns "8500000 8500000 8500000 8500000 5000000 5000000 5000000 2000000"
+    write /proc/sys/walt/sched_util_busy_hysteresis_enable_cpus 255
+    write /proc/sys/walt/sched_util_busy_hyst_cpu_util "1 1 1 1 15 15 15 15"
+    write /proc/sys/walt/sched_cluster_util_thres_pct 40
+    write /proc/sys/walt/sched_idle_enough 30
+    write /proc/sys/walt/sched_pipeline_cpus 112
+    write /proc/sys/walt/walt_low_latency_task_threshold 325
+    write /proc/sys/walt/sched_fmax_cap "1708800 2208000 2147483647"
+    write /proc/sys/walt/sched_boost 0
+    write /proc/sys/walt/input_boost/input_boost_freq "1113600 0 0 0 0 0 0 0"
+    write /proc/sys/walt/input_boost/input_boost_ms 120
+
+    # Frequency governor: WALT instead of the kernel's performance default.
+    write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor walt
+    write /sys/devices/system/cpu/cpufreq/policy4/scaling_governor walt
+    write /sys/devices/system/cpu/cpufreq/policy7/scaling_governor walt
+    write /sys/devices/system/cpu/cpufreq/policy0/walt/down_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy0/walt/up_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/down_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/up_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/down_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/up_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy0/walt/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/pl 0
+    write /proc/sys/walt/sched_conservative_pl 1
+    write /sys/devices/system/cpu/cpufreq/policy0/walt/rtg_boost_freq 595200
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/rtg_boost_freq 0
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/rtg_boost_freq 0
+    write /sys/devices/system/cpu/cpufreq/policy0/walt/hispeed_freq 1113600
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/hispeed_freq 1190400
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/hispeed_freq 1459200
+    write /sys/devices/system/cpu/cpufreq/policy4/walt/hispeed_load 85
+    write /sys/devices/system/cpu/cpufreq/policy7/walt/hispeed_load 85
+    write /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq 595200
+    write /sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq 633600
+    write /sys/devices/system/cpu/cpufreq/policy7/scaling_min_freq 633600
+    write /proc/sys/kernel/sched_util_clamp_min_rt_default 0
+
+    # Background work stays on the silver cores.
+    write /dev/cpuset/background/cpus 0-3
+    write /dev/cpuset/system-background/cpus 0-3
+
+    # Memory-bus scaling (LPDDR5 zones). Boost votes use the hardware minimum,
+    # as in stock.
+    write /sys/devices/system/cpu/bus_dcvs/DDR/boost_freq 547000
+    write /sys/devices/system/cpu/bus_dcvs/DDRQOS/boost_freq 0
+    write /sys/devices/system/cpu/bus_dcvs/L3/boost_freq 364800
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/mbps_zones "1720 2086 2929 3879 5931 6515 7980 12191"
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/sample_ms 4
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/io_percent 68
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/hist_memory 20
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/down_thres 80
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/guard_band_mbps 0
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/up_scale 250
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/idle_mbps 1600
+    write /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/window_ms 48
+    write /sys/devices/system/cpu/bus_dcvs/L3/soc:qcom,memlat:l3:gold/ipm_ceil 4000
+    write /sys/devices/system/cpu/bus_dcvs/L3/soc:qcom,memlat:l3:gold/wb_pct_thres 60
+    write /sys/devices/system/cpu/bus_dcvs/DDRQOS/soc:qcom,memlat:ddrqos:gold/ipm_ceil 4000
+
+    # Let idle CPUs and the system enter their low-power states.
+    write /sys/power/mem_sleep s2idle
+    write /sys/devices/system/cpu/qcom_lpm/parameters/sleep_disabled N
+
+    # Memory: zram swap (fstab.qcom), reclaim and read-ahead.
+    swapon_all /vendor/etc/fstab.qcom
+    write /proc/sys/vm/swappiness 100
+    write /proc/sys/vm/page-cluster 0
+    write /proc/sys/vm/compaction_proactiveness 0
+    write /proc/sys/vm/min_free_kbytes 11584
+    write /proc/sys/vm/watermark_scale_factor 40
+    write /sys/kernel/mm/transparent_hugepage/enabled always
+    write /sys/kernel/mm/transparent_hugepage/defrag never
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/defrag 0
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan 1
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs 4294967295
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs 4294967295
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_none 0
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_swap 0
+    write /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_shared 0
+    write /sys/class/kgsl/kgsl/page_reclaim_per_call 19200
+    write /sys/class/kgsl/kgsl/max_reclaim_limit 25600
+    write /sys/block/sda/queue/read_ahead_kb 512
+    write /sys/block/dm-0/queue/read_ahead_kb 512
+    write /sys/block/dm-1/queue/read_ahead_kb 512
+    write /sys/block/dm-2/queue/read_ahead_kb 512

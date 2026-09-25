@@ -25,8 +25,7 @@ Downstream adaptations:
   service is not installed.
 - Label the FP6 fingerprint service (`android.hardware.biometrics.
   fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
-  stock wrapper it replaces; its FocalTech node and QSEECom grants are an
-  enforcing-mode follow-up.
+  stock wrapper it replaces.
 - Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_pd_mapper`
   and `vendor_per_mgr`: their QMI libraries open AF_QIPCRTR sockets, which the
   upstream rules only grant as generic `socket`.
@@ -41,8 +40,12 @@ Downstream adaptations:
     same-process HAL library; the composer keeps state in
     `/data/vendor/display`.
   - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
-    and its heaps for the fingerprint HAL. The module's own debug binder service
-    is not granted.
+    and its heaps for the fingerprint HAL, each limited to the permissions the
+    module used. The module's debug binder service stays unlabelled, so the
+    platform neverallow on `default_android_service` forbids granting it; its
+    only switch is a /data configuration file, which is deliberately not
+    created, and a neverallow keeps the HAL from opening files in
+    `vendor_data_file`.
   - Read-only SoC, thermal-zone and remote-processor names for the thermal,
     performance and peripheral-manager services; `/dev/wlan` and the driver
     version property for the Wi-Fi HAL; the vendor patch level for KeyMint;

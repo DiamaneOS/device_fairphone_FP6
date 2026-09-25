@@ -4,8 +4,12 @@
      Copyright 2026 The DiamaneOS Project
 -->
 <resources>
-    <!-- Show Display > Smooth display, the user switch between 60 Hz and the
-         panel's 120 Hz peak. -->
+    <!-- Show Display > Smooth display (AOSP): a switch between a 60 Hz and a
+         120 Hz cap. Both stay adaptive: the panel idles at 10 Hz. This also
+         shows Developer options > Force peak refresh rate. Stock Settings hides
+         this switch and shows a 60/90/120 Hz "Refresh Rate" list; picking an
+         entry also sets match_content_frame_rate to 0, which on our framework
+         locks the panel to one rate, so we keep the AOSP switch. -->
     <bool name="config_show_smooth_display">true</bool>
 
     <!-- Labels for the colour modes in the framework's config_availableColorModes

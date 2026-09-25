@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The stock QCRIL daemon qcrilNrd runs in the platform rild domain (a
+# hal_telephony server; the platform policy covers the AOSP radio HAL services).
+# Reduced from Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
+# generic/vendor/common/rild.te, qva/vendor/common/rild.te,
+# generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te
+# (local copies in artifacts/vendor-work/fp6-policy-candidate-v3, hashes in
+# upstream-sepolicy-needed.txt). Omitted: diag and debug properties, executing
+# vendor tools (voice-call logging), the time and SSG TrustZone daemons, TIPC
+# and the legacy MSM IPC-router socket ioctls, the secure-element HAL, the
+# Qualcomm IWLAN and data-connection services, the IMS factory client, the
+# QCRIL client socket (/dev/socket/qcrild; its module is not installed) and
+# binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
+# binderservicedomain, so apps cannot call it through the platform appdomain
+# rule; its three app clients get binder_call in qtelephony.te,
+# qcril_audio.te and qti_lpa.te.
+
+# Qualcomm services the device declares: IImsRadio and IQtiRadioConfig
+# (vendor_hal_telephony_service2), IQcRilAudio and IUimLpa (own types,
+# service.te). Upstream grants add on these to every hal_telephony server;
+# here only to rild.
+allow rild { vendor_hal_telephony_service2 fp6_hal_qcrilaudio_service fp6_hal_uimlpa_service }:service_manager { add find };
+set_prop(rild, vendor_radio_prop)
+
+# QCRIL internal IPC (/dev/socket/qmux_radio), created by the daemon.
+allow rild vendor_qmuxd_socket:dir w_dir_perms;
+allow rild vendor_qmuxd_socket:sock_file create_file_perms;
+
+# QCRIL database (/data/vendor/radio) and the modem configuration version.
+allow rild vendor_radio_vendor_data_file:dir rw_dir_perms;
+allow rild vendor_radio_vendor_data_file:file create_file_perms;
+r_dir_file(rild, vendor_mbn_data_file)
+
+# QMI to the modem over QRTR.
+allow rild self:qipcrtr_socket create_socket_perms_no_ioctl;
+
+# Modem vote through the peripheral manager (libperipheral_client, vndbinder).
+vndbinder_use(rild)
+binder_call(rild, vendor_per_mgr)
+allow rild vendor_per_mgr_service:service_manager find;
+
+# System health monitor (libsystem_health_mon: /dev/system_health_monitor).
+allow rild vendor_shm_chr_device:chr_file r_file_perms;
+
+# Data-module and CLAT properties.
+get_prop(rild, radio_control_prop)
+get_prop(rild, vendor_dataqdp_prop)
+set_prop(rild, vendor_xlat_prop)
+get_prop(rild, vendor_qc_aon_prop)
+
+crash_dump_fallback(rild)

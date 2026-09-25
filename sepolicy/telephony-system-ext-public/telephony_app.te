@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# App domains of two stock Qualcomm telephony apps that keep their Fairphone
+# signature. Stock runs both in vendor_qtelephony (Qualcomm sepolicy
+# generic/private/seapp_contexts line 44, generic/product/private/seapp_contexts
+# line 47); here each gets only what it uses. Public so that the vendor policy
+# (telephony/) can bind their QCRIL service access to exactly these domains.
+# QCRIL audio messenger (com.qualcomm.qti.telephonyservice, process com.qti.phone).
+type fp6_qcril_audio_app, domain;
+# eSIM LPA (com.qualcomm.qti.lpa).
+type fp6_qti_lpa_app, domain;

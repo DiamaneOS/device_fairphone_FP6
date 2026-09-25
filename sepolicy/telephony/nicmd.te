@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# nicmd (network interface control manager) configures the rmnet data
+# interfaces for modem data calls. Stock nicmd.rc starts it as root (no user
+# line); it drops privileges itself. The rendered nicmd.rc bounds it to the
+# capabilities below (tools-edits.md, TELEPHONY_CONFIG_REWRITES). Reduced from
+# Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
+# generic/vendor/common/nicmd.te (local copy in
+# artifacts/vendor-work/fp6-policy-candidate-v3). Omitted: the SHS,
+# QMI-priority and performance helpers (shsusrd, qmipriod, perf HAL and their
+# properties), TIPC and the legacy MSM IPC-router socket and ioctls, the HIDL
+# netd service (the daemon links only the AIDL netd interface), diag, the
+# netdomain attribute (stock vendor_sepolicy.cil line 442; it would add TCP
+# connect and port binding, which nicmd does not use: it opens sockets only
+# for interface ioctls) and write access to /data/vendor/nicmd beyond the
+# init-created recovery file (the file log is off, nicm_config.xml rewrite).
+type vendor_nicmd, domain;
+type vendor_nicmd_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_nicmd)
+
+# Control socket (/dev/socket/nicmd) and recovery state
+# (/data/vendor/nicmd/nicm_recovery, created by nicmd.rc).
+allow vendor_nicmd vendor_nicmd_socket:dir w_dir_perms;
+allow vendor_nicmd vendor_nicmd_socket:sock_file create_file_perms;
+allow vendor_nicmd vendor_nicm_data_file:dir search;
+allow vendor_nicmd vendor_nicm_data_file:file rw_file_perms;
+
+# rmnet links, addresses, routes and xfrm; modem data-call events over QRTR;
+# interface ioctls on datagram sockets (stock vendor_sepolicy.cil 6082-6085).
+allow vendor_nicmd self:udp_socket create_socket_perms;
+allow vendor_nicmd self:tcp_socket create_socket_perms_no_ioctl;
+allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlmsg_read nlmsg_write };
+allow vendor_nicmd self:netlink_xfrm_socket { create_socket_perms_no_ioctl nlmsg_write nlmsg_read };
+allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
+allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;
+allow vendor_nicmd self:qipcrtr_socket create_socket_perms_no_ioctl;
+allowxperm vendor_nicmd self:udp_socket ioctl priv_sock_ioctls;
+allowxperm vendor_nicmd self:udp_socket ioctl rmnet_sock_ioctls;
+allow vendor_nicmd self:capability { net_admin net_raw setgid setpcap setuid kill };
+wakelock_use(vendor_nicmd)
+dontaudit vendor_nicmd kernel:system { module_request };
+
+# Network tuning knobs.
+allow vendor_nicmd sysfs_net:dir r_dir_perms;
+allow vendor_nicmd sysfs_net:file rw_file_perms;
+allow vendor_nicmd proc_net:file rw_file_perms;
+allow vendor_nicmd vendor_sysfs_data:file r_file_perms;
+get_prop(vendor_nicmd, boot_status_prop)
+
+# ip/iptables through the platform wrappers (/system/bin/ip-wrapper-1.0).
+use_netutils(vendor_nicmd)
+allow vendor_nicmd netutils_wrapper:process sigkill;
+
+# netd (android.system.net.netd AIDL) and the connectivity native service.
+binder_call(vendor_nicmd, netd)
+binder_call(vendor_nicmd, servicemanager)
+allow vendor_nicmd system_net_netd_service:service_manager find;
+allow vendor_nicmd connectivity_native_service:service_manager find;
+binder_call(vendor_nicmd, system_server)

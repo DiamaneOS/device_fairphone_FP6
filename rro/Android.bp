@@ -24,3 +24,17 @@ runtime_resource_overlay {
     manifest: "FP6SystemUIOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6SystemUIOverlay/res"],
 }
+
+runtime_resource_overlay {
+    name: "FP6TeleServiceOverlay",
+    vendor: true,
+    manifest: "FP6TeleServiceOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6TeleServiceOverlay/res"],
+}
+
+runtime_resource_overlay {
+    name: "FP6CarrierConfigOverlay",
+    vendor: true,
+    manifest: "FP6CarrierConfigOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6CarrierConfigOverlay/res"],
+}

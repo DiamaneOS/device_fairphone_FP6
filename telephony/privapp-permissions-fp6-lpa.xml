@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+
+     Privileged permissions of the stock Qualcomm eSIM LPA (com.qualcomm.qti.lpa,
+     /product/priv-app/uimlpaservice). It keeps its stock Fairphone signature;
+     its only privileges come from this list. Installed in /product/etc/permissions
+     because SystemConfig applies product allowlists to product apps.
+
+     Granted, both needed by the framework eUICC path:
+       WRITE_EMBEDDED_SUBSCRIPTIONS: EuiccConnector binds only an EuiccService
+         of a package that holds it.
+       READ_PRIVILEGED_PHONE_STATE: the service reads UICC slot and port state
+         (TelephonyManager.getUiccSlotsInfo) and ICCIDs of eSIM ports.
+     The LPA requests no other privileged permission. Its normal permissions
+     (INTERNET, ACCESS_NETWORK_STATE, CHANGE_NETWORK_STATE,
+     RECEIVE_BOOT_COMPLETED) and WRITE_SETTINGS (granted to preinstalled apps)
+     are not controlled by this list; its dex never writes Settings.
+-->
+<permissions>
+    <privapp-permissions package="com.qualcomm.qti.lpa">
+        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
+        <permission name="android.permission.WRITE_EMBEDDED_SUBSCRIPTIONS"/>
+    </privapp-permissions>
+</permissions>

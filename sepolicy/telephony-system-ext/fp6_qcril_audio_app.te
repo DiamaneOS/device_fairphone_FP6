@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock QCRIL audio messenger (com.qualcomm.qti.telephonyservice, process
+# com.qti.phone, privileged app). It registers an IQcRilAudio callback with the
+# radio daemon and forwards the in-call vsid/call_state parameters with
+# AudioManager.setParameters (AudioSystem to audioserver). Its vendor side
+# (IQcRilAudio find, binder with rild) is telephony/qcril_audio.te. No network,
+# no telephony framework service, no other QCRIL service.
+typeattribute fp6_qcril_audio_app coredomain;
+app_domain(fp6_qcril_audio_app)
+binder_use(fp6_qcril_audio_app)
+
+allow fp6_qcril_audio_app { app_api_service audioserver_service }:service_manager find;
+
+# Own app data (device-protected storage; the app is directBootAware).
+allow fp6_qcril_audio_app app_data_file:dir create_dir_perms;
+allow fp6_qcril_audio_app app_data_file:{ file lnk_file } create_file_perms;

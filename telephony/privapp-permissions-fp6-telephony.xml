@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+
+     Privileged permissions of the stock Qualcomm system_ext telephony apps,
+     which keep their stock signature (they are not signed with our platform
+     key). Every signature|privileged permission they request is listed, as
+     granted or explicitly denied; with ro.control_privapp_permissions=enforce
+     an unlisted one stops a user build at boot (AppIdPermissionPolicy).
+
+     org.codeaurora.ims (IMS/VoLTE). Granted, each needed on the VoLTE path:
+       MODIFY_PHONE_STATE, READ_PRIVILEGED_PHONE_STATE, READ_PRECISE_PHONE_STATE:
+         ImsService registration, call and SMS control.
+       INTERACT_ACROSS_USERS: ImsServiceSub.broadcastVopsSsacIntent
+         (sendBroadcastAsUser) and sendBroadcastForDisconnected
+         (sendStickyBroadcastAsUser) call it outside any try block.
+     Denied:
+       WRITE_SECURE_SETTINGS: its only writes are gated on state that does not
+         exist on this product. ImsService.migrateDb writes only when
+         Settings.Global "rtt_mode" is set (getInt(..., -1) != -1), a key only
+         Qualcomm's own settings apps write; ImsServiceSub.processShowVoWifiNtf
+         writes only when the carrier config key orange_new_feature_enabled is
+         true, which the AOSP carrier config does not define.
+       SUBSTITUTE_NOTIFICATION_APP_NAME: only relabels its notifications.
+     Not grantable without the platform key and not needed for VoLTE:
+     CREATE_USERS, INTERACT_ACROSS_USERS_FULL, INTERACT_ACROSS_PROFILES,
+     SYSTEM_ALERT_WINDOW.
+
+     com.qualcomm.qti.telephonyservice (QCRIL audio messenger), installed as a
+     privileged app so that its shared UID android.uid.qtiphone is privileged
+     and a non-privileged package cannot join it. Denied:
+       MODIFY_AUDIO_ROUTING: it forwards vsid/call_state with
+         AudioManager.setParameters, which needs MODIFY_AUDIO_SETTINGS (normal).
+-->
+<permissions>
+    <privapp-permissions package="org.codeaurora.ims">
+        <permission name="android.permission.MODIFY_PHONE_STATE"/>
+        <permission name="android.permission.READ_PRECISE_PHONE_STATE"/>
+        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
+        <permission name="android.permission.INTERACT_ACROSS_USERS"/>
+        <deny-permission name="android.permission.WRITE_SECURE_SETTINGS"/>
+        <deny-permission name="android.permission.SUBSTITUTE_NOTIFICATION_APP_NAME"/>
+    </privapp-permissions>
+    <privapp-permissions package="com.qualcomm.qti.telephonyservice">
+        <deny-permission name="android.permission.MODIFY_AUDIO_ROUTING"/>
+    </privapp-permissions>
+</permissions>

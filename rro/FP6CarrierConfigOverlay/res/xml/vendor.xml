@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+
+     Device-wide carrier defaults read by the AOSP CarrierConfig app
+     (DefaultCarrierConfigService, res/xml/vendor.xml). The app merges this
+     file after its per-carrier assets, so these values win over them. Values
+     follow the stock FP6 carrier-config app (com.fp.customercarrierconfig
+     res/xml/vendor.xml):
+     - VoLTE on for every carrier (the unfiltered stock block).
+     - Emergency calls: the stock unfiltered block sets
+       carrier_use_ims_first_for_emergency_bool=false (the AOSP default is
+       true); the stock carrier blocks below set it back to true for 38
+       carriers (carrier id or MCC/MNC, as in stock). Only this key is copied
+       from the stock carrier blocks.
+     VoWiFi and video calling stay off: their stacks are not installed.
+-->
+<carrier_config_list>
+    <carrier_config>
+        <boolean name="carrier_volte_available_bool" value="true" />
+        <boolean name="carrier_volte_provisioning_required_bool" value="false" />
+        <boolean name="enhanced_4g_lte_on_by_default_bool" value="true" />
+        <boolean name="hide_enhanced_4g_lte_bool" value="false" />
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="false" />
+    </carrier_config>
+    <carrier_config cid="20">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2386">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="5">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2468">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1365">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1366">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="27">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1487">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="16">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2366">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="14">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="4">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config mcc="232" mnc="04">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1344">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config mcc="232" mnc="14">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2094">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="28">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1463">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1466">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1690">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1691">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2555">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1696">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1695">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="958">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1464">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="3">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2092">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2557">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="25">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2397">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2147">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1453">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2360">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="2361">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1454">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config mcc="466">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+    <carrier_config cid="1884">
+        <boolean name="carrier_use_ims_first_for_emergency_bool" value="true" />
+    </carrier_config>
+</carrier_config_list>

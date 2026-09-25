@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Qualcomm sepolicy @ fea28791cc44cce15c7bd4cd94722796e4644735
+# generic/private/seapp_contexts lines 40, 44 and 66 and
+# generic/product/private/seapp_contexts line 47 select these apps with
+# seinfo=platform and the single domain vendor_qtelephony. They keep the stock
+# Fairphone signature here, so they are selected by that signer
+# (mac_permissions.xml), their package or process name and isPrivApp=true (all
+# three packages are installed as privileged system apps, so a newly installed
+# app never matches; only a same-signature update of one of them would, see
+# spec.md risks). Each app gets its own domain. The audio messenger's package
+# data uses its package name and its process runs as com.qti.phone.
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=org.codeaurora.ims domain=vendor_qtelephony type=app_data_file levelFrom=all
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=com.qualcomm.qti.telephonyservice domain=fp6_qcril_audio_app type=app_data_file levelFrom=all
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=com.qti.phone domain=fp6_qcril_audio_app type=app_data_file levelFrom=all
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=com.qualcomm.qti.lpa domain=fp6_qti_lpa_app type=app_data_file levelFrom=all

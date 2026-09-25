@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Own labels for two QCRIL services that upstream files under the shared
+# vendor_hal_telephony_service2 (vendor-common/service_contexts, relabelled
+# there by the device, shared-edits.md): each is found only by its one client
+# app, not by every app that may find the IMS services.
+# vendor.qti.hardware.radio.am.IQcRilAudio/slot1, slot2 (audio messenger).
+type fp6_hal_qcrilaudio_service, hal_service_type, protected_service, service_manager_type;
+# vendor.qti.hardware.radio.lpa.IUimLpa/UimLpa0, UimLpa1 (eSIM LPA).
+type fp6_hal_uimlpa_service, hal_service_type, protected_service, service_manager_type;

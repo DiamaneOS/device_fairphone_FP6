@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Vendor-side grants for the stock QCRIL audio messenger (domain
+# fp6_qcril_audio_app, telephony-system-ext-public): it finds IQcRilAudio,
+# registers its callback, and QCRIL calls back with the in-call parameters.
+allow fp6_qcril_audio_app fp6_hal_qcrilaudio_service:service_manager find;
+binder_call(fp6_qcril_audio_app, rild)
+binder_call(rild, fp6_qcril_audio_app)

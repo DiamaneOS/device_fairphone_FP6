@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The stock Qualcomm telephony apps (org.codeaurora.ims,
+# com.qualcomm.qti.telephonyservice, com.qualcomm.qti.lpa) declare
+# <overlay requiredSystemPropertyName="ro.boot.vendor.qspa.modem"
+# requiredSystemPropertyValue="enabled">; the package parser skips them when the
+# property differs. Stock sets it from system_ext/etc/qspa/qspa_default.rc
+# (imported by system_ext/etc/init/qspa_system.rc). Only the modem entry is set:
+# the stock "nav" entry gates GNSS packages that are not installed here.
+on init
+    setprop ro.boot.vendor.qspa.modem enabled

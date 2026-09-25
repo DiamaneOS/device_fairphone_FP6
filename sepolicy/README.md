@@ -111,3 +111,25 @@ For each upstream refresh:
 This preserves upstream traceability without importing unused policy. A shared
 DiamaneOS policy repository becomes useful when multiple devices genuinely share
 this maintained subset; it is not required merely to reduce this folder's size.
+
+## Audio
+
+`audio/adsprpcd.te` and `audio/hal_audio_default.te` are downstream-authored
+adaptations of the matching Qualcomm `sepolicy_vndr` files published by Fairphone
+at `67fa928299a49374a55281969fee357884c86890`. Their original licence headers,
+source hashes and derived hashes are retained in `provenance.json`. The audio
+file contexts and init-directory rules are authored by DiamaneOS.
+
+The policy deliberately omits upstream diagnostic-device access, sensor persist
+writes, voice-UI sockets, QTR SDK access, QRTR sockets, broad HAL-attribute
+grants, vendor Binder use and DSP restart controls. It confines device access to
+the audio service domains, keeps amplifier factory calibration read-only and
+restricts the PAL sleep-monitor extended ioctl grant to activity reporting
+(`0x5201`). AudioReach receives its AGM device, runtime audio directory, selected
+allocator and sound-card state access. The FastRPC listener receives only its DSP
+transport, firmware/RFSA, audio-DSP state and DSP-service lookup.
+
+The kernel may not search `/mnt/vendor` (a platform neverallow), so it cannot
+follow the amplifier calibration link into persist; the amplifier then uses its
+default calibration. These rules are not yet runtime-qualified under enforcing
+mode; collect denials on the device before adding any grant.

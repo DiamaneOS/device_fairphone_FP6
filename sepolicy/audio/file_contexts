@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+/vendor/bin/audioadsprpcd                 u:object_r:vendor_adsprpcd_exec:s0
+/data/vendor/audio(/.*)?                 u:object_r:vendor_audio_data_file:s0
+/data/vendor/audio_dsp(/.*)?             u:object_r:vendor_audio_dsp_data_file:s0

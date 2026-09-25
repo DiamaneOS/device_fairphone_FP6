@@ -1180,6 +1180,22 @@
       "source_sha256": "2cc63cb1f84e039c6a8c3f92469bf05e689078ef87345a15445931c7f1278410",
       "path": "fp6/hal_sensors_default.te",
       "sha256": "a95c09e4753b45228169ab5f5d25ff0a2f382a8662bb533b34d48462f0c9ffa9"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/adsprpcd.te",
+      "source_sha256": "be86ab505f5dc976544c64874e6c7dc003b404aba6ea0b6b7cc9ef80f1688baf",
+      "path": "audio/adsprpcd.te",
+      "sha256": "c2ca545b59f872a4b7b010e2180ff243de02989864944007827b26799a8bc45d"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/hal_audio_default.te",
+      "source_sha256": "a45518cf9a36d8636fe3f64901c19545e16a349149b57c7d3e1fd8737f81bf31",
+      "path": "audio/hal_audio_default.te",
+      "sha256": "5fc3e4e2575d89efc7c1ea2bed9583bd36debbcd574f41c3409ac8e96f1478bf"
     }
   ]
 }

@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// The amplifier driver requests the factory calibration through firmware_class.
+// Keep the device's own calibration in persist; never package another unit's data.
+install_symlink {
+    name: "fp6_audio_amplifier_calibration_link",
+    vendor: true,
+    installed_location: "firmware/aw_cali.bin",
+    symlink_target: "/mnt/vendor/persist/factory/audio/aw_cali.bin",
+}

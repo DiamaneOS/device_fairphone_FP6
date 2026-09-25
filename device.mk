@@ -157,6 +157,10 @@ PRODUCT_PACKAGES += \
     FP6SettingsOverlay \
     FP6SystemUIOverlay
 
+# Stock brightness map and high-brightness limits (display_port_130.xml link to
+# the selected stock display configuration; Android.bp).
+PRODUCT_PACKAGES += fp6_displayconfig_port130
+
 # Fingerprint: our AIDL service (fingerprint/) drives the stock FocalTech
 # module. The module keeps its own SONAME as file name, so it cannot collide
 # with AOSP's reference fingerprint modules; hw_get_module finds it through
@@ -215,7 +219,6 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.has_HDR_display=true \
     ro.surface_flinger.wcg_composition_dataspace=143261696 \
     persist.sys.sf.color_saturation=1.0 \
-    persist.sys.sf.color_mode=9 \
     debug.sf.auto_latch_unsignaled=1 \
     debug.sf.disable_client_composition_cache=0 \
     debug.sf.enable_gl_backpressure=1 \

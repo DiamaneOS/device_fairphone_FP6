@@ -8,6 +8,13 @@
     <dimen name="status_bar_height_portrait">48dp</dimen>
     <string name="config_mainBuiltInDisplayCutout" translatable="false">M -30,0 L -30,110 L 30,110 L 30,0 Z</string>
 
+    <!-- The FP6 has no hardware navigation keys. Without this the window
+         manager reports no navigation bar, so SystemUI creates neither the bar
+         nor the back gesture handler: edge back swipes do nothing and 3-button
+         mode shows no buttons. Stock also sets config_navBarInteractionMode 2,
+         which is already the default. -->
+    <bool name="config_showNavigationBar">true</bool>
+
     <!-- Stock leaves the default refresh rate unset (0) and the peak uncapped, so
          the 120 Hz panel mode is used. Android's default of 60 caps every mode. -->
     <integer name="config_defaultRefreshRate">0</integer>

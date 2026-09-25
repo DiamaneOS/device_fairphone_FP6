@@ -132,6 +132,7 @@ $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
 $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 $(call inherit-product, device/fairphone/FP6/gnss/gnss.mk)
 $(call inherit-product, device/fairphone/FP6/telephony/telephony.mk)
+$(call inherit-product, device/fairphone/FP6/camera/camera.mk)
 
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.

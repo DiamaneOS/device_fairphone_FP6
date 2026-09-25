@@ -288,3 +288,31 @@ services; the audio messenger (`fp6_qcril_audio_app`) only IQcRilAudio and the a
 APIs; the LPA (`fp6_qti_lpa_app`) only IUimLpa, the telephony and connectivity APIs and
 the network. None is a `hal_telephony` client (no AOSP IRadio access), none has camera,
 media, HIDL or diag access. Collect denials on the device before adding any grant.
+
+## Camera
+
+`camera/` holds the policy for the stock CamX/CHI provider
+(`vendor.qti.camera.provider-service_64`, platform domain `hal_camera_default`). The
+grants are drafted from the stock FP6 compiled vendor policy and bound to
+`hal_camera_default`, not to the `hal_camera` attributes. They cover the ToF node, UBWC-P,
+FastRPC with read-only opens (the secure node for the ADSP sensors PD of the CamX sensor
+direct channel, the non-secure node for the CDSP offloads, `/vendor/dsp`), Qualcomm
+DMA-BUF heaps (display heap allocation ioctl only), SoC/camera/JPEG/DDR identification,
+QRTR sockets without ioctls for the gyro QMI client, the thermal-engine client socket, the
+display QService lookup, `/data/vendor/camera`, read-only factory calibration in
+`/mnt/vendor/persist/camera`, vendor camera properties and the in-process offline camera
+service. Unlike the sensors HAL, the camera may need the non-secure FastRPC node: the
+kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
+expected in use; drop the other after the first permissive run.
+
+`vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module serial numbers
+the stock CamX tries to publish; nothing may set or read it. `vendor_init` may chmod the
+stock 0777 `/mnt/vendor/persist/camera` and `cam_cali` directories.
+
+Omitted: the TCL algorithm service and its data and dump directories, secure camera
+(QSEECom/TEE, protected heaps, VM memory-buffer nodes, ssgtzd), the AON service, factory
+OTP/OIS sysfs (`fp_mmitest_sysfs`), persist writes and QRTR ioctls. The file contexts restore
+three upstream `generic/vendor/common/file_contexts` entries (lines 317, 348, 440). The
+upstream files to reduce from are listed in the camera review
+(`upstream-sepolicy-needed.txt`); until they are imported there is no provenance entry.
+These rules are not yet runtime-qualified under enforcing mode.

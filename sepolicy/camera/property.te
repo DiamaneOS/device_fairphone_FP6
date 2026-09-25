@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Camera module serial numbers. The stock camera.qcom.so calls property_set for
+# vendor.fp.camera_main.sn, vendor.fp.camera_aux.sn and vendor.fp.camera_front.sn
+# (the values stock trace_util.rc lines 7-14 copy into traceability storage;
+# trace_util is not installed). Stock labels them vendor_fp_prop
+# (system_ext_property_contexts line 32) and grants hal_camera no set, so the
+# write is denied on stock. This dedicated vendor-internal type has no set or
+# get grant: under enforcing the write is denied and the platform neverallows
+# keep core domains and apps from reading vendor-internal properties.
+vendor_internal_prop(vendor_camera_sn_prop)

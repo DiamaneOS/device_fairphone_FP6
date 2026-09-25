@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Domain of the stock Qualcomm IMS app (org.codeaurora.ims). The type is
+# declared by the imported system-ext-public/domain.te. Reduced from Qualcomm
+# sepolicy @ fea28791cc44cce15c7bd4cd94722796e4644735 generic/private/qtelephony.te
+# (local copy in artifacts/vendor-work/fp6-policy-candidate-v3). Omitted:
+# networking (the app requests no INTERNET), HIDL (it uses the AIDL QCRIL
+# services), AT-command forwarding, diag, camera/media/DRM services (video
+# calls), the DPM socket (data policy manager not installed) and the
+# hal_telephony client attribute: the app uses only IImsRadio and
+# IQtiRadioConfig (dex), never the AOSP IRadio* services, so its binder access
+# to the radio daemon is granted directly in the vendor telephony/qtelephony.te.
+typeattribute vendor_qtelephony coredomain;
+app_domain(vendor_qtelephony)
+binder_use(vendor_qtelephony)
+
+# Telephony/IMS framework APIs and app/system APIs.
+allow vendor_qtelephony radio_service:service_manager find;
+allow vendor_qtelephony system_api_service:service_manager find;
+allow vendor_qtelephony app_api_service:service_manager find;
+
+# Own app data (settings database, shared preferences).
+allow vendor_qtelephony app_data_file:dir create_dir_perms;
+allow vendor_qtelephony app_data_file:{ file lnk_file } create_file_perms;

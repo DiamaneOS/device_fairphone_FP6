@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# QCRIL runtime directories and database, matching the stock init.qcom.rc
+# (lines 159-164, 323-328, 386-407 and 756) and init.qcom.sh (lines 432-451).
+# qcrilNrd.rc and nicmd.rc (stock, from the generated vendor tree) define the
+# services, their sockets and nicmd's data directory.
+
+on boot
+    # QCRIL internal IPC sockets (libqcrilNrQtiBus.so: /dev/socket/qmux_radio/ril_ipc).
+    mkdir /dev/socket/qmux_radio 0770 radio radio
+    chmod 2770 /dev/socket/qmux_radio
+
+on post-fs-data
+    mkdir /data/vendor/radio 0770 system radio
+    mkdir /data/vendor/modem_config 0570 radio root
+
+    # Prebuilt QCRIL database (libril-db.so: /data/vendor/radio/qcrilNr_prebuilt.db).
+    copy /vendor/etc/qcril_database/qcrilNr.db /data/vendor/radio/qcrilNr_prebuilt.db
+    chown radio radio /data/vendor/radio/qcrilNr_prebuilt.db
+    chmod 0660 /data/vendor/radio/qcrilNr_prebuilt.db
+    write /data/vendor/radio/prebuilt_db_support 1
+    chown radio radio /data/vendor/radio/prebuilt_db_support
+    chmod 0400 /data/vendor/radio/prebuilt_db_support
+    write /data/vendor/radio/db_check_done 0
+    chown radio radio /data/vendor/radio/db_check_done
+    chmod 0660 /data/vendor/radio/db_check_done
+
+    # QCRIL sends the modem image version to the modem
+    # (libqcrilNr.so: /data/vendor/modem_config/ver_info.txt,
+    # qcril_qmi_nas_dms_update_ap_sw_ver_info_to_modem) and checks
+    # /data/vendor/radio/copy_complete (qcril_mbn_is_copy_completed). Stock
+    # init.qcom.sh copies ver_info.txt (and the MBN tree, unused because
+    # qcrilNr.db sets sw_mbn_update and hw_mbn_update to false) and then sets
+    # ro.vendor.ril.mbn_copy_completed, which writes copy_complete=1. Only the
+    # version file is copied here; the MBN tree stays in the modem partition.
+    copy /vendor/firmware_mnt/verinfo/ver_info.txt /data/vendor/modem_config/ver_info.txt
+    chown radio root /data/vendor/modem_config/ver_info.txt
+    chmod 0440 /data/vendor/modem_config/ver_info.txt
+    write /data/vendor/radio/copy_complete 1
+    chown radio radio /data/vendor/radio/copy_complete
+    chmod 0660 /data/vendor/radio/copy_complete

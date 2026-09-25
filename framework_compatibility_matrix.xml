@@ -66,4 +66,42 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Qualcomm radio services in the stock QCRIL daemon, used by the stock IMS
+         app (IImsRadio, IQtiRadioConfig), the QCRIL audio messenger
+         (IQcRilAudio) and the stock eSIM LPA (IUimLpa). -->
+    <hal format="aidl">
+        <name>vendor.qti.hardware.radio.am</name>
+        <version>1</version>
+        <interface>
+            <name>IQcRilAudio</name>
+            <instance>slot1</instance>
+            <instance>slot2</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.radio.ims</name>
+        <version>16</version>
+        <interface>
+            <name>IImsRadio</name>
+            <instance>imsradio0</instance>
+            <instance>imsradio1</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.radio.lpa</name>
+        <version>1</version>
+        <interface>
+            <name>IUimLpa</name>
+            <instance>UimLpa0</instance>
+            <instance>UimLpa1</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.radio.qtiradioconfig</name>
+        <version>6</version>
+        <interface>
+            <name>IQtiRadioConfig</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
 </compatibility-matrix>

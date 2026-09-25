@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Labels of the stock FP6 vendor_file_contexts (lines 471, 472, 538, 918, 985).
+# The QCRIL and nicmd socket directories and /dev/system_health_monitor are
+# already labelled by the imported vendor-common and vendor-volcano files.
+/vendor/bin/hw/qcrilNrd                 u:object_r:rild_exec:s0
+/vendor/bin/nicmd                       u:object_r:vendor_nicmd_exec:s0
+/data/vendor/radio(/.*)?                u:object_r:vendor_radio_vendor_data_file:s0
+/data/vendor/modem_config(/.*)?         u:object_r:vendor_mbn_data_file:s0
+/data/vendor/nicmd(/.*)?                u:object_r:vendor_nicm_data_file:s0

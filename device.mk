@@ -158,6 +158,34 @@ PRODUCT_PACKAGES += \
 # ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
 PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
 PRODUCT_PACKAGES += android.hardware.biometrics.fingerprint-service.fp6
+# The stock FocalTech module and trusted app are debug builds that log
+# auth-token fields, the token HMAC and trusted-app traces at debug level; keep
+# every FocalTech tag at info. (The module's own switch is only read from a
+# /data file, which is deliberately not created.)
+PRODUCT_VENDOR_PROPERTIES += \
+    log.tag.focaltech=I \
+    log.tag.focaltech:ca:client=I \
+    log.tag.focaltech:config=I \
+    log.tag.focaltech:efc=I \
+    log.tag.focaltech:file=I \
+    log.tag.focaltech:hal:base=I \
+    log.tag.focaltech:hal:core=I \
+    log.tag.focaltech:hal:device=I \
+    log.tag.focaltech:hal:interface=I \
+    log.tag.focaltech:hal:logger=I \
+    log.tag.focaltech:libfpdata=I \
+    log.tag.focaltech:libfpsensor=I \
+    log.tag.focaltech:service:stub=I \
+    log.tag.focaltech:ta:base=I \
+    log.tag.focaltech:ta:core=I \
+    log.tag.focaltech:ta:ctx=I \
+    log.tag.focaltech:ta:device=I \
+    log.tag.focaltech:ta:file=I \
+    log.tag.focaltech:ta:interface=I \
+    log.tag.focaltech:ta:payment=I \
+    log.tag.focaltech:ta:spi=I \
+    log.tag.focaltech:util=I \
+    log.tag.focaltech:version=I
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with two exceptions:

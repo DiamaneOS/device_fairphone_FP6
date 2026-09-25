@@ -4,7 +4,10 @@
 """Derive the FP6 side-sensor enrolment animations from AOSP's.
 
 Settings shows fingerprint_edu_lottie_<variant>.json on the "touch the power
-button" screen and picks the variant from the display rotation. AOSP's assets
+button" screen and picks the variant from the display rotation. It uses the
+folded_* variants whenever smallestScreenWidthDp < 600 (ScreenSizeFoldProvider),
+which is always the case on the FP6 (1116 px at 480 dpi = 372 dp), so both sets
+are written; the other set only matters if that ever changes. AOSP's assets
 draw a tablet with the sensor on its top edge. The FP6 is a phone with the
 sensor in the power button on its right edge, 44% of the way down (the location
 the fingerprint HAL reports). This script reshapes AOSP's drawing and writes the
@@ -44,12 +47,17 @@ CIRCLE_START = (SENSOR_START[0] - 0.7, SENSOR_START[1] + 12.3)
 CIRCLE_END = (SENSOR_END[0] + 6.93, SENSOR_END[1] + 15.75)
 ICON = (CIRCLE_END[0], CIRCLE_END[1] - 110.333)
 
-# Settings file name -> root rotation (display rotation 0, 90, 180, 270).
+# Settings file name -> root rotation, for display rotations 0, 90, 180 and
+# 270 (FingerprintEnrollFindSensor.updateSfpsFindSensorAnimationAsset).
 VARIANTS = {
     'fingerprint_edu_lottie_landscape_top_right.json': 90,
     'fingerprint_edu_lottie_portrait_top_left.json': 0,
     'fingerprint_edu_lottie_landscape_bottom_left.json': 270,
     'fingerprint_edu_lottie_portrait_bottom_right.json': 180,
+    'fingerprint_edu_lottie_folded_top_right.json': 90,
+    'fingerprint_edu_lottie_folded_top_left.json': 0,
+    'fingerprint_edu_lottie_folded_bottom_left.json': 270,
+    'fingerprint_edu_lottie_folded_bottom_right.json': 180,
 }
 
 

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock Qualcomm eSIM LPA (com.qualcomm.qti.lpa, product priv-app, disabled
+# until the user turns eSIM on). It implements EuiccService over QCRIL's
+# IUimLpa service and performs the SM-DP+ HTTPS exchanges for profile
+# downloads (UimLpaAidl$LpaAidlDownloadProfileTask: URL.openConnection with
+# the URL the eUICC supplies). Its vendor side (IUimLpa find, binder with
+# rild) is telephony/qti_lpa.te. Stock uses vendor_qtelephony
+# (generic/product/private/seapp_contexts line 47), which also carries the IMS
+# and HIDL grants; none of those are given here.
+typeattribute fp6_qti_lpa_app coredomain;
+app_domain(fp6_qti_lpa_app)
+net_domain(fp6_qti_lpa_app)
+binder_use(fp6_qti_lpa_app)
+
+# TelephonyManager (UICC slot and port state), ConnectivityManager
+# (requestNetwork for the download), EuiccService callbacks.
+allow fp6_qti_lpa_app { app_api_service radio_service }:service_manager find;
+
+# Own app data (device-protected storage; the EuiccService is directBootAware).
+allow fp6_qti_lpa_app app_data_file:dir create_dir_perms;
+allow fp6_qti_lpa_app app_data_file:{ file lnk_file } create_file_perms;

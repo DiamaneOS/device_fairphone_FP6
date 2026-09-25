@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Vendor-side grants for the stock eSIM LPA (domain fp6_qti_lpa_app,
+# telephony-system-ext-public): IUimLpa requests and QCRIL's responses and
+# indications (IUimLpaResponse, IUimLpaIndication). The LPA's HIDL fallback
+# (vendor.qti.hardware.radio.lpa@1.x) is not declared and not granted.
+allow fp6_qti_lpa_app fp6_hal_uimlpa_service:service_manager find;
+binder_call(fp6_qti_lpa_app, rild)
+binder_call(rild, fp6_qti_lpa_app)

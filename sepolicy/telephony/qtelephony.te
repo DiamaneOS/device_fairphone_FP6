@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Vendor-side grants for the stock IMS app (domain vendor_qtelephony, declared
+# in system-ext-public/domain.te). Reduced from Qualcomm sepolicy_vndr
+# @ 67fa928299a49374a55281969fee357884c86890 generic/vendor/common/qtelephony.te
+# and generic/vendor/common/hal_telephony.te. Upstream makes the app a
+# hal_telephony client, which also lets it find and call the AOSP IRadio*
+# services (platform hal_telephony_client rules); the app uses only IImsRadio
+# and IQtiRadioConfig (dex), so it gets binder with the radio daemon and find
+# on the one service type that carries those two services. Of the other
+# services that share the type (vendor-common/service_contexts), none is
+# declared in the VINTF manifest, so none can register. Omitted: video-call
+# (IMS RTP, camera, video), data-factory and performance HAL clients.
+allow vendor_qtelephony vendor_hal_telephony_service2:service_manager find;
+binder_call(vendor_qtelephony, rild)
+binder_call(rild, vendor_qtelephony)
+# The IMS app reads persist.vendor.radio.* and persist.vendor.ims.* settings.
+get_prop(vendor_qtelephony, vendor_radio_prop)
+get_prop(vendor_qtelephony, vendor_ims_prop)

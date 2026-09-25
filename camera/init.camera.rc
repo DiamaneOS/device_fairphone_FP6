@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# CamX keeps its runtime caches, configuration dumps and crash dumps here
+# (stock init.qcom.rc creates the same directory). The provider runs as
+# cameraserver in group camera (reviewed provider rc derived from the stock
+# vendor.qti.camera.provider-service_64.rc).
+# The stock init.target.rc directories for the TCL algorithm service
+# (/data/vendor/camera_dump, /data/vendor/algoservice, both 0777) and its
+# 0777/0666 persist and sysfs permissions are not carried over.
+on post-fs-data
+    mkdir /data/vendor/camera 0770 camera camera
+    restorecon_recursive /data/vendor/camera
+    # Stock init.target.rc created these persist directories 0777 system system,
+    # and persist is not reflashed, so the phone keeps that mode. The provider
+    # only reads the factory calibration in persist/camera (dualcam_cali.bin,
+    # dualcam_flag.bin, vl53l1_cali.bin); nothing selected uses cam_cali. Close
+    # both to other users so no app can plant parser input or keep data across
+    # a factory reset there. Missing directories are left missing.
+    chown system camera /mnt/vendor/persist/camera
+    chmod 0750 /mnt/vendor/persist/camera
+    chmod 0700 /mnt/vendor/persist/cam_cali

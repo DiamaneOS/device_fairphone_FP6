@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Camera module serial numbers set by camera.qcom.so; nothing may set or read them.
+vendor.fp.camera_         u:object_r:vendor_camera_sn_prop:s0

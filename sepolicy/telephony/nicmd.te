@@ -8,7 +8,7 @@
 # generic/vendor/common/nicmd.te (local copy in
 # artifacts/vendor-work/fp6-policy-candidate-v3). Omitted: the SHS,
 # QMI-priority and performance helpers (shsusrd, qmipriod, perf HAL and their
-# properties), TIPC and the legacy MSM IPC-router socket and ioctls, the HIDL
+# properties), the legacy MSM IPC-router socket and ioctls, the HIDL
 # netd service (the daemon links only the AIDL netd interface), diag, the
 # netdomain attribute (stock vendor_sepolicy.cil line 442; it would add TCP
 # connect and port binding, which nicmd does not use: it opens sockets only
@@ -34,6 +34,9 @@ allow vendor_nicmd self:netlink_xfrm_socket { create_socket_perms_no_ioctl nlmsg
 allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:qipcrtr_socket create_socket_perms_no_ioctl;
+# The data module's interface requests arrive over TIPC (libnicm
+# EventTIPCMessenger/RequestTIPCMessenger; stock vendor_sepolicy.cil line 6080).
+allow vendor_nicmd self:tipc_socket { create_socket_perms_no_ioctl listen accept };
 allowxperm vendor_nicmd self:udp_socket ioctl priv_sock_ioctls;
 allowxperm vendor_nicmd self:udp_socket ioctl rmnet_sock_ioctls;
 allow vendor_nicmd self:capability { net_admin net_raw setgid setpcap setuid kill };

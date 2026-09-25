@@ -228,3 +228,27 @@ One stock grant is needed under enforcing mode: the HAL sets
 sets (`nfc.fw.*`, `persist.nfc.*`) use platform contexts; if the platform maps
 them to `nfc_prop`, `hal_nfc` may already set them (platform policy). Check the
 denials before adding anything for them.
+
+## GNSS
+
+`gnss/hal_gnss_qti.te` confines the stock Qualcomm GNSS HAL
+(`android.hardware.gnss-aidl-service-qti`) in `vendor_hal_gnss_qti`. It is a downstream
+draft reduced from the stock compiled policy (vendor_sepolicy.cil lines 4914-4953 and
+8128-8141) to the selected closure. It will be replaced by a reduction of the matching
+Qualcomm `sepolicy_vndr` file at `67fa928299a49374a55281969fee357884c86890` once that file
+is fetched; provenance is recorded then.
+
+The service is a HAL server for `hal_gnss` and a client of `hal_health`. It reaches the modem
+over QRTR (`qipcrtr_socket`, no ioctls; stock grants this to the `hal_gnss` attribute,
+here it is bound to the domain), keeps small state files in `/data/vendor/location` and
+serves its IPC socket in `/dev/socket/location`. It reads the modem version file from
+`/vendor/firmware_mnt` and the public SoC id and board type. `gnss/genfs_contexts` labels
+`/sys/devices/soc0/hw_platform` `vendor_sysfs_public`, so the HAL does not need read access
+to the rest of `vendor_sysfs_soc`, which includes the SoC serial number.
+
+The policy omits the peripheral manager and vndbinder, the location daemons' sockets
+(loc_launcher, XTRA, LOWI, Wi-Fi crowdsourcing, sensor, correction, engine and Skyhook
+services), RIL and SSG sockets, MHI sysfs and QMS/AON properties: none of those peers is
+installed. It adds no servicemanager rule; platform policy covers AIDL HAL registration, as
+for the gatekeeper and keymint HALs. Not yet runtime-qualified under enforcing mode; collect
+denials on the device before adding any grant.

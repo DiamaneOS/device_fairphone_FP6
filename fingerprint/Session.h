@@ -19,14 +19,26 @@ using common::ICancellationSignal;
 using common::OperationContext;
 using keymaster::HardwareAuthToken;
 
+// Serialises every call into the FP6 module. The module is one global device;
+// its callbacks (Session::onMessage) never take this lock, so a call that
+// reports synchronously cannot deadlock. Lock order: this lock, then a
+// session's own state lock.
+std::mutex& moduleMutex();
+
 // Translates one AIDL session into calls on the legacy FP6 module. The module
 // and its trusted app keep templates, challenges, authenticator ids, lockout
 // counters and HAT signing; this layer only relays requests and results.
 //
-// Each request is an operation with an id. An operation ends with exactly one
-// terminal result: the module's own (error, success, lockout, ...) or, when
-// the module fails a call without reporting anything, an UNABLE_TO_PROCESS
-// fallback. Cancellation only reaches the operation it was issued for.
+// Each request is an operation with an id and a kind. An operation ends with
+// exactly one terminal result: the module's own (error, success, lockout, ...)
+// or, when the module fails a call without reporting anything, an
+// UNABLE_TO_PROCESS fallback. Module messages that do not belong to the
+// running operation, or arrive after it ended, are dropped. Cancellation only
+// reaches the operation it was issued for.
+//
+// The service process has more than one binder thread (the module's own
+// service thread joins the pool), so every entry point is safe to call
+// concurrently.
 //
 // Authentication honours "Touch to unlock anytime": when SystemUI marks the
 // request press-to-auth and the screen is off (NO_UI or AOD), matches are held
@@ -34,6 +46,17 @@ using keymaster::HardwareAuthToken;
 // once a context update reports the screen on (the power button woke it).
 class Session : public BnSession {
   public:
+    enum class OpKind {
+        kNone,
+        kEnroll,
+        kAuthenticate,
+        kDetectInteraction,
+        kEnumerate,
+        kRemove,
+        kInvalidateAuthenticatorId,
+        kResetLockout,
+    };
+
     // onDetach is called once when the session is closed or its client dies.
     Session(fingerprint_device_t* device, int32_t userId, std::shared_ptr<ISessionCallback> cb,
             std::function<void(const Session*)> onDetach = nullptr);
@@ -84,13 +107,21 @@ class Session : public BnSession {
     ndk::ScopedAStatus setIgnoreDisplayTouches(bool shouldIgnore) override;
 
   private:
-    uint64_t beginOperation();
+    // Starts a new operation; the caller holds moduleMutex().
+    uint64_t beginOperation(OpKind kind);
+    // True while `op` is this session's running, unfinished operation; caller holds mMutex.
+    bool runningLocked(uint64_t op) const;
+    // True while an operation of `kind` is running; caller holds mMutex.
+    bool runningLocked(OpKind kind) const;
     // Records the press-to-auth setting and display state; caller holds mMutex.
     void updateContextLocked(const OperationContext& context);
     // True while authentication results must wait for the screen to turn on.
     bool screenGatedLocked() const;
     // Starts authentication again after a held match; the module stops after one.
     void rearm(uint64_t op);
+    // Stops the sensor after `op` ended outside the module (a held match was
+    // delivered), unless another operation has started since.
+    void stopSensorAfter(uint64_t op);
     // Reports UNABLE_TO_PROCESS for `op` unless it already has a terminal result.
     void failOperation(uint64_t op);
     // Marks the running operation finished; the caller holds mMutex.
@@ -108,13 +139,13 @@ class Session : public BnSession {
     std::mutex mMutex;
     uint64_t mNextOp = 0;
     uint64_t mOp = 0;         // running operation, 0 if none
+    OpKind mOpKind = OpKind::kNone;
     bool mOpEnded = true;     // mOp already delivered its terminal result
     bool mDetached = false;
     std::vector<int32_t> mEnumerated;
     std::vector<int32_t> mRemoved;
 
     // Authentication in progress (mOp) and the context SystemUI gave for it.
-    bool mAuthenticating = false;
     int64_t mAuthOperationId = 0;
     bool mPressToAuth = false;
     common::DisplayState mDisplayState = common::DisplayState::UNKNOWN;

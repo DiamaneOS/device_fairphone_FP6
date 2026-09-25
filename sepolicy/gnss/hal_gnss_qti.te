@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Stock Qualcomm GNSS HAL, android.hardware.gnss-aidl-service-qti (IGnss v3).
+# Drafted from the stock compiled policy (vendor_sepolicy.cil lines 4914-4953
+# and 8128-8141) and reduced to the selected closure. Before enforcing, reduce
+# it from Qualcomm generic/vendor/common/hal_gnss_qti.te at sepolicy_vndr
+# 67fa928 (local copy in the policy candidate).
+# Not granted, because their peers are not installed: peripheral manager and
+# vndbinder (liblbs_core, XTRA service), the location daemons' sockets
+# (loc_launcher, xtra-daemon, lowi-server, xtwifi-client, slim_daemon,
+# edgnss-daemon, engine-service, blpsvc, qsap_location), RIL and SSG sockets,
+# MHI sysfs and the QMS/AON properties.
+# servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
+# domains without such vendor rules (vendor_hal_gatekeeper_qti,
+# vendor_hal_keymint_qti) register on stock, so the platform hal server rules
+# cover it; confirm with the builder's policy compile and on-device denials
+# before enforcing.
+type vendor_hal_gnss_qti, domain;
+type vendor_hal_gnss_qti_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_hal_gnss_qti)
+hal_server_domain(vendor_hal_gnss_qti, hal_gnss)
+# The implementation links the health interfaces (stock: hal_health_client).
+hal_client_domain(vendor_hal_gnss_qti, hal_health)
+
+# QMI LOC to the modem over QRTR. Stock grants this to the hal_gnss attribute
+# (CIL line 8140); here it is bound to the service domain and has no ioctls.
+allow vendor_hal_gnss_qti self:qipcrtr_socket create_socket_perms_no_ioctl;
+
+# Engine state in /data/vendor/location (gps.prop, energy.conf; CIL lines
+# 4932-4933; no FIFOs).
+allow vendor_hal_gnss_qti vendor_location_data_file:dir create_dir_perms;
+allow vendor_hal_gnss_qti vendor_location_data_file:file create_file_perms;
+
+# The HAL's own IPC socket in /dev/socket/location (CIL lines 4935-4936).
+allow vendor_hal_gnss_qti vendor_location_socket:dir rw_dir_perms;
+allow vendor_hal_gnss_qti vendor_location_socket:sock_file create_file_perms;
+
+# Modem image version, /vendor/firmware_mnt/verinfo/ver_info.txt, read by the
+# implementation (CIL lines 4947-4949).
+r_dir_file(vendor_hal_gnss_qti, firmware_file)
+
+# SoC identification read by libgps.utils: /sys/devices/soc0/soc_id
+# (vendor_sysfs_public, vendor-common/genfs_contexts line 118) and
+# /sys/devices/soc0/hw_platform (relabelled vendor_sysfs_public in
+# gnss/genfs_contexts). No read of vendor_sysfs_soc files: that label covers
+# /sys/devices/soc0/serial_number, which the HAL does not need.
+allow vendor_hal_gnss_qti vendor_sysfs_soc:dir search;
+allow vendor_hal_gnss_qti vendor_sysfs_public:file r_file_perms;
+
+# Boot completion state (CIL line 4946).
+get_prop(vendor_hal_gnss_qti, boot_status_prop)

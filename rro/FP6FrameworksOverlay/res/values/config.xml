@@ -15,8 +15,11 @@
          which is already the default. -->
     <bool name="config_showNavigationBar">true</bool>
 
-    <!-- Stock leaves the default refresh rate unset (0) and the peak uncapped, so
-         the 120 Hz panel mode is used. Android's default of 60 caps every mode. -->
+    <!-- Stock leaves the default refresh rate unset (0) and the peak uncapped
+         (240), so the 120 Hz panel mode is used. Android's default of 60 caps
+         every mode. We use 120, the panel's highest mode, rather than 240:
+         Settings shows Smooth display as on only when this equals the
+         highest mode. -->
     <integer name="config_defaultRefreshRate">0</integer>
     <integer name="config_defaultPeakRefreshRate">120</integer>
 

@@ -24,4 +24,26 @@
     <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay: the
          controller supports LE peripheral (advertising) mode. -->
     <bool name="config_bluetooth_le_peripheral_mode_supported">true</bool>
+
+    <!-- Colour modes the panel calibration (qdcm_calib_data_nt37705...json)
+         supports: Natural, and the vendor modes 256 (boosted) and 257
+         (adaptive), as stock's android.overlay.common. All three compose in
+         sRGB (7): the calibration has no SDR Display-P3 mode, and stock's
+         "system default" for Natural lets SurfaceFlinger pick Display-P3
+         whenever a P3 layer such as the status bar is visible. -->
+    <integer-array name="config_availableColorModes">
+        <item>0</item>
+        <item>256</item>
+        <item>257</item>
+    </integer-array>
+    <integer-array name="config_displayCompositionColorModes">
+        <item>0</item>
+        <item>256</item>
+        <item>257</item>
+    </integer-array>
+    <integer-array name="config_displayCompositionColorSpaces">
+        <item>7</item>
+        <item>7</item>
+        <item>7</item>
+    </integer-array>
 </resources>

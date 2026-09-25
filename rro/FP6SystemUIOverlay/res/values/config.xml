@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- The display HAL supports the doze power state on the built-in panel,
+         as in the factory SystemUIResCommon_Sys overlay. Without this,
+         SystemUI keeps the panel in full power mode while it shows the
+         always-on display, and does not listen to the proximity sensor.
+         Doze-suspend stays unsupported, as in stock: the panel has no LP2
+         command set. -->
+    <bool name="doze_display_state_supported">true</bool>
+</resources>

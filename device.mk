@@ -152,8 +152,9 @@ PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
 
 # Framework, Settings and SystemUI hardware configuration (rro/): display
-# cutout, corners, status bar, 120 Hz refresh rate, the Smooth display switch
-# and the side fingerprint sensor description.
+# cutout, corners, status bar, navigation bar, colour modes and their names,
+# 120 Hz refresh rate, the Smooth display switch, always-on display (off by
+# default) and the side fingerprint sensor description.
 PRODUCT_PACKAGES += \
     FP6FrameworksOverlay \
     FP6SettingsOverlay \

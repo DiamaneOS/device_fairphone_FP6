@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- Always-on display and "Wake screen for notifications", as in the
+         FP6.QREL.16.100.0 factory overlays: SystemUI's doze service
+         (FrameworksResCommon_Sys) and always-on display available
+         (FrameworksResTarget_Vendor). The nt37705 panel has a low-power (LP1)
+         command set and the display HAL reports DOZE for the built-in panel.
+         Without a doze component Settings hides both options. -->
+    <string name="config_dozeComponent" translatable="false">com.android.systemui/com.android.systemui.doze.DozeService</string>
+    <bool name="config_dozeAlwaysOnDisplayAvailable">true</bool>
+
+    <!-- Both stay off until the user turns them on, to save battery. Android
+         defaults both to on; stock turns only always-on display off. With
+         both off the doze service does not start and screen off behaves as
+         before. -->
+    <bool name="config_dozeAlwaysOnEnabled">false</bool>
+    <bool name="config_dozeEnabled">false</bool>
+</resources>

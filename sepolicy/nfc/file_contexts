@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock FP6 labels (compiled vendor_file_contexts). The domain, its HAL
+# attribute and the controller access (nfc_device) come from AOSP policy
+# (hal_nfc_default, hal_nfc); no device grant is added before a denial is seen.
+/vendor/bin/hw/android\.hardware\.nfc-service\.sec    u:object_r:hal_nfc_default_exec:s0
+/dev/sec-nfc                                          u:object_r:nfc_device:s0

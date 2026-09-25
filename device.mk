@@ -129,6 +129,7 @@ $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 # makefile documents its stock and source-built parts.
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
+$(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.

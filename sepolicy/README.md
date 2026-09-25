@@ -201,3 +201,30 @@ Before enforcing mode:
   audio HAL read the Bluetooth properties, vendor_sepolicy.cil 4638, 7863).
 
 Not yet runtime-qualified under enforcing mode.
+
+## NFC
+
+`nfc/file_contexts` labels the stock Samsung NFC HAL
+(`android.hardware.nfc-service.sec`) `hal_nfc_default_exec` and the controller
+node `/dev/sec-nfc` `nfc_device`, the labels in the stock compiled
+`vendor_file_contexts`. The domain `hal_nfc_default` and its controller access
+come from AOSP policy (`hal_server_domain(hal_nfc_default, hal_nfc)`; `hal_nfc`
+may read and write `nfc_device`). No device grant is added yet.
+
+The Qualcomm `hal_nfc_default.te`, `nfc.te`, `nqnfcinfo.te`,
+`hal_secure_element_default.te` and `secure_element.te` are not imported. Most
+of their grants are for NXP/QTI parts that are not installed or not used by
+the Samsung HAL: HIDL registration (the HAL registers only AIDL
+`INfc/default`), the NXP NFC service, `vendor.qti.nfc.*` properties, the
+`ssgtzd` socket, `/firmware` and `/data/vendor/nfc`. The controller firmware
+in `/vendor/firmware` needs no grant: vendor domains may read
+`vendor_file_type` through platform policy.
+
+One stock grant is needed under enforcing mode: the HAL sets
+`vendor.nfc.fw.version` (`property_set` in `nfc_nci_sec.so`), labelled
+`vendor_nfc_prop`. Add exactly the stock rule
+`allow hal_nfc_default vendor_nfc_prop:property_service set;` in
+`nfc/hal_nfc_default.te` once the device shows the denial. Its other property
+sets (`nfc.fw.*`, `persist.nfc.*`) use platform contexts; if the platform maps
+them to `nfc_prop`, `hal_nfc` may already set them (platform policy). Check the
+denials before adding anything for them.

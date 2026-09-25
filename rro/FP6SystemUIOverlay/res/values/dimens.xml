@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- The FP6 power button, which holds the fingerprint sensor, is on the
+         right edge of the 1116x2484 panel at y 1100: the location the
+         fingerprint HAL reports (fingerprint/Fingerprint.cpp). SystemUI's
+         defaults (620 px, and the screen's horizontal centre at 610 px) place
+         the power-button wake reveal and the fingerprint unlock ripple near
+         the top middle of the screen instead. -->
+    <dimen name="physical_power_button_center_screen_location_y">1100px</dimen>
+    <dimen name="physical_fingerprint_sensor_center_screen_location_x">1116px</dimen>
+    <dimen name="physical_fingerprint_sensor_center_screen_location_y">1100px</dimen>
+</resources>

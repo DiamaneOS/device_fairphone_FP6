@@ -1,9 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # FocalTech fingerprint sensor node and the QSEECom path to its trusted app,
-# bound to the fingerprint HAL (stock ff_device label and grants). The
-# module's own debug binder service (ff_service) is not granted.
+# bound to the fingerprint HAL (stock ff_device label). Each grant is the set
+# the stock module used on permissive boots before these rules existed: open,
+# read, write and ioctl on the node and on QSEECom; open, read and ioctl on
+# the read-only (0444) QSEECom heaps. Templates live in
+# /data/vendor_de/<user>/fpdata (fingerprint_vendor_data_file, created by
+# vold), which the platform hal_fingerprint rules already cover.
 type ff_device, dev_type;
-allow hal_fingerprint_default ff_device:chr_file rw_file_perms;
-allow hal_fingerprint_default tee_device:chr_file rw_file_perms;
-allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_qseecom_ta_heap_device }:chr_file r_file_perms;
+allow hal_fingerprint_default ff_device:chr_file { open read write ioctl };
+allow hal_fingerprint_default tee_device:chr_file { open read write ioctl };
+allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_qseecom_ta_heap_device }:chr_file { open read ioctl };
+
+# The module also registers a factory/debug binder service,
+# FocalFingerprintService, whose one dispatcher (invokeCommand) has no caller
+# check. It is deliberately left unlabelled: it falls back to
+# default_android_service, on which the platform forbids every add, find and
+# list rule, so no policy can ever grant it. The module's only switch for it
+# is a /data config file, which is deliberately not created.
+
+# That /data config (/data/vendor/fingerprint/ft9391/Private/ff_config.json)
+# can retune matching and lockout, and the module's dump homes are under
+# /data/vendor too. Nothing may ever let the HAL open files there.
+neverallow hal_fingerprint_default vendor_data_file:file { open read };

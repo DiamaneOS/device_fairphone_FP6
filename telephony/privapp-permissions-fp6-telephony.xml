@@ -29,9 +29,13 @@
 
      com.qualcomm.qti.telephonyservice (QCRIL audio messenger), installed as a
      privileged app so that its shared UID android.uid.qtiphone is privileged
-     and a non-privileged package cannot join it. Denied:
-       MODIFY_AUDIO_ROUTING: it forwards vsid/call_state with
-         AudioManager.setParameters, which needs MODIFY_AUDIO_SETTINGS (normal).
+     and a non-privileged package cannot join it. Granted:
+       MODIFY_AUDIO_ROUTING: its AudioController calls
+         AudioManager.setAudioServerStateCallback and isAudioServerRunning,
+         which AudioService allows only with MODIFY_PHONE_STATE or
+         MODIFY_AUDIO_ROUTING. Without it the app crashes at start, QCRIL has
+         no audio client and calls have no audio. Stock grants it by
+         signature. The app has no INTERNET permission.
 -->
 <permissions>
     <privapp-permissions package="org.codeaurora.ims">
@@ -43,6 +47,6 @@
         <deny-permission name="android.permission.SUBSTITUTE_NOTIFICATION_APP_NAME"/>
     </privapp-permissions>
     <privapp-permissions package="com.qualcomm.qti.telephonyservice">
-        <deny-permission name="android.permission.MODIFY_AUDIO_ROUTING"/>
+        <permission name="android.permission.MODIFY_AUDIO_ROUTING"/>
     </privapp-permissions>
 </permissions>

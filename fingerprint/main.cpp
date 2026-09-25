@@ -12,7 +12,10 @@
 using aidl::android::hardware::biometrics::fingerprint::Fingerprint;
 
 int main() {
-    // One binder thread: requests reach the module one at a time.
+    // No extra pool threads of our own. The FocalTech module starts a service
+    // thread that joins the binder pool as well (r9o: ISession calls arrive on
+    // it), so requests can run concurrently; Session serialises every module
+    // call (moduleMutex).
     ABinderProcess_setThreadPoolMaxThreadCount(0);
     std::shared_ptr<Fingerprint> hal = Fingerprint::create();
     CHECK(hal != nullptr) << "FP6 fingerprint module unavailable";

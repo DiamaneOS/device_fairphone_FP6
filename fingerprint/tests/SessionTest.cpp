@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstring>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -68,8 +71,11 @@ struct FakeModule {
     int result = 0;                 // value returned by the next call
     int syncError = 0;              // FINGERPRINT_ERROR sent before returning, if non-zero
     std::vector<uint32_t> removeFids;  // FINGERPRINT_TEMPLATE_REMOVED sent by remove()
+    bool cancelReportsCanceled = false;  // cancel() sends CANCELED before returning, as the module does
     int cancels = 0;
     std::atomic<int> authenticates = 0;
+    std::mutex callsMutex;
+    std::vector<std::string> calls;  // module entry points in call order
 };
 FakeModule* gModule;
 
@@ -86,10 +92,17 @@ int finish() {
 }
 
 int fakeEnroll(fingerprint_device_t*, const hw_auth_token_t*, uint32_t, uint32_t) { return finish(); }
+void record(const char* call) {
+    std::lock_guard lock(gModule->callsMutex);
+    gModule->calls.push_back(call);
+}
+
 int fakeAuthenticate(fingerprint_device_t*, uint64_t, uint32_t) {
+    record("authenticate");
     gModule->authenticates++;
     return finish();
 }
+int fakeDetect(fingerprint_device_t*) { return finish(); }
 
 // Writes the same layout as SystemUI's PressToAuthParcelable.
 struct TestPressToAuth {
@@ -127,7 +140,9 @@ bool waitFor(const std::atomic<int>& value, int expected) {
 int fakeEnumerate(fingerprint_device_t*) { return finish(); }
 int fakeResetLockout(fingerprint_device_t*, const hw_auth_token_t*) { return finish(); }
 int fakeCancel(fingerprint_device_t*) {
+    record("cancel");
     gModule->cancels++;
+    if (gModule->cancelReportsCanceled) sendError(FINGERPRINT_ERROR_CANCELED);
     return 0;
 }
 int fakeRemove(fingerprint_device_t*, uint32_t gid, uint32_t fid) {
@@ -149,6 +164,7 @@ class SessionTest : public ::testing::Test {
         dev.cancel = fakeCancel;
         dev.remove = fakeRemove;
         dev.reserved[fp6::kResetLockout] = reinterpret_cast<void*>(fakeResetLockout);
+        dev.reserved[fp6::kDetectInteraction] = reinterpret_cast<void*>(fakeDetect);
         mCb = ndk::SharedRefBase::make<RecordingCallback>();
         mSession = ndk::SharedRefBase::make<Session>(&dev, kUser, mCb);
         mModule.session = mSession;
@@ -160,6 +176,13 @@ class SessionTest : public ::testing::Test {
         fingerprint_msg_t msg = {};
         msg.type = FINGERPRINT_AUTHENTICATED;
         msg.data.authenticated.finger = {.gid = gid, .fid = fid};
+        return msg;
+    }
+    fingerprint_msg_t lockout(uint32_t kind) {
+        fingerprint_msg_t msg = {};
+        msg.type = static_cast<fingerprint_msg_type_t>(fp6::kMsgLockout);
+        fp6::LockoutMsg payload = {.kind = kind, .reserved = 0, .durationMillis = 30000};
+        std::memcpy(&msg.data, &payload, sizeof(payload));
         return msg;
     }
 
@@ -282,6 +305,89 @@ TEST_F(SessionTest, DeadClientCancelsRunningOperation) {
     sendError(FINGERPRINT_ERROR_CANCELED);
     EXPECT_EQ(mModule.cancels, 1);
     EXPECT_TRUE(mCb->events.empty());
+}
+
+TEST_F(SessionTest, MatchAfterCancelIsDropped) {
+    // A late scan result must not unlock after the framework cancelled.
+    mModule.cancelReportsCanceled = true;
+    mSession->authenticate(1, &mSignal);
+    mSignal->cancel();
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"error 5/0"}));
+}
+
+TEST_F(SessionTest, ErrorWithoutOperationIsDropped) {
+    sendError(FINGERPRINT_ERROR_HW_UNAVAILABLE);
+    EXPECT_TRUE(mCb->events.empty());
+}
+
+TEST_F(SessionTest, LockoutClearedDoesNotEndAuthentication) {
+    mSession->authenticate(1, &mSignal);
+    deliver(lockout(fp6::kLockoutCleared));
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"lockout cleared", "success 3"}));
+}
+
+TEST_F(SessionTest, TimedLockoutEndsAuthenticationOnce) {
+    mSession->authenticate(1, &mSignal);
+    deliver(lockout(fp6::kLockoutTimed));
+    sendError(FINGERPRINT_ERROR_LOCKOUT);  // a legacy error after the lockout message
+    mSignal->cancel();
+    EXPECT_EQ(mCb->events, (Events{"lockout timed"}));
+    EXPECT_EQ(mModule.cancels, 0);
+}
+
+TEST_F(SessionTest, LockoutClearedEndsLockoutReset) {
+    mSession->resetLockout(HardwareAuthToken{});
+    deliver(lockout(fp6::kLockoutCleared));
+    sendError(FINGERPRINT_ERROR_UNABLE_TO_PROCESS);
+    EXPECT_EQ(mCb->events, (Events{"lockout cleared"}));
+}
+
+TEST_F(SessionTest, MatchDuringDetectionReportsInteractionOnly) {
+    mSession->detectInteraction(&mSignal);
+    deliver(authenticated(kUser, 3));
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"interaction"}));
+}
+
+TEST_F(SessionTest, PromptAfterKeyguardIsNotScreenGated) {
+    // A request without the press-to-auth parcelable (BiometricPrompt) must not
+    // inherit the keyguard's setting.
+    mModule.cancelReportsCanceled = true;
+    mSession->authenticateWithContext(1, context(common::DisplayState::NO_UI, true), &mSignal);
+    mSignal->cancel();
+    OperationContext prompt;
+    prompt.displayState = common::DisplayState::NO_UI;
+    prompt.authenticateReason = common::AuthenticateReason::make<
+            common::AuthenticateReason::Tag::fingerprintAuthenticateReason>();
+    mSession->authenticateWithContext(2, prompt, &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"error 5/0", "success 3"}));
+}
+
+TEST_F(SessionTest, ReleasedHeldMatchStopsTheSensor) {
+    mSession->authenticateWithContext(1, context(common::DisplayState::NO_UI, true), &mSignal);
+    deliver(authenticated(kUser, 3));
+    ASSERT_TRUE(waitFor(mModule.authenticates, 2));
+    mSession->onContextChanged(context(common::DisplayState::LOCKSCREEN, true));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
+    EXPECT_EQ(mModule.cancels, 1);
+}
+
+TEST_F(SessionTest, CancelRacingRearmNeverRestartsTheSensor) {
+    // Whichever of the re-arm thread and the cancel runs first, the module is
+    // never asked to authenticate after the cancel.
+    mModule.cancelReportsCanceled = true;
+    mSession->authenticateWithContext(1, context(common::DisplayState::NO_UI, true), &mSignal);
+    deliver(authenticated(kUser, 3));
+    mSignal->cancel();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::lock_guard lock(mModule.callsMutex);
+    auto cancel = std::find(mModule.calls.begin(), mModule.calls.end(), "cancel");
+    ASSERT_NE(cancel, mModule.calls.end());
+    EXPECT_EQ(std::find(cancel, mModule.calls.end(), "authenticate"), mModule.calls.end());
+    EXPECT_EQ(mCb->events, (Events{"error 5/0"}));
 }
 
 }  // namespace

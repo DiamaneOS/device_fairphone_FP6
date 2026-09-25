@@ -93,9 +93,12 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
     if (mkdir(path.c_str(), 0700) != 0 && errno != EEXIST) {
         PLOG(ERROR) << "can't create " << path;
     }
-    if (int err = mDevice->set_active_group(mDevice, userId, path.c_str()); err != 0) {
-        LOG(ERROR) << "set_active_group(" << userId << "): " << err;
-        return ndk::ScopedAStatus::fromServiceSpecificError(err);
+    {
+        std::lock_guard moduleLock(moduleMutex());
+        if (int err = mDevice->set_active_group(mDevice, userId, path.c_str()); err != 0) {
+            LOG(ERROR) << "set_active_group(" << userId << "): " << err;
+            return ndk::ScopedAStatus::fromServiceSpecificError(err);
+        }
     }
     auto session = ndk::SharedRefBase::make<Session>(mDevice, userId, cb, [this](const Session* s) {
         std::lock_guard lock(mSessionMutex);

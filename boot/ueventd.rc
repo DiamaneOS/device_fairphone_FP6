@@ -130,3 +130,9 @@
 /dev/msm_audio_ion        0660   system     audio
 /dev/aw882xx_smartpa      0660   system     audio
 /dev/msm_adsp_sleepmon    0660   system     audio
+
+# Bluetooth HAL (bluetooth user): chip power and version through btpower (stock
+# ueventd.rc) and the HCI UART (stock init.qcom.rc sets bluetooth:net_bt 0660 on
+# boot). The FM/codec nodes (btfmcodec_dev, bt_cp_ctrl, btfmslim) stay root-only.
+/dev/btpower              0660   bluetooth  system
+/dev/ttyHS0               0660   bluetooth  net_bt

@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Stock Qualcomm Bluetooth HCI service (android.hardware.bluetooth@1.1-service-qti).
+# Drafted from the stock compiled vendor policy (vendor_sepolicy.cil, rules for
+# hal_bluetooth_default and hal_bluetooth). Before enforcing, reduce it from
+# Qualcomm generic/vendor/common/hal_bluetooth_default.te at sepolicy_vndr
+# 67fa928 (local copy in the policy candidate, sepolicy/README.md).
+# Platform policy already covers the HIDL service registration, binder with
+# the Bluetooth app, wake locks, NET_ADMIN and the HCI UART (/dev/ttyHS0 is
+# hci_attach_dev; stock grants no vendor rule for it).
+
+# /dev/btpower: chip power and SoC version ioctls (stock rule 4644).
+allow hal_bluetooth_default vendor_bt_device:chr_file rw_file_perms;
+
+# Patch and NVM files on the Bluetooth firmware partition (stock rules 4649-4651).
+r_dir_file(hal_bluetooth_default, bt_firmware_file)
+
+# Bluetooth address from /mnt/vendor/persist/bluetooth/.bt_nv.bin (libbtnv).
+# Read only: the HAL makes a single bt_nv_cmd call, a read of NV_BD_ADDR_I.
+# Stock grants write (rules 4652-4653) and read of all of mnt_vendor_file
+# (4657-4659); here only persist traversal and the Bluetooth directory.
+allow hal_bluetooth_default { mnt_vendor_file vendor_persist_file }:dir search;
+r_dir_file(hal_bluetooth_default, vendor_persist_bluetooth_file)
+
+# The service and HCI implementation write only these properties (exact names,
+# vendor_bluetooth_hal_state_prop in property_contexts): the SoC name,
+# scram.enabled, a generated address, and two crash counters. All other
+# Bluetooth vendor properties (debug and feature switches) are read only.
+set_prop(hal_bluetooth_default, vendor_bluetooth_hal_state_prop)
+get_prop(hal_bluetooth_default, vendor_bluetooth_prop)
+
+# libsoc_helper: ro.vendor.qti.soc_id, else /sys/devices/soc0/soc_id (stock
+# rule 4660; sysfs types from vendor-common/genfs_contexts).
+get_prop(hal_bluetooth_default, vendor_soc_id_prop)
+allow hal_bluetooth_default vendor_sysfs_soc:dir search;
+allow hal_bluetooth_default vendor_sysfs_public:file r_file_perms;
+
+# Not granted (stock grants them): write to persist, QRTR sockets (only for
+# the modem-NV address query, off), /data/vendor/bluetooth, diag, the FM radio
+# device, the ssgtzd socket, the TPI and Xpan service registrations and HSUART
+# tracing.

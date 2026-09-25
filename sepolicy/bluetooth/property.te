@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Properties the stock Bluetooth HCI service writes at run time. Vendor
+# internal: no platform domain or app may read them (the generated Bluetooth
+# address is one of them), and only the HAL may set them.
+vendor_internal_prop(vendor_bluetooth_hal_state_prop)

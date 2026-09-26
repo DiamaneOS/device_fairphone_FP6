@@ -46,7 +46,6 @@ allow tee vendor_persist_drm_file:file create_file_perms;
 allow tee vendor_persist_data_file:dir create_dir_perms;
 allow tee vendor_persist_data_file:file create_file_perms;
 
-allow tee vendor_time_daemon:unix_stream_socket connectto;
 
 # Allow SFS to write to data partition
 allow tee vendor_data_tzstorage_file:dir create_dir_perms;

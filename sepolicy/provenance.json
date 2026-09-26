@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "5830de518385faa67d561812c720cb754b139b7c0c92139e3b571a78681835fe"
+      "sha256": "4ecb98d14e479007b5b6fec0372a4411b268e3470c7c5a6fcb40b88f7c89b368"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -291,7 +291,7 @@
       "source": "generic/vendor/common/tee.te",
       "source_sha256": "1fc472afd8cf08a187a93c6f02d7362c63e37b0f3ef617d33d74cfd72254573e",
       "path": "vendor-common/tee.te",
-      "sha256": "1fc472afd8cf08a187a93c6f02d7362c63e37b0f3ef617d33d74cfd72254573e"
+      "sha256": "bf27f606a3d7ada7e17e734b270f840e4a9df38c05b62b1c0c806dcad3bc19b3"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -300,14 +300,6 @@
       "source_sha256": "71142f5bc64ac5e10ec051ad4e9a38a1323c3789bf71e39f2b42bc6652ae08bb",
       "path": "vendor-common/thermal-engine.te",
       "sha256": "4596d7079a513edb7982fb3066714a94db4d58e9fc3d670b841b951210f5487f"
-    },
-    {
-      "project": "qualcomm-sepolicy-vendor",
-      "revision": "67fa928299a49374a55281969fee357884c86890",
-      "source": "generic/vendor/common/time_daemon.te",
-      "source_sha256": "35c074754f48fc0d34b688c81007cc6fe9ea9f54ddd0e8fb0692089fd6972e7e",
-      "path": "vendor-common/time_daemon.te",
-      "sha256": "35c074754f48fc0d34b688c81007cc6fe9ea9f54ddd0e8fb0692089fd6972e7e"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

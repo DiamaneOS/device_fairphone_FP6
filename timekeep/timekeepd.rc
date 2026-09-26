@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Keeps the system clock across reboots (timekeep/main.cpp).
+
+# Restore the clock as soon as /data is available. init waits for it, so zygote
+# and system_server's build-date floor always see the restored time. Then keep
+# the saved offset current.
+on post-fs-data
+    mkdir /data/vendor/timekeepd 0700 system system
+    exec_start vendor.timekeepd-restore
+    start vendor.timekeepd
+
+# Sets the clock once and exits: the only part with CAP_SYS_TIME. The timeout
+# keeps a stuck RTC read from holding up boot.
+service vendor.timekeepd-restore /vendor/bin/timekeepd --restore
+    user system
+    group system
+    capabilities SYS_TIME
+    seclabel u:r:vendor_timekeepd_restore:s0
+    timeout_period 10
+    oneshot
+    disabled
+
+# Saves the offset whenever the clock changes; cannot set the clock.
+service vendor.timekeepd /vendor/bin/timekeepd
+    user system
+    group system
+    capabilities
+    disabled

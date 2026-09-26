@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The PMK8550 RTC's seconds counter, read by timekeepd (timekeepd.te). Only this
+# file: the alarm (wakealarm) and the other RTC attributes stay sysfs.
+genfscon sysfs /devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-00/c42d000.qcom,spmi:qcom,pmk8550@0:rtc@6100/rtc/rtc0/since_epoch u:object_r:vendor_sysfs_rtc_counter:s0

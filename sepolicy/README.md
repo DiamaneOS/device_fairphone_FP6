@@ -275,8 +275,12 @@ The stock radio daemon runs in the platform `rild` domain. It may add only the f
 Qualcomm radio services the device declares (IMS and radio config under
 `vendor_hal_telephony_service2`, audio messenger and LPA under their own types). It is not
 a `binderservicedomain`; each of its three app clients has an explicit binder grant. The
-secure-element HAL, Qualcomm IWLAN and data-connection services, diag, TIPC, the legacy
+secure-element HAL, Qualcomm IWLAN and data-connection services, diag, the legacy
 IPC-router ioctls, the QCRIL client socket and executing vendor tools are not granted.
+The radio daemon and nicmd may use TIPC sockets with each other, as on stock: the data
+module's DSI layer waits for nicmd over TIPC before it allows any data call. No other
+domain may create a TIPC socket (neverallow in `telephony/rild.te`), and the kernel builds
+TIPC without its UDP bearer, crypto or diag module.
 nicmd keeps its netlink, QRTR, rmnet ioctl and network-wrapper access, datagram sockets
 for interface ioctls and its init-created recovery file; it is not a `netdomain` (no TCP
 connect or port binding), and the SHS, QMI-priority and performance helpers are not

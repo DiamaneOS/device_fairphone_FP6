@@ -35,10 +35,12 @@ r_dir_file(rild, vendor_mbn_data_file)
 # QMI to the modem over QRTR.
 allow rild self:qipcrtr_socket create_socket_perms_no_ioctl;
 
-# The data module asks nicmd to set up the rmnet data interfaces over TIPC
-# (libnicm RequestTIPCMessenger); every data call fails without it. Same as
-# stock (vendor_sepolicy.cil line 6576). TIPC has no network bearer in our
-# kernel and only rild and nicmd may create TIPC sockets.
+# The data module's DSI layer waits for nicmd's answer over TIPC (libnicm
+# RequestTIPCMessenger/EventTIPCMessenger) before it allows any data call;
+# without it every call fails at once with cause 0x1004. Same as stock
+# (vendor_sepolicy.cil line 6576). No TIPC bearer is configured and the kernel
+# builds TIPC without the UDP bearer and crypto; only rild and nicmd may
+# create TIPC sockets.
 allow rild self:tipc_socket create_socket_perms_no_ioctl;
 neverallow { domain -rild -vendor_nicmd } self:tipc_socket create;
 

@@ -73,6 +73,10 @@
 # The stock FP6 RPMB rule lets the system-owned qseecomd listener serve
 # hardware-backed Gatekeeper and KeyMint requests.
 /dev/0:0:0:49476          0600   system     system
+# The persistent data block (ro.frp.pst): system_server's
+# PersistentDataBlockService reads and writes it, including the bootloader's
+# unlock-ability flag. Stock rule; without it system_server fails to boot.
+/dev/block/platform/soc/1d84000.ufshc/by-name/frp   0600   system   system
 # The stock FP6 FocalTech node is owned by the system fingerprint service.
 /dev/focaltech_fp          0660   system     system
 # The stock NFC HAL runs as nfc and opens the Samsung controller node. Stock

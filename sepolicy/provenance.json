@@ -451,7 +451,7 @@
       "source": "qva/vendor/common/file_contexts",
       "source_sha256": "d9863a51acc638990e7963c61b85d91bf8455efe644792b0e7a506dcfe13da49",
       "path": "qva-common/file_contexts",
-      "sha256": "e2fc3946c7bd5818fb4f4107142317c0a84cd4e45e6945f442eec403d6afbae6"
+      "sha256": "eb3cf1d3728e0c9550d2e85e57b3b3f4ce0b14bfcccc9180d0c4db8fc2e02741"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -488,14 +488,6 @@
     {
       "project": "qualcomm-sepolicy-vendor",
       "revision": "67fa928299a49374a55281969fee357884c86890",
-      "source": "qva/vendor/common/hal_qseecom.te",
-      "source_sha256": "59aa2fde1ac53ad6aa719a2ba82a035b5efd2c131ce8913604f95fda366f0c20",
-      "path": "qva-common/hal_qseecom.te",
-      "sha256": "59aa2fde1ac53ad6aa719a2ba82a035b5efd2c131ce8913604f95fda366f0c20"
-    },
-    {
-      "project": "qualcomm-sepolicy-vendor",
-      "revision": "67fa928299a49374a55281969fee357884c86890",
       "source": "qva/vendor/common/hal_usb.te",
       "source_sha256": "eb6d2d0c4450300020fcd2f660db2612ad15c18edfa3d89873f7ed9684d21726",
       "path": "qva-common/hal_usb.te",
@@ -523,7 +515,7 @@
       "source": "qva/vendor/common/hwservice_contexts",
       "source_sha256": "6d98bc2781a72bc48742ccb42f6974201ce0f05c9b0af05f60d9123bddc1015d",
       "path": "qva-common/hwservice_contexts",
-      "sha256": "6d98bc2781a72bc48742ccb42f6974201ce0f05c9b0af05f60d9123bddc1015d"
+      "sha256": "f2b809d234bcb16b37dea9c0f61f45f4d8c4f50da64ed7d6ebcd978b00e37070"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -571,7 +563,7 @@
       "source": "qva/vendor/common/service_contexts",
       "source_sha256": "20a147ae8bd3b1ce903312d3aa2d5ead73329add1514af5758cbbde425c46931",
       "path": "qva-common/service_contexts",
-      "sha256": "20a147ae8bd3b1ce903312d3aa2d5ead73329add1514af5758cbbde425c46931"
+      "sha256": "db6a77f8ad2f975ec84c260eea2171b4e9c542b8625b34f0a6e9d5e0c79876c1"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1195,7 +1187,7 @@
       "source": "generic/vendor/common/hal_audio_default.te",
       "source_sha256": "a45518cf9a36d8636fe3f64901c19545e16a349149b57c7d3e1fd8737f81bf31",
       "path": "audio/hal_audio_default.te",
-      "sha256": "5fc3e4e2575d89efc7c1ea2bed9583bd36debbcd574f41c3409ac8e96f1478bf"
+      "sha256": "81531b05d96acfa442aa69f08a1aff43c7d8c5fe1b93351845502fc6b84730bc"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

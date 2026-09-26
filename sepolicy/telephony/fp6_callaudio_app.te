@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Vendor-side grants for the FP6 call-audio bridge (domain fp6_callaudio_app,
+# telephony-system-ext-public): it finds IQcRilAudio/slot1 and /slot2,
+# registers its request callback, reports the audioserver state, and QCRIL
+# calls the callback with the in-call parameters and takes the replies on its
+# own response callback. The same reach the stock app it replaces had.
+allow fp6_callaudio_app fp6_hal_qcrilaudio_service:service_manager find;
+binder_call(fp6_callaudio_app, rild)
+binder_call(rild, fp6_callaudio_app)

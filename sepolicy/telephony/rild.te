@@ -14,7 +14,7 @@
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
 # binderservicedomain, so apps cannot call it through the platform appdomain
 # rule; its three app clients get binder_call in qtelephony.te,
-# qcril_audio.te and qti_lpa.te.
+# fp6_callaudio_app.te and qti_lpa.te.
 
 # Qualcomm services the device declares: IImsRadio and IQtiRadioConfig
 # (vendor_hal_telephony_service2), IQcRilAudio and IUimLpa (own types,

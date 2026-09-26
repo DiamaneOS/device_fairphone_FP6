@@ -27,15 +27,10 @@
      CREATE_USERS, INTERACT_ACROSS_USERS_FULL, INTERACT_ACROSS_PROFILES,
      SYSTEM_ALERT_WINDOW.
 
-     com.qualcomm.qti.telephonyservice (QCRIL audio messenger), installed as a
-     privileged app so that its shared UID android.uid.qtiphone is privileged
-     and a non-privileged package cannot join it. Granted:
-       MODIFY_AUDIO_ROUTING: its AudioController calls
-         AudioManager.setAudioServerStateCallback and isAudioServerRunning,
-         which AudioService allows only with MODIFY_PHONE_STATE or
-         MODIFY_AUDIO_ROUTING. Without it the app crashes at start, QCRIL has
-         no audio client and calls have no audio. Stock grants it by
-         signature. The app has no INTERNET permission.
+     The stock QCRIL audio messenger (com.qualcomm.qti.telephonyservice) and
+     its MODIFY_AUDIO_ROUTING grant are gone: our call-audio bridge
+     (callaudio/) does the same job with the normal permission
+     MODIFY_AUDIO_SETTINGS and needs no entry here.
 -->
 <permissions>
     <privapp-permissions package="org.codeaurora.ims">
@@ -45,8 +40,5 @@
         <permission name="android.permission.INTERACT_ACROSS_USERS"/>
         <deny-permission name="android.permission.WRITE_SECURE_SETTINGS"/>
         <deny-permission name="android.permission.SUBSTITUTE_NOTIFICATION_APP_NAME"/>
-    </privapp-permissions>
-    <privapp-permissions package="com.qualcomm.qti.telephonyservice">
-        <permission name="android.permission.MODIFY_AUDIO_ROUTING"/>
     </privapp-permissions>
 </permissions>

@@ -100,7 +100,7 @@ Downstream adaptations:
     removed too.
   Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
   `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
-  (its fstab line should go, as in stock). The modem's `study` partition has
+  (its fstab line is gone: nothing on the FP6 mounts `/product/vm-system`). The modem's `study` partition has
   the stock `vendor_modem_efs_partition_device` label
   (`vendor-volcano/file_contexts`), so `rmt_storage` can serve it with its
   existing grant.

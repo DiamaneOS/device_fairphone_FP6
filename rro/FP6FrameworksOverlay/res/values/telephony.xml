@@ -13,7 +13,7 @@
     <bool name="config_telephony5gNonStandalone">true</bool>
 
     <!-- Stock eUICC capabilities, reported by the stock LPA
-         (com.qualcomm.qti.lpa) once the user enables it. -->
+         (com.qualcomm.qti.lpa). -->
     <string-array name="config_telephonyEuiccDeviceCapabilities" translatable="false">
         <item>gsm,9</item>
         <item>utran,10</item>

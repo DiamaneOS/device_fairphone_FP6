@@ -3,7 +3,7 @@
 
 # Telephony for private bring-up: the stock Qualcomm radio daemon (qcrilNrd),
 # its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
-# stock eSIM LPA (com.qualcomm.qti.lpa, disabled by default) come from the
+# stock eSIM LPA (com.qualcomm.qti.lpa, its eSIM service on) come from the
 # selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
 # radio daemon and the audio HAL is our own (callaudio/, replacing the stock
 # QtiTelephonyService). The radio interface libraries, the carrier
@@ -85,8 +85,8 @@ PRODUCT_PACKAGES += \
     FP6CallAudio
 
 # eSIM LPA (product priv-app): its privileged-permission allowlist and the
-# default-disabled state of its services (product apps take their allowlist
-# from the product partition).
+# default-disabled state of its unused UimLpaService (product apps take their
+# allowlist from the product partition).
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/privapp-permissions-fp6-lpa.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-fp6-lpa.xml \
     device/fairphone/FP6/telephony/fp6-lpa-default-disabled.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/fp6-lpa-default-disabled.xml

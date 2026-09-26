@@ -6,6 +6,16 @@ genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_0_geni_se/a84000.i2c/i2c-1/1-0027/wakeup u:object_r:sysfs_wakeup:s0
 # UFS LUN 0 (userdata) queue settings that platform init.rc tunes.
 genfscon sysfs /devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/block u:object_r:sysfs_devices_block:s0
+# The root disk's discard cap, the one node there platform init.rc writes
+# (storage.te); the longer path wins over the block entry above.
+genfscon sysfs /devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/block/sda/queue/discard_max_bytes u:object_r:vendor_sysfs_ufs_discard_max:s0
+# WALT and VM tuning set by init.fp6.perf.rc and perf HAL boosts (perf.te).
+genfscon proc /sys/walt u:object_r:vendor_proc_walt:s0
+genfscon proc /sys/vm/swappiness u:object_r:vendor_proc_vm_tuning:s0
+genfscon proc /sys/vm/min_free_kbytes u:object_r:vendor_proc_vm_tuning:s0
+genfscon proc /sys/vm/compaction_proactiveness u:object_r:vendor_proc_compaction:s0
+# TCP small-queue limit tuned by the Wi-Fi HAL (platform.te).
+genfscon proc /sys/net/ipv4/tcp_limit_output_bytes u:object_r:vendor_proc_tcp_limit_output_bytes:s0
 # Awinic haptics nodes the vibrator HAL writes (vibrator.te). genfs matches
 # path prefixes, so "activate" also labels activate_mode; that node is not
 # chowned to system, so the HAL still cannot write it.

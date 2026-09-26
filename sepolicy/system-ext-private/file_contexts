@@ -49,3 +49,6 @@
 ####### system_ext file ###############
 
 ####### data files ################
+# Core NFC state (NFA storage, service event log); platform init.rc creates
+# /data/nfc and platform nfc.te already owns nfc_data_file (stock label).
+/data/nfc(/.*)?                                 u:object_r:nfc_data_file:s0

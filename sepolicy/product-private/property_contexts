@@ -31,4 +31,7 @@
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 vendor.display.disable_rounded_corner       u:object_r:vendor_display_notch_prop:s0
 vendor.qvirtmgr.                            u:object_r:vendor_qvirtmgr_prop:s0
+# Intentional (DiamaneOS): SystemUI cannot read this label, so its read falls
+# back to false and screen decorations, including the camera/mic privacy dot,
+# stay on; as AOSP debug_prop, adb setprop could switch them off.
 debug.disable_screen_decorations            u:object_r:vendor_display_notch_prop:s0

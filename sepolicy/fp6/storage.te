@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Platform init.rc caps discard_max_bytes on the root disk (UFS LUN 0, sda) to
+# avoid long I/O stalls. Only that node gets this type (genfs line in
+# fp6/genfs_contexts); the rest of the LUN 0 block directory stays
+# sysfs_devices_block, which init may only read.
+type vendor_sysfs_ufs_discard_max, fs_type, sysfs_type;
+allow init vendor_sysfs_ufs_discard_max:file { open write };

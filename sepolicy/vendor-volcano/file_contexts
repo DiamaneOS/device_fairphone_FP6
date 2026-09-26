@@ -43,6 +43,8 @@
 /dev/block/platform/soc/1d84000.ufshc/by-name/fsg                   u:object_r:vendor_modem_efs_partition_device:s0
 /dev/block/platform/soc/1d84000.ufshc/by-name/modemst1              u:object_r:vendor_modem_efs_partition_device:s0
 /dev/block/platform/soc/1d84000.ufshc/by-name/modemst2              u:object_r:vendor_modem_efs_partition_device:s0
+# FP6 modem EFS store that rmt_storage serves as /boot/modem_study (stock label).
+/dev/block/platform/soc/1d84000.ufshc/by-name/study                 u:object_r:vendor_modem_efs_partition_device:s0
 /dev/block/platform/soc/1d84000.ufshc/by-name/ssd                   u:object_r:vendor_ssd_block_device:s0
 /dev/block/platform/soc/1d84000.ufshc/by-name/misc                  u:object_r:misc_block_device:s0
 /dev/block/platform/soc/1d84000.ufshc/by-name/rpm                   u:object_r:vendor_rpmb_device:s0

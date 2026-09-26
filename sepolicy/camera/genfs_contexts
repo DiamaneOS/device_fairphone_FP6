@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# CamX sizes its pipelines from the number of fused-off SoC parts. The count is
+# the companion of subset_parts (vendor-common/genfs_contexts) and not an
+# identifier; without this line it inherits vendor_sysfs_soc, which also covers
+# serial_number. Only camera.qcom.so reads it (hal_camera_default.te).
+genfscon sysfs /devices/soc0/num_subset_parts u:object_r:vendor_sys_nonsp_comp:s0

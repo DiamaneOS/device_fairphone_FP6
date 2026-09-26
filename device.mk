@@ -12,15 +12,26 @@ PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
+# Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed
+# snapshots that the userspace snapshot daemon merges (the kernel has dm-user
+# and io_uring), so an update needs far less free space on /data. The generic
+# ramdisk already has the first-stage snapuserd; recovery, which also runs
+# fastbootd, needs its own to finish a pending merge before a wipe or a flash.
+# Takes effect from the first OTA whose source build carries these properties.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/vabc_features.mk)
+PRODUCT_VIRTUAL_AB_COMPRESSION_METHOD := lz4
+PRODUCT_VENDOR_PROPERTIES += ro.virtual_ab.compression.threads=true
+PRODUCT_PACKAGES += snapuserd.recovery
 
 # The stock GPU driver and graphics mapper are HIDL HALs. Android only includes
 # hwservicemanager by default for devices shipping at API 34 or older, and
 # without it HIDL, including passthrough HALs, is unavailable.
 PRODUCT_PACKAGES += hwservicemanager
 
-# The stock display composer registers its QService on /dev/vndbinder.
-# Android only includes vndservicemanager for devices shipping at API 29 or
-# older, and this product does not inherit base_vendor.mk.
+# The display composer (built from source) registers its QService, and the
+# stock peripheral manager its service, on /dev/vndbinder. Android only includes
+# vndservicemanager for devices shipping at API 29 or older, and this product
+# does not inherit base_vendor.mk.
 PRODUCT_PACKAGES += vndservicemanager
 
 # OEM unlocking, as stock: Android's persistent data block service manages the
@@ -29,6 +40,34 @@ PRODUCT_PACKAGES += vndservicemanager
 PRODUCT_VENDOR_PROPERTIES += \
     ro.frp.pst=/dev/block/bootdevice/by-name/frp \
     ro.oem_unlock_supported=1
+
+# Remote key provisioning, as stock: without a hostname keystore2 treats it as
+# off, and stock declares the TEE KeyMint RKP-only (no factory attestation
+# key). The hostname only switches it on. The server rkpd talks to is set by
+# GrapheneOS's RemoteKeyProvisioningSettings (frameworks/base,
+# android.ext.settings; default the GrapheneOS proxy, https://<hostname>/v1
+# only if the user picks the standard server); our own backend replaces it
+# there (tools endpoint contract rkp-proxy).
+PRODUCT_VENDOR_PROPERTIES += \
+    remote_provisioning.hostname=remoteprovisioning.googleapis.com \
+    remote_provisioning.tee.rkp_only=true
+
+# Keys, as stock: when the metadata key is created after a wipe, vold first asks
+# KeyMint to delete every old key, rollback-resistant ones included; and
+# AndroidKeyStore offers the TEE's 3DES keys.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.crypto.metadata_init_delete_all_keys.enabled=true \
+    ro.hardware.keystore_desede=true
+
+# Device-ID attestation sends these to KeyMint, which checks them against the
+# IDs provisioned at the factory, so they carry stock's values; the visible
+# brand stays DiamaneOS. Stock sets brand, name and model; device and
+# manufacturer pin what ro.product.vendor.* reports today.
+PRODUCT_BRAND_FOR_ATTESTATION := Fairphone
+PRODUCT_NAME_FOR_ATTESTATION := FP6
+PRODUCT_MODEL_FOR_ATTESTATION := Fairphone 6
+PRODUCT_DEVICE_FOR_ATTESTATION := FP6
+PRODUCT_MANUFACTURER_FOR_ATTESTATION := Fairphone
 
 # Recovery has no zygote or normal vendor init; platform recovery imports this.
 PRODUCT_COPY_FILES += \
@@ -74,7 +113,9 @@ PRODUCT_PACKAGES += \
 
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
 # its interface repositories; OP-DISPLAY-HAL-SOURCE). The stock Android 14
-# composer cannot present under Android 17. Configuration values follow
+# composer failed to present under Android 17 when tried without
+# libsdmextension and is untested with it; source is kept so we can patch and
+# harden the code that handles every app's buffers. Configuration values follow
 # LineageOS for 6.1-kernel platforms; stock declares a wide-colour panel.
 $(call soong_config_set,qtidisplay,default,true)
 $(call soong_config_set,qtidisplay,drmpp,true)
@@ -325,3 +366,9 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.usb.use_gadget_hal=1 \
     vendor.usb.rndis.func.name=rndis \
     vendor.usb.ncm.func.name=ncm
+
+# USB tethering over NCM, as Pixels: Tethering defaults to RNDIS, which this
+# kernel does not build. With the overlay the gadget HAL links ncm.gs6 (created
+# by init.qcom.usb.rc) through the "ncm" and "ncm,adb" compositions; the usb0
+# interface matches Tethering's default USB pattern.
+PRODUCT_PACKAGES += FP6TetheringOverlay

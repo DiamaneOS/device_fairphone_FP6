@@ -131,3 +131,11 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.audio.feature.usb_offload_sidetone_volume.enable=false \
     vendor.audio.feature.vbat.enable=true \
     vendor.audio.feature.wsa.enable=false
+
+# audioserver's watchdog for audio HAL calls: stock's 8 s first chance (10 s in
+# total with the default 2 s second chance) instead of 3 s (5 s). Device
+# switches, Bluetooth call audio and DSP recovery in the stock AudioReach HAL
+# may take longer than 5 s, and a timeout aborts audioserver, which drops
+# playback or call audio.
+PRODUCT_VENDOR_PROPERTIES += \
+    audio.timecheck.timeout_duration_ms=8000

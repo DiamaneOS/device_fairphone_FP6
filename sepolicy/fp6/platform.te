@@ -33,3 +33,6 @@ set_prop(vendor_init, vendor_disable_spu_prop)
 set_prop(vendor_init, vendor_audio_prop)
 set_prop(vendor_init, vendor_radio_prop)
 set_prop(vendor_init, vendor_ssr_prop)
+# persist.vendor.data.profile_update (telephony.mk): QCRIL copies Android's
+# APNs into the modem's data profiles.
+set_prop(vendor_init, vendor_dataqdp_prop)

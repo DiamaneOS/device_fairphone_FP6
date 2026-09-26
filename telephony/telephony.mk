@@ -30,6 +30,19 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     ro.telephony.default_network=26,26
 
+# Without a SIM the lock screen is not forced on (also not over the setup
+# wizard): the AOSP phone default from full_base_telephony.mk, which this
+# product does not inherit; stock sets it too.
+PRODUCT_VENDOR_PROPERTIES += \
+    keyguard.no_require_sim=true
+
+# QCRIL copies the APNs Android uses (custom, MVNO, MMS and attach APNs) into
+# the modem's data profiles, as stock; its database default (false) keeps the
+# modem's built-in carrier profiles. vendor_init may set vendor_dataqdp_prop
+# (sepolicy/fp6/platform.te).
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.data.profile_update=true
+
 # Telephony, calling, messaging, data, IMS and eUICC features (AOSP
 # definitions; stock declares the same set in vendor/etc/permissions and
 # system/etc/permissions/android.hardware.telephony.euicc.xml). No MBMS:

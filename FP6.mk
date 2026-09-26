@@ -11,8 +11,13 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_product.mk)
 $(call inherit-product, device/fairphone/FP6/device.mk)
 $(call inherit-product, vendor/diamaneos/product.mk)
 
-PRODUCT_NAME := diamaneos_FP6
+# Fairphone's stock product identity, as GrapheneOS keeps Google's for Pixels
+# (owner decision of 26 September 2026): Google blocked the DiamaneOS-branded
+# identity as an uncertified device. DiamaneOS stays the name people see
+# (setup, About, system label, boot); the build ID, number, variant and keys
+# in the fingerprint are our own.
+PRODUCT_NAME := FP6
 PRODUCT_DEVICE := FP6
-PRODUCT_MODEL := Fairphone 6
+PRODUCT_MODEL := The Fairphone (Gen. 6)
 PRODUCT_MANUFACTURER := Fairphone
-PRODUCT_BRAND := DiamaneOS
+PRODUCT_BRAND := Fairphone

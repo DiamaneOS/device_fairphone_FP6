@@ -73,4 +73,9 @@
     <bool name="config_setColorTransformAccelerated">true</bool>
     <bool name="config_nightDisplayAvailable">true</bool>
     <bool name="config_reduceBrightColorsAvailable">true</bool>
+
+    <!-- Keyboard key presses compose the CLICK primitive at this amplitude,
+         which the FP6 vibrator HAL plays as the medium tick the owner chose
+         (Awinic RAM wave 3 at gain 0x40); other clicks keep their own effect. -->
+    <item name="config_keyboardHapticFeedbackFixedAmplitude" format="float" type="dimen">0.5</item>
 </resources>

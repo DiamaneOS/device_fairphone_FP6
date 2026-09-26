@@ -65,6 +65,17 @@ Downstream adaptations:
     `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the
     touch device. Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE); it
     may search the device directory but not use its factory-test files.
+  - Vibrator: the Awinic haptics nodes the vibrator HAL writes (`activate`,
+    `brightness`, `duration`, `gain`, `loop`, `seq`) are
+    `vendor_sysfs_aw_vibrator`. The imported `hal_vibrator_default.te` no
+    longer lets the HAL write every `sysfs_leds` file, so raw waveform
+    streaming (`rtp`), calibration and the other LEDs stay read-only to it.
+    The imported files also lose the HAL's `input_device` access (it no
+    longer probes `/dev/input` when the Awinic chip is present, and its
+    service drops the `input` group), so it can neither read touch and key
+    events nor drive the chip's force-feedback input node. The grants for the
+    absent `qcom-haptics` sysfs node and persist haptics calibration are
+    removed too.
   Not granted: `qseecomd` on the raw UFS LUN node, `rmt_storage` on the
   unlabeled `study` partition and `fsck` on `vm-bootsys`, which need their own
   review.

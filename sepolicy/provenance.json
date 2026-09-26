@@ -163,7 +163,7 @@
       "source": "generic/vendor/common/hal_vibrator_default.te",
       "source_sha256": "95e660c006eaf77cfc9147ec65862c7cdd3b66f78a22fb14ad9938392c9b313c",
       "path": "vendor-common/hal_vibrator_default.te",
-      "sha256": "95e660c006eaf77cfc9147ec65862c7cdd3b66f78a22fb14ad9938392c9b313c"
+      "sha256": "58f7771fafe9a490132a7df6383eb1a1f34a335ce99bd469bc83716d2393d086"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -499,7 +499,7 @@
       "source": "qva/vendor/common/hal_vibrator.te",
       "source_sha256": "b7616216ba50429a76c62e09d005a6565273bbce898398941277efabd732b78a",
       "path": "qva-common/hal_vibrator.te",
-      "sha256": "45cfa495dcf1902a9e9a547c1f5317a77b1419ab997a01c680c0f1d794f3193d"
+      "sha256": "f8d3f45c402e08d12f418eb1052e4a599d7dff2562dcab66f36e597b1cfbe05f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

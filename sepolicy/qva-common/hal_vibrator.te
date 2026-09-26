@@ -26,6 +26,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 r_dir_file(hal_vibrator_default, sysfs_leds)
-allow hal_vibrator_default input_device:dir r_dir_perms;
-allow hal_vibrator_default input_device:chr_file rw_file_perms;
+# FP6: no input device access. The HAL drives the Awinic chip through its
+# sysfs nodes (fp6/vibrator.te) and does not open /dev/input.
 use_libsoc_helper(hal_vibrator_default);

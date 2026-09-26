@@ -166,8 +166,7 @@ $(call inherit-product, vendor/diamaneos/config/wifi.mk)
 PRODUCT_PACKAGES += \
     libcld80211 \
     wpa_supplicant.conf \
-    fp6_wlan_cfg_ini \
-    fp6_wlan_mac_bin
+    fp6_wlan_cfg_ini
 # Supplicant overlays, identical to stock. p2p_disabled keeps P2P off wlan0;
 # otherwise the supplicant registers wlan0 as its P2P interface and the
 # framework cannot add it as a station.

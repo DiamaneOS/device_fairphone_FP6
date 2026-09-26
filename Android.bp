@@ -425,20 +425,16 @@ install_symlink {
     symlink_target: "/mnt/vendor/persist/rfs/shared",
 }
 
-// The QCA6750 host driver requests its configuration and MAC address through
-// the kernel firmware loader, at the paths the stock vendor image links.
+// The QCA6750 host driver requests its configuration through the kernel
+// firmware loader, at the path the stock vendor image links. Stock also links
+// wlan_mac.bin to /mnt/vendor/persist; the kernel may not read that label
+// (platform neverallow), so the driver uses its next MAC source instead and
+// the link is not installed.
 install_symlink {
     name: "fp6_wlan_cfg_ini",
     vendor: true,
     installed_location: "firmware/wlan/qca_cld/qca6750/WCNSS_qcom_cfg.ini",
     symlink_target: "/vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini",
-}
-
-install_symlink {
-    name: "fp6_wlan_mac_bin",
-    vendor: true,
-    installed_location: "firmware/wlan/qca_cld/qca6750/wlan_mac.bin",
-    symlink_target: "/mnt/vendor/persist/qca6750/wlan_mac.bin",
 }
 
 // The stock fingerprint module is installed under its own SONAME

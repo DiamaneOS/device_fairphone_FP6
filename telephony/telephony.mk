@@ -43,6 +43,13 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.data.profile_update=true
 
+# The slot-0 RIL reports network state 40-150 times a minute while idle. While
+# the screen is off, unplugged and in service, poll about once per 5 s and every
+# report within 10 s (frameworks/opt/telephony network-state poll coalescing).
+# Labelled in sepolicy/telephony-system-ext/property_contexts.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.telephony.network_state_poll_window_ms=5000
+
 # Telephony, calling, messaging, data, IMS and eUICC features (AOSP
 # definitions; stock declares the same set in vendor/etc/permissions and
 # system/etc/permissions/android.hardware.telephony.euicc.xml). No MBMS:

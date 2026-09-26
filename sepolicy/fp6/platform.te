@@ -27,3 +27,9 @@ set_prop(vendor_init, vendor_gralloc_prop)
 set_prop(vendor_init, vendor_display_prop)
 set_prop(vendor_init, vendor_usb_prop)
 set_prop(vendor_init, vendor_disable_spu_prop)
+# Our audio.mk and telephony.mk properties, and persist.vendor.ssr.restart_level
+# (modem.mk), without which a modem or DSP crash panics the phone instead of
+# restarting that subsystem. Under enforcing, init drops lines it may not set.
+set_prop(vendor_init, vendor_audio_prop)
+set_prop(vendor_init, vendor_radio_prop)
+set_prop(vendor_init, vendor_ssr_prop)

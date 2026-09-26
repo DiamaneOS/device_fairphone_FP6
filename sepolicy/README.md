@@ -56,6 +56,10 @@ Downstream adaptations:
   - The UFS LUN 0 block directory is `sysfs_devices_block`, so platform
     init.rc can tune userdata's discard size; the NFC controller's wakeup
     source is `sysfs_wakeup`.
+  - Touch: the controller's double-tap wake switch (`gesture_wakeup`) is
+    `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the
+    touch device. Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE); it
+    may search the device directory but not use its factory-test files.
   Not granted: `qseecomd` on the raw UFS LUN node, `rmt_storage` on the
   unlabeled `study` partition and `fsck` on `vm-bootsys`, which need their own
   review.

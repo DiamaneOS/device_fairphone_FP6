@@ -88,6 +88,10 @@
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
 /sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics
 
+# Double-tap wake gesture of the touch controller, switched by the power HAL
+# (system) for Display > Tap to wake. Stock wrote it as root from vendor init.
+/sys/bus/spi/devices/spi0.0   gesture_wakeup   0660   system   system
+
 # USB controller role and speed for the USB HAL (matches stock).
 /sys/bus/platform/devices/a600000.ssusb	dynamic_disable	0220	root	usb
 /sys/bus/platform/devices/a600000.ssusb    mode        0660  system  usb

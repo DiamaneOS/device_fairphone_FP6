@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Stock Qualcomm eSIM LPA (com.qualcomm.qti.lpa, product priv-app, disabled
-# until the user turns eSIM on). It implements EuiccService over QCRIL's
+# Stock Qualcomm eSIM LPA (com.qualcomm.qti.lpa, product priv-app; its eSIM
+# service is on from r9s, UimLpaService stays off). It implements EuiccService over QCRIL's
 # IUimLpa service and performs the SM-DP+ HTTPS exchanges for profile
 # downloads (UimLpaAidl$LpaAidlDownloadProfileTask: URL.openConnection with
 # the URL the eUICC supplies). Its vendor side (IUimLpa find, binder with

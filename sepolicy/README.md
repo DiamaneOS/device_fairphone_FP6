@@ -58,9 +58,31 @@ Downstream adaptations:
   - The USB speed node is `sysfs_udc` (in the imported file_contexts and
     genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
     covers camera calibration and download mode.
-  - The UFS LUN 0 block directory is `sysfs_devices_block`, so platform
-    init.rc can tune userdata's discard size; the NFC controller's wakeup
-    source is `sysfs_wakeup`.
+  - The UFS LUN 0 block directory is `sysfs_devices_block`, which init may
+    only read. The one node platform init.rc writes there, the root disk's
+    `queue/discard_max_bytes`, is `vendor_sysfs_ufs_discard_max` (`storage.te`),
+    writable by init only. The NFC controller's wakeup source is
+    `sysfs_wakeup`.
+  - Tuning: `init.fp6.perf.rc` writes WALT and VM sysctls that the platform
+    does not label. `/proc/sys/walt` is `vendor_proc_walt`, `swappiness` and
+    `min_free_kbytes` are `vendor_proc_vm_tuning`, `compaction_proactiveness`
+    is `vendor_proc_compaction` (`perf.te`). vendor_init writes all three; the
+    perf HAL reads and writes only WALT and compaction (its SysNode 0xA).
+    vendor_init also writes the platform `proc_sched` and
+    `proc_watermark_scale_factor` sysctls; it still has no write on generic
+    `proc`. The perf HAL keeps the imported `proc:file rw_file_perms`
+    (`qva-common/hal_perf_default.te`), which should be narrowed.
+  - camera.ko's CCI probe asks to raise the CCI IRQ thread from the kernel
+    default SCHED_FIFO 50 to 99 from `vendor_modprobe`; this stays denied
+    (non-fatal); `vendor_modprobe` has no `sys_nice` and no kernel task
+    control.
+  - Wi-Fi: `/proc/sys/net/ipv4/tcp_limit_output_bytes` is
+    `vendor_proc_tcp_limit_output_bytes`, read and written only by the Wi-Fi
+    HAL for high-throughput TCP tuning; the rest of `/proc/sys/net` stays
+    read-only to it. `/data/vendor/tombstones` is no longer labelled as a
+    whole (only `rfs/`), so the platform `tombstones/wifi` label for the HAL's
+    ring-buffer logs applies.
+  - The genfs lines for these tuning nodes are in `fp6/genfs_contexts`.
   - Touch: the controller's double-tap wake switch (`gesture_wakeup`) is
     `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the
     touch device. Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE); it
@@ -76,9 +98,15 @@ Downstream adaptations:
     events nor drive the chip's force-feedback input node. The grants for the
     absent `qcom-haptics` sysfs node and persist haptics calibration are
     removed too.
-  Not granted: `qseecomd` on the raw UFS LUN node, `rmt_storage` on the
-  unlabeled `study` partition and `fsck` on `vm-bootsys`, which need their own
-  review.
+  Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
+  `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
+  (its fstab line should go, as in stock). The modem's `study` partition has
+  the stock `vendor_modem_efs_partition_device` label
+  (`vendor-volcano/file_contexts`), so `rmt_storage` can serve it with its
+  existing grant.
+- `product-private/property_contexts` keeps `debug.disable_screen_decorations`
+  on `vendor_display_notch_prop`, which SystemUI cannot read: the read falls
+  back to false, so the privacy dot cannot be switched off with `adb setprop`.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.
@@ -144,13 +172,20 @@ source hashes and derived hashes are retained in `provenance.json`. The audio
 file contexts and init-directory rules are authored by DiamaneOS.
 
 The policy deliberately omits upstream diagnostic-device access, sensor persist
-writes, voice-UI sockets, QTR SDK access, QRTR sockets, broad HAL-attribute
-grants, vendor Binder use and DSP restart controls. It confines device access to
-the audio service domains, keeps amplifier factory calibration read-only and
-restricts the PAL sleep-monitor extended ioctl grant to activity reporting
-(`0x5201`). AudioReach receives its AGM device, runtime audio directory, selected
-allocator and sound-card state access. The FastRPC listener receives only its DSP
-transport, firmware/RFSA, audio-DSP state and DSP-service lookup.
+writes, voice-UI sockets, QTR SDK access, broad HAL-attribute grants, vendor
+Binder use and DSP restart controls (`vendor.audio.crash.trigger` is unset). QRTR
+is granted narrowly: `hal_audio_default` may create and use its own
+`qipcrtr_socket` (create, read, write, getattr, setopt; no ioctl, bind or
+connect) for the audio-PD lookup and restart notifications of GPR and GSL.
+SELinux cannot filter QRTR by service, so the HAL can send QMI to any service.
+AGM and PAL open the sound-card state node read-write, so the HAL may also write
+it. PAL's wake locks (sound trigger only, not shipped) stay denied. The audio
+policy confines device access to the audio service domains, keeps amplifier
+factory calibration read-only and restricts the PAL sleep-monitor extended ioctl
+grant to activity reporting (`0x5201`). AudioReach receives its AGM device,
+runtime audio directory, selected allocator and sound-card state access. The
+FastRPC listener receives only its DSP transport, firmware/RFSA, audio-DSP state
+and DSP-service lookup.
 
 The stock primary HAL registers the PAL and AGM HIDL services (`IPAL`, `IAGM`)
 in its own process. `qva-common/hwservice_contexts` labels them
@@ -250,14 +285,15 @@ the Samsung HAL: HIDL registration (the HAL registers only AIDL
 in `/vendor/firmware` needs no grant: vendor domains may read
 `vendor_file_type` through platform policy.
 
-One stock grant is needed under enforcing mode: the HAL sets
-`vendor.nfc.fw.version` (`property_set` in `nfc_nci_sec.so`), labelled
-`vendor_nfc_prop`. Add exactly the stock rule
+The HAL's `property_set` of `vendor.nfc.fw.version` (`vendor_nfc_prop`) stays
+denied: `nfc_nci_sec.so` ignores the result and never reads it back, and the
+only stock reader is the factory MMI app. If the firmware version is wanted in
+bug reports, the minimal rule is
 `allow hal_nfc_default vendor_nfc_prop:property_service set;` in
-`nfc/hal_nfc_default.te` once the device shows the denial. Its other property
-sets (`nfc.fw.*`, `persist.nfc.*`) use platform contexts; if the platform maps
-them to `nfc_prop`, `hal_nfc` may already set them (platform policy). Check the
-denials before adding anything for them.
+`nfc/hal_nfc_default.te`. The HAL's read of `persist.sys.factory.mode`
+(`system_prop`) also stays denied, which keeps it on the normal firmware path.
+`/data/nfc`, which platform init.rc creates for the NFC stack's state, is
+`nfc_data_file` (`system-ext-private/file_contexts`, as in stock).
 
 ## GNSS
 
@@ -309,8 +345,11 @@ module's DSI layer waits for nicmd over TIPC before it allows any data call. No 
 domain may create a TIPC socket (neverallow in `telephony/rild.te`), and the kernel builds
 TIPC without its UDP bearer, crypto or diag module.
 nicmd keeps its netlink, QRTR, rmnet ioctl and network-wrapper access, datagram sockets
-for interface ioctls and its init-created recovery file; it is not a `netdomain` (no TCP
-connect or port binding), and the SHS, QMI-priority and performance helpers are not
+for interface ioctls and its init-created recovery file. It may `node_bind` TCP and UDP
+sockets, to reserve the ephemeral ports the modem's embedded clients use, and read the
+public SoC id for data target detection. It is not a `netdomain` (no TCP connect, no
+`name_bind`); its remote-processor probe (`vendor_sysfs_ssr`) stays denied because the
+result is unused on this SoC. The SHS, QMI-priority and performance helpers are not
 installed and not granted.
 
 The stock IMS app, QCRIL audio messenger and eSIM LPA keep their stock Fairphone
@@ -333,10 +372,24 @@ FastRPC with read-only opens (the secure node for the ADSP sensors PD of the Cam
 direct channel, the non-secure node for the CDSP offloads, `/vendor/dsp`), Qualcomm
 DMA-BUF heaps (display heap allocation ioctl only), SoC/camera/JPEG/DDR identification,
 QRTR sockets without ioctls for the gyro QMI client, the thermal-engine client socket, the
-display QService lookup, `/data/vendor/camera`, read-only factory calibration in
+provider's own vndbinder open, `/data/vendor/camera`, read-only factory calibration in
 `/mnt/vendor/persist/camera`, vendor camera properties and the in-process offline camera
-service. Unlike the sensors HAL, the camera may need the non-secure FastRPC node: the
-kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
+service. For streaming the provider is a client of the graphics allocator (buffer
+allocation and IMapper) through `hal_client_domain`, the only form the platform
+neverallows allow for the allocator service lookups. The membership also lets it find the
+mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
+servicemanager and share memfds with the allocator, and, as a `halclientdomain`, call
+hwservicemanager, read `hwservicemanager_prop` and find `hidl_manager_hwservice`. For CamX
+perf locks it may only make binder calls into the perf HAL (`vendor_hal_perf_default`):
+r9r logged no IPerf service lookup, so it is not a perf HAL client; if r9s shows a find
+denial on `vendor_hal_perf2_service` or `vendor_hal_perf_hwservice`, make it one with
+`hal_client_domain`. It may use the composer's release fences, read the public SoC id and
+search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelled in
+`camera/genfs_contexts`). Denied: the display QService and display-config lookups
+(IDisplayConfig would expose brightness, power mode and writeback capture),
+IPostProcService registration and the property-area listing CamX does at start (silent
+under enforcing). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
+the kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
 expected in use; drop the other after the first permissive run.
 
 `vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module serial numbers

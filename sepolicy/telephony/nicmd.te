@@ -11,9 +11,10 @@
 # properties), the legacy MSM IPC-router socket and ioctls, the HIDL
 # netd service (the daemon links only the AIDL netd interface), diag, the
 # netdomain attribute (stock vendor_sepolicy.cil line 442; it would add TCP
-# connect and port binding, which nicmd does not use: it opens sockets only
-# for interface ioctls) and write access to /data/vendor/nicmd beyond the
-# init-created recovery file (the file log is off, nicm_config.xml rewrite).
+# connect and name_bind on every port, which nicmd does not use: besides
+# interface ioctls it only binds ephemeral ports for the modem, node_bind
+# below) and write access to /data/vendor/nicmd beyond the init-created
+# recovery file (the file log is off, nicm_config.xml rewrite).
 type vendor_nicmd, domain;
 type vendor_nicmd_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_nicmd)
@@ -39,6 +40,10 @@ allow vendor_nicmd self:qipcrtr_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:tipc_socket { create_socket_perms_no_ioctl listen accept };
 allowxperm vendor_nicmd self:udp_socket ioctl priv_sock_ioctls;
 allowxperm vendor_nicmd self:udp_socket ioctl rmnet_sock_ioctls;
+# Modem remote-socket port reservation (libnicm_modemproxy reservePorts): nicmd
+# binds the ephemeral TCP/UDP ports the modem's embedded clients use, so AP
+# traffic cannot take them. No name_bind (ephemeral ports only), no listen.
+allow vendor_nicmd node:{ tcp_socket udp_socket } node_bind;
 allow vendor_nicmd self:capability { net_admin net_raw setgid setpcap setuid kill };
 wakelock_use(vendor_nicmd)
 dontaudit vendor_nicmd kernel:system { module_request };
@@ -49,6 +54,13 @@ allow vendor_nicmd sysfs_net:file rw_file_perms;
 allow vendor_nicmd proc_net:file rw_file_perms;
 allow vendor_nicmd vendor_sysfs_data:file r_file_perms;
 get_prop(vendor_nicmd, boot_status_prop)
+
+# Mobile data target detection (libdsutils ds_get_target, ds_get_soc_id): with
+# only the internal modem, the target comes from the public SoC id (636 ->
+# lanai). Not granted: /sys/class/remoteproc (vendor_sysfs_ssr), which
+# libmdmdetect probes for external/fusion modems only; one denial per start.
+allow vendor_nicmd vendor_sysfs_soc:dir search;
+allow vendor_nicmd vendor_sysfs_public:file { open read getattr };
 
 # ip/iptables through the platform wrappers (/system/bin/ip-wrapper-1.0).
 use_netutils(vendor_nicmd)

@@ -14,6 +14,11 @@ r_dir_file({ vendor_per_mgr vendor_per_proxy }, vendor_sysfs_ssr)
 # publishes the driver version, as in stock.
 allow hal_wifi_default vendor_wlan_device:chr_file w_file_perms;
 set_prop(hal_wifi_default, vendor_wifi_version)
+# High-throughput TCP tuning: libwifi-hal saves the TCP small-queue limit, raises
+# it on the driver's throughput-change event and restores it. Only this sysctl
+# (genfs line in fp6/genfs_contexts), not the rest of /proc/sys/net.
+type vendor_proc_tcp_limit_output_bytes, fs_type, proc_type;
+allow hal_wifi_default vendor_proc_tcp_limit_output_bytes:file { getattr open read write };
 
 # KeyMint reports the vendor patch level for key attestation.
 get_prop(vendor_hal_keymint_qti, vendor_security_patch_level_prop)

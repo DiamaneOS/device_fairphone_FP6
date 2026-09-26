@@ -76,11 +76,12 @@ may access, and why. It describes the policy of a release (`user`) build.
     number, and no vendor service reads extcon. Stock instead lets
     system_server write all of `vendor_sysfs_graphics`.
     and its heaps for the fingerprint HAL, each limited to the permissions the
-    module used. The module's debug binder service stays unlabelled, so the
-    platform neverallow on `default_android_service` forbids granting it; its
-    only switch is a /data configuration file, which is deliberately not
-    created, and a neverallow keeps the HAL from opening files in
-    `vendor_data_file`.
+    module used. The module registers a debug binder service with no caller
+    check at every start and fails without it; our HAL keeps it inside its own
+    process (`fingerprint/ModuleFactoryService.h`), and it stays unlabelled,
+    so the platform neverallow on `default_android_service` forbids granting
+    it. A neverallow keeps the HAL from opening files in `vendor_data_file`,
+    where the module's configuration and dumps would live.
   - SoC serial number: `/sys/devices/soc0/serial_number` is
     `vendor_sysfs_soc_serial` (`soc_serial.te`), not the soc0 directory's
     `vendor_sysfs_soc`. No shipped program reads it (only kernel code uses

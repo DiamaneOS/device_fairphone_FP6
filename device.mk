@@ -11,6 +11,12 @@ PRODUCT_BUILD_SUPER_PARTITION := true
 PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
+# Casefolded, project-quota shared storage, as stock and Pixels: file names in
+# /sdcard compare case-insensitively without a FUSE lookup, and per-app storage
+# is counted by project ID. Recovery formats userdata with both features when
+# these properties are set, so it takes effect at the next factory reset from
+# recovery or Settings (fastboot -w would need --fs-options=casefold,projid).
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 # Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed
 # snapshots that the userspace snapshot daemon merges (the kernel has dm-user

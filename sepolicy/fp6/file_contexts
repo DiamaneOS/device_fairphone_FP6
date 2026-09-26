@@ -6,3 +6,6 @@
 # Adreno shader compiler, loaded by the in-process GLES driver (stock label).
 /vendor/lib(64)?/libllvm-qgl\.so        u:object_r:same_process_hal_file:s0
 /dev/focaltech_fp                       u:object_r:ff_device:s0
+# Touch controller double-tap wake switch (power HAL). The rest of the touch
+# device keeps the factory-test type fp_mmitest_sysfs.
+/sys/devices/platform/soc/ac0000\.qcom,qupv3_0_geni_se/a80000\.spi/spi_master/spi0/spi0\.0/gesture_wakeup u:object_r:vendor_sysfs_touch_gesture:s0

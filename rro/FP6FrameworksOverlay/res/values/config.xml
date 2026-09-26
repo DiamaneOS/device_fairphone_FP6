@@ -56,4 +56,11 @@
         <item>7</item>
         <item>7</item>
     </integer-array>
+
+    <!-- FP6.QREL.16.100.0 factory framework-res: the touch controller can wake
+         the phone on a double tap while the screen is off or shows the
+         always-on display. Settings then offers Display > Tap to wake (off
+         until turned on); the power HAL switches the controller's wake
+         gesture (Mode::DOUBLE_TAP_TO_WAKE). -->
+    <bool name="config_supportDoubleTapWake">true</bool>
 </resources>

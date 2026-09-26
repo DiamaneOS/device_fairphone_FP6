@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// timekeepd: keeps the system clock across reboots on top of the read-only
+// PMIC RTC (see main.cpp). It replaces Qualcomm's time_daemon, which talks
+// QMI to the modem and needs a vendor app.
+
+cc_defaults {
+    name: "timekeepd_defaults",
+    srcs: ["Record.cpp"],
+    shared_libs: ["libbase"],
+    sanitize: {
+        integer_overflow: true,
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+cc_binary {
+    name: "timekeepd",
+    defaults: ["timekeepd_defaults"],
+    vendor: true,
+    init_rc: ["timekeepd.rc"],
+    srcs: ["main.cpp"],
+    shared_libs: ["liblog"],
+}
+
+// Record handling and restore decisions: power loss, daemon restart, unset
+// clock, RTC granularity, hourly refresh, plausible times.
+cc_test_host {
+    name: "timekeepd_test",
+    defaults: ["timekeepd_defaults"],
+    srcs: ["tests/RecordTest.cpp"],
+}

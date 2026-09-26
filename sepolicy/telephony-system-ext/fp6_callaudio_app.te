@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# FP6 call-audio bridge (org.diamaneos.callaudio, device callaudio/): a
+# system_ext privileged app signed with the default application key, selected
+# by package name and isPrivApp=true (seapp_contexts). It registers a request
+# callback with QCRIL's IQcRilAudio/slotN and applies the in-call audio
+# parameters with AudioSystem setParameters/getParameters; its only permission
+# is MODIFY_AUDIO_SETTINGS. Vendor side (IQcRilAudio find, binder with rild):
+# telephony/fp6_callaudio_app.te. No network, no telephony framework service,
+# no other QCRIL service.
+typeattribute fp6_callaudio_app coredomain;
+app_domain(fp6_callaudio_app)
+binder_use(fp6_callaudio_app)
+
+# activity_service: the process attaches to ActivityManager and registers its
+# multi-SIM receiver there; the other services an app process uses at start
+# come in the bind cache and need no lookup. audioserver_service:
+# media.audio_flinger (setParameters, getParameters and the death watch) and
+# media.audio_policy (restart check). Binder calls with audioserver come with
+# app_domain (appdomain and binderservicedomain), and so does access to the
+# app's own data directory.
+allow fp6_callaudio_app { activity_service audioserver_service }:service_manager find;
+
+# It sends no traffic and never speaks QMI.
+neverallow fp6_callaudio_app self:{
+  tcp_socket udp_socket rawip_socket packet_socket qipcrtr_socket
+} create;

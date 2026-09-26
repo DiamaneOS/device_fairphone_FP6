@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+
+     FP6 call-audio bridge: passes the radio daemon's in-call audio parameters
+     to the audio HAL through AudioFlinger (see Android.bp).
+
+     - One permission, MODIFY_AUDIO_SETTINGS (normal), which AudioFlinger
+       requires for setParameters. getParameters needs none. No
+       MODIFY_AUDIO_ROUTING, no phone-state permission, no INTERNET.
+     - No components: nothing can bind to it, start it or send it intents.
+     - persistent and directBootAware: running at boot, before the first
+       unlock, so the first call after boot (an emergency call from the lock
+       screen included) has audio.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.diamaneos.callaudio">
+
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <application
+        android:name=".CallAudioApp"
+        android:label="@string/app_name"
+        android:persistent="true"
+        android:directBootAware="true"
+        android:defaultToDeviceProtectedStorage="true"
+        android:allowBackup="false" />
+</manifest>

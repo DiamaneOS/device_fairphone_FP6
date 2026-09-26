@@ -341,13 +341,13 @@ reductions of the Qualcomm `sepolicy_vndr` files published by Fairphone at
 `telephony-system-ext/seapp_contexts` reduce `generic/private/qtelephony.te`,
 `generic/private/seapp_contexts` and `generic/product/private/seapp_contexts` of
 `device/qcom/sepolicy` at `fea28791cc44cce15c7bd4cd94722796e4644735`. The file contexts
-are the stock labels. `telephony/service.te`, `qcril_audio.te`, `qti_lpa.te`, the two
+are the stock labels. `telephony/service.te`, `fp6_callaudio_app.te`, `qti_lpa.te`, the
 `fp6_*_app` domains and the relabelling of IQcRilAudio and IUimLpa in
 `vendor-common/service_contexts` are downstream.
 
 The stock radio daemon runs in the platform `rild` domain. It may add only the four
 Qualcomm radio services the device declares (IMS and radio config under
-`vendor_hal_telephony_service2`, audio messenger and LPA under their own types). It is not
+`vendor_hal_telephony_service2`, call audio and LPA under their own types). It is not
 a `binderservicedomain`; each of its three app clients has an explicit binder grant. The
 secure-element HAL, Qualcomm IWLAN and data-connection services, diag, the legacy
 IPC-router ioctls, the QCRIL client socket and executing vendor tools are not granted.
@@ -363,15 +363,18 @@ public SoC id for data target detection. It is not a `netdomain` (no TCP connect
 result is unused on this SoC. The SHS, QMI-priority and performance helpers are not
 installed and not granted.
 
-The stock IMS app, QCRIL audio messenger and eSIM LPA keep their stock Fairphone
-signature. They are selected through a dedicated seinfo (`fp6_stock_platform`,
-`telephony-system-ext/mac_permissions.xml`), their package or process name and
-`isPrivApp=true`, never through our platform key. Each has its own domain: the IMS app
-(`vendor_qtelephony`) may call the radio daemon and find the IMS and radio-config
-services; the audio messenger (`fp6_qcril_audio_app`) only IQcRilAudio and the audio
-APIs; the LPA (`fp6_qti_lpa_app`) only IUimLpa, the telephony and connectivity APIs and
+The stock IMS app and eSIM LPA keep their stock Fairphone signature. They are selected
+through a dedicated seinfo (`fp6_stock_platform`, `telephony-system-ext/mac_permissions.xml`),
+their package or process name and `isPrivApp=true`, never through our platform key. Each
+has its own domain: the IMS app (`vendor_qtelephony`) may call the radio daemon and find
+the IMS and radio-config services; the LPA (`fp6_qti_lpa_app`) only IUimLpa, the telephony and connectivity APIs and
 the network. None is a `hal_telephony` client (no AOSP IRadio access), none has camera,
 media, HIDL or diag access. Collect denials on the device before adding any grant.
+
+Our own call-audio bridge (`org.diamaneos.callaudio`, `callaudio/`) replaces the stock
+QtiTelephonyService. It is signed with our key, selected by package name, and runs in
+`fp6_callaudio_app`: it may find only IQcRilAudio, the audio server and the activity
+manager, make binder calls with the radio daemon, and create no network or QRTR sockets.
 
 ## Camera
 

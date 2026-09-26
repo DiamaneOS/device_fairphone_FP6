@@ -2,10 +2,11 @@
 # Copyright 2026 The DiamaneOS Project
 
 # Telephony for private bring-up: the stock Qualcomm radio daemon (qcrilNrd),
-# its data module and nicmd, the stock IMS app (org.codeaurora.ims), the QCRIL
-# audio messenger (QtiTelephonyService) and the stock eSIM LPA
-# (com.qualcomm.qti.lpa, disabled by default) come from the selected stock
-# files (vendor/fairphone/FP6). The radio interface libraries, the carrier
+# its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
+# stock eSIM LPA (com.qualcomm.qti.lpa, disabled by default) come from the
+# selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
+# radio daemon and the audio HAL is our own (callaudio/, replacing the stock
+# QtiTelephonyService). The radio interface libraries, the carrier
 # configuration app, the APN list and the telephony features are AOSP and built
 # from source. Not included yet: VoWiFi (IWLAN), video calls, RCS, an eSIM
 # download UI, the SIM secure element (OMAPI UICC).
@@ -59,11 +60,11 @@ PRODUCT_PACKAGES += \
     android.hardware.telephony.ims.prebuilt.xml \
     android.hardware.telephony.euicc.prebuilt.xml
 
-# QCRIL directories and database; the stock IMS, audio-messenger and LPA apps
-# are only parsed when ro.boot.vendor.qspa.modem=enabled (their manifests carry
-# an <overlay requiredSystemPropertyName=...> gate), which stock sets from a
-# system_ext init script. Only init may set ro.boot.* properties, so the
-# property is set from system_ext as on stock.
+# QCRIL directories and database; the stock IMS and LPA apps are only parsed
+# when ro.boot.vendor.qspa.modem=enabled (their manifests carry an <overlay
+# requiredSystemPropertyName=...> gate), which stock sets from a system_ext
+# init script. Only init may set ro.boot.* properties, so the property is set
+# from system_ext as on stock.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/init.fp6.telephony.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.telephony.rc \
     device/fairphone/FP6/telephony/init.fp6.qspa.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.fp6.qspa.rc \
@@ -75,6 +76,13 @@ PRODUCT_COPY_FILES += \
 # a UI-ready call from stock apps we do not ship.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/qcril-upgrade-0016.0_config.sql:$(TARGET_COPY_OUT_VENDOR)/etc/qcril_database/upgrade/config/0016.0_config.sql
+
+# Call-audio bridge (system_ext privileged app, one normal permission): passes
+# each call's vsid/call_state parameters from the radio daemon's IQcRilAudio
+# service to the audio HAL. Every call's audio needs it, emergency calls
+# included; see callaudio/Android.bp.
+PRODUCT_PACKAGES += \
+    FP6CallAudio
 
 # eSIM LPA (product priv-app): its privileged-permission allowlist and the
 # default-disabled state of its services (product apps take their allowlist

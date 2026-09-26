@@ -1,0 +1,73 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// FP6 call-audio bridge. The stock radio daemon (qcrilNrd) serves
+// IQcRilAudio/slot1 and /slot2 and sends each call's audio parameters (vsid,
+// call_state, call_type, crs_call) to a registered client, which applies them
+// with AudioFlinger's global setParameters; the audio HAL starts and stops the
+// voice session from them. Every call's audio depends on this, emergency calls
+// included. This app replaces the stock QtiTelephonyService with the same
+// behaviour and one normal permission, MODIFY_AUDIO_SETTINGS, instead of
+// MODIFY_AUDIO_ROUTING.
+//
+// Signing: no certificate property, so the build signs it with the default
+// application key, never the platform key. It is privileged only so that
+// seapp_contexts can select its domain by package name
+// (sepolicy/telephony-system-ext/seapp_contexts, isPrivApp=true). It requests
+// no privileged permission, so it needs no allowlist entry.
+//
+// API level: platform APIs, for the hidden ServiceManager.waitForService (the
+// audioserver death watch) and AudioSystem.setParameters, which returns
+// AudioFlinger's status. Soong then marks the app usesNonSdkApi, which lifts
+// runtime hidden-API enforcement for system apps.
+//
+// The AIDL is a client-side copy of the radio daemon's frozen version 1. The
+// flags make the generated stubs match it: VINTF stability (our request
+// callback crosses into the vendor daemon) and the vendor's version and hash,
+// which the daemon can query on that callback. There is no aidl_interface
+// module on purpose: the interface is the vendor's, we only mirror it.
+
+android_app {
+    name: "FP6CallAudio",
+    srcs: [
+        "src/**/*.java",
+        "aidl/**/*.aidl",
+    ],
+    aidl: {
+        local_include_dirs: ["aidl"],
+        flags: [
+            "--stability=vintf",
+            "--structured",
+            "--version=1",
+            "--hash=7807b67b5d557d9479da5c0f34c525bf48aaec90",
+        ],
+    },
+    resource_dirs: ["res"],
+    platform_apis: true,
+    system_ext_specific: true,
+    privileged: true,
+    required: ["sysconfig-org.diamaneos.callaudio.xml"],
+}
+
+prebuilt_etc {
+    name: "sysconfig-org.diamaneos.callaudio.xml",
+    src: "sysconfig-org.diamaneos.callaudio.xml",
+    sub_dir: "sysconfig",
+    system_ext_specific: true,
+}
+
+// Status reporting (every audioserver change once and in order, the current
+// status again after each registration, never a stale one) and the retries in
+// the audioserver recovery window.
+java_test_host {
+    name: "FP6CallAudioHostTests",
+    srcs: [
+        "src/org/diamaneos/callaudio/Recovery.java",
+        "src/org/diamaneos/callaudio/StatusRelay.java",
+        "tests/src/**/*.java",
+    ],
+    static_libs: ["junit"],
+    test_options: {
+        unit_test: true,
+    },
+}

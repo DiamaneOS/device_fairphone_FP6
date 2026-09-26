@@ -11,11 +11,13 @@ PRODUCT_BUILD_SUPER_PARTITION := true
 PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
-# Casefolded, project-quota shared storage, as stock and Pixels: file names in
-# /sdcard compare case-insensitively without a FUSE lookup, and per-app storage
-# is counted by project ID. Recovery formats userdata with both features when
-# these properties are set, so it takes effect at the next factory reset from
-# recovery or Settings (fastboot -w would need --fs-options=casefold,projid).
+# Casefolded shared storage, as stock and Pixels: file names in /sdcard compare
+# case-insensitively without a FUSE lookup (project quota is always on for f2fs).
+# The feature is fixed when /data is formatted: after any wipe (Settings,
+# recovery, bootloader lock/unlock) the next boot's vold formats it and reads
+# these properties. Never use fastboot -w on the FP6: the bootloader reports
+# ext4 for an encrypted userdata, so the computer would write the wrong
+# filesystem. Never ship a build that turns this back off.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 # Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed

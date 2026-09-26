@@ -248,6 +248,13 @@ PRODUCT_VENDOR_PROPERTIES += \
     log.tag.focaltech:util=I \
     log.tag.focaltech:version=I
 
+# Clock across reboots: the PMIC RTC is read-only from Linux, so without help
+# every boot starts at the build date. Our timekeepd (timekeep/) restores the
+# clock at post-fs-data, before zygote, from the RTC counter plus the offset it
+# saved when the time was last set (and at least hourly). Qualcomm's
+# time_daemon and TimeService app stay out.
+PRODUCT_PACKAGES += timekeepd
+
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with two exceptions:
 # - no touch timer override: stock's 3500000 ms kept touch boost active for

@@ -319,6 +319,17 @@ installed. It adds no servicemanager rule; platform policy covers AIDL HAL regis
 for the gatekeeper and keymint HALs. Not yet runtime-qualified under enforcing mode; collect
 denials on the device before adding any grant.
 
+## Time keeping
+
+`timekeep/` holds our time daemon, which replaces Qualcomm's `time_daemon` (its imported
+policy, file label and `tee` socket rule are removed). A one-shot restore step
+(`vendor_timekeepd_restore`) sets the clock at post-fs-data from the RTC counter plus the
+saved offset; it is the only domain with `sys_time` and cannot write the offset file. The
+long-running `vendor_timekeepd` holds no capability: it searches `/sys/class/rtc`, reads
+the RTC counter file `since_epoch` (its own genfs type) and replaces files in
+`/data/vendor/timekeepd`. Neither has sockets, binder, properties, `/dev/rtc0` or persist,
+and a neverallow keeps other vendor domains from writing the offset file.
+
 ## Telephony
 
 `telephony/rild.te`, `telephony/nicmd.te` and `telephony/qtelephony.te` are downstream

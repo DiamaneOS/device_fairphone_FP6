@@ -6,6 +6,9 @@ on early-init
     symlink /vendor/firmware_mnt /firmware
     symlink /vendor/bt_firmware /bt_firmware
     symlink /vendor/dsp /dsp
+    # As stock (init.qti.kernel.rc): when the kernel cannot read a firmware
+    # file, ueventd loads it (firmware_directories in ueventd.rc).
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on init
     wait /dev/block/platform/soc/${ro.boot.bootdevice}

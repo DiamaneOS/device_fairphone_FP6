@@ -63,6 +63,12 @@
 # Platform ueventd supplies standard input, framebuffer, DRM and DMA-heap rules.
 # SELinux remains the authority for access by individual service domains.
 
+# The kernel cannot read the modem partition's firmware itself: it is mounted
+# system-owned (fstab.qcom, as stock) and the kernel domain may not override
+# file permissions. As stock, init.qcom.rc turns on the sysfs fallback and
+# ueventd loads the ADSP, CDSP, modem, Wi-Fi, GPU and other firmware from here.
+firmware_directories /vendor/firmware_mnt/image/
+
 /dev/kgsl                 0666   system     system
 /dev/kgsl-3d0             0666   system     system
 /dev/membuf               0664   system     system

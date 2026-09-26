@@ -23,6 +23,13 @@ PRODUCT_PACKAGES += hwservicemanager
 # older, and this product does not inherit base_vendor.mk.
 PRODUCT_PACKAGES += vndservicemanager
 
+# OEM unlocking, as stock: Android's persistent data block service manages the
+# bootloader's unlock-ability flag, the last byte of the frp partition (edk2
+# FastbootCmds.c ReadAllowUnlockValue), and Settings shows the toggle.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.frp.pst=/dev/block/bootdevice/by-name/frp \
+    ro.oem_unlock_supported=1
+
 # Recovery has no zygote or normal vendor init; platform recovery imports this.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc

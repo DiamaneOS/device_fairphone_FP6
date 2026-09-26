@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Read by the framework's ServiceStateTracker (com.android.phone) and set from
+# vendor build.prop (telephony/telephony.mk). Without this label init drops the
+# vendor build.prop line under enforcing SELinux.
+ro.telephony.network_state_poll_window_ms u:object_r:telephony_config_prop:s0 exact int

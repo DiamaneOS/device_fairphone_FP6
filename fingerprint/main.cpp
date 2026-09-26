@@ -3,13 +3,27 @@
 
 #define LOG_TAG "fp6-fingerprint"
 
+#include <dlfcn.h>
+
 #include <android-base/logging.h>
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 
 #include "Fingerprint.h"
+#include "ModuleFactoryService.h"
 
 using aidl::android::hardware::biometrics::fingerprint::Fingerprint;
+
+// Exported from this executable (exported_symbols.list), so the FocalTech
+// module, loaded later by hw_get_module, binds its registration to this
+// definition rather than libbinder_ndk's and its factory service stays in this
+// process (ModuleFactoryService.h). Every other service reaches libbinder_ndk.
+extern "C" binder_exception_t AServiceManager_addService(AIBinder* binder, const char* instance) {
+    static const auto next =
+            reinterpret_cast<fp6::AddServiceFn>(dlsym(RTLD_NEXT, "AServiceManager_addService"));
+    CHECK(next != nullptr) << "libbinder_ndk's AServiceManager_addService not found";
+    return fp6::addServiceUnlessModuleFactory(binder, instance, next);
+}
 
 int main() {
     // No extra pool threads of our own. The FocalTech module starts a service

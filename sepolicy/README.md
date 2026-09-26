@@ -46,11 +46,12 @@ Downstream adaptations:
     `/data/vendor/display`.
   - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
     and its heaps for the fingerprint HAL, each limited to the permissions the
-    module used. The module's debug binder service stays unlabelled, so the
-    platform neverallow on `default_android_service` forbids granting it; its
-    only switch is a /data configuration file, which is deliberately not
-    created, and a neverallow keeps the HAL from opening files in
-    `vendor_data_file`.
+    module used. The module registers a debug binder service with no caller
+    check at every start and fails without it; our HAL keeps it inside its own
+    process (`fingerprint/ModuleFactoryService.h`), and it stays unlabelled,
+    so the platform neverallow on `default_android_service` forbids granting
+    it. A neverallow keeps the HAL from opening files in `vendor_data_file`,
+    where the module's configuration and dumps would live.
   - Read-only SoC, thermal-zone and remote-processor names for the thermal,
     performance and peripheral-manager services; `/dev/wlan` and the driver
     version property for the Wi-Fi HAL; the vendor patch level for KeyMint;

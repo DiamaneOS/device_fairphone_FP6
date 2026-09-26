@@ -14,10 +14,13 @@ allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_
 
 # The module also registers a factory/debug binder service,
 # FocalFingerprintService, whose one dispatcher (invokeCommand) has no caller
-# check. It is deliberately left unlabelled: it falls back to
+# check. It registers it every time it opens and fails without it, and has no
+# switch for it. Our HAL answers that registration inside its own process
+# (fingerprint/ModuleFactoryService.h), so the service never reaches
+# servicemanager. It also stays unlabelled: it falls back to
 # default_android_service, on which the platform forbids every add, find and
-# list rule, so no policy can ever grant it. The module's only switch for it
-# is a /data config file, which is deliberately not created.
+# list rule, so no policy can ever grant it. Any label would make it findable
+# by shell, system_app and dumpstate.
 
 # That /data config (/data/vendor/fingerprint/ft9391/Private/ff_config.json)
 # can retune matching and lockout, and the module's dump homes are under

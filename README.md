@@ -1,8 +1,7 @@
 # Fairphone 6 device configuration
 
-Android product `diamaneos_FP6`, installed at `device/fairphone/FP6` in the
-pinned GrapheneOS source workspace. Shared product configuration belongs at
-`vendor/diamaneos`.
+Android product `FP6` (`lunch FP6-cur-user`), at `device/fairphone/FP6` in the
+GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 
 - Keeps Fairphone's product identity (brand, device, model) in the fingerprint,
   as GrapheneOS keeps Google's. Build ID, number and keys are DiamaneOS's.

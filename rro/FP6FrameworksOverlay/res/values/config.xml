@@ -63,4 +63,14 @@
          until turned on); the power HAL switches the controller's wake
          gesture (Mode::DOUBLE_TAP_TO_WAKE). -->
     <bool name="config_supportDoubleTapWake">true</bool>
+
+    <!-- The source-built display HAL applies colour transforms in hardware
+         (DisplayCapability::SKIP_CLIENT_COLOR_TRANSFORM, SDM colour manager), so
+         Night Light, Extra dim and the Modes grayscale effect are offered and
+         run on the display pipeline instead of the GPU. AOSP ties the first two
+         to this value; they are set explicitly so an overlay change cannot
+         silently drop them. -->
+    <bool name="config_setColorTransformAccelerated">true</bool>
+    <bool name="config_nightDisplayAvailable">true</bool>
+    <bool name="config_reduceBrightColorsAvailable">true</bool>
 </resources>

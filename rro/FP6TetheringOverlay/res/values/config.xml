@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- USB tethering function: 1 = NCM. Tethering's default (0, RNDIS) cannot
+         work: the FP6 kernel has no RNDIS gadget function. -->
+    <integer name="config_tether_usb_functions">1</integer>
+</resources>

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replace the stock QtiTelephonyService with our own call-audio bridge
+  (`callaudio/`): it passes the radio daemon's in-call audio parameters to the
+  audio HAL with the normal MODIFY_AUDIO_SETTINGS permission instead of
+  MODIFY_AUDIO_ROUTING, in its own SELinux domain.
 - Stop setting androidboot.fstab_suffix in the vendor bootconfig; the bootloader
   already appends it, and the duplicate made the kernel reject all bootconfig.
 - Build protected VM firmware from source and describe it in the system AVB

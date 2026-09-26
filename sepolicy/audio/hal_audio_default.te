@@ -42,7 +42,15 @@ allowxperm hal_audio_default vendor_adsp_sleepmon_device:chr_file ioctl { 0x5201
 allow hal_audio_default ion_device:chr_file r_file_perms;
 allow hal_audio_default dmabuf_system_heap_device:chr_file r_file_perms;
 allow hal_audio_default vendor_sysfs_sndcard:file r_file_perms;
+# AGM and PAL open card_state read-write to wait for the sound card and follow
+# DSP restarts; without write the open fails and no audio comes up.
+allow hal_audio_default vendor_sysfs_sndcard:file write;
 r_dir_file(hal_audio_default, vendor_proc_audiod)
+
+# GPR and GSL look up the audio PD and register for its restart notifications
+# over QRTR (liblx-osal: libpdmapper, libpdnotifier). Only the operations seen
+# at boot: no ioctl, bind, connect or shutdown.
+allow hal_audio_default self:qipcrtr_socket { create read write getattr setopt };
 
 # PAL owns runtime calibration/delta state. Factory amplifier calibration is read
 # only; neither persist as a whole nor other services' data is exposed here.

@@ -38,6 +38,14 @@ cc_library_static {
     export_include_dirs: ["."],
 }
 
+// Keeps the module's factory service out of servicemanager (ModuleFactoryService.h).
+cc_library_static {
+    name: "fp6_fingerprint_module_factory_service",
+    defaults: ["fp6_fingerprint_defaults"],
+    srcs: ["ModuleFactoryService.cpp"],
+    export_include_dirs: ["."],
+}
+
 cc_binary {
     name: "android.hardware.biometrics.fingerprint-service.fp6",
     defaults: ["fp6_fingerprint_defaults"],
@@ -48,8 +56,13 @@ cc_binary {
         "Fingerprint.cpp",
         "main.cpp",
     ],
-    static_libs: ["fp6_fingerprint_session"],
+    static_libs: [
+        "fp6_fingerprint_module_factory_service",
+        "fp6_fingerprint_session",
+    ],
     shared_libs: ["libhardware"],
+    // Exports main.cpp's AServiceManager_addService to the module.
+    dynamic_list: "exported_symbols.list",
     required: ["fp6_fingerprint_hw_module"],
 }
 
@@ -60,5 +73,14 @@ cc_test {
     defaults: ["fp6_fingerprint_defaults"],
     srcs: ["tests/SessionTest.cpp"],
     static_libs: ["fp6_fingerprint_session"],
+    test_suites: ["device-tests"],
+}
+
+// The factory service is kept back, by exact name only; everything else passes.
+cc_test {
+    name: "fp6_fingerprint_module_factory_service_test",
+    defaults: ["fp6_fingerprint_defaults"],
+    srcs: ["tests/ModuleFactoryServiceTest.cpp"],
+    static_libs: ["fp6_fingerprint_module_factory_service"],
     test_suites: ["device-tests"],
 }

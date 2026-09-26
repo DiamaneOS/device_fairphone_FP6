@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Awinic haptics driver nodes (aw_vibrator) the vibrator HAL writes to play
+# the chip's fixed RAM waveforms: activate, brightness, duration, gain, loop
+# and seq (genfs_contexts). The rest of the driver, including raw waveform
+# streaming (rtp), calibration and register access, stays sysfs_leds, which
+# the HAL may read but not write.
+type vendor_sysfs_aw_vibrator, fs_type, sysfs_type;
+
+allow hal_vibrator_default vendor_sysfs_aw_vibrator:file rw_file_perms;

@@ -6,3 +6,12 @@ genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_0_geni_se/a84000.i2c/i2c-1/1-0027/wakeup u:object_r:sysfs_wakeup:s0
 # UFS LUN 0 (userdata) queue settings that platform init.rc tunes.
 genfscon sysfs /devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/block u:object_r:sysfs_devices_block:s0
+# Awinic haptics nodes the vibrator HAL writes (vibrator.te). genfs matches
+# path prefixes, so "activate" also labels activate_mode; that node is not
+# chowned to system, so the HAL still cannot write it.
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/activate u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/brightness u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/duration u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/gain u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/loop u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/seq u:object_r:vendor_sysfs_aw_vibrator:s0

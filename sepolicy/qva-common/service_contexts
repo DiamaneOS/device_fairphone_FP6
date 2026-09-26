@@ -65,7 +65,6 @@ vendor.qti.hardware.vpp.IVppService/default            u:object_r:vendor_hal_vpp
 vendor.qti.hardware.hexlp.IHexlpService/default           u:object_r:vendor_hal_hexlp_service:s0
 vendor.qti.hardware.power.powermodule.IPowerModule/default     u:object_r:vendor_hal_poweroptservice_service:s0
 vendor.qti.qhcp.IQHDC/default                          u:object_r:vendor_hal_qms_service:s0
-vendor.qti.hardware.qseecom.IQSEECom/default           u:object_r:vendor_hal_qseecom_service:s0
 vendor.tsa.hdcp.IHDCPInterface/default                 u:object_r:vendor_tsa_hdcpvndservice:s0
 vendor.qti.hardware.wifi.wificfr.IWificfr/default                         u:object_r:hal_wificfr_service:s0
 vendor.qti.hardware.soter.ISoter/default               u:object_r:vendor_hal_soteraidl_service:s0

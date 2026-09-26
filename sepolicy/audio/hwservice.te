@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# PAL and AGM HIDL services, private to the audio HAL process
+# (qva-common/hwservice_contexts, hal_audio_default.te).
+type vendor_hal_audio_internal_hwservice, hwservice_manager_type, protected_hwservice;

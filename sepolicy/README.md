@@ -23,6 +23,11 @@ Downstream adaptations:
   selected common AIDL power service.
 - Omit the peripheral manager's binder call into the WLAN service domain; that
   service is not installed.
+- Drop the QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
+  `hal_qseecom.te` and its file and service contexts are removed, and the
+  service is not selected. No installed file looks it up; KeyMint, Gatekeeper,
+  the fingerprint module and `qseecomd` use `libQSEEComAPI` directly. The
+  kernel `qseecom_proxy.ko` is a different component and stays.
 - Label the FP6 fingerprint service (`android.hardware.biometrics.
   fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
   stock wrapper it replaces.
@@ -135,6 +140,13 @@ restricts the PAL sleep-monitor extended ioctl grant to activity reporting
 (`0x5201`). AudioReach receives its AGM device, runtime audio directory, selected
 allocator and sound-card state access. The FastRPC listener receives only its DSP
 transport, firmware/RFSA, audio-DSP state and DSP-service lookup.
+
+The stock primary HAL registers the PAL and AGM HIDL services (`IPAL`, `IAGM`)
+in its own process. `qva-common/hwservice_contexts` labels them
+`vendor_hal_audio_internal_hwservice` (`audio/hwservice.te`) instead of
+`hal_audio_hwservice`, so only `hal_audio_default` may register and look them
+up; audioserver, system_server and the Bluetooth stack, which are hal_audio
+clients, cannot reach them.
 
 The kernel may not search `/mnt/vendor` (a platform neverallow), so it cannot
 follow the amplifier calibration link into persist; the amplifier then uses its

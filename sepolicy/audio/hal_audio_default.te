@@ -53,5 +53,10 @@ allow hal_audio_default { mnt_vendor_file vendor_persist_file }:dir search;
 
 get_prop(hal_audio_default, vendor_audio_prop)
 
-# These are vendor-local HIDL endpoints hosted by the primary HAL itself.
-# Their existing hwservice contexts use hal_audio_hwservice and platform rules.
+# The stock primary HAL registers the PAL and AGM HIDL services (IPAL, IAGM) in
+# its own process, and only code in that process uses them (libagmclient, the
+# AGM ALSA plugins and the effects that link PAL). Their private type keeps
+# every other hal_audio client (audioserver, system_server, the Bluetooth stack)
+# from looking them up and reaching their closed parsers.
+add_hwservice(hal_audio_default, vendor_hal_audio_internal_hwservice)
+neverallow { domain -hal_audio_default } vendor_hal_audio_internal_hwservice:hwservice_manager find;

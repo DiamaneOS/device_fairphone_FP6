@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- The presigned stock apps use platform-only SystemProperties/HwBinder APIs.
+     Scope hidden-API access to these preinstalled packages instead of signing
+     them with our platform key. Android permission checks and the dedicated
+     SELinux domain still apply. Telephony binds them in user 0. -->
+<config>
+    <hidden-api-whitelisted-app package="vendor.qti.iwlan" />
+    <hidden-api-whitelisted-app package="vendor.qti.hardware.cacert.server" />
+    <prevent-disable package="vendor.qti.iwlan" />
+    <prevent-disable package="vendor.qti.hardware.cacert.server" />
+    <install-in-user-type package="vendor.qti.iwlan">
+        <install-in user-type="SYSTEM" />
+    </install-in-user-type>
+    <install-in-user-type package="vendor.qti.hardware.cacert.server">
+        <install-in user-type="SYSTEM" />
+    </install-in-user-type>
+</config>

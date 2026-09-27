@@ -10,4 +10,7 @@
          (com.fp.customercarrierconfig) are not installed; the AOSP defaults
          apply for those. -->
     <string name="config_ims_mmtel_package" translatable="false">org.codeaurora.ims</string>
+    <!-- Stock capabilities; framework/carrier policy chooses when RTT applies. -->
+    <bool name="config_support_rtt">true</bool>
+    <bool name="config_support_simless_emergency_rtt">true</bool>
 </resources>

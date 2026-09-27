@@ -97,6 +97,10 @@ SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
 PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
+# Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
+include hardware/diamaneos/ims/ims-board.mk
+include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
+
 # Development identity only. AVB remains enabled; a later signing workflow
 # replaces test identities rather than relabelling these artifacts.
 BOARD_AVB_ENABLE := true

@@ -3,11 +3,12 @@
      SPDX-License-Identifier: Apache-2.0
      Copyright 2026 The DiamaneOS Project
 
-     The stock eSIM LPA stays off by default, as on stock. SystemConfig
-     "component-override" sets the default enabled state of these components
-     of a preinstalled package (ScanPackageUtils.configurePackageComponents);
-     a later user or shell choice (pm enable) overrides the default and
-     persists.
+     DiamaneOS turns the stock eSIM LPA's services off by default. Stock does
+     not: its manifest enables QtiEuiccServiceImpl and no stock file overrides
+     that. SystemConfig "component-override" sets the default enabled state of
+     these components of a preinstalled package
+     (ScanPackageUtils.configurePackageComponents); a later user or shell
+     choice (pm enable) overrides the default and persists.
 
      QtiEuiccServiceImpl: the EuiccService. It cannot list profiles on the FP6
        (the stock radio daemon cannot decode the modem's reply), so Android

@@ -10,3 +10,6 @@ ro.telephony.network_state_poll_window_ms u:object_r:telephony_config_prop:s0 ex
 # empty default_prop and crash. Use the existing public build-property type,
 # matching ro.build.version.sdk; never grant apps access to default_prop.
 ro.build.version.sdk_full u:object_r:build_prop:s0 exact string
+# Other public Build.VERSION fields observed under default_prop on this base.
+ro.build.version.release_or_preview_display u:object_r:build_prop:s0 exact string
+ro.build.version.known_codenames u:object_r:build_prop:s0 exact string

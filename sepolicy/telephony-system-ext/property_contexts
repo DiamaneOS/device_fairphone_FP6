@@ -4,3 +4,9 @@
 # vendor build.prop (telephony/telephony.mk). Without this label init drops the
 # vendor build.prop line under enforcing SELinux.
 ro.telephony.network_state_poll_window_ms u:object_r:telephony_config_prop:s0 exact int
+
+# Android 17 Build.VERSION reads this during process initialization. The
+# pinned platform omits its label, making non-coredomain vendor apps read an
+# empty default_prop and crash. Use the existing public build-property type,
+# matching ro.build.version.sdk; never grant apps access to default_prop.
+ro.build.version.sdk_full u:object_r:build_prop:s0 exact string

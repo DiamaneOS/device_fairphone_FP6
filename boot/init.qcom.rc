@@ -14,6 +14,15 @@ on init
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
 
+# Release builds keep no Android log in the pstore event-log area, which
+# survives a soft reboot in RAM: ueventd creates /dev/pmsg0 as 0222 root log,
+# and liblog still writes security and SafetyNet events there when the build
+# is not debuggable. Mode 0000 leaves it to processes with the DAC-override
+# capability only. Debuggable builds keep the platform default; recovery uses
+# its own init files. vendor_init may already set attributes on device nodes.
+on init && property:ro.debuggable=0
+    chmod 0000 /dev/pmsg0
+
 on early-fs
     start vold
 

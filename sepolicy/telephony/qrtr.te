@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# QRTR has no per-QMI-service access control. This inventory covers the device's
+# existing modem/DSP clients and the isolated DCM/certificate additions. Any new
+# domain requires an explicit trust-boundary review, not audit2allow output.
+neverallow {
+  domain
+  -diamaneos_imsdcm
+  -fp6_iwlan_app
+  -hal_audio_default
+  -hal_camera_default
+  -hal_graphics_composer_default
+  -hal_sensors_default
+  -kernel
+  -rild
+  -vendor_hal_gnss_qti
+  -vendor_nicmd
+  -vendor_pd_mapper
+  -vendor_per_mgr
+  -vendor_qrtr
+  -vendor_rfs_access
+  -vendor_rmt_storage
+  -vendor_thermal-engine
+  userdebug_or_eng(`-su')
+} self:qipcrtr_socket create;

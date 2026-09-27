@@ -2,6 +2,12 @@
 <!-- Copyright 2026 The DiamaneOS Project -->
 <!-- Remaining selected HAL declarations are installed with their providers. -->
 <manifest version="7.0" type="device" target-level="8">
+    <!-- Stock certificate helper for the modem AUTH requests used by IWLAN. -->
+    <hal format="hidl">
+        <name>vendor.qti.hardware.cacert</name>
+        <transport>hwbinder</transport>
+        <fqname>@1.0::IService/default</fqname>
+    </hal>
     <hal format="aidl">
         <name>android.hardware.gatekeeper</name>
         <version>1</version>

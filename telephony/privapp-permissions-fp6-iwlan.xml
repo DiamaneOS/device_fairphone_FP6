@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Privileged placement closes the shared UID to ordinary installed apps.
+     Only normal WAKE_LOCK / RECEIVE_BOOT_COMPLETED permissions are requested;
+     these packages receive no privileged permission grant. -->
+<permissions>
+    <privapp-permissions package="vendor.qti.iwlan" />
+    <privapp-permissions package="vendor.qti.hardware.cacert.server" />
+</permissions>

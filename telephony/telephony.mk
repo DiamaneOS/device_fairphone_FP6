@@ -7,8 +7,9 @@
 # selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
 # radio daemon and the audio HAL is our own (callaudio/, replacing the stock
 # QtiTelephonyService). The radio interface libraries, the carrier
-# configuration app, the APN list and the telephony features are AOSP and built
-# from source. Not included yet: VoWiFi (IWLAN), video calls, RCS, an eSIM
+# configuration service and telephony features are built from source. Carrier
+# data is extracted from the authenticated stock package without its code.
+# The IWLAN frontend follows the stock QCRIL path. Not included yet: video calls, RCS, an eSIM
 # download UI, the SIM secure element (OMAPI UICC).
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
@@ -84,6 +85,29 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     FP6CallAudio
 
+# Stock modem-backed IWLAN, not the alternative AP-assisted AOSP service.
+# The renderer selects IWlanService, CACertService and their exact JNI closure.
+# Neither app uses the system UID or our platform key, and neither receives
+# privileged Android permissions. Their shared process has a scoped domain.
+ifneq ($(filter-out qti,$(DIAMANEOS_IWLAN_IMPLEMENTATION)),)
+$(error FP6 selects the QTI IWLAN path; do not also inherit an AOSP IWLAN product)
+endif
+DIAMANEOS_IWLAN_IMPLEMENTATION := qti
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/telephony/privapp-permissions-fp6-iwlan.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/privapp-permissions-fp6-iwlan.xml \
+    device/fairphone/FP6/telephony/fp6-iwlan-sysconfig.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/sysconfig/fp6-iwlan-sysconfig.xml
+
+# CarrierConfig remains the maintained Android service. The generated
+# filegroup contains XML only; CustomerCarrierConfig.apk is never installed.
+$(call soong_config_set,diamaneos_carrierconfig,asset_module,fp6_stock_carrier_assets)
+
+# Verified FP6 QRTR topology: AP node 1, modem node 0 (DMS/NAS/WDS/WMS/VOICE
+# name-service records). Pin it; never trust the first incoming DCM packet.
+# The transport asks the kernel for its local AP node before binding.
+DIAMANEOS_IMS_MODEM_NODE := 0
+DIAMANEOS_IMS_SLOTS := 2
+$(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
+
 # eSIM LPA (product priv-app): its privileged-permission allowlist and the
 # default-disabled state of its unused UimLpaService (product apps take their
 # allowlist from the product partition).
@@ -91,18 +115,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/privapp-permissions-fp6-lpa.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-fp6-lpa.xml \
     device/fairphone/FP6/telephony/fp6-lpa-default-disabled.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/fp6-lpa-default-disabled.xml
 
-# APNs: the AOSP sample database (source equivalent of the stock
-# product/etc/apns-conf.xml); users can still add APNs in Settings. The
-# telephony provider imports this file only when ro.build.id changes, so a
-# phone that booted a build without it keeps an empty APN table until APNs are
-# reset to default in Settings.
-PRODUCT_COPY_FILES += \
-    device/sample/etc/apns-full-conf.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/apns-conf.xml
+# APNs come from the authenticated stock XML in vendor/fairphone/FP6. Keep
+# IMS/emergency rows, MVNO filters and ordering intact instead of appending
+# overlapping entries to the sample database. Users can still add APNs in
+# Settings. Existing installations need a new build identity or an owner-run
+# APN reset before TelephonyProvider reimports the changed file.
 
-# Device overlays: IMS package for TeleService and the stock global VoLTE and
-# emergency-domain carrier defaults for the AOSP CarrierConfig app (stock FP6
-# ships them in its own carrier-config app, com.fp.customercarrierconfig
-# res/xml/vendor.xml).
+# Device overlay: IMS package and RTT capabilities for TeleService. Stock
+# carrier defaults are now extracted as data, including their original filters.
 PRODUCT_PACKAGES += \
-    FP6TeleServiceOverlay \
-    FP6CarrierConfigOverlay
+    FP6TeleServiceOverlay

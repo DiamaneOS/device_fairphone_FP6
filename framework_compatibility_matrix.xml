@@ -2,6 +2,23 @@
 <!-- Copyright 2026 The DiamaneOS Project -->
 <!-- Device-specific interfaces supplied by the selected FP6 vendor services. -->
 <compatibility-matrix version="1.0" type="framework">
+    <hal format="aidl">
+        <name>vendor.qti.hardware.data.iwlandata</name>
+        <version>1</version>
+        <interface>
+            <name>IIWlan</name>
+            <instance>slot1</instance>
+            <instance>slot2</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.qti.hardware.cacert</name>
+        <version>1.0</version>
+        <interface>
+            <name>IService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <hal format="hidl">
         <name>vendor.qti.hardware.AGMIPC</name>
         <version>1.0</version>

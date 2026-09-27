@@ -9,12 +9,12 @@
 # upstream-sepolicy-needed.txt). Omitted: diag and debug properties, executing
 # vendor tools (voice-call logging), the time and SSG TrustZone daemons, the
 # legacy MSM IPC-router socket ioctls, the secure-element HAL, the
-# Qualcomm IWLAN and data-connection services, the IMS factory client, the
+# data-factory services, the IMS factory client, the
 # QCRIL client socket (/dev/socket/qcrild; its module is not installed) and
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
 # binderservicedomain, so apps cannot call it through the platform appdomain
-# rule; its three app clients get binder_call in qtelephony.te,
-# fp6_callaudio_app.te and qti_lpa.te.
+# rule; its app clients get scoped binder_call grants in qtelephony.te,
+# fp6_callaudio_app.te, qti_lpa.te and fp6_iwlan_app.te.
 
 # Qualcomm services the device declares: IImsRadio and IQtiRadioConfig
 # (vendor_hal_telephony_service2), IQcRilAudio and IUimLpa (own types,

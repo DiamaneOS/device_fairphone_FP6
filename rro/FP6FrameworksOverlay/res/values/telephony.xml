@@ -5,10 +5,19 @@
 -->
 <resources>
     <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay: the device
-         supports VoLTE and 5G NSA/SA. Video calling and Wi-Fi calling stay at
-         the AOSP default (off) until their stacks are installed. -->
+         supports VoLTE, Wi-Fi calling and 5G NSA/SA. Video calling stays off
+         until its media path is qualified. Carrier provisioning still applies. -->
     <bool name="config_device_volte_available">true</bool>
     <bool name="config_carrier_volte_available">true</bool>
+    <bool name="config_device_wfc_ims_available">true</bool>
+    <string name="config_wlan_data_service_package" translatable="false">vendor.qti.iwlan</string>
+    <string name="config_wlan_data_service_class" translatable="false">vendor.qti.iwlan.IWlanDataService</string>
+    <string name="config_wlan_network_service_package" translatable="false">vendor.qti.iwlan</string>
+    <string name="config_wlan_network_service_class" translatable="false">vendor.qti.iwlan.IWlanNetworkService</string>
+    <string name="config_qualified_networks_service_package" translatable="false">vendor.qti.iwlan</string>
+    <string name="config_qualified_networks_service_class" translatable="false">vendor.qti.iwlan.QualifiedNetworksServiceImpl</string>
+    <bool name="config_enable_iwlan_handover_policy">false</bool>
+    <bool name="config_enhanced_iwlan_handover_check">false</bool>
     <bool name="config_telephony5gStandalone">true</bool>
     <bool name="config_telephony5gNonStandalone">true</bool>
 

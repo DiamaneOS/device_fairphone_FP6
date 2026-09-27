@@ -15,6 +15,14 @@ HIDL and QRTR paths. Package-specific hidden-API access supports the stock Java
 IPC classes without platform-signing the apps. The AOSP IWLAN alternative must
 not be selected at the same time.
 
+The opt-in source Wi-Fi reporter supplies connected-network observations to DSD
+through a separate system_ext daemon and application identity. It does not add
+CNE, change modem NV settings or replace the PDN broker. The daemon only sends
+the bounded, reviewed status/settings/subscription messages; it does not advertise
+unimplemented scan, quality-measurement or keepalive capabilities. Cold-start
+reconciliation and complete carrier behavior remain private-candidate
+qualification requirements; this configuration is not a release acceptance claim.
+
 The vendor generator supplies the exact stock APN table and carrier XML assets.
 The source CarrierConfig fork consumes that data; the stock carrier-service APK
 is not installed. This replaces the earlier partial FP6CarrierConfigOverlay.

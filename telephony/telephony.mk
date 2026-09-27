@@ -107,6 +107,7 @@ $(call soong_config_set,diamaneos_carrierconfig,asset_module,fp6_stock_carrier_a
 DIAMANEOS_IMS_MODEM_NODE := 0
 DIAMANEOS_IMS_SLOTS := 2
 $(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
+$(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 
 # eSIM LPA (product priv-app): its privileged-permission allowlist and the
 # default-disabled state of its services (product apps take their allowlist

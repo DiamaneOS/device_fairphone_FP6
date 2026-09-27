@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Stock IWlanService and CACertService share .qtidataservices under their own
+# application UID. They retain the Fairphone signer, not our platform signer.
+# IWLAN calls QCRIL's IIWlan through libWlanServiceJni. CACertService exposes
+# its HIDL certificate lookup and libjnihelper forwards modem AUTH requests.
+type fp6_iwlan_app, domain;
+app_domain(fp6_iwlan_app)
+binder_use(fp6_iwlan_app)
+hwbinder_use(fp6_iwlan_app)
+
+# Framework-managed DataService/NetworkService lifecycle and normal wake locks.
+allow fp6_iwlan_app { activity_service power_service user_service }:service_manager find;
+allow fp6_iwlan_app vendor_hal_iwlan_service:service_manager find;
+binder_call(fp6_iwlan_app, rild)
+binder_call(rild, fp6_iwlan_app)
+allow rild vendor_hal_iwlan_service:service_manager { add find };
+
+# Certificate lookup is local to this shared process; no ordinary app or
+# other modem-facing daemon is made a client. The modem receives CA material
+# via the helper's QMI AUTH client, not through a network socket in this app.
+add_hwservice(fp6_iwlan_app, vendor_hal_cacert_hwservice)
+binder_call(fp6_iwlan_app, fp6_iwlan_app)
+get_prop(fp6_iwlan_app, hwservicemanager_prop)
+allow fp6_iwlan_app self:qipcrtr_socket create_socket_perms_no_ioctl;
+
+# Vendor JNI and its selected, read-only ELF dependencies. No vendor data or
+# modem configuration write grants, CNE, performance HAL or data-factory access.
+r_dir_file(fp6_iwlan_app, vendor_file)
+allow fp6_iwlan_app vendor_file:file { execute map };
+
+neverallow fp6_iwlan_app self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+neverallow fp6_iwlan_app self:global_capability_class_set *;
+neverallow fp6_iwlan_app self:global_capability2_class_set *;

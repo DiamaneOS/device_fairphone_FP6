@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Both stock packages declare this exact shared process and have the FP6
+# signer. Privileged placement prevents ordinary installs joining the UID;
+# no signature or privileged Android permissions are granted to these apps.
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=.qtidataservices domain=fp6_iwlan_app type=app_data_file levelFrom=all

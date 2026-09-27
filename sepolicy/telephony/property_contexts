@@ -1,0 +1,2 @@
+# SPDX-License-Identifier: Apache-2.0
+persist.vendor.iwlan.logging.logcat u:object_r:fp6_iwlan_log_prop:s0 exact bool

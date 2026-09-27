@@ -3,22 +3,25 @@
      SPDX-License-Identifier: Apache-2.0
      Copyright 2026 The DiamaneOS Project
 
-     Default component state of the stock eSIM LPA. SystemConfig
-     "component-override" sets the default enabled state of components of a
-     preinstalled package (ScanPackageUtils.configurePackageComponents); a later
-     user choice overrides it and persists.
+     The stock eSIM LPA stays off by default, as on stock. SystemConfig
+     "component-override" sets the default enabled state of these components
+     of a preinstalled package (ScanPackageUtils.configurePackageComponents);
+     a later user or shell choice (pm enable) overrides the default and
+     persists.
 
-     QtiEuiccServiceImpl, the EuiccService, is on (its manifest default; owner
-     decision of 26 September 2026). Without it Android finds no LPA: it cannot
-     tell that a profile is an eSIM, switching an eSIM off drops it from
-     Settings with no way back, and a factory reset cannot erase eSIM profiles.
-     There is still no download screen, so adding an eSIM is not possible yet.
-
+     QtiEuiccServiceImpl: the EuiccService. It cannot list profiles on the FP6
+       (the stock radio daemon cannot decode the modem's reply), so Android
+       would treat an eSIM as a physical SIM. While it is disabled the
+       framework finds no LPA and the app is never started (it has no
+       activity or receiver); installed eSIM profiles keep working as SIMs.
+       Its JNI library is not installed, so enabling it by hand makes the app
+       crash.
      UimLpaService: a service for Qualcomm's own LPA UI apps, which are not
        installed. QtiEuiccServiceImpl does not bind it. It stays disabled.
 -->
 <config>
     <component-override package="com.qualcomm.qti.lpa">
+        <component class="com.qualcomm.qti.lpa.QtiEuiccServiceImpl" enabled="false"/>
         <component class="com.qualcomm.qti.lpa.UimLpaService" enabled="false"/>
     </component-override>
 </config>

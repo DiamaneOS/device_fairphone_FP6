@@ -99,6 +99,7 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk
+include hardware/diamaneos/ims/wlan-board.mk
 include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 
 # Development identity only. AVB remains enabled; a later signing workflow

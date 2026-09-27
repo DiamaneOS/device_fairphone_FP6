@@ -21,8 +21,9 @@
     <bool name="config_telephony5gStandalone">true</bool>
     <bool name="config_telephony5gNonStandalone">true</bool>
 
-    <!-- Stock eUICC capabilities, reported by the stock LPA
-         (com.qualcomm.qti.lpa). -->
+    <!-- Stock eUICC capabilities. The stock LPA (com.qualcomm.qti.lpa) that
+         would use them stays off (telephony/fp6-lpa-default-disabled.xml)
+         because it cannot list profiles on the FP6. -->
     <string-array name="config_telephonyEuiccDeviceCapabilities" translatable="false">
         <item>gsm,9</item>
         <item>utran,10</item>

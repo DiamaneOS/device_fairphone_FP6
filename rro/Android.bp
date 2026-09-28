@@ -5,7 +5,10 @@
 // generic system image stays device independent.
 
 runtime_resource_overlay {
-    name: "FP6FrameworksOverlay",
+    // Keep the new package's idmap path distinct from the pre-migration overlay.
+    // Old-package cleanup runs after zygote creates immutable framework
+    // idmaps and must not delete the new package's mapping at the same APK path.
+    name: "DiamaneOSFP6FrameworksOverlay",
     vendor: true,
     manifest: "FP6FrameworksOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6FrameworksOverlay/res"],

@@ -10,3 +10,8 @@ and needs no overlay.
 `doze_display_state_supported` lets the always-on display put the panel in
 its low-power doze mode instead of keeping it fully on, as stock does
 (`res/values/config.xml`).
+
+`config_volumeDialogOnLeft` puts the volume dialog on the left edge, next to
+the FP6 volume buttons. Stock FP6 SystemUI does the same. The resource comes
+from a DiamaneOS SystemUI change; upstream Android 17 always shows the dialog
+on the right.

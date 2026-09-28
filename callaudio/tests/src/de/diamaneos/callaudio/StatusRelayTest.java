@@ -3,7 +3,7 @@
  * Copyright 2026 The DiamaneOS Project
  */
 
-package org.diamaneos.callaudio;
+package de.diamaneos.callaudio;
 
 import static org.junit.Assert.assertEquals;
 

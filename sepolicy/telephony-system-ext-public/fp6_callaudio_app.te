@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# App domain of the FP6 call-audio bridge (org.diamaneos.callaudio, device
+# App domain of the FP6 call-audio bridge (de.diamaneos.callaudio, device
 # callaudio/), which replaces the stock QtiTelephonyService. Public so that the
 # vendor policy (telephony/fp6_callaudio_app.te) can bind its QCRIL service
 # access to exactly this domain.

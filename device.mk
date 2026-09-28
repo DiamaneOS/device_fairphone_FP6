@@ -212,7 +212,7 @@ PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
 # double-tap to wake (both off by default) and the side fingerprint sensor
 # description.
 PRODUCT_PACKAGES += \
-    FP6FrameworksOverlay \
+    DiamaneOSFP6FrameworksOverlay \
     FP6SettingsOverlay \
     FP6SystemUIOverlay
 

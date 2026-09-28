@@ -372,7 +372,7 @@ the IMS and radio-config services; the LPA (`fp6_qti_lpa_app`) only IUimLpa, the
 the network. None is a `hal_telephony` client (no AOSP IRadio access), none has camera,
 media, HIDL or diag access. Collect denials on the device before adding any grant.
 
-Our own call-audio bridge (`org.diamaneos.callaudio`, `callaudio/`) replaces the stock
+Our own call-audio bridge (`de.diamaneos.callaudio`, `callaudio/`) replaces the stock
 QtiTelephonyService. It is signed with our key, selected by package name, and runs in
 `fp6_callaudio_app`: it may find only IQcRilAudio, the audio server and the activity
 manager, make binder calls with the radio daemon, and create no network or QRTR sockets.

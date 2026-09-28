@@ -3,7 +3,7 @@
  * Copyright 2026 The DiamaneOS Project
  */
 
-package org.diamaneos.callaudio;
+package de.diamaneos.callaudio;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;

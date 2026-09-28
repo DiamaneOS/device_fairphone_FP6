@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# FP6 call-audio bridge (org.diamaneos.callaudio, device callaudio/): a
+# FP6 call-audio bridge (de.diamaneos.callaudio, device callaudio/): a
 # system_ext privileged app signed with the default application key, selected
 # by package name and isPrivApp=true (seapp_contexts). It registers a request
 # callback with QCRIL's IQcRilAudio/slotN and applies the in-call audio

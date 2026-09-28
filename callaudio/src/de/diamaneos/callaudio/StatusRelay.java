@@ -3,7 +3,7 @@
  * Copyright 2026 The DiamaneOS Project
  */
 
-package org.diamaneos.callaudio;
+package de.diamaneos.callaudio;
 
 /**
  * Which audioserver status one slot reports to the radio daemon with setError, as stock does:

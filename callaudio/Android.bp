@@ -46,12 +46,12 @@ android_app {
     platform_apis: true,
     system_ext_specific: true,
     privileged: true,
-    required: ["sysconfig-org.diamaneos.callaudio.xml"],
+    required: ["sysconfig-de.diamaneos.callaudio.xml"],
 }
 
 prebuilt_etc {
-    name: "sysconfig-org.diamaneos.callaudio.xml",
-    src: "sysconfig-org.diamaneos.callaudio.xml",
+    name: "sysconfig-de.diamaneos.callaudio.xml",
+    src: "sysconfig-de.diamaneos.callaudio.xml",
     sub_dir: "sysconfig",
     system_ext_specific: true,
 }
@@ -62,8 +62,8 @@ prebuilt_etc {
 java_test_host {
     name: "FP6CallAudioHostTests",
     srcs: [
-        "src/org/diamaneos/callaudio/Recovery.java",
-        "src/org/diamaneos/callaudio/StatusRelay.java",
+        "src/de/diamaneos/callaudio/Recovery.java",
+        "src/de/diamaneos/callaudio/StatusRelay.java",
         "tests/src/**/*.java",
     ],
     static_libs: ["junit"],

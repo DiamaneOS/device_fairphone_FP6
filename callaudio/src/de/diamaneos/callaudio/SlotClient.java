@@ -3,9 +3,9 @@
  * Copyright 2026 The DiamaneOS Project
  */
 
-package org.diamaneos.callaudio;
+package de.diamaneos.callaudio;
 
-import static org.diamaneos.callaudio.CallAudioApp.TAG;
+import static de.diamaneos.callaudio.CallAudioApp.TAG;
 
 import android.media.AudioSystem;
 import android.os.Handler;

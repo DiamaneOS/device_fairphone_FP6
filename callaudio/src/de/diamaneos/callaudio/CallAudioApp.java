@@ -3,7 +3,7 @@
  * Copyright 2026 The DiamaneOS Project
  */
 
-package org.diamaneos.callaudio;
+package de.diamaneos.callaudio;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;

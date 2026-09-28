@@ -15,7 +15,7 @@
        screen included) has audio.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.diamaneos.callaudio">
+    package="de.diamaneos.callaudio">
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 

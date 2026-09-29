@@ -6,7 +6,16 @@
 <resources>
     <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay. -->
     <dimen name="status_bar_height_portrait">48dp</dimen>
-    <string name="config_mainBuiltInDisplayCutout" translatable="false">M -30,0 L -30,110 L 30,110 L 30,0 Z</string>
+    <!-- The front camera hole, measured on the panel (a calibration grid photographed
+         around the hole, 2026-09-28): a circle of radius 36.8 px centred on the display's
+         horizontal centre, 64 px below the top edge. The path is that circle, rounded out
+         to 37 px, so everything that follows the cutout's shape (the Tally lens ring among
+         it) hugs the real hole. The factory value was a 60 x 110 px rectangle, which is
+         narrower than the hole (74 px): the rectangle approximation below keeps the factory
+         rectangle's height, so the status bar and app insets stay 110 px, and takes the
+         hole's width, so no status bar content sits under its edges. -->
+    <string name="config_mainBuiltInDisplayCutout" translatable="false">M 0,27 A 37,37 0 1 1 0,101 A 37,37 0 1 1 0,27 Z</string>
+    <string name="config_mainBuiltInDisplayCutoutRectApproximation" translatable="false">M -37,0 L -37,110 L 37,110 L 37,0 Z</string>
 
     <!-- The FP6 has no hardware navigation keys. Without this the window
          manager reports no navigation bar, so SystemUI creates neither the bar

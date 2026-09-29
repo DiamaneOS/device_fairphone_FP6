@@ -11,4 +11,10 @@
          Doze-suspend stays unsupported, as in stock: the panel has no LP2
          command set. -->
     <bool name="doze_display_state_supported">true</bool>
+
+    <!-- The FP6 volume buttons are on the left edge (the power button with the
+         fingerprint sensor is on the right). Show the volume dialog next to
+         them, as stock FP6 does. Needs the DiamaneOS SystemUI change that adds
+         this resource; without it the overlay has no effect. -->
+    <bool name="config_volumeDialogOnLeft">true</bool>
 </resources>

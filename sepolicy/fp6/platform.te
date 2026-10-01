@@ -41,3 +41,6 @@ set_prop(vendor_init, vendor_ssr_prop)
 # persist.vendor.data.profile_update (telephony.mk): QCRIL copies Android's
 # APNs into the modem's data profiles.
 set_prop(vendor_init, vendor_dataqdp_prop)
+# persist.vendor.sensors.enable.mag_filter and support_direct_channel
+# (device.mk), as stock.
+set_prop(vendor_init, vendor_sensors_prop)

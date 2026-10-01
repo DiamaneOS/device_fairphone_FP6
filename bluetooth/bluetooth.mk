@@ -44,6 +44,12 @@ PRODUCT_VENDOR_PROPERTIES += \
     bluetooth.profile.ccp.server.enabled=true \
     bluetooth.profile.hap.client.enabled=true
 
+# Stock (system_ext build.prop): up to 10 Bluetooth LE devices connected at
+# once instead of 8, on the same controller firmware. A bluetooth_prop, which
+# vendor_init may not set, so it is a product property.
+PRODUCT_PRODUCT_PROPERTIES += \
+    bluetooth.core.le.max_number_of_concurrent_connections=10
+
 # Not set on purpose:
 # - ro.bluetooth.a2dp_offload.supported and ro.bluetooth.leaudio_offload.supported
 #   (default false): stock offload needs the Qualcomm Bluetooth audio stack.

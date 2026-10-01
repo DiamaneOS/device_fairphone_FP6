@@ -26,3 +26,13 @@ PRODUCT_COPY_FILES += \
 # not carried over.
 PRODUCT_VENDOR_PROPERTIES += \
     ro.camera.disableHeicUltraHDR=true
+
+# Stock (system build.prop): the CamX provider takes the tuning path Fairphone
+# shipped and validated. vendor_init may set it (sepolicy/camera/vendor_init.te).
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.camera.fprom=1
+
+# Stock (system build.prop): MediaRecorder high-frame-rate recordings keep a
+# 60 fps base layer instead of about 33 fps.
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.media.recorder-max-base-layer-fps=60

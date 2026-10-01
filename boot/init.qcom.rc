@@ -41,6 +41,13 @@ on fs
     mkdir /mnt/vendor/persist/sensors 0775 system system
     mkdir /mnt/vendor/persist/sensors/registry 0775 system system
     mkdir /mnt/vendor/persist/sensors/registry/registry 0775 system system
+    # The sensors HAL waits up to 8 s at start for every sensor type listed in
+    # sensors_list.txt and never removes an entry. A list left by an earlier
+    # system can name a sensor this one never reports (a hall sensor), which
+    # delays the HAL, and system_server with it, by 8 s on every boot. Keep it
+    # to the FP6's physical sensors; the HAL may read the list, not change it.
+    write /mnt/vendor/persist/sensors/sensors_list.txt "accel\ngyro\nmag\npressure\nproximity\nambient_light\n"
+    restorecon /mnt/vendor/persist/sensors/sensors_list.txt
     chown system system /mnt/vendor/persist/sensors/sns.reg
     chown system system /mnt/vendor/persist/sensors/sensors_list.txt
     chown system system /mnt/vendor/persist/sensors/registry/registry/sensors_registry

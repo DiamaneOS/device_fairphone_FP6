@@ -119,6 +119,11 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.qti \
     android.hardware.health-service.qti_recovery
 
+# The health service's uevent filter (libhealthloop). Without it the service
+# wakes for every kernel uevent instead of power-supply events only.
+# base_vendor.mk, which this product does not inherit, normally adds it.
+PRODUCT_PACKAGES += filterPowerSupplyEvents.o
+
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
 # its interface repositories). The stock Android 14
 # composer failed to present under Android 17 when tried without

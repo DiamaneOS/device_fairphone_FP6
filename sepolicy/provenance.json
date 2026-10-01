@@ -1163,7 +1163,7 @@
       "source": "generic/vendor/common/hal_sensors_default.te",
       "source_sha256": "2cc63cb1f84e039c6a8c3f92469bf05e689078ef87345a15445931c7f1278410",
       "path": "fp6/hal_sensors_default.te",
-      "sha256": "d17d8e08c66bebec36d3bb325d76f5b1a824a4d7ed4f209316b8b6ffcbdf5f3f"
+      "sha256": "318caa92b1ee730a5b6bf8702384b11c9b31a0d5370893807fb7f50649896b60"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

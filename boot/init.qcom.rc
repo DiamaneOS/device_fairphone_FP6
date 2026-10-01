@@ -44,9 +44,10 @@ on fs
     # The sensors HAL waits up to 8 s at start for every sensor type listed in
     # sensors_list.txt and never removes an entry. A list left by an earlier
     # system can name a sensor this one never reports (a hall sensor), which
-    # delays the HAL, and system_server with it, by 8 s on every boot. Keep it
-    # to the FP6's physical sensors; the HAL may read the list, not change it.
-    write /mnt/vendor/persist/sensors/sensors_list.txt "accel\ngyro\nmag\npressure\nproximity\nambient_light\n"
+    # delays the HAL, and system_server with it, by 8 s on every boot. Write
+    # the stock list without the hall sensor, in the stock order; the HAL may
+    # read the list, not change it.
+    write /mnt/vendor/persist/sensors/sensors_list.txt "step_detect\npedometer\npersist_stationary_detect\npressure\ntilt\noffbody_detect\nmag_cal\npersist_motion_detect\ngravity\nmag\nsig_motion\nrotv\ndevice_orient\ngeomag_rv\ngyro\ngyro_cal\ngame_rv\naccel\nrgb\nproximity\nambient_light\n"
     restorecon /mnt/vendor/persist/sensors/sensors_list.txt
     chown system system /mnt/vendor/persist/sensors/sns.reg
     chown system system /mnt/vendor/persist/sensors/sensors_list.txt

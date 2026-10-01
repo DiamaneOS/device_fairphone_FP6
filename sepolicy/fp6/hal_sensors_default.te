@@ -5,11 +5,12 @@
 # sysrq, SLPI/SSR sysfs, persist writes or HID devices; QRTR without ioctls.
 
 # The list of sensor types the HAL waits for at start, written by init
-# (boot/init.qcom.rc). The HAL reads only this file in persist, not the
-# sensor registry or calibration; its attempts to append to it stay denied.
+# (boot/init.qcom.rc) with its own label; the HAL reads it, and its attempts
+# to append to it stay denied. The rest of persist/sensors (registry and
+# calibration) stays readable, as before.
 type vendor_persist_sensors_list_file, file_type, vendor_persist_type;
 allow hal_sensors_default mnt_vendor_file:dir search;
-allow hal_sensors_default vendor_persist_sensors_file:dir search;
+r_dir_file(hal_sensors_default, vendor_persist_sensors_file)
 allow hal_sensors_default vendor_persist_sensors_list_file:file r_file_perms;
 
 get_prop(hal_sensors_default, vendor_sensors_prop)

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Modem subsystem (MSS, 4080000.remoteproc-mss) for private bring-up. The stock
+# Modem subsystem (MSS, 4080000.remoteproc-mss) for bring-up. The stock
 # peripheral manager boots it: pm-proxy votes for the internal modem and
 # pm-service starts it through /dev/remoteprocN (boot/ueventd.rc gives the node
 # to system, owner-only). pd-mapper, pm-service, pm-proxy, rmt_storage,
@@ -9,7 +9,7 @@
 # vendor tree (component remote-processor-services). The modem firmware is on
 # the modem partition (/vendor/firmware_mnt, boot/fstab.qcom).
 # Not included: full RAM dump collection (subsystem_ramdump), diagnostics,
-# time_daemon and the IPA offload manager (ipacm); see the modem review.
+# time_daemon and the IPA offload manager (ipacm).
 # Crash data: remoteproc coredumps stay disabled (kernel default), and the
 # remote processors' error-log path to /data (/vendor/rfs/*/*/ramdumps and
 # /data/vendor/tombstones/rfs) is not installed (rfs-links.mk, boot/init.qcom.rc).

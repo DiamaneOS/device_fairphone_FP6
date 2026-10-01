@@ -396,9 +396,9 @@ mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
 servicemanager and share memfds with the allocator, and, as a `halclientdomain`, call
 hwservicemanager, read `hwservicemanager_prop` and find `hidl_manager_hwservice`. For CamX
 perf locks it may only make binder calls into the perf HAL (`vendor_hal_perf_default`):
-r9r logged no IPerf service lookup, so it is not a perf HAL client; if r9s shows a find
-denial on `vendor_hal_perf2_service` or `vendor_hal_perf_hwservice`, make it one with
-`hal_client_domain`. It may use the composer's release fences, read the public SoC id and
+a permissive boot logged no IPerf service lookup, so it is not a perf HAL client; if a find
+denial on `vendor_hal_perf2_service` or `vendor_hal_perf_hwservice` shows up, make it one
+with `hal_client_domain`. It may use the composer's release fences, read the public SoC id and
 search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelled in
 `camera/genfs_contexts`). Denied: the display QService and display-config lookups
 (IDisplayConfig would expose brightness, power mode and writeback capture),
@@ -415,6 +415,5 @@ Omitted: the TCL algorithm service and its data and dump directories, secure cam
 (QSEECom/TEE, protected heaps, VM memory-buffer nodes, ssgtzd), the AON service, factory
 OTP/OIS sysfs (`fp_mmitest_sysfs`), persist writes and QRTR ioctls. The file contexts restore
 three upstream `generic/vendor/common/file_contexts` entries (lines 317, 348, 440). The
-upstream files to reduce from are listed in the camera review
-(`upstream-sepolicy-needed.txt`); until they are imported there is no provenance entry.
+upstream files to reduce from are not imported, so there is no provenance entry.
 These rules are not yet runtime-qualified under enforcing mode.

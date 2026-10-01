@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Audio for private bring-up: the stock AudioReach userspace (primary HAL, PAL,
+# Audio for bring-up: the stock AudioReach userspace (primary HAL, PAL,
 # AGM, graph services, calibration and configuration) comes from the selected
 # stock vendor files. The AOSP audio service, HIDL adapters, effects and
 # interface libraries are built from source. Sound trigger, Bluetooth audio,

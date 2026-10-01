@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Camera for private bring-up: the stock Qualcomm CamX/CHI provider, its
+# Camera for bring-up: the stock Qualcomm CamX/CHI provider, its
 # Qualcomm components and algorithms, the FP6 sensor module and tuning data,
 # the ICP firmware and the CDSP skeletons come from the selected stock vendor
 # files (vendor/fairphone/FP6). The AOSP camera interfaces, the HIDL shims and

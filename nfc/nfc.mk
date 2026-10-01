@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# NFC for private bring-up: the stock Samsung S3NRN4V HAL
+# NFC for bring-up: the stock Samsung S3NRN4V HAL
 # (android.hardware.nfc-service.sec, nfc_nci_sec.so), its configuration,
 # RF register files and controller firmware come from the selected stock
 # vendor files. The NFC AIDL/HIDL interface libraries it links are built from

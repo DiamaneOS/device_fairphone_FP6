@@ -28,3 +28,10 @@ hal_client_domain(hal_sensors_default, hal_graphics_allocator)
 # presence property.
 allow hal_sensors_default device:dir r_dir_perms;
 get_prop(hal_sensors_default, vendor_qc_aon_prop)
+
+# The Qualcomm sub-HAL publishes every proximity sample as
+# vendor.fp.psensor.rawdata, a factory-test value nothing in this build reads.
+# Its only other set clears a debug switch (vendor.slpi.ssrsimulate) that
+# nothing sets. The set stays denied; not auditing it avoids up to 18 audit
+# records a second while the proximity sensor is on.
+dontaudit hal_sensors_default property_socket:sock_file write;

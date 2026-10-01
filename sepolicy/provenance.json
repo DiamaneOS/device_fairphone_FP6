@@ -451,7 +451,7 @@
       "source": "qva/vendor/common/genfs_contexts",
       "source_sha256": "5dcda7d4ef4587b0bd224a45cebf0db13a8992bced0e0b025bd0f2574eadbfe7",
       "path": "qva-common/genfs_contexts",
-      "sha256": "5dcda7d4ef4587b0bd224a45cebf0db13a8992bced0e0b025bd0f2574eadbfe7"
+      "sha256": "c7154ab84093eea11bb20ef98ae85f1e28636a04d7b392fc666b36b7c150a96e"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1163,7 +1163,7 @@
       "source": "generic/vendor/common/hal_sensors_default.te",
       "source_sha256": "2cc63cb1f84e039c6a8c3f92469bf05e689078ef87345a15445931c7f1278410",
       "path": "fp6/hal_sensors_default.te",
-      "sha256": "f8249dbed8724e8e2fa33b6b50c748708d42d7e0ed21159eee1577cbc82a0fa5"
+      "sha256": "d17d8e08c66bebec36d3bb325d76f5b1a824a4d7ed4f209316b8b6ffcbdf5f3f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

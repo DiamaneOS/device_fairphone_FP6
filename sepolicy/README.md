@@ -50,7 +50,17 @@ Downstream adaptations:
   - Graphics: the in-process Adreno driver reads the GPU model (the Qualcomm
     domain grant) and its read-only graphics properties; `libllvm-qgl.so` is a
     same-process HAL library; the composer keeps state in
-    `/data/vendor/display`.
+    `/data/vendor/display`. The gralloc properties (`vendor.gralloc.*`) are
+    readable by the processes that map buffers, including the camera
+    provider, cameraserver and mediaserver; stock lets every domain read
+    them.
+  - Extcon: the DisplayPort and audio-codec extcon devices are
+    `sysfs_extcon`, which system_server reads to detect DisplayPort (HDMI)
+    and wired headsets. The imported per-index `vendor_sysfs_graphics` lines
+    for `msm-ext-disp` are removed from `qva-common/genfs_contexts`: extcon
+    numbers follow probe order, so they labelled whichever device got the
+    number, and no vendor service reads extcon. Stock instead lets
+    system_server write all of `vendor_sysfs_graphics`.
   - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
     and its heaps for the fingerprint HAL, each limited to the permissions the
     module used. The module registers a debug binder service with no caller
@@ -127,6 +137,68 @@ hardware functionality or complete least privilege. Remaining performance
 backend, firmware-handler and auxiliary-service decisions must be checked
 against the final selected product and first-boot evidence. Do not resolve a
 failure by importing stock policy wholesale or adding a permissive domain.
+
+## Denied on purpose
+
+Denials seen on enforcing boots that stay denied, each checked against what
+the process does without the access. Denials covered in the sections above
+are not repeated.
+
+- `hal_sensors_default`, `property_socket` write: the proximity raw-data
+  factory property; not audited (`fp6/hal_sensors_default.te`).
+- `hal_sensors_default`, append to `sensors_list.txt`: init owns the list.
+- `system_server`, extcon cable names of the EUD debug port (`sysfs`): no
+  cable type the framework uses.
+- `system_server` (InputReader), `max_brightness` of the haptics LED device
+  (`sysfs_leds`): it sits next to the chip's input device; reading it would
+  let InputReader treat the vibrator as a light.
+- `system_server`, `surfaceflinger`, `mediaserver`, `mediaswcodec` and apps,
+  `libubwcp.so` (`vendor_file`): the source-built mapper tries to load it on
+  first use, but UBWC-P support is compiled out, so it would never be used.
+- `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not set
+  on this build; CamX uses the public SoC id file. As stock.
+- `hal_bluetooth_default`, `hal_camera_default`, `vendor_hal_gnss_qti`,
+  `ro.vendor.qti.va_aosp.support` and `va_odm.support`
+  (`vendor_exported_system_prop`, `vendor_exported_odm_prop`): not set on this
+  build, so a denied read returns the same default.
+- `hal_audio_default`, `rild`, `persist.vendor.pd_locater_debug`
+  (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable; stock
+  grants it only to the PD mapper.
+- `vendor_nicmd`, `property_socket` write and an `init.svc.*` read
+  (`init_service_status_private_prop`): the SHS and QMI-priority helpers it
+  starts and checks are not installed.
+- `vendor_nicmd`, `netlink_route_socket` `nlmsg_readpriv`: seen after a Wi-Fi
+  change; stock does not grant it either.
+- `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
+  nodes of the other UFS LUNs: it probes them at start; stock grants read on
+  the block devices but never open, and labels none of those BSG nodes.
+- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service` and
+  `netstats_service` (and `content_capture` for the bridge): lookups every app
+  process makes at start (ActivityThread's GraphicsEnvironment setup, for GPU
+  driver statistics, and TrafficStats.init). Platform apps get them through
+  `app_api_service`; these two domains have no graphics and keep no traffic
+  statistics, and the framework continues when the lookup returns nothing
+  (calls and Wi-Fi calling work with both denied).
+- `hal_audio_default`, `read append` on `/sys/power/wake_lock`
+  (`sysfs_wake_lock`), once per boot: PAL's `ResourceManager::initWakeLocks`
+  opens the wake-lock nodes at start. Every PAL call of `acquireWakeLock` and
+  `releaseWakeLock` is in sound trigger (`StreamSoundTrigger`,
+  `SoundTriggerEngineGsl`; disassembly of the shipped `libar-pal.so`), which is
+  not shipped. Playback with the screen off is kept awake by audioserver's own
+  wake lock through the framework, and a call's audio runs between the modem
+  and the audio DSP, so neither needs it. Stock grants it to the whole
+  `hal_audio` attribute (`wakelock_use`).
+- `platform_app` and `system_app`, the absent Google wireless-charger service.
+- `platform_app` (SystemUI), `read` of `bluetooth_lea_prop`: SettingsLib's
+  `BluetoothUtils.isAudioSharingSupported` reads
+  `persist.bluetooth.leaudio_dynamic_switcher.mode`, which the platform lets
+  only `bluetooth`, `system_app` and `gmscore_app` read. The property
+  is not set on this build, so the denied read returns the same default.
+  Platform app policy, as on other GrapheneOS devices; nothing added for apps.
+- `untrusted_app`: sandboxed Google Play and other apps probing the device
+  (adb properties, `/proc`, `/sys`, `selinuxfs`, the root and `/dev`
+  directories, the wallet property, cgroups). Intended.
+- `shell` and `su`: only the commands used to capture logs.
 
 ## Recovery ownership
 

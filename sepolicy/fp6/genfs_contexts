@@ -25,3 +25,9 @@ genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-
 genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/gain u:object_r:vendor_sysfs_aw_vibrator:s0
 genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/loop u:object_r:vendor_sysfs_aw_vibrator:s0
 genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/seq u:object_r:vendor_sysfs_aw_vibrator:s0
+# Extcon cable names and states that system_server reads for DisplayPort
+# (HDMI) and wired-headset detection (platform sysfs_extcon). They replace the
+# imported per-index vendor_sysfs_graphics lines, which matched whichever
+# extcon device got that number. The EUD debug port's extcon stays unlabelled.
+genfscon sysfs /devices/platform/soc/soc:qcom,msm-ext-disp/extcon u:object_r:sysfs_extcon:s0
+genfscon sysfs /devices/platform/soc/soc:spf_core_platform/soc:spf_core_platform:lpass-cdc/wcd9378-codec/extcon u:object_r:sysfs_extcon:s0

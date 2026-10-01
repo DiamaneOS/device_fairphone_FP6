@@ -6,12 +6,13 @@
 # ro.vendor.graphics.memory, vendor.debug.egl.*).
 allow { domain -isolated_app_all } vendor_sysfs_kgsl:dir search;
 allow { domain -isolated_app_all } vendor_sysfs_kgsl_gpu_model:file r_file_perms;
-# mediaserver (MediaRecorder/MediaPlayer) also loads the gralloc mapper but is
-# left out: the only vendor.gralloc.* value set (disable_ubwc=0) equals the
-# mapper's default, so a denied read changes nothing. Add mediaserver here in
-# the same change that sets any vendor.gralloc.* property to a non-default
-# value, so its buffer layout matches the allocator's.
+# The camera provider, cameraserver and mediaserver (MediaRecorder,
+# MediaPlayer) map camera and video buffers through the same mapper, which
+# reads vendor.gralloc.* again for every buffer: denied, that was over a
+# thousand audit records per camera session. Stock lets every domain read
+# these properties; here only the processes that map buffers may.
 get_prop({ appdomain -isolated_app_all zygote system_server bootanim surfaceflinger mediaswcodec
+           cameraserver mediaserver hal_camera_default
            hal_graphics_allocator_default hal_graphics_composer_default }, vendor_gralloc_prop)
 get_prop({ appdomain -isolated_app_all zygote system_server bootanim surfaceflinger mediaswcodec
            hal_graphics_allocator_default hal_graphics_composer_default }, vendor_public_vendor_default_prop)

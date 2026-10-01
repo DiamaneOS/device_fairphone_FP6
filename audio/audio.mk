@@ -139,3 +139,10 @@ PRODUCT_VENDOR_PROPERTIES += \
 # playback or call audio.
 PRODUCT_VENDOR_PROPERTIES += \
     audio.timecheck.timeout_duration_ms=8000
+
+# As stock: tracks of 30 s or longer (instead of 60 s) play through the
+# power-saving offload path, and AudioService tells the HAL about screen
+# rotation so the stereo speakers' left and right follow the screen.
+PRODUCT_VENDOR_PROPERTIES += \
+    audio.offload.min.duration.secs=30 \
+    ro.audio.monitorRotation=true

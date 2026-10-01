@@ -7,8 +7,8 @@
 # Fairphone signature here, so they are selected by that signer
 # (mac_permissions.xml), their package or process name and isPrivApp=true (both
 # packages are installed as privileged system apps, so a newly installed
-# app never matches; only a same-signature update of one of them would, see
-# spec.md risks). Each app gets its own domain. Our own call-audio bridge is
+# app never matches; only a same-signature update of one of them would).
+# Each app gets its own domain. Our own call-audio bridge is
 # selected by package name only; it is signed with our key.
 user=_app seinfo=fp6_stock_platform isPrivApp=true name=org.codeaurora.ims domain=vendor_qtelephony type=app_data_file levelFrom=all
 user=_app seinfo=fp6_stock_platform isPrivApp=true name=com.qualcomm.qti.lpa domain=fp6_qti_lpa_app type=app_data_file levelFrom=all

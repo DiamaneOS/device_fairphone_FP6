@@ -5,7 +5,7 @@
 # Drafted from the stock compiled vendor policy (vendor_sepolicy.cil, rules for
 # hal_bluetooth_default and hal_bluetooth). Before enforcing, reduce it from
 # Qualcomm generic/vendor/common/hal_bluetooth_default.te at sepolicy_vndr
-# 67fa928 (local copy in the policy candidate, sepolicy/README.md).
+# 67fa928 (sepolicy/README.md).
 # Platform policy already covers the HIDL service registration, binder with
 # the Bluetooth app, wake locks, NET_ADMIN and the HCI UART (/dev/ttyHS0 is
 # hci_attach_dev; stock grants no vendor rule for it).

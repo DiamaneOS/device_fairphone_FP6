@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Bluetooth for private bring-up (stock-first). The selected stock vendor files
+# Bluetooth for bring-up (stock-first). The selected stock vendor files
 # supply the Qualcomm HIDL HCI service (android.hardware.bluetooth@1.1-service-qti)
 # and its link closure; manifest.xml declares IBluetoothHci. The AOSP HCI
 # interfaces are built from source through the renderer's SOURCE_INTERFACES.
@@ -60,4 +60,4 @@ PRODUCT_VENDOR_PROPERTIES += \
 # - persist.vendor.bluetooth.alt_path_for_fw: firmware from /data.
 #
 # HFP audio gateway stays enabled so headsets connect with their call profile;
-# SCO audio is not validated in r9p (spec.md, Bluetooth audio).
+# SCO audio is not validated.

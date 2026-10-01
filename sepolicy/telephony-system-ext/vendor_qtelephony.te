@@ -2,8 +2,8 @@
 # Copyright 2026 The DiamaneOS Project
 # Domain of the stock Qualcomm IMS app (org.codeaurora.ims). The type is
 # declared by the imported system-ext-public/domain.te. Reduced from Qualcomm
-# sepolicy @ fea28791cc44cce15c7bd4cd94722796e4644735 generic/private/qtelephony.te
-# (local copy in artifacts/vendor-work/fp6-policy-candidate-v3). Omitted:
+# sepolicy @ fea28791cc44cce15c7bd4cd94722796e4644735 generic/private/qtelephony.te.
+# Omitted:
 # networking (the app requests no INTERNET), HIDL (it uses the AIDL QCRIL
 # services), AT-command forwarding, diag, camera/media/DRM services (video
 # calls), the DPM socket (data policy manager not installed) and the

@@ -20,8 +20,8 @@ through a separate system_ext daemon and application identity. It does not add
 CNE, change modem NV settings or replace the PDN broker. The daemon only sends
 the bounded, reviewed status/settings/subscription messages; it does not advertise
 unimplemented scan, quality-measurement or keepalive capabilities. Cold-start
-reconciliation and complete carrier behavior remain private-candidate
-qualification requirements; this configuration is not a release acceptance claim.
+reconciliation and complete carrier behavior remain qualification
+requirements; this configuration is not a release acceptance claim.
 
 The vendor generator supplies the exact stock APN table and carrier XML assets.
 The source CarrierConfig fork consumes that data; the stock carrier-service APK
@@ -42,4 +42,4 @@ neverallows, seapp matching and installed permissions. Then use the IMS reposito
 read-only checker with `--iwlan qti`. Presence checks and host simulations do not
 establish registration, handover, call audio or emergency/location delivery.
 Test ordinary calls, SMS and Wi-Fi calling on both SIMs; keep emergency simulations
-separate from any future carrier-authorized observations.
+separate from carrier-authorized observations.

@@ -4,9 +4,8 @@
 # hal_telephony server; the platform policy covers the AOSP radio HAL services).
 # Reduced from Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
 # generic/vendor/common/rild.te, qva/vendor/common/rild.te,
-# generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te
-# (local copies in artifacts/vendor-work/fp6-policy-candidate-v3, hashes in
-# upstream-sepolicy-needed.txt). Omitted: diag and debug properties, executing
+# generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te.
+# Omitted: diag and debug properties, executing
 # vendor tools (voice-call logging), the time and SSG TrustZone daemons, the
 # legacy MSM IPC-router socket ioctls, the secure-element HAL, the
 # data-factory services, the IMS factory client, the

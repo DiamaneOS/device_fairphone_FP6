@@ -27,7 +27,7 @@ extern "C" binder_exception_t AServiceManager_addService(AIBinder* binder, const
 
 int main() {
     // No extra pool threads of our own. The FocalTech module starts a service
-    // thread that joins the binder pool as well (r9o: ISession calls arrive on
+    // thread that joins the binder pool as well (ISession calls arrive on
     // it), so requests can run concurrently; Session serialises every module
     // call (moduleMutex).
     ABinderProcess_setThreadPoolMaxThreadCount(0);

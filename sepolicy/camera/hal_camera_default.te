@@ -7,7 +7,7 @@
 # domain only. The platform hal_camera/hal_camera_default policy already covers
 # the V4L2/media nodes (video_device), gralloc, the GPU node, cameraserver IPC
 # and the provider service registration. Replace with the reduced upstream
-# sepolicy_vndr files listed in upstream-sepolicy-needed.txt when fetched.
+# sepolicy_vndr files when they are imported.
 #
 # Not granted (stock grants them for features this product does not install):
 # the TCL algorithm service and its data/dump directories, secure camera
@@ -34,8 +34,8 @@ allow hal_camera_default vendor_ubwcp_device:chr_file r_file_perms;
 # - vendor_qdsp_device (/dev/adsprpc-smd): the CDSP channel is non-secure with
 #   unsigned support (adsprpc.c lines 3211-3213) and serves the FastCV, BitML,
 #   HME, MCTF and ML-AWB offloads when libcdsprpc falls back to it.
-# Read-only opens, as stock (CIL 4693, 4724). Keep only the node the r9p
-# provider actually holds open (see spec.md section 13) before enforcing.
+# Read-only opens, as stock (CIL 4693, 4724). Keep only the node the
+# provider actually holds open before enforcing.
 allow hal_camera_default { vendor_qdsp_device vendor_xdsp_device }:chr_file r_file_perms;
 r_dir_file(hal_camera_default, adsprpcd_file)
 get_prop(hal_camera_default, vendor_adsprpc_prop)
@@ -65,9 +65,10 @@ hal_client_domain(hal_camera_default, hal_graphics_allocator)
 # fences in capture requests from cameraserver.
 allow hal_camera_default hal_graphics_composer_default:fd use;
 
-# CamX perf locks (launch, snapshot, recording): r9r logged only the binder
-# call into the perf HAL, no IPerf service lookup. If r9s shows a find denial
-# on vendor_hal_perf2_service or vendor_hal_perf_hwservice, replace this with
+# CamX perf locks (launch, snapshot, recording): a permissive boot logged only
+# the binder call into the perf HAL, no IPerf service lookup. If a find denial
+# on vendor_hal_perf2_service or vendor_hal_perf_hwservice shows up, replace
+# this with
 # hal_client_domain(hal_camera_default, vendor_hal_perf); the platform
 # neverallow permits that lookup only for client members.
 binder_call(hal_camera_default, vendor_hal_perf_default)

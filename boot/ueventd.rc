@@ -173,7 +173,7 @@ firmware_directories /vendor/firmware_mnt/image/
 # (line 222); only the camera group needs it here, read-only (the stock
 # provider, uid cameraserver, could only open it through the read bit). The
 # secure node keeps its 0640 system media rule; the camera provider reaches it
-# through its media group (reviewed provider rc, tools-edits.md section 7).
+# through its media group (reviewed provider rc).
 /dev/adsprpc-smd          0640   system     camera
 # VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc made
 # it 0666 system; only the camera group needs it.

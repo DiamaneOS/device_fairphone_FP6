@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony for private bring-up: the stock Qualcomm radio daemon (qcrilNrd),
+# Telephony for bring-up: the stock Qualcomm radio daemon (qcrilNrd),
 # its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
 # stock eSIM LPA (com.qualcomm.qti.lpa, disabled by default) come from the
 # selected stock files (vendor/fairphone/FP6). The call-audio bridge between the

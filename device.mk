@@ -120,11 +120,12 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.qti_recovery
 
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
-# its interface repositories; OP-DISPLAY-HAL-SOURCE). The stock Android 14
+# its interface repositories). The stock Android 14
 # composer failed to present under Android 17 when tried without
 # libsdmextension and is untested with it; source is kept so we can patch and
 # harden the code that handles every app's buffers. Configuration values follow
-# LineageOS for 6.1-kernel platforms; stock declares a wide-colour panel.
+# the usual setup for Qualcomm 6.1-kernel platforms; stock declares a
+# wide-colour panel.
 $(call soong_config_set,qtidisplay,default,true)
 $(call soong_config_set,qtidisplay,drmpp,true)
 $(call soong_config_set,qtidisplay,gralloc4,true)
@@ -165,8 +166,8 @@ PRODUCT_PACKAGES += libtxml2v34
 # Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
 # driver; the vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
 # fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
-# (BoardConfig.mk). Station mode only: hostapd (hotspot) is deferred until
-# station mode is validated, and the stock cnss-daemon is not selected.
+# (BoardConfig.mk). Station mode only: hostapd (hotspot) is not shipped, and the
+# stock cnss-daemon is not selected.
 PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom/wlan/cld80211-lib \
     hardware/qcom/wlan/qcwcn
@@ -185,8 +186,8 @@ PRODUCT_COPY_FILES += \
 # Audio: the stock AudioReach userspace with AOSP source adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
-# r9p hardware bring-up (reviews/OP-HW-BRINGUP-2026-09-25). Each subsystem
-# makefile documents its stock and source-built parts.
+# Hardware bring-up. Each subsystem makefile documents its stock and
+# source-built parts.
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
 $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)

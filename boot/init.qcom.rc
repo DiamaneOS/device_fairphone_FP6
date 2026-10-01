@@ -64,7 +64,7 @@ on post-fs-data
     mkdir /data/vendor/tombstones 0771 system system
     # Unlike stock, no /data/vendor/tombstones/rfs: remote-processor error logs
     # are not written to /data (the /vendor/rfs/*/*/ramdumps links are not
-    # installed either; see the modem review).
+    # installed either).
     # The Awinic haptics nodes the vibrator HAL writes to play the chip's RAM
     # waveforms (vendor_sysfs_aw_vibrator). Unlike stock, raw waveform
     # streaming (rtp) and the unused trigger, state, index and activate_mode

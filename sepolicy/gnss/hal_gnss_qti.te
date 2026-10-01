@@ -5,7 +5,7 @@
 # Drafted from the stock compiled policy (vendor_sepolicy.cil lines 4914-4953
 # and 8128-8141) and reduced to the selected closure. Before enforcing, reduce
 # it from Qualcomm generic/vendor/common/hal_gnss_qti.te at sepolicy_vndr
-# 67fa928 (local copy in the policy candidate).
+# 67fa928.
 # Not granted, because their peers are not installed: peripheral manager and
 # vndbinder (liblbs_core, XTRA service), the location daemons' sockets
 # (loc_launcher, xtra-daemon, lowi-server, xtwifi-client, slim_daemon,
@@ -14,7 +14,7 @@
 # servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
 # domains without such vendor rules (vendor_hal_gatekeeper_qti,
 # vendor_hal_keymint_qti) register on stock, so the platform hal server rules
-# cover it; confirm with the builder's policy compile and on-device denials
+# cover it; confirm with a policy compile and on-device denials
 # before enforcing.
 type vendor_hal_gnss_qti, domain;
 type vendor_hal_gnss_qti_exec, exec_type, vendor_file_type, file_type;

@@ -207,6 +207,19 @@ $(call inherit-product, device/fairphone/FP6/media/media.mk)
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 
+# The SoC maker and model apps read through Build.SOC_MANUFACTURER and
+# Build.SOC_MODEL, as stock (which sets the model at boot from the SoC id;
+# both FP6 SoC ids are SM7635).
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.soc.manufacturer=QTI \
+    ro.soc.model=SM7635
+
+# Stock's two ANGLE workarounds for this GPU, used where ANGLE renders
+# (Vanadium, WebView, per-app ANGLE): linear filtering for YUV video textures
+# and pass-through for an unspecified colour space.
+PRODUCT_VENDOR_PROPERTIES += \
+    debug.angle.feature_overrides_enabled=preferLinearFilterForYUV:mapUnspecifiedColorSpaceToPassThrough
+
 # The FP6 panel is 1116x2484 at 480 dpi on stock Android 16. Without an
 # explicit density, Android 17 chooses 213 dpi and renders the UI too small.
 # A panel property, so it belongs to the vendor partition.
@@ -349,6 +362,13 @@ PRODUCT_COPY_FILES += \
     $(foreach f,accelerometer barometer compass dynamic.head_tracker gyroscope light proximity stepcounter stepdetector, \
         frameworks/native/data/etc/android.hardware.sensor.$(f).xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.$(f).xml)
 
+# As stock: filter magnetometer samples (the sub-HAL's default is off), and do
+# not offer sensor direct channels, which stock never enabled (the sub-HAL's
+# default is on). vendor_init may set them (sepolicy/fp6/platform.te).
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.sensors.enable.mag_filter=true \
+    persist.vendor.sensors.support_direct_channel=false
+
 # Match the trusted-execution backend selected by the authenticated stock image.
 PRODUCT_VENDOR_PROPERTIES += vendor.gatekeeper.is_security_level_spu=0
 
@@ -386,6 +406,11 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.usb.use_gadget_hal=1 \
     vendor.usb.rndis.func.name=rndis \
     vendor.usb.ncm.func.name=ncm
+
+# MTP cancels pending transfers in one batch, as stock. On the DWC3 controller,
+# cancelling them one by one fails after the first, which by the code aborts
+# PC-to-phone copies of 4 GB or more (not yet tested on the phone).
+PRODUCT_VENDOR_PROPERTIES += sys.usb.mtp.batchcancel=1
 
 # USB tethering over NCM, as Pixels: Tethering defaults to RNDIS, which this
 # kernel does not build. With the overlay the gadget HAL links ncm.gs6 (created

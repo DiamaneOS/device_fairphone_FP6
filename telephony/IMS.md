@@ -33,8 +33,8 @@ through a separate system_ext daemon and application identity. It does not add
 CNE, change modem NV settings or replace the PDN broker. The daemon only sends
 the bounded, reviewed status/settings/subscription messages; it does not advertise
 unimplemented scan, quality-measurement or keepalive capabilities. Cold-start
-reconciliation and complete carrier behavior remain private-candidate
-qualification requirements; this configuration is not a release acceptance claim.
+reconciliation and complete carrier behavior remain qualification
+requirements; this configuration is not a release acceptance claim.
 
 The vendor generator supplies the exact stock APN table and carrier XML assets.
 The source CarrierConfig fork consumes that data; the stock carrier-service APK
@@ -46,13 +46,18 @@ neither IMS transport nor AML, and cannot replace mandatory carrier push support
 
 RTT capabilities follow the stock TeleService overlay. Emergency routing remains
 in the maintained Android telephony/Telecom stack and the selected radio/IMS
-implementation. No new emergency-number list, local fallback heuristic, location
-recipient or forced provisioning state is introduced. Existing GNSS/SUPL and
-modem emergency-location paths retain their selected configuration; AML is absent.
+implementation; no new emergency-number list, local fallback heuristic,
+location recipient or forced provisioning state is added. Existing GNSS/SUPL
+and modem emergency-location paths keep their selected configuration; AML is
+absent.
 
-Before a phone test, build and check AIDL, VINTF, JNI linking, UID uniqueness,
-neverallows, seapp matching and installed permissions. Then use the IMS repository's
-read-only checker with `--iwlan qti`. Presence checks and host simulations do not
-establish registration, handover, call audio or emergency/location delivery.
-Test ordinary calls, SMS and Wi-Fi calling on both SIMs; keep emergency simulations
-separate from any future carrier-authorized observations.
+## Checks
+
+1. Build and check AIDL, VINTF, JNI linking, UID uniqueness, neverallows,
+   seapp matching and installed permissions.
+2. Run the IMS repository's read-only checker with `--iwlan qti`.
+3. On the phone, test ordinary calls, SMS and Wi-Fi calling on both SIMs. Keep
+   emergency simulations separate from carrier-authorized observations.
+
+Presence checks and host simulations do not establish registration, handover,
+call audio or emergency/location delivery.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "kernel_workspace": "FP6 CodeLinaro kernel workspace (kernel_manifest-fp6 r9s): msm-kernel is kernel_qcom_msm-6.1 50d0244, display-drivers kernel_qcom_display 9574dc7, securemsm-kernel kernel_qcom_securemsm 1ee0ba2",
+  "kernel_workspace": "FP6 CodeLinaro kernel workspace (kernel_manifest-fp6): msm-kernel is kernel_qcom_msm-6.1 50d0244, display-drivers kernel_qcom_display 9574dc7, securemsm-kernel kernel_qcom_securemsm 1ee0ba2",
   "note": "First generated from the pre-migration trees (msm-kernel kernel_fairphone_qcom 61e9f54, display-drivers a3519ad, securemsm-kernel 171b160). Regenerated from the pins above on 2026-09-26: every header is byte-identical. The UAPI sources and headers_install.sh are the same blobs; unifdef.c only renames a variable (msm-kernel d8780220, 'scripts/unifdef: avoid constexpr keyword'). Regenerate and compare at every kernel intake.",
   "generator": {
     "script": "kernel_platform/msm-kernel/scripts/headers_install.sh",

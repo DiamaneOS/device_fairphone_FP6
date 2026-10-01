@@ -3,10 +3,9 @@
 # nicmd (network interface control manager) configures the rmnet data
 # interfaces for modem data calls. Stock nicmd.rc starts it as root (no user
 # line); it drops privileges itself. The rendered nicmd.rc bounds it to the
-# capabilities below (tools-edits.md, TELEPHONY_CONFIG_REWRITES). Reduced from
+# capabilities below (TELEPHONY_CONFIG_REWRITES in the tools). Reduced from
 # Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
-# generic/vendor/common/nicmd.te (local copy in
-# artifacts/vendor-work/fp6-policy-candidate-v3). Omitted: the SHS,
+# generic/vendor/common/nicmd.te. Omitted: the SHS,
 # QMI-priority and performance helpers (shsusrd, qmipriod, perf HAL and their
 # properties), the legacy MSM IPC-router socket and ioctls, the HIDL
 # netd service (the daemon links only the AIDL netd interface), diag, the

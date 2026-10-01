@@ -1187,7 +1187,7 @@
       "source": "generic/vendor/common/ssr_setup.te",
       "source_sha256": "e640747756a5515fce30d954f4b3c98690c69130ec35ab436794c9efd15e1486",
       "path": "modem/ssr_setup.te",
-      "sha256": "ab55fe177e93a1131a0f351927b31b0799c92a596767eba3acf536290c2fc785"
+      "sha256": "74ab6d8f01be5d39bae21f954873797c39720530d5818874552e25c454400575"
     }
   ]
 }

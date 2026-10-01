@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# GNSS for private bring-up. The GNSS engine runs in the modem, so GNSS works
+# GNSS for bring-up. The GNSS engine runs in the modem, so GNSS works
 # only while the modem runs (modem packet; pm-proxy keeps the modem vote). The
 # stock Qualcomm GNSS HAL (android.hardware.gnss IGnss v3) and the location
 # libraries it links or loads come from the selected stock vendor files

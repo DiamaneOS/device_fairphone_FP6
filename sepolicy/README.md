@@ -42,11 +42,11 @@ Downstream adaptations:
     diag, sysrq, SLPI/SSR sysfs, HID or persist writes from the HAL; it reads
     persist/sensors. `sensors_list.txt`, the sensor types the HAL waits for at
     start, has its own label (`vendor_persist_sensors_list_file`), and init
-    writes it at every boot with the stock list minus the hall sensor: the HAL
-    never removes an entry, and the stock list names a hall sensor this
-    build's sensor core never reports, which held the HAL, and system_server
-    with it, for 8 s at every boot. Stock lets the HAL write all of
-    persist/sensors instead.
+    copies it from vendor at every boot with the stock list minus the hall
+    sensor: the HAL never removes an entry, and the stock list names a hall
+    sensor this build's sensor core never reports, which held the HAL, and
+    system_server with it, for 8 s at every boot. Stock lets the HAL write all
+    of persist/sensors instead.
   - Graphics: the in-process Adreno driver reads the GPU model (the Qualcomm
     domain grant) and its read-only graphics properties; `libllvm-qgl.so` is a
     same-process HAL library; the composer keeps state in

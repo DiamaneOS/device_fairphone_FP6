@@ -58,12 +58,13 @@ prebuilt_etc {
 
 // Status reporting (every audioserver change once and in order, the current
 // status again after each registration, never a stale one) and the retries in
-// the audioserver recovery window.
+// the audioserver recovery window, plus bounded per-registration parameter work.
 java_test_host {
     name: "FP6CallAudioHostTests",
     srcs: [
         "src/de/diamaneos/callaudio/Recovery.java",
         "src/de/diamaneos/callaudio/StatusRelay.java",
+        "src/de/diamaneos/callaudio/ParameterBudget.java",
         "tests/src/**/*.java",
     ],
     static_libs: ["junit"],

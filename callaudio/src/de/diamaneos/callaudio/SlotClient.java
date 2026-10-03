@@ -26,12 +26,15 @@ import vendor.qti.hardware.radio.am.IQcRilAudioResponse;
 import java.util.NoSuchElementException;
 
 /**
- * One radio-daemon client (IQcRilAudio/slotN). Everything for the slot runs in order on its own
- * thread: registration, re-registration after the daemon dies, setError reports, and the
- * daemon's requests. The daemon's oneway calls reach the request binder one at a time and are
+ * One radio-daemon client (IQcRilAudio/slotN). Registration, re-registration after the daemon
+ * dies, setError reports, and accepted parameter work run in order on the slot's own thread.
+ * The daemon's oneway calls reach the request binder one at a time and are
  * queued here in that order, so a slot's call-state changes reach AudioFlinger in the order the
  * daemon sent them. The parameter strings (vsid, call_state, call_type, crs_call,
  * isCRSsupported) are passed through unchanged and never logged; the daemon chooses the vsid.
+ * Pending/running payloads are bounded per registration. Overflow replies use that
+ * registration's oneway endpoint without adding Handler work; an overfull registration
+ * that has not yet published its endpoint is revoked and retried.
  */
 final class SlotClient implements AudioServerMonitor.Listener {
     private static final long RECONNECT_MS = 1000;
@@ -125,8 +128,9 @@ final class SlotClient implements AudioServerMonitor.Listener {
         death = d;
         service = IQcRilAudio.Stub.asInterface(b);
         try {
-            next.response = service.setRequestInterface(next);
-            if (next.response == null) throw new RemoteException();
+            IQcRilAudioResponse returned = service.setRequestInterface(next);
+            if (returned == null) throw new RemoteException();
+            next.publishResponse(returned);
         } catch (RemoteException | RuntimeException e) {
             Log.w(TAG, "slot " + slot + ": registration failed");
             clear();
@@ -230,20 +234,70 @@ final class SlotClient implements AudioServerMonitor.Listener {
     /** Called by the radio daemon on binder threads; queued in arrival order. */
     private final class Request extends IQcRilAudioRequest.Stub {
         private volatile boolean valid = true;
-        private IQcRilAudioResponse response; // Slot thread only; never belongs to a successor.
+        // Overflow replies run on the admitted binder caller's thread. Frozen replies are oneway.
+        private volatile IQcRilAudioResponse response; // Never belongs to a successor.
+        private final ParameterBudget budget = new ParameterBudget();
 
-        void invalidate() { valid = false; }
+        synchronized void invalidate() {
+            valid = false;
+            // Serialize with posting: a dead registration cannot retain queued strings.
+            handler.removeCallbacksAndMessages(this);
+            budget.close();
+        }
         boolean current() { return valid && !disposed && request == this; }
+
+        synchronized void publishResponse(IQcRilAudioResponse value) {
+            // Serialize publication with startup overflow, after registration IPC.
+            // Revocation must be visible to connect() before it accepts registration.
+            if (current()) response = value;
+        }
+
+        private synchronized boolean enqueue(int token, String params, boolean query) {
+            if (!current()) return true; // Stale registrations have no response obligation.
+            ParameterBudget.Reservation reserved = budget.acquire(params == null ? 0 : params.length());
+            if (reserved == null) return false;
+            boolean posted = handler.postAtTime(() -> {
+                try (reserved) {
+                    if (query) SlotClient.this.queryParameters(this, token, params);
+                    else SlotClient.this.setParameters(this, token, params);
+                }
+            }, this, SystemClock.uptimeMillis());
+            if (!posted) reserved.close();
+            return posted;
+        }
+
+        private void rejected(int token, boolean query) {
+            final IQcRilAudioResponse r;
+            synchronized (this) {
+                if (!current()) return;
+                r = response;
+                if (r == null) {
+                    // A flooding registration has not returned its reply endpoint yet.
+                    // Revoke it rather than retain unbounded failed tokens or pretend
+                    // its startup succeeded. connect() retries after that call returns.
+                    invalidate();
+                    Log.w(TAG, "slot " + slot + ": registration exceeded pending audio budget");
+                    return;
+                }
+            }
+            try {
+                if (query) r.queryParametersResponse(token, "");
+                else r.setParametersResponse(token, AudioError.GENERIC_FAILURE);
+            } catch (RemoteException ignored) {
+                // Registration death handles reconnection; no payload is logged.
+            }
+        }
+
         @Override
         public void setParameters(int token, String params) {
             if (Binder.getCallingUid() != Process.PHONE_UID || !current()) return;
-            handler.post(() -> SlotClient.this.setParameters(this, token, params));
+            if (!enqueue(token, params, false)) rejected(token, false);
         }
 
         @Override
         public void queryParameters(int token, String params) {
             if (Binder.getCallingUid() != Process.PHONE_UID || !current()) return;
-            handler.post(() -> SlotClient.this.queryParameters(this, token, params));
+            if (!enqueue(token, params, true)) rejected(token, true);
         }
 
         // The daemon can ask; the answers are the vendor's frozen version 1 (Android.bp).

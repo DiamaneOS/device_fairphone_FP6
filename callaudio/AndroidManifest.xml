@@ -25,5 +25,9 @@
         android:persistent="true"
         android:directBootAware="true"
         android:defaultToDeviceProtectedStorage="true"
-        android:allowBackup="false" />
+        android:allowBackup="false">
+        <!-- Audio parameters do not use physical sensors; proximity remains in Telecom. -->
+        <meta-data android:name="de.diamaneos.permission.NO_IMPLICIT_OTHER_SENSORS"
+            android:value="true" />
+    </application>
 </manifest>

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Sensors multi-HAL with the Qualcomm and dynamic sub-HALs. Reduced from the
+# Sensors multi-HAL with the Qualcomm sub-HAL. Reduced from the
 # pinned Qualcomm generic/vendor/common/hal_sensors_default.te: no diag,
 # sysrq, SLPI/SSR sysfs, persist writes or HID devices; QRTR without ioctls.
 
@@ -15,7 +15,6 @@ allow hal_sensors_default vendor_persist_sensors_list_file:file r_file_perms;
 
 get_prop(hal_sensors_default, vendor_sensors_prop)
 get_prop(hal_sensors_default, vendor_adsprpc_prop)
-get_prop(hal_sensors_default, vendor_dynamic_sensor_prop)
 
 # QMI to the ADSP sensor core over QRTR; the direct channel uses FastRPC on
 # the secure node and gralloc buffers.
@@ -24,10 +23,7 @@ allow hal_sensors_default vendor_xdsp_device:chr_file r_file_perms;
 allow hal_sensors_default dmabuf_system_heap_device:chr_file r_file_perms;
 hal_client_domain(hal_sensors_default, hal_graphics_allocator)
 
-# The dynamic-sensor sub-HAL watches /dev for HID sensors (listing only; no
-# device node access is granted). The Qualcomm sub-HAL reads the AON
-# presence property.
-allow hal_sensors_default device:dir r_dir_perms;
+# The Qualcomm sub-HAL reads the AON presence property.
 get_prop(hal_sensors_default, vendor_qc_aon_prop)
 
 # The Qualcomm sub-HAL publishes every proximity sample as

@@ -3,6 +3,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.diamaneos.callaudioboundarytests">
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- An unrelated, nonprivileged requester must not obtain the bridge's authority. -->
+    <uses-permission android:name="android.permission.DIAMANEOS_CONTROL_CALL_AUDIO" />
     <application android:testOnly="true">
         <meta-data android:name="de.diamaneos.permission.NO_IMPLICIT_OTHER_SENSORS"
             android:value="true" />

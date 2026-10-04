@@ -50,10 +50,12 @@ final class AudioServerMonitor {
     private long sequence; // Guarded by lock.
 
     AudioServerMonitor() {
-        status = ServiceManager.checkService(AUDIO_FLINGER) != null
+        this(ServiceManager.checkService(AUDIO_FLINGER) != null
                 ? AudioError.STATUS_OK
-                : AudioError.GENERIC_FAILURE;
+                : AudioError.GENERIC_FAILURE);
     }
+
+    AudioServerMonitor(int initialStatus) { status = initialStatus; }
 
     void start() {
         Thread thread = new Thread(this::watch, "CallAudioServer");

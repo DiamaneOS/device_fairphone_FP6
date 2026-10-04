@@ -11,8 +11,8 @@
 // DIAMANEOS_CONTROL_CALL_AUDIO, instead of MODIFY_AUDIO_ROUTING or phone-state access.
 //
 // Signing: no certificate property, so the build signs it with the default
-// application key, never the platform key. It is privileged only so that
-// seapp_contexts can select its domain by signer, package and privileged placement
+// application key, never the platform key. Privileged placement supports its
+// signer-bound domain and its one dedicated call-key permission
 // (sepolicy/telephony-system-ext/mac_permissions.xml and seapp_contexts). Its only privileged permission is the dedicated call-key authority, with an
 // explicit system_ext allowlist; it receives no broad routing or phone access.
 //

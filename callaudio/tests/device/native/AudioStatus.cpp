@@ -2,7 +2,7 @@
 // Copyright 2026 The DiamaneOS Project
 #include <jni.h>
 #include <media/AudioSystem.h>
-#include <nativehelper/ScopedUtfChars.h>
+#include <nativehelper/scoped_utf_chars.h>
 #include <utils/Errors.h>
 
 extern "C" JNIEXPORT jint JNICALL

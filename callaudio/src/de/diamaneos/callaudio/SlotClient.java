@@ -38,6 +38,14 @@ import java.util.NoSuchElementException;
  * that has not yet published its endpoint is revoked and retried.
  */
 final class SlotClient implements AudioServerMonitor.Listener {
+    interface Services {
+        boolean declared(String name);
+        IBinder lookup(String name);
+    }
+    private static final Services PLATFORM_SERVICES = new Services() {
+        public boolean declared(String name) { return ServiceManager.isDeclared(name); }
+        public IBinder lookup(String name) { return ServiceManager.checkService(name); }
+    };
     private static final long RECONNECT_MS = 1000;
     private static final long UNDECLARED_RETRY_MS = 60_000;
 
@@ -46,8 +54,12 @@ final class SlotClient implements AudioServerMonitor.Listener {
     private final AudioServerMonitor audioServer;
     private final HandlerThread thread;
     private final Handler handler;
+    private final Services services;
     private volatile Request request;
     private volatile boolean disposed;
+    private volatile boolean enabled;
+    private volatile Object activation = new Object();
+    private final Runnable reconnect = this::connect;
 
     // Slot thread only.
     private StatusRelay relay;
@@ -56,61 +68,84 @@ final class SlotClient implements AudioServerMonitor.Listener {
     private IBinder.DeathRecipient death;
 
     SlotClient(int slot, AudioServerMonitor audioServer) {
+        this(slot, audioServer, PLATFORM_SERVICES);
+    }
+
+    SlotClient(int slot, AudioServerMonitor audioServer, Services services) {
         this.slot = slot;
         instance = IQcRilAudio.DESCRIPTOR + "/slot" + slot;
         this.audioServer = audioServer;
+        this.services = services;
         thread = new HandlerThread("CallAudioSlot" + slot);
         thread.start();
         handler = new Handler(thread.getLooper());
     }
 
-    void start() {
-        handler.post(
-                () -> {
-                    if (disposed) return;
-                    long[] start = audioServer.addListener(this);
-                    if (disposed) { audioServer.removeListener(this); return; }
-                    relay = new StatusRelay((int) start[0], start[1]);
-                    connect();
-                });
+    void start() { setEnabled(true); }
+
+    /** Retain one serial worker per hardware slot across SIM-mode changes. */
+    void setEnabled(boolean value) {
+        if (disposed || enabled == value) return;
+        activation = new Object();
+        enabled = value;
+        if (!value) {
+            Request current = request;
+            if (current != null) current.invalidate();
+            audioServer.removeListener(this);
+            handler.removeCallbacks(reconnect);
+        }
+        handler.post(() -> {
+            if (!value) { audioServer.removeListener(this); clear(); return; }
+            if (disposed || !enabled) return;
+            audioServer.removeListener(this);
+            long[] snapshot = audioServer.addListener(this);
+            if (disposed || !enabled) { audioServer.removeListener(this); return; }
+            relay = new StatusRelay((int) snapshot[0], snapshot[1]);
+            scheduleReconnect(0);
+        });
     }
 
-    /** The slot is no longer active (single-SIM mode): drop the client, as stock. */
+    /** Final application teardown; ordinary SIM-mode changes only suspend. */
     void dispose() {
+        setEnabled(false);
         disposed = true;
-        Request current = request;
-        if (current != null) current.invalidate();
-        audioServer.removeListener(this);
         handler.post(this::clear);
         thread.quitSafely();
+    }
+
+    private void scheduleReconnect(long delay) {
+        handler.removeCallbacks(reconnect);
+        if (!disposed && enabled) handler.postDelayed(reconnect, delay);
     }
 
     @Override
     public void onAudioServerStatus(int status, long sequence) {
         handler.post(() -> {
-            if (!disposed && relay != null) send(relay.onAudioStatus(status, sequence));
+            if (!disposed && enabled && relay != null) send(relay.onAudioStatus(status, sequence));
         });
     }
 
     private void connect() {
-        if (disposed) return;
-        if (!ServiceManager.isDeclared(instance)) {
+        Object incarnation = activation;
+        if (!active(incarnation)) return;
+        if (service != null && request != null && request.current()) return;
+        if (!services.declared(instance)) {
             // Not declared, or this domain may not find it (isDeclared reports a denial as
             // false). Neither heals by itself, but the error repeats so that a log taken at the
             // time of a silent call shows it.
             Log.e(TAG, "slot " + slot + ": call-audio service not declared or not allowed;"
                     + " calls will have no audio");
-            handler.postDelayed(this::connect, UNDECLARED_RETRY_MS);
+            scheduleReconnect(UNDECLARED_RETRY_MS);
             return;
         }
         // Do not block disposal indefinitely while the radio daemon is absent.
-        IBinder b = ServiceManager.checkService(instance);
-        if (disposed) return;
+        IBinder b = services.lookup(instance);
+        if (!active(incarnation)) return;
         if (b == null) {
-            handler.postDelayed(this::connect, RECONNECT_MS);
+            scheduleReconnect(RECONNECT_MS);
             return;
         }
-        Request next = new Request();
+        Request next = new Request(incarnation);
         request = next;
         IBinder.DeathRecipient d = () -> {
             next.invalidate(); // Fence retries/queued work immediately on the binder thread.
@@ -122,12 +157,13 @@ final class SlotClient implements AudioServerMonitor.Listener {
             next.invalidate();
             if (request == next) request = null;
             // Right after a death servicemanager can still hand out the old binder.
-            handler.postDelayed(this::connect, RECONNECT_MS);
+            scheduleReconnect(RECONNECT_MS);
             return;
         }
         binder = b;
         death = d;
         service = IQcRilAudio.Stub.asInterface(b);
+        if (!next.current()) { clear(); scheduleReconnect(0); return; }
         try {
             IQcRilAudioResponse returned = service.setRequestInterface(next);
             if (returned == null) throw new RemoteException();
@@ -135,12 +171,12 @@ final class SlotClient implements AudioServerMonitor.Listener {
         } catch (RemoteException | RuntimeException e) {
             Log.w(TAG, "slot " + slot + ": registration failed");
             clear();
-            handler.postDelayed(this::connect, RECONNECT_MS);
+            scheduleReconnect(RECONNECT_MS);
             return;
         }
         if (!next.current()) {
             clear();
-            if (!disposed) handler.postDelayed(this::connect, RECONNECT_MS);
+            if (!disposed) scheduleReconnect(RECONNECT_MS);
             return;
         }
         Log.i(TAG, "slot " + slot + ": registered with the radio daemon");
@@ -156,7 +192,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
         if (b != binder || owner != request) return;
         clear();
         Log.w(TAG, "slot " + slot + ": radio daemon gone; waiting for it");
-        handler.post(this::connect);
+        scheduleReconnect(0);
     }
 
     private void clear() {
@@ -174,6 +210,10 @@ final class SlotClient implements AudioServerMonitor.Listener {
         death = null;
         service = null;
         if (relay != null) relay.onUnregistered();
+    }
+
+    private boolean active(Object incarnation) {
+        return !disposed && enabled && activation == incarnation;
     }
 
     private void send(int status) {
@@ -234,6 +274,8 @@ final class SlotClient implements AudioServerMonitor.Listener {
 
     /** Called by the radio daemon on binder threads; queued in arrival order. */
     private final class Request extends IQcRilAudioRequest.Stub {
+        private final Object incarnation;
+        Request(Object incarnation) { this.incarnation = incarnation; }
         private volatile boolean valid = true;
         // Overflow replies run on the admitted binder caller's thread. Frozen replies are oneway.
         private volatile IQcRilAudioResponse response; // Never belongs to a successor.
@@ -245,7 +287,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
             handler.removeCallbacksAndMessages(this);
             budget.close();
         }
-        boolean current() { return valid && !disposed && request == this; }
+        boolean current() { return valid && active(incarnation) && request == this; }
 
         synchronized void publishResponse(IQcRilAudioResponse value) {
             // Serialize publication with startup overflow, after registration IPC.

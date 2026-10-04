@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: Apache-2.0
+android_test {
+    name: "FP6CallAudioLifecycleTests",
+    srcs: ["src/**/*.java", ":FP6CallAudioJavaSources", ":FP6CallAudioAidlSources"],
+    manifest: "AndroidManifest.xml",
+    dont_merge_manifests: true,
+    platform_apis: true,
+    aidl: {
+        include_dirs: ["device/fairphone/FP6/callaudio/aidl"],
+        flags: ["--stability=vintf", "--structured", "--version=1",
+                "--hash=7807b67b5d557d9479da5c0f34c525bf48aaec90"],
+    },
+    static_libs: ["androidx.test.runner", "androidx.test.ext.junit"],
+    test_suites: ["device-tests"],
+}

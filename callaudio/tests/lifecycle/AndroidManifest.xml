@@ -1,0 +1,9 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.diamaneos.callaudiolifecycletests">
+    <application android:testOnly="true">
+        <meta-data android:name="de.diamaneos.permission.NO_IMPLICIT_OTHER_SENSORS" android:value="true" />
+    </application>
+    <instrumentation android:name="androidx.test.runner.AndroidJUnitRunner"
+        android:targetPackage="de.diamaneos.callaudiolifecycletests" />
+</manifest>

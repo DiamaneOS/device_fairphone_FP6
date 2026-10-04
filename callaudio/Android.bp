@@ -27,11 +27,14 @@
 // which the daemon can query on that callback. There is no aidl_interface
 // module on purpose: the interface is the vendor's, we only mirror it.
 
+filegroup { name: "FP6CallAudioJavaSources", srcs: ["src/**/*.java"] }
+filegroup { name: "FP6CallAudioAidlSources", srcs: ["aidl/**/*.aidl"] }
+
 android_app {
     name: "FP6CallAudio",
     srcs: [
-        "src/**/*.java",
-        "aidl/**/*.aidl",
+        ":FP6CallAudioJavaSources",
+        ":FP6CallAudioAidlSources",
     ],
     aidl: {
         local_include_dirs: ["aidl"],

@@ -27,6 +27,7 @@ public final class CallAudioApp extends Application {
 
     private final List<SlotClient> slots = new ArrayList<>(); // Main thread only.
     private AudioServerMonitor audioServer;
+    private int supportedSlots;
 
     @Override
     public void onCreate() {
@@ -35,6 +36,7 @@ public final class CallAudioApp extends Application {
         audioServer = new AudioServerMonitor();
         audioServer.start();
         TelephonyManager telephony = getSystemService(TelephonyManager.class);
+        supportedSlots = telephony.getSupportedModemCount();
         setSlotCount(telephony.getActiveModemCount());
         // A protected broadcast that the phone process sends; it only reaches exported receivers.
         registerReceiver(
@@ -51,15 +53,14 @@ public final class CallAudioApp extends Application {
                 RECEIVER_EXPORTED);
     }
 
-    /** Adds clients from the bottom and disposes them from the top, as stock. */
+    /** A slot keeps its serial worker when disabled, so an old registration cannot overtake a replacement. */
     private void setSlotCount(int count) {
+        count = Math.max(0, Math.min(count, supportedSlots));
         while (slots.size() < count) {
-            SlotClient slot = new SlotClient(slots.size() + 1, audioServer);
-            slots.add(slot);
-            slot.start();
+            slots.add(new SlotClient(slots.size() + 1, audioServer));
         }
-        while (slots.size() > count) {
-            slots.remove(slots.size() - 1).dispose();
+        for (int index = 0; index < slots.size(); index++) {
+            slots.get(index).setEnabled(index < count);
         }
     }
 }

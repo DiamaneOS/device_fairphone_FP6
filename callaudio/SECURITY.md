@@ -28,3 +28,10 @@ or network authority. Select the bridge, frameworks/base permission and framewor
 Native denial tests and ordinary calls/routing still need qualification after
 any bridge, AudioFlinger or HAL change. Release keys must be private; development
 test keys are public fixtures and cannot establish a production trust boundary.
+
+SIM-mode changes retain one serial worker per supported hardware slot. Disabling
+a slot revokes its activation identity and queued parameter ownership immediately;
+reenabling registers only after the previous physical registration has returned.
+A coalesced reconnect task and unique monitor listener avoid duplicate retries
+or accumulated listeners. The lifecycle fixture uses the actual Android worker
+with a local fake radio and no HAL/network/modem lookup.

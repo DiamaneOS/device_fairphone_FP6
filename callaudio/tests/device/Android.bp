@@ -4,6 +4,8 @@ android_test {
     name: "FP6CallAudioAuthorizationTests",
     srcs: ["src/**/*.java"],
     manifest: "AndroidManifest.xml",
+    // Keep only this self-target fixture's permissions and metadata.
+    dont_merge_manifests: true,
     platform_apis: true,
     static_libs: ["androidx.test.runner", "androidx.test.ext.junit"],
     jni_libs: ["libfp6_callaudio_guard_test"],

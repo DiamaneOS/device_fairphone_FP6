@@ -39,3 +39,10 @@ runtime_resource_overlay {
     manifest: "FP6TetheringOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6TetheringOverlay/res"],
 }
+
+runtime_resource_overlay {
+    name: "FP6WifiOverlay",
+    vendor: true,
+    manifest: "FP6WifiOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6WifiOverlay/res"],
+}

@@ -19,9 +19,11 @@ privileged placement select the bridge's dedicated SELinux domain.
 This boundary limits modem-influenced input to audio HAL parsers. The paired
 AudioFlinger source change additionally reserves vendor call-control keys and
 `all_call_states` queries for root, system, radio, audioserver and holders of the
-bridge's signature-only `de.diamaneos.permission.CONTROL_CALL_AUDIO` permission.
-The bridge defines and requests that permission; it gains no routing, phone-state
-or network authority. Select the bridge and framework changes together.
+platform's `android.permission.DIAMANEOS_CONTROL_CALL_AUDIO` permission.
+The platform defines this signature/privileged permission; the bridge is its sole
+privileged allowlist entry. AudioFlinger also requires the primary user's unique
+bridge package and checks grants without a persistent permission cache. It gains no routing, phone-state
+or network authority. Select the bridge, frameworks/base permission and frameworks/av changes together.
 
 Native denial tests and ordinary calls/routing still need qualification after
 any bridge, AudioFlinger or HAL change. Release keys must be private; development

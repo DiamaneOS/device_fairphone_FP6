@@ -12,8 +12,8 @@
 // phone-state access.
 //
 // Signing: no certificate property, so the build signs it with the default
-// application key, never the platform key. It is privileged only so that
-// seapp_contexts can select its domain by signer, package and privileged placement
+// application key, never the platform key. It is privileged only for its
+// signer-bound domain (sepolicy/telephony-system-ext/mac_permissions.xml and
 // seapp_contexts) and that one permission, which has an explicit system_ext
 // allowlist; it receives no broad routing or phone access.
 //

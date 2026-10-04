@@ -1,11 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Stock Qualcomm Bluetooth HCI service (android.hardware.bluetooth@1.1-service-qti).
-# Drafted from the stock compiled vendor policy (vendor_sepolicy.cil, rules for
-# hal_bluetooth_default and hal_bluetooth). Before enforcing, reduce it from
-# Qualcomm generic/vendor/common/hal_bluetooth_default.te at sepolicy_vndr
-# 67fa928 (sepolicy/README.md).
+# Bluetooth HCI service (bluetooth/service.cpp) hosting the stock Qualcomm HCI
+# implementation. Drafted for the stock service it replaces
+# (android.hardware.bluetooth@1.1-service-qti), which needed the same device
+# and property access, from the stock compiled vendor policy
+# (vendor_sepolicy.cil, rules for hal_bluetooth_default and hal_bluetooth).
+# Before enforcing, reduce it from Qualcomm
+# generic/vendor/common/hal_bluetooth_default.te at sepolicy_vndr 67fa928
+# (sepolicy/README.md).
 # Platform policy already covers the HIDL service registration, binder with
 # the Bluetooth app, wake locks, NET_ADMIN and the HCI UART (/dev/ttyHS0 is
 # hci_attach_dev; stock grants no vendor rule for it).
@@ -23,7 +26,7 @@ r_dir_file(hal_bluetooth_default, bt_firmware_file)
 allow hal_bluetooth_default { mnt_vendor_file vendor_persist_file }:dir search;
 r_dir_file(hal_bluetooth_default, vendor_persist_bluetooth_file)
 
-# The service and HCI implementation write only these properties (exact names,
+# The service and the HCI implementation write only these properties (exact names,
 # vendor_bluetooth_hal_state_prop in property_contexts): the SoC name,
 # scram.enabled, a generated address, and two crash counters. All other
 # Bluetooth vendor properties (debug and feature switches) are read only.

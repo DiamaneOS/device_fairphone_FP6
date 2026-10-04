@@ -292,11 +292,14 @@ a need. These rules are not yet runtime-qualified under enforcing mode.
 `bluetooth/hal_bluetooth_default.te` is drafted by DiamaneOS from the stock
 compiled vendor policy of FP6.QREL.16.100.0 (`vendor_sepolicy.cil`, rules for
 `hal_bluetooth_default` and `hal_bluetooth`), for the stock Qualcomm HCI
-service `android.hardware.bluetooth@1.1-service-qti`. It is to be reduced from
+service `android.hardware.bluetooth@1.1-service-qti`. Our own service
+(`bluetooth/service.cpp`) replaces that binary and needs the same access: it
+reads the chip's compatible string from btpower, sets the SoC name and
+registers the stock HCI implementation. The policy is to be reduced from
 Qualcomm `generic/vendor/common/hal_bluetooth.te` (or `hal_bluetooth_default.te`) at the pinned
 `sepolicy_vndr` revision once that file is fetched; then record it in
-`provenance.json`. `bluetooth/file_contexts` gives the service its stock
-label (stock `vendor_file_contexts` line 1125).
+`provenance.json`. `bluetooth/file_contexts` gives our service the stock
+service's label (stock `vendor_file_contexts` line 1125).
 
 The policy grants the btpower node, read access to the Bluetooth firmware
 partition and to the Bluetooth persist directory, read access to the Bluetooth
@@ -310,8 +313,8 @@ stock QRTR sockets (only used for the modem-NV address query, which is off),
 `/data/vendor/bluetooth`, diag, the FM radio device, the ssgtzd socket, TPI and
 Xpan service registration and HSUART tracing.
 
-The service links, but does not register, the FM, ANT, SAR, config-store and
-TPI libraries. The imported hwservice_contexts map `com.dsi.ant::IAnt`,
+The FM, ANT, SAR, config-store and TPI libraries the stock service linked are
+not installed. The imported hwservice_contexts map `com.dsi.ant::IAnt`,
 `com.qualcomm.qti.ant::IAntHci` (vendor-common lines 32-33) and
 `vendor.qti.hardware.bluetooth_sar::IBluetoothSar` (qva-common line 65) to
 `hal_bluetooth_hwservice`, which the HAL may add. Keep those interfaces out of

@@ -105,6 +105,8 @@ dontaudit hal_camera_default default_prop:file read;
 # vendor.fp.camera_{main,aux,front}.sn (property.te). No domain may set or
 # read them: no grant here, and the denials stay audited.
 
-# The CHI override registers the offline camera AIDL service in-process
-# (declared by vendor.qti.camera.offlinecamera-impl.xml).
-add_service(hal_camera_default, vendor_hal_offlinecamera_service)
+# The CHI override tries to register the offline camera AIDL service
+# in-process. Nothing uses that service and the vendor image does not declare
+# it, so the registration stays denied; the library logs the failure and the
+# provider carries on. Not audited: it is retried at every provider start.
+dontaudit hal_camera_default vendor_hal_offlinecamera_service:service_manager add;

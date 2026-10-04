@@ -4,6 +4,7 @@ package de.diamaneos.callaudio;
 
 import static org.junit.Assert.*;
 import android.os.IBinder;
+import android.os.Handler;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -56,6 +57,16 @@ public final class SlotLifecycleTest {
         Method method = request.getClass().getDeclaredMethod("current");
         method.setAccessible(true); return (Boolean) method.invoke(request);
     }
+    private static void awaitWorker(SlotClient client) throws Exception {
+        Field field = SlotClient.class.getDeclaredField("handler"); field.setAccessible(true);
+        CountDownLatch finished = new CountDownLatch(1);
+        assertTrue(((Handler) field.get(client)).post(finished::countDown));
+        assertTrue("slot worker did not finish prior work", finished.await(5, TimeUnit.SECONDS));
+    }
+    private static long reconnectWindow() throws Exception {
+        Field field = SlotClient.class.getDeclaredField("RECONNECT_MS"); field.setAccessible(true);
+        return 2 * field.getLong(null);
+    }
     private static void dispose(SlotClient client, FakeRadio radio) throws Exception {
         radio.release.countDown(); client.dispose();
         Field field = SlotClient.class.getDeclaredField("thread");field.setAccessible(true);
@@ -84,7 +95,10 @@ public final class SlotLifecycleTest {
             client.start();assertTrue(radio.entered.await(5, TimeUnit.SECONDS));
             client.setEnabled(false);assertFalse(current(radio.first.get()));
             radio.release.countDown();
-            assertFalse(radio.replacement.await(100, TimeUnit.MILLISECONDS));
+            awaitWorker(client);
+            assertFalse(radio.replacement.await(reconnectWindow(), TimeUnit.MILLISECONDS));
+            awaitWorker(client);
+            assertFalse(current(radio.first.get()));
             assertEquals(1, radio.registrations.get());
         } finally { dispose(client, radio); }
     }

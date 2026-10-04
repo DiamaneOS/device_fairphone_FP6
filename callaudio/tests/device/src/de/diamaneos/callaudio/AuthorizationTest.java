@@ -32,11 +32,18 @@ public final class AuthorizationTest {
         assertNotNull(audio);
         for (String parameters : new String[] {"vsid=0", "call_state=1", "call_type=UNKNOWN",
                 "crs_call=false", "all_call_states", "vsid", "screen_state=on;vsid=0",
-                "vsid=0;vsid=1", "vsid=0;call_state=1"}) {
+                "vsid=0;vsid=1", "vsid=0;call_state=1",
+                // Call features and Bluetooth voice links; values are inert or absent.
+                "tty_mode=tty_off", "HACSetting=OFF", "hd_voice", "st_enable", "volume_boost",
+                "device_mute", "CRS_volume", "BT_SCO", "bt_headset_nrec", "bt_wbs", "bt_swb",
+                "bt_lc3_swb", "hfp_enable", "hfp_volume", "A2dpSuspended", "LeAudioSuspended",
+                "screen_state=on;tty_mode=tty_off"}) {
             assertEquals(-OsConstants.EPERM, setParametersNative(audio, parameters));
         }
     }
     @Test public void ordinaryAppCannotReadCallStateParameters() {
         assertEquals("", AudioSystem.getParameters("all_call_states"));
+        assertEquals("", AudioSystem.getParameters("tty_mode"));
+        assertEquals("", AudioSystem.getParameters("bt_headset_name"));
     }
 }

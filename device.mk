@@ -418,3 +418,7 @@ PRODUCT_VENDOR_PROPERTIES += sys.usb.mtp.batchcancel=1
 # by init.qcom.usb.rc) through the "ncm" and "ncm,adb" compositions; the usb0
 # interface matches Tethering's default USB pattern.
 PRODUCT_PACKAGES += FP6TetheringOverlay
+
+# Wi-Fi capabilities from Fairphone's Wi-Fi resource overlays: MAC address
+# randomisation, screen-off scans, bands and SAR transmit limits.
+PRODUCT_PACKAGES += FP6WifiOverlay

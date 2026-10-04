@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<!-- FP6 Wi-Fi capabilities, as Fairphone's Wi-Fi resource overlays declare them
+     (factory 16.111.0). Without them the Wi-Fi service treats the hardware as
+     unable to randomise its MAC address and to scan while the screen is off. -->
+<resources>
+    <!-- Connect with a randomised MAC address, not the hardware one. -->
+    <bool name="config_wifi_connected_mac_randomization_supported">true</bool>
+    <!-- Offloaded scans with the screen off, so saved networks reconnect. -->
+    <bool name="config_wifi_background_scan_support">true</bool>
+    <bool name="config_wifiEnablePartialInitialScan">true</bool>
+
+    <bool name="config_wifi5ghzSupport">true</bool>
+    <bool name="config_wifi6ghzSupport">true</bool>
+    <bool name="config_wifiSaeH2eSupported">true</bool>
+    <bool name="config_wifiSaeUpgradeOffloadEnabled">true</bool>
+    <bool name="config_wifiDriverSupportedNl80211RegChangedEvent">true</bool>
+    <bool name="config_wifiStaDynamicCountryCodeUpdateSupported">true</bool>
+    <bool name="config_wifiUpdateCountryCodeFromScanResultGeneric">true</bool>
+    <bool name="config_wifiApplicationCentricQosPolicyFeatureEnabled">true</bool>
+    <bool name="config_wifiNetworkCentricQosPolicyFeatureEnabled">true</bool>
+    <integer name="config_wifiBssidBlocklistMonitorApUnableToHandleNewStaThreshold">3</integer>
+    <integer name="config_wifiDisableReasonByWrongPasswordThreshold">2</integer>
+    <integer name="config_wifiMaxNumWifiConfigurations">1000</integer>
+    <string name="config_wifi_tcp_buffers" translatable="false">524288,1048576,2097152,524288,1048576,4194304</string>
+    <string-array name="config_wifiCharsetsForSsidTranslation" translatable="false">
+        <item>zh,GBK</item>
+    </string-array>
+
+    <!-- Give IMS a second to move a call to cellular before Wi-Fi disconnects. -->
+    <integer name="config_wifiDelayDisconnectOnImsLostMs">1000</integer>
+
+    <!-- Lower Wi-Fi transmit power near the head and during calls (SAR). -->
+    <bool name="config_wifi_framework_enable_sar_tx_power_limit">true</bool>
+</resources>

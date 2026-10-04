@@ -6,8 +6,8 @@
      FP6 call-audio bridge: passes the radio daemon's in-call audio parameters
      to the audio HAL through AudioFlinger (see Android.bp).
 
-     - One permission, MODIFY_AUDIO_SETTINGS (normal), which AudioFlinger
-       requires for setParameters. getParameters needs none. No
+     - MODIFY_AUDIO_SETTINGS (normal), which AudioFlinger requires for
+       setParameters, and a signature-only bridge permission for call keys. No
        MODIFY_AUDIO_ROUTING, no phone-state permission, no INTERNET.
      - No components: nothing can bind to it, start it or send it intents.
      - persistent and directBootAware: running at boot, before the first
@@ -17,6 +17,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.diamaneos.callaudio">
 
+    <!-- AudioFlinger reserves vendor voice-session keys for trusted services
+         and this narrowly signed bridge, rather than granting broad routing
+         or phone-state privileges. Other APKs cannot acquire it by user consent. -->
+    <permission android:name="de.diamaneos.permission.CONTROL_CALL_AUDIO"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="de.diamaneos.permission.CONTROL_CALL_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application

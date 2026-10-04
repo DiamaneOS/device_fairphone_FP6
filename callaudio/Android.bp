@@ -7,8 +7,8 @@
 // with AudioFlinger's global setParameters; the audio HAL starts and stops the
 // voice session from them. Every call's audio depends on this, emergency calls
 // included. This app replaces the stock QtiTelephonyService with the same
-// behaviour and one normal permission, MODIFY_AUDIO_SETTINGS, instead of
-// MODIFY_AUDIO_ROUTING.
+// behaviour, MODIFY_AUDIO_SETTINGS and its own narrow signature permission
+// CONTROL_CALL_AUDIO, instead of MODIFY_AUDIO_ROUTING or phone-state access.
 //
 // Signing: no certificate property, so the build signs it with the default
 // application key, never the platform key. It is privileged only so that

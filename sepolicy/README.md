@@ -455,8 +455,7 @@ direct channel, the non-secure node for the CDSP offloads, `/vendor/dsp`), Qualc
 DMA-BUF heaps (display heap allocation ioctl only), SoC/camera/JPEG/DDR identification,
 QRTR sockets without ioctls for the gyro QMI client, the thermal-engine client socket, the
 provider's own vndbinder open, `/data/vendor/camera`, read-only factory calibration in
-`/mnt/vendor/persist/camera`, vendor camera properties and the in-process offline camera
-service. For streaming the provider is a client of the graphics allocator (buffer
+`/mnt/vendor/persist/camera` and vendor camera properties. For streaming the provider is a client of the graphics allocator (buffer
 allocation and IMapper) through `hal_client_domain`, the only form the platform
 neverallows allow for the allocator service lookups. The membership also lets it find the
 mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
@@ -470,7 +469,8 @@ search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelle
 `camera/genfs_contexts`). Denied: the display QService and display-config lookups
 (IDisplayConfig would expose brightness, power mode and writeback capture),
 IPostProcService registration and the property-area listing CamX does at start (silent
-under enforcing). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
+under enforcing), and the offline camera service registration (in no VINTF manifest, not
+audited). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
 the kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
 expected in use; drop the other after the first permissive run.
 

@@ -352,15 +352,17 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml
 
-# Sensors: the AOSP multi-HAL loads the sub-HALs in /vendor/etc/sensors/hals.conf
-# (the Qualcomm sub-HAL comes with the generated vendor tree).
+# Sensors: the AOSP multi-HAL loads the sub-HALs in /vendor/etc/sensors/hals.conf,
+# which the generated vendor tree derives from stock with only the Qualcomm
+# sub-HAL. The AOSP dynamic-sensor sub-HAL (HID sensors such as head trackers)
+# is not installed: the HAL has no hidraw access, so it could not serve one.
 PRODUCT_PACKAGES += \
-    android.hardware.sensors-service.multihal \
-    sensors.dynamic_sensor_hal
+    android.hardware.sensors-service.multihal
 
-# Sensors served by the ADSP through the sensors multi-HAL (the stock set).
+# Sensors served by the ADSP through the sensors multi-HAL (the stock set
+# without the dynamic head tracker).
 PRODUCT_COPY_FILES += \
-    $(foreach f,accelerometer barometer compass dynamic.head_tracker gyroscope light proximity stepcounter stepdetector, \
+    $(foreach f,accelerometer barometer compass gyroscope light proximity stepcounter stepdetector, \
         frameworks/native/data/etc/android.hardware.sensor.$(f).xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.$(f).xml)
 
 # As stock: filter magnetometer samples (the sub-HAL's default is off), and do

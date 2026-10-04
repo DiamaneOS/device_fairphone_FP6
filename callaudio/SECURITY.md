@@ -14,25 +14,30 @@ that reaches the audio HAL's parsers.
   oversized messages.
 - `vsid` accepts the vendor's 32-bit bit pattern, and the HAL keeps authority over
   valid session IDs and call states.
-- The producer's textual call type (including `UNKNOWN`) is preserved within a
-  32-character ASCII token grammar, not an invented numeric enum.
-- CRS uses the HAL's literal `true` / `false`.
-- Queries are limited to `isCRSsupported=1`, its key-only form, and
-  `all_call_states`.
-- Accepted messages are preserved verbatim and never logged. A 256-character
-  containment limit bounds each message; per-registration count and payload
-  budgets include running work.
-- Registration identity, PHONE_UID callbacks, ordering and audioserver recovery
-  fences remain required.
-- Signing plus package name and privileged placement select the bridge's
-  dedicated SELinux domain.
+- `call_type` keeps the producer's text (including `UNKNOWN`) within a
+  32-character ASCII token grammar. It is not mapped to a numeric enum.
+- `crs_call` uses the HAL's literal `true` / `false`.
+- Accepted messages are passed on verbatim and never logged.
+- Limits: 256 characters per message, and per-registration count and payload
+  budgets, which include running work.
+- Registration identity, PHONE_UID callbacks, ordering and audioserver
+  recovery fences are required.
 
-This boundary limits modem-influenced input to audio HAL parsers. The paired
-AudioFlinger source change additionally reserves vendor call-control keys and
-`all_call_states` queries for root, system, radio, audioserver and holders of the
-bridge's signature-only `de.diamaneos.permission.CONTROL_CALL_AUDIO` permission.
-The bridge defines and requests that permission; it gains no routing, phone-state
-or network authority. Select the bridge and framework changes together.
+## Authority
+
+- AudioFlinger (paired source change) reserves the vendor call-control keys
+  and `all_call_states` queries for root, system, radio, audioserver and
+  holders of `android.permission.DIAMANEOS_CONTROL_CALL_AUDIO`.
+- The platform defines this signature/privileged permission, and the bridge is
+  its sole privileged allowlist entry.
+- AudioFlinger also requires the primary user's unique bridge package and
+  checks grants without a persistent permission cache.
+- The bridge gains no routing, phone-state or network authority.
+- Signing, package name and privileged placement select the bridge's dedicated
+  SELinux domain.
+- The boundary holds only while the release signing key stays private.
+- Select the bridge, the frameworks/base permission and the frameworks/av
+  changes together.
 
 ## SIM-mode changes
 

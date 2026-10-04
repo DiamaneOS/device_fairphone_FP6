@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Settings (system_app) shows the vendor security patch level next to the
+# Android one (About phone > Android version). Read only that property; the
+# platform policy grants it to shell, keystore and vendor_init only.
+get_prop(system_app, vendor_security_patch_level_prop)

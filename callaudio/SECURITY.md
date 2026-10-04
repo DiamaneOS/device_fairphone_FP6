@@ -5,6 +5,8 @@ The bridge accepts the pinned QCRIL call-control keys `vsid`, `call_state`,
 trailing separators, non-ASCII numeric input and oversized messages are rejected
 before queuing or calling AudioFlinger. VSID accepts the vendor's 32-bit bit
 pattern; the HAL retains authority over valid session IDs and call states.
+The producer's textual call type (including `UNKNOWN`) is preserved within a
+32-character ASCII token grammar, rather than an invented numeric enum.
 CRS uses the HAL's literal `true` / `false` representation. Queries are limited
 to `isCRSsupported=1`, its key-only form, and `all_call_states`.
 

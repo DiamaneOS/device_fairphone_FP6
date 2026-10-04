@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+android_test {
+    name: "FP6CallAudioAuthorizationTests",
+    srcs: ["src/**/*.java"],
+    manifest: "AndroidManifest.xml",
+    platform_apis: true,
+    static_libs: ["androidx.test.runner", "androidx.test.ext.junit"],
+    test_suites: ["device-tests"],
+}

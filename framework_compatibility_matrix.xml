@@ -36,14 +36,6 @@
         </interface>
     </hal>
     <hal format="aidl">
-        <name>vendor.qti.hardware.display.color</name>
-        <version>1</version>
-        <interface>
-            <name>IDisplayColor</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="aidl">
         <name>vendor.qti.hardware.display.config</name>
         <version>11</version>
         <interface>
@@ -56,14 +48,6 @@
         <version>4.0</version>
         <interface>
             <name>IQtiMapper</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="aidl">
-        <name>vendor.qti.hardware.display.postproc</name>
-        <version>1</version>
-        <interface>
-            <name>IDisplayPostproc</name>
             <instance>default</instance>
         </interface>
     </hal>

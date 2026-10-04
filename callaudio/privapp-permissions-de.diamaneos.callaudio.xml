@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0; Copyright 2026 The DiamaneOS Project -->
+<permissions>
+    <privapp-permissions package="de.diamaneos.callaudio">
+        <permission name="android.permission.DIAMANEOS_CONTROL_CALL_AUDIO" />
+    </privapp-permissions>
+</permissions>

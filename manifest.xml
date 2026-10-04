@@ -35,9 +35,8 @@
         <transport>hwbinder</transport>
         <fqname>@1.0::IAGM/default</fqname>
     </hal>
-    <!-- The stock Qualcomm Bluetooth HCI service registers IBluetoothHci 1.1
-         (and 1.0 through it). FM, ANT, config store, SAR and TPI are not
-         registered in this product (bluetooth/bluetooth.mk). -->
+    <!-- The Bluetooth HCI service (bluetooth/service.cpp) registers the stock
+         Qualcomm implementation as IBluetoothHci 1.1 (and 1.0 through it). -->
     <hal format="hidl">
         <name>android.hardware.bluetooth</name>
         <transport>hwbinder</transport>

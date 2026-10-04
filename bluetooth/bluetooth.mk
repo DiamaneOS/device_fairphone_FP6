@@ -2,13 +2,16 @@
 # Copyright 2026 The DiamaneOS Project
 
 # Bluetooth for bring-up (stock-first). The selected stock vendor files
-# supply the Qualcomm HIDL HCI service (android.hardware.bluetooth@1.1-service-qti)
-# and its link closure; manifest.xml declares IBluetoothHci. The AOSP HCI
-# interfaces are built from source through the renderer's SOURCE_INTERFACES.
+# supply the Qualcomm HIDL HCI implementation
+# (android.hardware.bluetooth@1.1-impl-qti) and its link closure; our own
+# service (service.cpp) registers it in place of the stock service, which also
+# links the FM, ANT, SAR, config-store and TPI libraries. manifest.xml declares
+# IBluetoothHci. The AOSP HCI interfaces are built from source.
 # Bluetooth audio is software only (no DSP offload): the AOSP Bluetooth audio
 # provider runs in the audio service and the AOSP "bluetooth" audio module
 # carries A2DP, hearing-aid and LE audio streams.
 PRODUCT_PACKAGES += \
+    android.hardware.bluetooth@1.1-service.fp6 \
     android.hardware.bluetooth.audio-impl \
     audio.bluetooth.default
 
@@ -53,9 +56,9 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # Not set on purpose:
 # - ro.bluetooth.a2dp_offload.supported and ro.bluetooth.leaudio_offload.supported
 #   (default false): stock offload needs the Qualcomm Bluetooth audio stack.
-# - ro.vendor.qti.va_odm.support: when set, the stock service also registers
-#   the FM, ANT and Bluetooth config-store HALs, which are not installed.
-# - persist.vendor.qcom.bluetooth.tpi_supported: would register the TPI service.
+# - ro.vendor.qti.va_odm.support and persist.vendor.qcom.bluetooth.tpi_supported:
+#   only the stock service read them, to register FM, ANT, config-store and TPI
+#   services; neither it nor those libraries are installed.
 # - persist.vendor.bluetooth.modem_nv_support: would ask the modem for the
 #   Bluetooth address over QMI.
 # - persist.vendor.service.bdroid.{snooplog,soclog,fwsnoop,dump_uartlogs}:

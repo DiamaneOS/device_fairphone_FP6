@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Stock Qualcomm Bluetooth HCI service (selected stock vendor file). Same as the
-# stock android.hardware.bluetooth@1.1-service-qti.rc, with fewer groups:
+# Bluetooth HCI service (bluetooth/service.cpp), hosting the stock Qualcomm HCI
+# implementation. Same as the stock android.hardware.bluetooth@1.1-service-qti.rc,
+# with fewer groups:
 # - no diag (oem_2901) or ssgtzd (oem_2912): neither service is installed;
 # - no system: every node the HAL uses is owned by the bluetooth user, and the
 #   group would let it write controller dumps (with HCI traffic) into
 #   /data/vendor/ssrdump (root:system 0770 in stock) if that directory exists;
 # - no net_raw: the HAL opens no inet raw socket.
-service vendor.bluetooth-1-1-qti /vendor/bin/hw/android.hardware.bluetooth@1.1-service-qti
+service vendor.bluetooth-1-1-fp6 /vendor/bin/hw/android.hardware.bluetooth@1.1-service.fp6
     class hal
     user bluetooth
     group bluetooth wakelock

@@ -125,6 +125,10 @@ Downstream adaptations:
 - `product-private/property_contexts` keeps `debug.disable_screen_decorations`
   on `vendor_display_notch_prop`, which SystemUI cannot read: the read falls
   back to false, so the privacy dot cannot be switched off with `adb setprop`.
+- `system-ext-private/system_app.te` lets Settings read only
+  `ro.vendor.build.security_patch` (`vendor_security_patch_level_prop`) for the
+  "Vendor security update" row; the platform grants it to shell, keystore and
+  vendor_init only.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 import android.content.pm.PackageManager;
 import android.media.AudioSystem;
 import android.system.OsConstants;
+import android.os.IBinder;
+import android.os.ServiceManager;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import org.junit.Test;
@@ -15,7 +17,7 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public final class AuthorizationTest {
     static { System.loadLibrary("fp6_callaudio_guard_test"); }
-    private static native int setParametersNative(String parameters);
+    private static native int setParametersNative(IBinder binder, String parameters);
     @Test public void ordinaryAudioPermissionDoesNotAuthorizeVoiceSessionKeys() {
         var context = InstrumentationRegistry.getInstrumentation().getContext();
         assertEquals(PackageManager.PERMISSION_GRANTED,
@@ -26,7 +28,9 @@ public final class AuthorizationTest {
         // regression fails. The guarded path must refuse before calling a HAL.
         // JNI's public wrapper maps native failures to a generic Java code.
         // Preserve status_t here so HAL EINVAL cannot look like authorization denial.
-        assertEquals(-OsConstants.EPERM, setParametersNative("vsid=0;call_state=1"));
+        IBinder audio = ServiceManager.getService("media.audio_flinger");
+        assertNotNull(audio);
+        assertEquals(-OsConstants.EPERM, setParametersNative(audio, "vsid=0;call_state=1"));
     }
     @Test public void ordinaryAppCannotReadCallStateParameters() {
         assertEquals("", AudioSystem.getParameters("all_call_states"));

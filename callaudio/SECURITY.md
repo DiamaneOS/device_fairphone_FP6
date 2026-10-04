@@ -42,3 +42,22 @@ that reaches the audio HAL's parsers.
 ## SIM-mode changes
 
 Each supported hardware slot has one serial worker.
+
+- Disabling a slot immediately revokes its activation identity and its claim
+  on queued parameters.
+- Re-enabling registers only after the previous physical registration has
+  returned.
+- A coalesced reconnect task and a unique monitor listener avoid duplicate
+  retries and accumulated listeners.
+
+## Checks
+
+Run after any bridge, AudioFlinger or HAL change.
+
+- `FP6CallAudioHostTests`: parameter grammar, budgets, status relay and
+  recovery.
+- `FP6CallAudioAuthorizationTests`: on the phone with no active call, an
+  ordinary app is refused the call keys and the call-state query.
+- `FP6CallAudioLifecycleTests`: the actual Android worker with a local fake
+  radio, with no HAL, network or modem lookup.
+- Ordinary calls and audio routing on the phone.

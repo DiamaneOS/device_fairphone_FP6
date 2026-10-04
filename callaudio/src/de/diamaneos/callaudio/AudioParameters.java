@@ -10,6 +10,7 @@ import java.util.Set;
 final class AudioParameters {
     // Containment limit, comfortably above four stock keys and 32-bit values.
     static final int MAX_LENGTH = 256;
+    private static final int MAX_CALL_TYPE_LENGTH = 32; // Downstream opaque-token containment budget.
     private AudioParameters() {}
 
     static boolean validSet(String parameters) {
@@ -29,8 +30,12 @@ final class AudioParameters {
                     if (!decimal(value, Integer.MIN_VALUE, 0xffff_ffffL)) return false;
                     break;
                 case "call_state":
-                case "call_type":
                     if (!decimal(value, Integer.MIN_VALUE, Integer.MAX_VALUE)) return false;
+                    break;
+                case "call_type":
+                    // The pinned producer sends text, including UNKNOWN. Keep
+                    // this opaque HAL value bounded without inventing an enum.
+                    if (!callType(value)) return false;
                     break;
                 case "crs_call":
                     if (!value.equals("true") && !value.equals("false")) return false;
@@ -40,6 +45,16 @@ final class AudioParameters {
             }
         }
         return keys.contains("vsid") && keys.contains("call_state");
+    }
+
+    private static boolean callType(String value) {
+        if (value.isEmpty() || value.length() > MAX_CALL_TYPE_LENGTH) return false;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+                    || (c >= '0' && c <= '9') || c == '_' || c == '-')) return false;
+        }
+        return true;
     }
 
     static boolean validQuery(String parameters) {

@@ -1,12 +1,8 @@
 # Call audio boundary
 
-The bridge accepts the pinned QCRIL call-control keys `vsid`, `call_state`,
-`call_type` and `crs_call`. Unknown or duplicate keys, malformed numeric values,
-trailing separators, non-ASCII numeric input and oversized messages are rejected
-before queuing or calling AudioFlinger. VSID accepts the vendor's 32-bit bit
-pattern; the HAL retains authority over valid session IDs and call states.
-CRS uses the HAL's literal `true` / `false` representation. Queries are limited
-to `isCRSsupported=1`, its key-only form, and `all_call_states`.
+The bridge (`de.diamaneos.callaudio`) passes the radio daemon's in-call audio
+parameters to the audio HAL. This boundary limits the modem-influenced input
+that reaches the audio HAL's parsers.
 
 ## Accepted input
 

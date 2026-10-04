@@ -8,8 +8,8 @@ package de.diamaneos.callaudio;
 /** Bounds retained parameter work for one radio registration, including running work. */
 final class ParameterBudget {
     static final int MAX_REQUESTS = 64;
-    // At most 1 MiB of UTF-16 payload per slot. Count also bounds empty requests.
-    static final int MAX_CHARACTERS = 512 * 1024;
+    // Every request already satisfies the narrow command grammar and size bound.
+    static final int MAX_CHARACTERS = MAX_REQUESTS * AudioParameters.MAX_LENGTH;
     private int requests;
     private int characters;
     private boolean closed;

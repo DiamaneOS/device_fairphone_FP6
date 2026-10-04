@@ -31,7 +31,8 @@ import java.util.NoSuchElementException;
  * The daemon's oneway calls reach the request binder one at a time and are
  * queued here in that order, so a slot's call-state changes reach AudioFlinger in the order the
  * daemon sent them. The parameter strings (vsid, call_state, call_type, crs_call,
- * isCRSsupported) are passed through unchanged and never logged; the daemon chooses the vsid.
+ * isCRSsupported) are validated against AudioParameters and never logged; the daemon chooses
+ * the vsid. Unknown keys and malformed values never reach AudioFlinger.
  * Pending/running payloads are bounded per registration. Overflow replies use that
  * registration's oneway endpoint without adding Handler work; an overfull registration
  * that has not yet published its endpoint is revoked and retried.
@@ -291,12 +292,14 @@ final class SlotClient implements AudioServerMonitor.Listener {
         @Override
         public void setParameters(int token, String params) {
             if (Binder.getCallingUid() != Process.PHONE_UID || !current()) return;
+            if (!AudioParameters.validSet(params)) { rejected(token, false); return; }
             if (!enqueue(token, params, false)) rejected(token, false);
         }
 
         @Override
         public void queryParameters(int token, String params) {
             if (Binder.getCallingUid() != Process.PHONE_UID || !current()) return;
+            if (!AudioParameters.validQuery(params)) { rejected(token, true); return; }
             if (!enqueue(token, params, true)) rejected(token, true);
         }
 

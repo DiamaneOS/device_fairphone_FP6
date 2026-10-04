@@ -12,8 +12,8 @@
 //
 // Signing: no certificate property, so the build signs it with the default
 // application key, never the platform key. It is privileged only so that
-// seapp_contexts can select its domain by package name
-// (sepolicy/telephony-system-ext/seapp_contexts, isPrivApp=true). It requests
+// seapp_contexts can select its domain by signer, package and privileged placement
+// (sepolicy/telephony-system-ext/mac_permissions.xml and seapp_contexts). It requests
 // no privileged permission, so it needs no allowlist entry.
 //
 // API level: platform APIs, for the hidden ServiceManager.waitForService (the
@@ -65,6 +65,7 @@ java_test_host {
         "src/de/diamaneos/callaudio/Recovery.java",
         "src/de/diamaneos/callaudio/StatusRelay.java",
         "src/de/diamaneos/callaudio/ParameterBudget.java",
+        "src/de/diamaneos/callaudio/AudioParameters.java",
         "tests/src/**/*.java",
     ],
     static_libs: ["junit"],

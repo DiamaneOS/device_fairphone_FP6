@@ -3,14 +3,16 @@
 
 # Telephony for bring-up: the stock Qualcomm radio daemon (qcrilNrd),
 # its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
-# stock eSIM LPA (com.qualcomm.qti.lpa, disabled by default) come from the
+# native modem services come from the
 # selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
 # radio daemon and the audio HAL is our own (callaudio/, replacing the stock
 # QtiTelephonyService). The radio interface libraries, the carrier
 # configuration service and telephony features are built from source. Carrier
 # data is extracted from the authenticated stock package without its code.
-# The IWLAN frontend follows the stock QCRIL path. Not included yet: video calls, RCS, an eSIM
-# download UI, the SIM secure element (OMAPI UICC).
+# Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
+# Ordinary calling/SMS/data require carrier qualification on the selected image;
+# emergency handling is simulated, not end-to-end emergency acceptance.
+# AML and eSIM management are deferred. No inactive stock LPA is packaged.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
 # QCRIL defaults that stock sets in vendor build.prop and that are not in the
@@ -108,13 +110,6 @@ DIAMANEOS_IMS_MODEM_NODE := 0
 DIAMANEOS_IMS_SLOTS := 2
 $(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
 $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
-
-# eSIM LPA (product priv-app): its privileged-permission allowlist and the
-# default-disabled state of its services (product apps take their allowlist
-# from the product partition).
-PRODUCT_COPY_FILES += \
-    device/fairphone/FP6/telephony/privapp-permissions-fp6-lpa.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-fp6-lpa.xml \
-    device/fairphone/FP6/telephony/fp6-lpa-default-disabled.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/fp6-lpa-default-disabled.xml
 
 # APNs come from the authenticated stock XML in vendor/fairphone/FP6. Keep
 # IMS/emergency rows, MVNO filters and ordering intact instead of appending

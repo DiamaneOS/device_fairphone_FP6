@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # nicmd (network interface control manager) configures the rmnet data
-# interfaces for modem data calls. Stock nicmd.rc starts it as root (no user
-# line); it drops privileges itself. The rendered nicmd.rc bounds it to the
-# capabilities below (TELEPHONY_CONFIG_REWRITES in the tools). Reduced from
+# interfaces for modem data calls. Start as radio from exec, so threads created
+# before the closed library's privilege-drop call cannot remain root. The
+# rendered service retains only NET_ADMIN, NET_RAW and BLOCK_SUSPEND. Reduced from
 # Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
 # generic/vendor/common/nicmd.te. Omitted: the SHS,
 # QMI-priority and performance helpers (shsusrd, qmipriod, perf HAL and their
@@ -43,7 +43,8 @@ allowxperm vendor_nicmd self:udp_socket ioctl rmnet_sock_ioctls;
 # binds the ephemeral TCP/UDP ports the modem's embedded clients use, so AP
 # traffic cannot take them. No name_bind (ephemeral ports only), no listen.
 allow vendor_nicmd node:{ tcp_socket udp_socket } node_bind;
-allow vendor_nicmd self:capability { net_admin net_raw setgid setpcap setuid kill };
+allow vendor_nicmd self:capability { net_admin net_raw };
+neverallow vendor_nicmd self:capability { setgid setpcap setuid kill };
 wakelock_use(vendor_nicmd)
 dontaudit vendor_nicmd kernel:system { module_request };
 

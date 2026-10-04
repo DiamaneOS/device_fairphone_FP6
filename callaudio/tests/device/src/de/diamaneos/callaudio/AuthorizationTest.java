@@ -30,7 +30,11 @@ public final class AuthorizationTest {
         // Preserve status_t here so HAL EINVAL cannot look like authorization denial.
         IBinder audio = ServiceManager.getService("media.audio_flinger");
         assertNotNull(audio);
-        assertEquals(-OsConstants.EPERM, setParametersNative(audio, "vsid=0;call_state=1"));
+        for (String parameters : new String[] {"vsid=0", "call_state=1", "call_type=UNKNOWN",
+                "crs_call=false", "all_call_states", "vsid", "screen_state=on;vsid=0",
+                "vsid=0;vsid=1", "vsid=0;call_state=1"}) {
+            assertEquals(-OsConstants.EPERM, setParametersNative(audio, parameters));
+        }
     }
     @Test public void ordinaryAppCannotReadCallStateParameters() {
         assertEquals("", AudioSystem.getParameters("all_call_states"));

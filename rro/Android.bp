@@ -32,12 +32,6 @@ runtime_resource_overlay {
     resource_dirs: ["FP6TeleServiceOverlay/res"],
 }
 
-runtime_resource_overlay {
-    name: "FP6CarrierConfigOverlay",
-    vendor: true,
-    manifest: "FP6CarrierConfigOverlay/AndroidManifest.xml",
-    resource_dirs: ["FP6CarrierConfigOverlay/res"],
-}
 
 runtime_resource_overlay {
     name: "FP6TetheringOverlay",

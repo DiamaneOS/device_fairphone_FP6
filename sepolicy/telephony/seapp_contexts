@@ -3,3 +3,6 @@
 # signer. Privileged placement prevents ordinary installs joining the UID;
 # no signature or privileged Android permissions are granted to these apps.
 user=_app seinfo=fp6_stock_platform isPrivApp=true name=.qtidataservices domain=fp6_iwlan_app type=app_data_file levelFrom=all
+# Data labeling looks up package names rather than the shared process name.
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=vendor.qti.iwlan domain=fp6_iwlan_app type=app_data_file levelFrom=all
+user=_app seinfo=fp6_stock_platform isPrivApp=true name=vendor.qti.hardware.cacert.server domain=fp6_iwlan_app type=app_data_file levelFrom=all

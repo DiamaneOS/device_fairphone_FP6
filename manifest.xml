@@ -42,14 +42,4 @@
         <transport>hwbinder</transport>
         <fqname>@1.1::IBluetoothHci/default</fqname>
     </hal>
-    <!-- The stock Qualcomm Codec2 service registers the hardware video store,
-         which lists only the Iris encoders (media/media.mk). Only the default
-         instance: the platform's software store is declared by the framework
-         manifest (manifest_media_c2_software.xml), and the stock fragment's
-         extra "software" line is not carried over. -->
-    <hal format="hidl">
-        <name>android.hardware.media.c2</name>
-        <transport>hwbinder</transport>
-        <fqname>@1.2::IComponentStore/default</fqname>
-    </hal>
 </manifest>

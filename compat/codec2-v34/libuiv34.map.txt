@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* uiv34 exports exactly the Android 14 entry points the stock libcodec2_vndk */
+/* imports from it (see Android.bp); everything else stays local. */
+{
+  global:
+    _ZN7android19GraphicBufferMapper4lockEPK13native_handlejRKNS_4RectEPPvPiS9_;
+    _ZN7android19GraphicBufferMapper6unlockEPK13native_handle;
+    _ZN7android13GraphicBufV34C1Ev;
+    _ZN7android13GraphicBufV34C1EPK13native_handleNS0_16HandleWrapMethodEjjijmj;
+    _ZNK7android13GraphicBufV349initCheckEv;
+    _ZN7android13GraphicBufV3419fromAHardwareBufferEP15AHardwareBuffer;
+    _ZN7android13GraphicBufV3419fromAHardwareBufferEPK15AHardwareBuffer;
+    _ZN7android13GraphicBufV3417toAHardwareBufferEv;
+  local:
+    *;
+};

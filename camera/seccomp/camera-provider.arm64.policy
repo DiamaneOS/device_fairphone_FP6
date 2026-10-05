@@ -1,0 +1,95 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# System calls the stock CamX camera provider may make (arm64, minijail
+# syntax), installed as /vendor/etc/seccomp_policy/camera-provider.policy and
+# compiled by libcamxjail before the provider's main(). Whether a call outside
+# this list is logged or trapped is set in Android.bp (CAMXJAIL_LOG_ONLY), not
+# here. Duplicate entries are an error.
+#
+# Sources: a trace of the running provider (photo, front camera, video), the
+# provider's own imports, and the calls the debuggerd fallback handler needs
+# to write a tombstone from a no_new_privs process. Ordered by observed
+# frequency, most frequent first.
+
+futex: 1
+# ioctl requests are filtered by the SELinux policy.
+ioctl: 1
+ppoll: 1
+# No mapping may be writable and executable at once.
+mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+writev: 1
+read: 1
+lseek: 1
+# 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 15 PR_SET_NAME,
+# 16 PR_GET_NAME, 39 PR_GET_NO_NEW_PRIVS, 54 PR_PAC_RESET_KEYS (pthread_create),
+# 56 PR_GET_TAGGED_ADDR_CTRL, 61 PR_PAC_GET_ENABLED_KEYS.
+prctl: arg0 == 0x53564d41 || arg0 == 15 || arg0 == 16 || arg0 == 39 || arg0 == 54 || arg0 == 56 || arg0 == 61
+madvise: 1
+mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+munmap: 1
+close: 1
+rt_sigprocmask: 1
+write: 1
+openat: 1
+sigaltstack: 1
+fstat: 1
+fcntl: 1
+mremap: 1
+dup: 1
+newfstatat: 1
+# Threads only (0x10000 CLONE_THREAD): no fork, no child processes.
+clone: arg0 & 0x10000
+readlinkat: 1
+getdents64: 1
+pread64: 1
+fstatfs: 1
+inotify_add_watch: 1
+inotify_rm_watch: 1
+eventfd2: 1
+gettid: 1
+set_tid_address: 1
+# 1 AF_UNIX (logd, property service, thermal-engine), 42 AF_QIPCRTR (the ADSP
+# sensors QMI service for EIS and OIS).
+socket: arg0 == 1 || arg0 == 42
+connect: 1
+nanosleep: 1
+inotify_init1: 1
+getrandom: 1
+pipe2: 1
+sendto: 1
+pselect6: 1
+mkdirat: 1
+restart_syscall: 1
+
+# Never returning, so absent from the trace's counts.
+exit: 1
+exit_group: 1
+rt_sigreturn: 1
+
+# The provider's main() sets its scheduling policy (SYS_NICE in its rc).
+sched_getscheduler: 1
+sched_getparam: 1
+sched_setscheduler: 1
+
+# debuggerd fallback handler (system/core debuggerd/seccomp_policy/
+# crash_dump.arm64.policy), less the calls already listed.
+clock_gettime: 1
+gettimeofday: 1
+getpid: 1
+getppid: 1
+faccessat: 1
+recvmsg: 1
+recvfrom: 1
+setsockopt: 1
+sysinfo: 1
+uname: 1
+process_vm_readv: 1
+tgkill: 1
+rt_sigaction: 1
+rt_tgsigqueueinfo: 1
+getuid: 1
+geteuid: 1
+getgid: 1
+getegid: 1
+getgroups: 1

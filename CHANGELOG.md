@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Let imeiprovd read the traceability partition: ueventd gives its block
+  device to group vendor_imeiprov, read-only. Without it the tool, which runs
+  without capabilities, could not open the partition.
 - Let the camera provider stat `/proc/meminfo` as well as read it: CamX checks
   the file before reading it, and only the stat was denied.
 - Load the vendor kernel modules in parallel streams instead of one serial

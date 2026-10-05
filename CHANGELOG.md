@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Pass the stock camera's performance hints to the power HAL. CamX's open,
+  close and snapshot hints become CAMERA_LAUNCH and CAMERA_SHOT boosts of at
+  most 5 s (a hint held until release at most 2 s), ended early when CamX
+  releases them; `libqti-perfd-client` sends them from its own thread with
+  one-way calls, so the camera never waits for the power HAL. The camera
+  provider becomes a power HAL client, as on Pixels. Not yet built.
 - Ask CamX for a UBWC preview stream: the display hardware rotates only UBWC
   buffers, so the linear portrait preview was composed by the GPU on every
   frame. The 16:9 preview is now composed by the display hardware.

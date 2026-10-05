@@ -65,8 +65,15 @@ hal_client_domain(hal_camera_default, hal_graphics_allocator)
 # fences in capture requests from cameraserver.
 allow hal_camera_default hal_graphics_composer_default:fd use;
 
-# CamX perf locks (launch, snapshot, recording) go to the no-op
-# libqti-perfd-client (device power/), so the camera calls no perf service.
+# CamX perf hints go to our libqti-perfd-client (device power/), never to the
+# perf2 service. The library forwards the open, close and snapshot hints to
+# the power HAL as time-limited CAMERA_LAUNCH and CAMERA_SHOT boosts (one-way
+# setBoost calls from its own thread), so the provider is an IPower client, as
+# on Pixels. hal_client_domain is the only form the platform neverallow on
+# hal_power_service lookups allows. It also lets the two processes make binder
+# calls both ways and share memfds, and lets the provider look up the HIDL
+# power service, which nothing registers.
+hal_client_domain(hal_camera_default, hal_power)
 
 # Left denied: the display-config camera hint (IDisplayConfig would also expose
 # brightness, power mode and writeback capture), IPostProcService registration

@@ -1,35 +1,27 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
-// No-op Qualcomm perf client. Exports the calls the stock vendor code looks up
-// with dlsym:
+// Stand-in for Qualcomm's perf client. Exports the calls the stock vendor code
+// looks up with dlsym:
 //   camera.qcom.so:       perf_lock_acq, perf_lock_rel, perf_hint, perf_hint_renew
 //   libsdmextension.so:   perf_lock_acq, perf_lock_rel, perf_hint_acq_rel_offload,
 //                         perf_lock_rel_offload
 //   source composer (cpuhint.cpp, only with ro.vendor.extension_library set):
 //                         perf_hint_acq_rel_offload, perf_lock_rel_offload,
 //                         perf_hint_offload, perf_event
-// plus the rest of the client API LineageOS's stub provides. Every request
-// succeeds without doing anything: CPU, GPU and scheduler boosts come from the
-// power HAL (powerhint.json). To see the requests, for example to map camera
-// hints to power HAL hints later:
+// plus the rest of the client API LineageOS's stub provides. The camera's
+// open, close and snapshot hints (perf_hint, perf_hint_renew) become
+// time-limited power HAL boosts, and perf_lock_rel ends them
+// (camera_hints.cpp). Every other request succeeds without doing anything:
+// CPU, GPU and scheduler boosts come from the power HAL (powerhint.json). To
+// see the requests and the boosts they start:
 //   adb shell setprop log.tag.perfd-client-stub D
 
-#define LOG_TAG "perfd-client-stub"
-
-#include <android/log.h>
+#include "camera_hints.h"
+#include "trace.h"
 
 // A positive handle: callers treat zero or negative handles as failure.
 #define STUB_HANDLE 1
-
-static int tracing(void) {
-    return __android_log_is_loggable(ANDROID_LOG_DEBUG, LOG_TAG, ANDROID_LOG_INFO);
-}
-
-#define TRACE(...)                                                      \
-    do {                                                                \
-        if (tracing()) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__); \
-    } while (0)
 
 static int handle_or_stub(int handle) {
     return handle > 0 ? handle : STUB_HANDLE;
@@ -41,7 +33,8 @@ int perf_lock_acq(int handle, int duration, int list[], int numArgs) {
 }
 
 int perf_lock_rel(int handle) {
-    TRACE("perf_lock_rel handle=%d", handle);
+    int ended = camera_hint_release(handle);
+    TRACE("perf_lock_rel handle=%d%s", handle, ended ? " (ends its camera boost)" : "");
     return 0;
 }
 
@@ -60,14 +53,19 @@ void perf_lock_cmd(int cmd) {
 }
 
 int perf_hint(int hint, const char* pkg, int duration, int type) {
-    TRACE("perf_hint hint=0x%x duration=%d type=%d", hint, duration, type);
-    return STUB_HANDLE;
+    int forwarded = camera_hint_acquire(0, hint, duration);
+    int result = forwarded > 0 ? forwarded : STUB_HANDLE;
+    TRACE("perf_hint hint=0x%x duration=%d type=%d -> %d", hint, duration, type, result);
+    return result;
 }
 
 int perf_hint_renew(int handle, int hint, const char* pkg, int duration, int type, int numArgs,
                     int list[]) {
-    TRACE("perf_hint_renew handle=%d hint=0x%x duration=%d type=%d", handle, hint, duration, type);
-    return handle_or_stub(handle);
+    int forwarded = camera_hint_acquire(handle, hint, duration);
+    int result = forwarded > 0 ? forwarded : handle_or_stub(handle);
+    TRACE("perf_hint_renew handle=%d hint=0x%x duration=%d type=%d -> %d", handle, hint, duration,
+          type, result);
+    return result;
 }
 
 int perf_hint_acq_rel(int handle, int hint, const char* pkg, int duration, int type, int numArgs,

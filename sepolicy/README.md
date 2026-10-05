@@ -476,9 +476,17 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
   on hint-session threads. The domain is an `mlstrustedsubject` because the platform MLS
   constraint on setsched requires equal levels and apps run with categories; setsched is its
   only access to app processes. It is a thermal HAL client for the throttling state.
-- `libqti-perfd-client` (`power/libqti-perfd-client`) is a source no-op stand-in for the
-  closed client library the stock camera and SDM extension load by name. It is
-  `vendor_file`: no app process loads it.
+- `libqti-perfd-client` (`power/libqti-perfd-client`) is a source stand-in for the closed
+  client library the stock camera and SDM extension load by name. It forwards only the
+  camera's open, close and snapshot hints, as CAMERA_LAUNCH and CAMERA_SHOT boosts of at most
+  5 s (a hint held until release at most 2 s, each ended early when CamX releases it); every
+  other call does nothing. It is `vendor_file`: no app process loads it.
+- Clients: the platform's (system_server, SurfaceFlinger, apps' hint sessions through
+  system_server) and, the only vendor one, the camera provider
+  (`camera/hal_camera_default.te`). A client reaches every IPower method: boosts, modes such
+  as SUSTAINED_PERFORMANCE, EXPENSIVE_RENDERING or DOUBLE_TAP_TO_WAKE, and ADPF hint sessions.
+  Their effects stay within the grants above: frequency floors and caps, the three
+  `sched_boost` values, the GPU wake trigger, tap-to-wake and uclamp on session threads.
 - Not granted: reads of the nodes (dumpsys shows request indexes, not values), the debug
   configuration in `/data/vendor/etc` (`vendor.powerhal.config.debug`), the Pixel-only
   `/proc/vendor_sched`, the display `idle_state` nodes (the Qualcomm display driver has
@@ -578,9 +586,16 @@ neverallows allow for the allocator service lookups. The membership also lets it
 mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
 servicemanager and share memfds with the allocator, and, as a `halclientdomain`, call
 hwservicemanager, read `hwservicemanager_prop` and find `hidl_manager_hwservice`. CamX's
-perf locks go to the no-op `libqti-perfd-client` (device `power/`), so the provider has no
-perf HAL access and makes no perf service lookups (with the stock library its perf2 lookups
-were denied at camera open and close, each waiting about a second). It may use the
+perf hints go to our `libqti-perfd-client` (device `power/`), never to the perf2 service
+(with the stock library its perf2 lookups were denied at camera open and close, each waiting
+about a second). The library forwards the open, close and snapshot hints to the power HAL as
+time-limited boosts, so the provider is a power HAL client through
+`hal_client_domain(hal_camera_default, hal_power)`, as on Pixels: the platform neverallow on
+`hal_power_service` lookups allows only that form. The membership lets it find the power
+service, make binder calls with the power HAL both ways (the HAL never calls back), share
+memfds with it and find the HIDL power service, which nothing registers. SELinux cannot limit
+the grant to the camera boosts: it covers the whole IPower interface (see [Power](#power)).
+It may use the
 composer's release fences, read the public SoC id and
 search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelled in
 `camera/genfs_contexts`). Denied: the display QService and display-config lookups

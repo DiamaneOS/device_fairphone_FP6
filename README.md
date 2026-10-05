@@ -54,10 +54,11 @@ requires device verification.
 The product uses the published FP6 thermal, lights, vibrator, USB and health
 services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the
 FP6 configuration in `power/`: the hint table (`powerhint.json`), its init file
-(the HAL runs as system with CAP_SYS_NICE only) and a no-op
-`libqti-perfd-client` for the stock camera; Qualcomm's closed perf2 daemon is
-not installed. `power/stats` is a small power stats HAL of our own: it reports
-the SoC sleep modes and the modem, WPSS, ADSP and CDSP sleep time from the
+(the HAL runs as system with CAP_SYS_NICE only) and a `libqti-perfd-client`
+for the stock camera, which turns its open, close and snapshot hints into
+time-limited power HAL boosts; Qualcomm's closed perf2 daemon is not installed.
+`power/stats` is a small power stats HAL of our own: it reports the SoC sleep
+modes and the modem, WPSS, ADSP and CDSP sleep time from the
 qcom_stats driver's `/dev/stats` (no energy meters; the FP6 has no on-device
 power monitor), as its own user without capabilities. The implementations
 remain separate from the device configuration. Required runtime dependencies,

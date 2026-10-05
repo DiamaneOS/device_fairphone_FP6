@@ -26,6 +26,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc
 
+# SurfaceFlinger's main and RenderEngine threads join the top-app cpuset, as on
+# Pixels. AOSP's default (and stock's) is system-background, which this device
+# limits to the silver cores (boot/init.fp6.perf.rc), so SF could never use a
+# bigger core and its ADPF boosts had no effect.
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/power/task_profiles.json:$(TARGET_COPY_OUT_VENDOR)/etc/task_profiles.json
+
 # INTERACTION boosts run on timers (the defaults 1.4 to 5.65 s): the Qualcomm
 # display driver has no idle_state node for the HAL to wait on.
 PRODUCT_VENDOR_PROPERTIES += vendor.powerhal.disp.idle_support=false

@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# pd-mapper (linux-msm, BSD-3-Clause, vendor/qcom/opensource/pd-mapper) serves
+# the QMI service-registry locator (service 0x40) that the ADSP, CDSP, modem
+# and the audio HAL ask to find protection domains. At start it reads the
+# domain lists (*.jsn) next to each remote processor's firmware, under
+# /vendor/firmware, which links them from the modem partition
+# (modem/Android.bp). It replaces Qualcomm's pd-mapper (its imported policy,
+# pd_services.te, is removed), which held setuid, setgid, setpcap and
+# net_bind_service, used the legacy IPC router socket and its ioctl, and read
+# vendor_sysfs_data and a debug property.
+# This domain has no capabilities, no network, no files to write, no binder
+# and no properties.
+type vendor_pd_mapper, domain;
+type vendor_pd_mapper_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_pd_mapper)
+
+neverallow vendor_pd_mapper self:global_capability_class_set *;
+neverallow vendor_pd_mapper self:global_capability2_class_set *;
+neverallow vendor_pd_mapper self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+
+# QRTR, without ioctls: publish service 0x40 (its address through
+# getsockname, getattr) and answer domain-list requests from the same socket.
+# libqrtr sets a receive timeout (setopt). No bind or connect.
+allow vendor_pd_mapper self:qipcrtr_socket { create getattr read setopt write };
+
+# The remote processors' firmware names: list /sys/class/remoteproc, follow
+# its links and read only the firmware attribute. The domain lists in
+# /vendor/firmware and on the modem partition (firmware_file) need no grant:
+# vendor domains may read vendor_file_type through platform policy.
+allow vendor_pd_mapper vendor_sysfs_ssr:dir { getattr open read search };
+allow vendor_pd_mapper vendor_sysfs_ssr:lnk_file read;
+allow vendor_pd_mapper vendor_sysfs_rproc_firmware:file { open read };
+
+# stdio_to_kmsg (boot/init.qcom.rc): on debuggable builds its error messages
+# reach the kernel log. stdio's device probe stays denied and is not audited.
+userdebug_or_eng(`
+  allow vendor_pd_mapper kmsg_debug_device:chr_file write;
+  dontaudit vendor_pd_mapper kmsg_debug_device:chr_file { getattr ioctl };
+')

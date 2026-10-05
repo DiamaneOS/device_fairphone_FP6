@@ -31,9 +31,9 @@ Downstream adaptations:
 - Label the FP6 fingerprint service (`android.hardware.biometrics.
   fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
   stock wrapper it replaces.
-- Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_pd_mapper`
-  and `vendor_per_mgr`: their QMI libraries open AF_QIPCRTR sockets, which the
-  upstream rules only grant as generic `socket`.
+- Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_per_mgr`: its
+  QMI libraries open AF_QIPCRTR sockets, which the upstream rules only grant
+  as generic `socket`.
 - `fp6/` holds device-owned grants, each bound to the service that showed the
   denial on a permissive boot:
   - Sensors: `sensors.te` (sscrpcd) and `hal_sensors_default.te` are reduced
@@ -167,7 +167,7 @@ are not repeated.
   build, so a denied read returns the same default.
 - `hal_audio_default`, `rild`, `persist.vendor.pd_locater_debug`
   (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable; stock
-  grants it only to the PD mapper.
+  grants it only to its PD mapper, and no domain reads it here.
 - `vendor_nicmd`, `property_socket` write and an `init.svc.*` read
   (`init_service_status_private_prop`): the SHS and QMI-priority helpers it
   starts and checks are not installed.
@@ -282,10 +282,52 @@ grants: writes to `vendor_sysfs_ssr` files and links (the legacy
 MSS, ADSP, CDSP and WPSS recovery switches are in `vendor-volcano/file_contexts`.
 The full RAM dump collector (`vendor_subsystem_ramdump`) is not installed and
 has no policy. Remote-processor error logs are not written to /data (no
-ramdumps links, no `/data/vendor/tombstones/rfs`); the imported
-`vendor_rfs_access` grants on `vendor_tombstone_data_file` and
-`vendor_pddump_data_file` are to be dropped when enforcing unless a denial shows
-a need. These rules are not yet runtime-qualified under enforcing mode.
+`/data/vendor/tombstones/rfs`, and the file server below serves no ramdump
+paths). These rules are not yet runtime-qualified under enforcing mode.
+
+The modem's TFTP file server and the protection-domain mapper are the
+open-source linux-msm `tqftpserv` (DiamaneOS fork with memory and path fixes,
+unlink and truncation) and `pd-mapper` (BSD-3-Clause, built from
+`vendor/qcom/opensource`). They replace Qualcomm's `tftp_server` and
+`pd-mapper`: the imported `vendor-common/rfs_access.te` and `pd_services.te`
+and their `vendor-common/file_contexts` lines are removed, and so are the
+`/vendor/rfs` links into persist that only `tftp_server` used. Each service
+runs as its own vendor user (`modem/config.fs`) with no capabilities, no
+network, no binder and no properties; the stock daemons held setuid, setgid,
+setpcap and net_bind_service (and chown for `tftp_server`).
+
+- `modem/tqftpserv.te` (`vendor_tqftpserv`): QRTR sockets (create, connect,
+  getattr, read, setopt, write; no ioctl or bind), listing
+  `/sys/class/remoteproc` and reading each processor's `firmware` attribute
+  (`vendor_sysfs_rproc_firmware`, `modem/file_contexts`), and its read-write
+  directory `/data/vendor/tmp/tqftpserv` (`vendor_tqftpserv_data_file`: open,
+  create, read, write and delete files; no rename, link, attribute change or
+  subdirectory). The modem asks for `modem_pr/...` read-only files, served
+  through the `/vendor/firmware/modem_pr` link to the modem partition, writes
+  `server_check.txt` and `mcfg.tmp`, and deletes `mcfg.tmp` (the TFTP
+  "unlink" option). tqftpserv deletes only files in that directory and follows
+  no symbolic links there. Unlike `tftp_server`, nothing goes to persist, so a
+  factory reset clears these files. Its probe of the
+  kernel's firmware search path (`vendor_sysfs_firmware_path`,
+  `modem/genfs_contexts`) stays denied and is not audited: on the FP6 that path
+  is a comma-separated list tqftpserv cannot use. A neverallow keeps other
+  vendor services from changing its files.
+- `modem/pd_mapper.te` (`vendor_pd_mapper`): QRTR sockets (create, getattr,
+  read, setopt, write) and the same remoteproc listing and `firmware`
+  attribute. Its domain lists (`/vendor/firmware/*.jsn`, links to the modem
+  partition) and the modem partition itself are readable through the
+  platform's vendor-file rules, as for tqftpserv. Stock also read
+  `vendor_sysfs_data` and `persist.vendor.pd_locater_debug` and used the
+  legacy IPC router socket with its ioctl; none of that is granted.
+- Both: `kmsg_debug_device` write on debuggable builds only, for
+  `stdio_to_kmsg` (their logs go to the kernel log); stdio's fstat and terminal
+  ioctl on it stay denied and are not audited.
+
+Both read the modem partition, which is mounted for `system` (uid and gid
+1000, `fstab.qcom`), through the `system` supplementary group; SELinux limits
+what they can read. QRTR has no per-service access control, so either service
+can reach any QMI service; the `telephony/qrtr.te` inventory lists
+`vendor_tqftpserv` and `vendor_pd_mapper`.
 
 ## Bluetooth
 

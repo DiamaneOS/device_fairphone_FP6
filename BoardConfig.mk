@@ -97,6 +97,9 @@ SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
 PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
+# Vendor users of the remote-processor services (tqftpserv, pd-mapper).
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
+
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk
 include hardware/diamaneos/ims/wlan-board.mk

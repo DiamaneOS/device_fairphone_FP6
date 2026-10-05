@@ -145,6 +145,9 @@ firmware_directories /vendor/firmware_mnt/image/
 /dev/uio0                 0660   system     system
 /dev/uio1                 0660   system     system
 /dev/uio2                 0660   system     system
+# Sleep counters of the SoC and remote processors (qcom_stats driver): the power
+# stats HAL only (power/stats), read-only. Unlisted, the node would be root's.
+/dev/stats                0400   vendor_powerstats vendor_powerstats
 
 # AudioReach GPR/shared memory and PAL speaker protection. ALSA /dev/snd/*
 # permissions are supplied by platform ueventd; legacy MSM codec nodes are unused.

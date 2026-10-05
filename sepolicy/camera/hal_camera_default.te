@@ -50,7 +50,7 @@ allowxperm hal_camera_default vendor_dmabuf_display_heap_device:chr_file ioctl 0
 # (soc0 per-part files, incl. num_subset_parts, are vendor_sys_nonsp_comp).
 allow hal_camera_default { vendor_sysfs_camera vendor_sysfs_jpeg vendor_sysfs_ddr vendor_sys_nonsp_comp vendor_sys_sp_comp }:file r_file_perms;
 r_dir_file(hal_camera_default, vendor_sysfs_graphics)
-allow hal_camera_default proc_meminfo:file { open read };
+allow hal_camera_default proc_meminfo:file { getattr open read };
 # CamX picks chip settings from the public SoC id; soc0 search also reaches the
 # per-part files above. serial_number (vendor_sysfs_soc) stays unreadable.
 allow hal_camera_default vendor_sysfs_soc:dir search;

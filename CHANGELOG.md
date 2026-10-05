@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Let the camera provider stat `/proc/meminfo` as well as read it: CamX checks
+  the file before reading it, and only the stat was denied.
 - Load the vendor kernel modules in parallel streams instead of one serial
   `modprobe`: the platform modules first, then one stream per subsystem at the
   same time, each in the kernel list's order and in the same `vendor_modprobe`

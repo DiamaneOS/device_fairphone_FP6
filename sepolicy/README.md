@@ -172,6 +172,11 @@ are not repeated.
   starts and checks are not installed.
 - `vendor_nicmd`, `netlink_route_socket` `nlmsg_readpriv`: seen after a Wi-Fi
   change; stock does not grant it either.
+- `vendor_nicmd`, `rawip_socket` `create`: seen after a Wi-Fi change; stock does
+  not grant it either, and Wi-Fi calling works without it.
+- `hal_camera_default`, finding `vendor.tcl.camera.algoservice.ITctCameraAlgoService`
+  (`vendor_tct_camera_algo_service`): once per camera open; the TCL algorithm
+  service is not installed (see Camera), and CamX continues without it.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it probes them at start; stock grants read on
   the block devices but never open, and labels none of those BSG nodes.

@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Power HAL: LineageOS libperfmgr (android.hardware.power-service.
+# lineage-libperfmgr), driven by power/powerhint.json. It runs as system with
+# CAP_SYS_NICE only (power/init.fp6.power.rc). Every node it writes gets its own
+# type here and init hands exactly those nodes to system; the WALT sysctl it
+# cannot write goes through fixed init property triggers.
+
+# CPU frequency floors and caps: scaling_min_freq and scaling_max_freq of
+# policy0, policy4 and policy7 (fp6/genfs_contexts). The platform labels them
+# sysfs_devices_system_cpu with the rest of /sys/devices/system/cpu.
+type vendor_sysfs_cpufreq_limit, fs_type, sysfs_type;
+# GPU frequency floor and cap (kgsl devfreq min_freq and max_freq) and the GPU
+# wake trigger (touch_wake) (fp6/file_contexts). The rest of the GPU sysfs
+# stays vendor_sysfs_kgsl.
+type vendor_sysfs_kgsl_limit, fs_type, sysfs_type;
+
+# The HAL only writes these nodes (powerhint.json marks them WriteOnly).
+allow hal_power_default { vendor_sysfs_cpufreq_limit vendor_sysfs_kgsl_limit }:file w_file_perms;
+
+# Keep the access the nodes had under their old labels for the processes the
+# relabelling would otherwise cut off: the thermal engine may read and write
+# all of sysfs_devices_system_cpu and vendor_sysfs_kgsl
+# (vendor-common/thermal-engine.te), and system_server's CPU monitor
+# (debuggable builds) reads scaling_max_freq.
+allow vendor_thermal-engine { vendor_sysfs_cpufreq_limit vendor_sysfs_kgsl_limit }:file rw_file_perms;
+allow system_server vendor_sysfs_cpufreq_limit:file r_file_perms;
+
+# ADPF: the HAL sets uclamp_min on the threads of each hint session with
+# sched_setattr. Sessions come from apps (HWUI), SurfaceFlinger and
+# system_server. Changing another user's thread needs CAP_SYS_NICE, and the
+# platform MLS constraint on setsched needs equal levels, which app processes
+# (with categories) never share with a vendor service, so the domain is an MLS
+# trusted subject as on Pixels. Its only grants on app processes are setsched.
+allow hal_power_default self:capability sys_nice;
+allow hal_power_default { appdomain surfaceflinger system_server }:process setsched;
+typeattribute hal_power_default mlstrustedsubject;
+
+# Throttling state for ADPF (ThermalStateListener registers a thermal callback).
+hal_client_domain(hal_power_default, hal_thermal)
+
+# vendor.powerhal.*: the HAL reads its switches (init, display idle support,
+# interaction timing, the sched_boost switch); vendor init sets
+# vendor.powerhal.init at boot and clears the state properties when the
+# framework restarts (the module's own rc file).
+vendor_internal_prop(vendor_power_prop)
+get_prop(hal_power_default, vendor_power_prop)
+set_prop(vendor_init, vendor_power_prop)
+
+# vendor.powerhal.sched_boost: the HAL's only setting it may change; init
+# turns the values 0, 1 and 2 into fixed writes of /proc/sys/walt/sched_boost
+# (power/init.fp6.power.rc). The sysctl is root-only and cannot be chowned.
+vendor_internal_prop(vendor_power_sched_boost_prop)
+set_prop(hal_power_default, vendor_power_sched_boost_prop)

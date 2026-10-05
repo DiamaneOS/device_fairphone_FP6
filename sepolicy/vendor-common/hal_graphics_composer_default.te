@@ -101,9 +101,6 @@ allow hal_graphics_composer_client vendor_hal_vnddisplayconfig_service:service_m
 # Allow qdcmss socket access
 # Unselected service/legacy entrypoint: no grant.
 
-#allow composer to find hal_perf
-hal_client_domain(hal_graphics_composer_default, vendor_hal_perf);
-
 #allow composer to find hal_thermal
 hal_client_domain(hal_graphics_composer_default, hal_thermal);
 

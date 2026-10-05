@@ -51,14 +51,6 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <hal format="aidl">
-        <name>vendor.qti.hardware.perf2</name>
-        <version>1</version>
-        <interface>
-            <name>IPerf</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
     <!-- Qualcomm radio services in the stock QCRIL daemon, used by the stock IMS
          app (IImsRadio, IQtiRadioConfig), our call-audio bridge (IQcRilAudio,
          callaudio/) and the stock eSIM LPA (IUimLpa). -->

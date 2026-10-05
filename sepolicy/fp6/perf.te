@@ -1,22 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Scheduler and memory tuning from boot/init.fp6.perf.rc (vendor_init) and the
-# perf HAL. The platform labels none of these sysctls, so they would share the
-# generic proc label; each gets its own type (genfs lines in
-# fp6/genfs_contexts) and only its writers get write.
+# Scheduler and memory tuning from boot/init.fp6.perf.rc (vendor_init). The
+# platform labels none of these sysctls, so they would share the generic proc
+# label; each gets its own type (genfs lines in fp6/genfs_contexts) and only
+# vendor_init writes them.
 #
 # WALT scheduler tunables (/proc/sys/walt: sched_boost, migration thresholds,
-# input boost, fmax caps), set at boot and changed by perf HAL boosts.
+# input boost, fmax caps), set at boot. The power HAL's sched_boost requests
+# reach sched_boost only through fixed vendor_init property triggers
+# (power.te, power/init.fp6.power.rc).
 type vendor_proc_walt, fs_type, proc_type;
-# swappiness and min_free_kbytes: only vendor_init writes them.
+# swappiness and min_free_kbytes.
 type vendor_proc_vm_tuning, fs_type, proc_type;
-# compaction_proactiveness: vendor_init and perf HAL SysNode 0xA
-# (commonsysnodesconfigs.xml).
+# compaction_proactiveness.
 type vendor_proc_compaction, fs_type, proc_type;
 
 allow vendor_init { vendor_proc_walt vendor_proc_vm_tuning vendor_proc_compaction }:file write;
-allow vendor_hal_perf_default vendor_proc_walt:dir search;
-allow vendor_hal_perf_default { vendor_proc_walt vendor_proc_compaction }:file { getattr open read write };
 
 # RT throttling window and the RT uclamp default (platform proc_sched).
 allow vendor_init proc_sched:file write;

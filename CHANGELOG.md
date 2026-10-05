@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Replace the CodeLinaro power HAL and Qualcomm's closed perf2 daemon, which
+  ran as root, with LineageOS's libperfmgr power HAL (`power/`). It runs as
+  system with CAP_SYS_NICE only, writes only the CPU and GPU frequency limits,
+  the GPU wake trigger and the tap-to-wake switch that init hands to it, and
+  reaches WALT `sched_boost` only through fixed init property triggers. It adds
+  touch, launch, rendering and ADPF boosts. A no-op `libqti-perfd-client`
+  ends the camera's perf2 lookups. Not yet built.
 - Replace Qualcomm's closed tftp_server and pd-mapper with the open-source
   linux-msm tqftpserv (our fork, with upstream's pending memory and path
   fixes, unlink and truncation) and pd-mapper, each under its own user with no

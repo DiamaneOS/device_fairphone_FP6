@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// No-op stand-in for Qualcomm's closed libqti-perfd-client.so, which sent perf
+// locks and hints to the perf2 daemon. The stock camera (camera.qcom.so) and
+// SDM composition extension (libsdmextension.so) load it by name; with this
+// library they get valid handles and no binder lookup of the perf2 service.
+// power/power.mk installs it; client.c lists the exported calls.
+cc_library_shared {
+    name: "libqti-perfd-client",
+    vendor: true,
+    srcs: ["client.c"],
+    shared_libs: ["liblog"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wno-unused-parameter",
+    ],
+}

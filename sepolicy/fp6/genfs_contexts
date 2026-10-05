@@ -31,3 +31,11 @@ genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-
 # extcon device got that number. The EUD debug port's extcon stays unlabelled.
 genfscon sysfs /devices/platform/soc/soc:qcom,msm-ext-disp/extcon u:object_r:sysfs_extcon:s0
 genfscon sysfs /devices/platform/soc/soc:spf_core_platform/soc:spf_core_platform:lpass-cdc/wcd9378-codec/extcon u:object_r:sysfs_extcon:s0
+# CPU frequency floors and caps the power HAL writes (power.te). The rest of
+# /sys/devices/system/cpu keeps the platform sysfs_devices_system_cpu.
+genfscon sysfs /devices/system/cpu/cpufreq/policy0/scaling_min_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+genfscon sysfs /devices/system/cpu/cpufreq/policy0/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_min_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_min_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0

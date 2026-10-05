@@ -11,3 +11,9 @@
 # Touch controller double-tap wake switch (power HAL). The rest of the touch
 # device keeps the factory-test type fp_mmitest_sysfs.
 /sys/devices/platform/soc/ac0000\.qcom,qupv3_0_geni_se/a80000\.spi/spi_master/spi0/spi0\.0/gesture_wakeup u:object_r:vendor_sysfs_touch_gesture:s0
+# Power HAL (power.te): LineageOS libperfmgr in the platform power HAL domain,
+# and the GPU nodes it writes: devfreq floor and cap, and the wake trigger.
+/vendor/bin/hw/android\.hardware\.power-service\.lineage-libperfmgr u:object_r:hal_power_default_exec:s0
+/sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/devfreq/3d00000\.qcom,kgsl-3d0/min_freq u:object_r:vendor_sysfs_kgsl_limit:s0
+/sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/devfreq/3d00000\.qcom,kgsl-3d0/max_freq u:object_r:vendor_sysfs_kgsl_limit:s0
+/sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake u:object_r:vendor_sysfs_kgsl_limit:s0

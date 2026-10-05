@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Load the vendor kernel modules in parallel streams instead of one serial
+  `modprobe`: the platform modules first, then one stream per subsystem at the
+  same time, each in the kernel list's order and in the same `vendor_modprobe`
+  domain, now with only CAP_SYS_MODULE. init no longer waits for the touch
+  driver, whose probe takes about a second. Not yet built.
 - Run the stock CamX camera provider under a seccomp filter. The tools
   renderer renames the provider's libhardware.so dependency to our
   libcamxjail.so (`camera/seccomp`), which links libhardware and installs

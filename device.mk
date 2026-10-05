@@ -90,6 +90,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
+# The vendor_dlkm load list split into streams that init.qcom.rc loads in
+# parallel. Together they must list every module of the kernel's
+# modules.load once, each in its order (image verification checks this).
+PRODUCT_COPY_FILES += \
+    $(foreach s,platform debug wireless audio data crypto media display touch, \
+        device/fairphone/FP6/boot/modules/modules.load.$(s):$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.load.$(s))
+
 # CPU, scheduler, deep sleep and memory tuning with stock's values (the kernel
 # defaults pin every core at its maximum clock and keep deep sleep off).
 PRODUCT_COPY_FILES += \

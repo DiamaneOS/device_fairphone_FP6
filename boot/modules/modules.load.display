@@ -1,0 +1,4 @@
+msm_drm.ko
+msm_ext_display.ko
+sync_fence.ko
+msm_hw_fence.ko

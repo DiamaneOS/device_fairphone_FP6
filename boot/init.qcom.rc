@@ -29,8 +29,32 @@ on early-fs
 on fs
     mount_all --early
     # Firmware mounts precede vendor drivers which may request firmware at probe.
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /system/lib/modules --all=/system/lib/modules/modules.load
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load
+    # The kernel modules load in parallel streams (the vendor.modprobe_*
+    # services below), each in the order of the kernel's modules.load. The
+    # platform stream (clocks, regulators, buses, USB, thermal, remote
+    # processors) loads alone first; then every subsystem loads its own stream
+    # at the same time. Touch starts once display is done, since its driver
+    # needs the panel and its backlight. init goes on only when all streams
+    # are done, except touch: its driver takes about a second to probe, and
+    # nothing uses the touchscreen before system_server, which picks it up
+    # when it appears.
+    start vendor.modprobe_system
+    exec_start vendor.modprobe_platform
+    start vendor.modprobe_debug
+    start vendor.modprobe_wireless
+    start vendor.modprobe_audio
+    start vendor.modprobe_data
+    start vendor.modprobe_crypto
+    start vendor.modprobe_media
+    exec_start vendor.modprobe_display
+    start vendor.modprobe_touch
+    wait_for_prop init.svc.vendor.modprobe_system stopped
+    wait_for_prop init.svc.vendor.modprobe_debug stopped
+    wait_for_prop init.svc.vendor.modprobe_wireless stopped
+    wait_for_prop init.svc.vendor.modprobe_audio stopped
+    wait_for_prop init.svc.vendor.modprobe_data stopped
+    wait_for_prop init.svc.vendor.modprobe_crypto stopped
+    wait_for_prop init.svc.vendor.modprobe_media stopped
     chown root system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
@@ -54,6 +78,103 @@ on fs
     chown system system /mnt/vendor/persist/sensors/sensors_list.txt
     chown system system /mnt/vendor/persist/sensors/registry/registry/sensors_registry
     chown system system /mnt/vendor/persist/sensors/sensors_settings
+
+# The module streams started at "on fs": one modprobe for system_dlkm and one
+# per list in /vendor/lib/modules (boot/modules/, which together hold the
+# kernel's vendor_dlkm modules.load), with the options and domain of the
+# single modprobe each list was part of. libmodprobe loads the dependencies of
+# every module first; when two streams need the same module, the kernel loads
+# it once and the other waits for it. Each keeps only CAP_SYS_MODULE, and its
+# errors go to the kernel log.
+service vendor.modprobe_system /vendor/bin/modprobe -q -b -d /system/lib/modules --all=/system/lib/modules/modules.load
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_platform /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.platform
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_debug /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.debug
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_wireless /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.wireless
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_audio /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.audio
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_data /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.data
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_crypto /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.crypto
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_media /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.media
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_display /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.display
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_touch /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.touch
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
 
 on late-fs
     mount_all --late

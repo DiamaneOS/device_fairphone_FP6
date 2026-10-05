@@ -64,8 +64,13 @@ The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
 enabled. Boot, init_boot and recovery use header version 4; recovery excludes the
 kernel, matching the stock bootloader layout. Android and recovery use the same
 fstab so encryption definitions cannot drift. Vendor drivers are loaded after
-their firmware mounts. Image-header, policy and native product checks remain
-mandatory before flashing.
+their firmware mounts, in parallel streams: `boot/modules/` splits the kernel's
+vendor_dlkm `modules.load` into a platform list, loaded first, and one list per
+subsystem, loaded together after it (`boot/init.qcom.rc`). Each list keeps the
+kernel list's order, and together they name every module once; a kernel update
+that changes `modules.load` needs the same change here, or image verification
+fails. Image-header, policy and native product checks remain mandatory before
+flashing.
 
 Recovery has its own `boot/init.recovery.qcom.rc`, imported by the platform
 recovery as `init.recovery.qcom.rc`. It selects configfs and the FP6 controller,

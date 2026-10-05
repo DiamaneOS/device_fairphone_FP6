@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Label `/data/vendor/tzstorage` as the TEE's storage again, as upstream: the
+  line was lost when the Qualcomm file contexts were reduced, so qseecomd,
+  which may write that type, could only read the directory.
 - Let imeiprovd read the traceability partition: ueventd gives its block
   device to group vendor_imeiprov, read-only. Without it the tool, which runs
   without capabilities, could not open the partition.

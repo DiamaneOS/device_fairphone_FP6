@@ -174,6 +174,10 @@ are not repeated.
   change; stock does not grant it either.
 - `vendor_nicmd`, `rawip_socket` `create`: seen after a Wi-Fi change; stock does
   not grant it either, and Wi-Fi calling works without it.
+- `fp6_iwlan_app` (qtidataservices) and `mediacodec` (the Codec2 image-texture
+  filter), reads of `default_prop` and `zygote_config_prop`: generic platform
+  properties (verified-boot partition info, build UUIDs, runtime flags) a
+  denied read returns as unset; neither needs them.
 - `hal_camera_default`, finding `vendor.tcl.camera.algoservice.ITctCameraAlgoService`
   (`vendor_tct_camera_algo_service`): once per camera open; the TCL algorithm
   service is not installed (see Camera), and CamX continues without it.

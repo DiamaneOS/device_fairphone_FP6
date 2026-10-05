@@ -19,8 +19,8 @@ neverallow {
   -vendor_pd_mapper
   -vendor_per_mgr
   -vendor_qrtr
-  -vendor_rfs_access
   -vendor_rmt_storage
   -vendor_thermal-engine
+  -vendor_tqftpserv
   userdebug_or_eng(`-su')
 } self:qipcrtr_socket create;

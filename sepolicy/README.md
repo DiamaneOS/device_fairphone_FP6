@@ -597,3 +597,35 @@ OTP/OIS sysfs (`fp_mmitest_sysfs`), persist writes and QRTR ioctls. The file con
 three upstream `generic/vendor/common/file_contexts` entries (lines 317, 348, 440). The
 upstream files to reduce from are not imported, so there is no provenance entry.
 These rules are not yet runtime-qualified under enforcing mode.
+
+## Media
+
+`media/` holds the policy for the stock Qualcomm Codec2 video service
+(`vendor.qti.media.c2@1.0-service`, platform domain `mediacodec`), which exposes only the
+hardware encoders (owner decision 2026-09-27; decoders stay the software codecs in the
+sandboxed `mediaswcodec`). Every app except isolated processes is a Codec2 client and can
+call it. The platform vendor policy already makes `mediacodec` the Codec2 HIDL server and a
+gralloc and GPU client, and gives it read-write access to every `video_device` node. That
+type also labels the camera V4L2, subdevice, media, JPEG and CVP nodes and the Iris decoder
+node, so the DAC group is what keeps the codec off them: it runs in group `mediacodec`, and
+`boot/ueventd.rc` gives that group only the encoder node `/dev/video33`; the decoder node
+`/dev/video32` is root-only. The platform neverallows cover tcp, udp and rawip sockets; the
+stock seccomp policies the service applies forbid `socket` and `connect` entirely. The
+device grants add only what the encoder path uses: `SYS_NICE`, the read-only
+`vendor.media.target_variant` (the service finds the target specification that limits it
+to the encoders through it; without the read it would register every codec) and the
+gralloc and Adreno properties. `vendor_init` may set `vendor.media.target_variant` from the
+vendor build.prop. The file context restores upstream `generic/vendor/common/file_contexts`
+line 324.
+
+The composer's `IDisplayConfig` lookup (refresh rates for perf hints, which are off) is
+denied and not audited: the service exposes screen writeback and panel controls. FastRPC is
+denied the same way, with a neverallow on opening a DSP node, as in stock; `libfastcvopt`
+then runs on the CPU.
+
+Omitted: the Codec2 audio service, Wi-Fi display, VPP, hexlp, the capability config
+store, secure video (content-protection and membuf nodes, QSEECom), FastRPC, the
+performance HAL, `/data/vendor/media` and the Qualcomm system DMA-BUF heap (the selected
+libraries allocate from the AOSP system heaps only). As for the camera, the upstream files
+to reduce from are not imported, so there is no provenance entry. These rules are not yet
+runtime-qualified under enforcing mode.

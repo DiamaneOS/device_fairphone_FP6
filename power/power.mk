@@ -22,6 +22,12 @@ PRODUCT_PACKAGES += \
 # /dev/stats. Stock FP6 ships no power stats HAL.
 PRODUCT_PACKAGES += android.hardware.power.stats-service.fp6
 
+# powerhint.json has no camera streaming modes (Mode::CAMERA_STREAMING_*).
+# Pixels cap the CPUs in them and move the camera daemon to bigger cores;
+# Qualcomm's own streaming tunings cap the little cores and lower the migration
+# thresholds. This HAL can make neither placement change, and CamX runs on the
+# little cores, so a cap alone would slow it. Nothing sends the modes, and
+# libqti-perfd-client does not forward CamX's streaming hints.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc

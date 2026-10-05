@@ -5,6 +5,13 @@
 // generic system image stays device independent.
 
 runtime_resource_overlay {
+    name: "FP6CarrierConfigOverlay",
+    vendor: true,
+    manifest: "FP6CarrierConfigOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6CarrierConfigOverlay/res"],
+}
+
+runtime_resource_overlay {
     name: "FP6FrameworksOverlay",
     vendor: true,
     manifest: "FP6FrameworksOverlay/AndroidManifest.xml",

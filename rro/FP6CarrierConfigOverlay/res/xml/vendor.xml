@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+
+     Device corrections to the stock carrier data. CarrierConfig reads this
+     file last, after the carrier's own file and the stock vendor.xml, so a
+     value here applies to every carrier.
+
+     world_phone_bool: the stock vendor.xml sets it for every carrier, a
+     Qualcomm default for CDMA world phones. With it, Settings drops the
+     network-type list GrapheneOS shows ("5G", "4G", "LTE only", "5G only",
+     filtered by what the modem supports) for an unfiltered list of 34 modes,
+     CDMA, EvDo and TD-SCDMA included, and adds CDMA system-select options.
+     No carrier file sets it and the Android default is false. It changes
+     what Settings offers (and TelephonyManager.isWorldPhone), not radio or
+     emergency behaviour.
+-->
+<carrier_config_list>
+    <carrier_config>
+        <boolean name="world_phone_bool" value="false" />
+    </carrier_config>
+</carrier_config_list>

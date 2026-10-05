@@ -17,3 +17,7 @@
 /sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/devfreq/3d00000\.qcom,kgsl-3d0/min_freq u:object_r:vendor_sysfs_kgsl_limit:s0
 /sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/devfreq/3d00000\.qcom,kgsl-3d0/max_freq u:object_r:vendor_sysfs_kgsl_limit:s0
 /sys/devices/platform/soc/3d00000\.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake u:object_r:vendor_sysfs_kgsl_limit:s0
+# Power stats HAL (power_stats.te) in the platform power stats HAL domain, and
+# the qcom_stats sleep counter device it reads.
+/vendor/bin/hw/android\.hardware\.power\.stats-service\.fp6 u:object_r:hal_power_stats_default_exec:s0
+/dev/stats                              u:object_r:vendor_qcom_stats_device:s0

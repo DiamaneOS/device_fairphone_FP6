@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Add a power stats HAL (`power/stats`, IPowerStats V2), which stock does
+  not have. It reports the SoC sleep modes (AOSD, CXSD, DDR) and the modem,
+  WPSS, ADSP and CDSP sleep time from the qcom_stats driver's `/dev/stats`
+  ioctls, so batterystats, statsd and `dumpsys powerstats` see subsystem
+  sleep. No energy meters or consumers. It runs as its own user
+  (`vendor_powerstats`) without capabilities in the platform
+  `hal_power_stats_default` domain; only it may open `/dev/stats`, and only
+  the seven commands it uses. Not yet built.
 - Run the stock CamX camera provider under a seccomp filter. The tools
   renderer renames the provider's libhardware.so dependency to our
   libcamxjail.so (`camera/seccomp`), which links libhardware and installs

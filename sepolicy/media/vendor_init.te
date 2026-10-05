@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# media/media.mk sets vendor.media.target_variant in the vendor build.prop,
+# which init loads with vendor_init's permissions. Stock set it from its
+# init.qti.media.sh domain (vendor_qti_init_shell), which is not installed.
+set_prop(vendor_init, vendor_video_prop)

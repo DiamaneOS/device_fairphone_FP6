@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The stock Qualcomm Codec2 video service (vendor.qti.media.c2@1.0-service),
+# hardware encoders only (media/media.mk), in the platform mediacodec domain.
+# The platform vendor policy (system/sepolicy/vendor/mediacodec.te) already
+# makes it the Codec2 HIDL server (hal_codec2), a gralloc/allocator client and
+# a GPU same-process-HAL user, and gives it read-write access to every
+# video_device node, the platform DMA-BUF system heap and vndbinder. Every app
+# except isolated processes is a Codec2 client and can call this service.
+# video_device is not narrow: it also labels the camera V4L2, subdevice,
+# media, JPEG and CVP nodes (vendor-common/file_contexts), so the service's
+# DAC group (mediacodec; media/init.fp6.media.rc and boot/ueventd.rc) is what
+# keeps it off the camera nodes and off the hardware decoder node until those
+# nodes get their own types. The platform neverallows cover only tcp, udp and
+# rawip sockets; the stock seccomp policies are what forbid socket() and
+# connect() entirely.
+# Reduced from the pinned Qualcomm generic/vendor/common/mediacodec.te,
+# qva/vendor/common/mediacodec.te and qva/vendor/volcano/mediacodec.te and the
+# stock compiled policy, bound to this domain and to what the encoder path of
+# the selected closure uses.
+#
+# Not granted (stock grants them for components this product does not
+# install, for decoders or for optional features): the Codec2 audio service
+# (audio_device, the audio HAL, the DSP manager), Wi-Fi display, VPP, hexlp,
+# qconfig, the capability config store, secure video (VM content-protection
+# bitstream and membuf nodes), FastRPC (vendor_qdsp_device), the performance
+# HAL (the perf library property ro.vendor.extension_library is not set), the
+# composer's IDisplayConfig (see below), /data/vendor/media (dumps), and the
+# Qualcomm system DMA-BUF heap (vendor_dmabuf_system_heap_device): the
+# selected libraries allocate only from the AOSP system heaps
+# (/dev/dma_heap/system and system-uncached, platform grant) and name no
+# qcom,system heap.
+
+# init.fp6.media.rc: capabilities SYS_NICE (qva/vendor/common/mediacodec.te).
+allow mediacodec self:capability sys_nice;
+
+# libqcodec2_platform reads vendor.media.target_variant to find the target
+# specification (qva/vendor/common/mediacodec.te). That file is what limits
+# the store to the encoders: without this read the library falls back to a
+# path that does not exist and registers every codec, decoders included.
+get_prop(mediacodec, vendor_video_prop)
+
+# The in-process gralloc (libgralloc.qti) and the Adreno Vulkan driver used by
+# the image-transform engine (libvideotxr) read their read-only properties;
+# same grant as for mediaswcodec in fp6/graphics.te.
+get_prop(mediacodec, vendor_gralloc_prop)
+get_prop(mediacodec, vendor_public_vendor_default_prop)
+
+# libqcodec2_utils (QC2DisplayConfigClient) looks up the composer's
+# IDisplayConfig/default only for the refresh rate its perf hints use; perf
+# hints are off here and the library logs "IDisplayConfig AIDL is not present"
+# and carries on. The service would expose screen writeback, display freeze and
+# panel controls to a process every app can call, so the lookup is denied,
+# silently. (A grant would also break the build: hal_attribute_service
+# neverallows find by any domain outside the composer client/server
+# attributes.) /dev/binder and the servicemanager call come from the platform
+# (every domain; hal_graphics_allocator_client), so no binder_use here.
+dontaudit mediacodec vendor_hal_vnddisplayconfig_service:service_manager find;
+
+# libqcodec2_utils loads libfastcvopt.so (installed by the camera stack),
+# which tries FastRPC to the CDSP and falls back to the CPU. The codec never
+# gets a DSP node of its own: upstream qva/vendor/common/mediacodec.te has the
+# same dontaudit rules and generic/vendor/common/domain.te neverallows every
+# permission but ioctl and read. Upstream's ioctl/read grant on a DSP
+# descriptor passed in by another process is not carried over.
+dontaudit mediacodec vendor_qdsp_device:chr_file open;
+dontaudit mediacodec vendor_xdsp_device:chr_file { getattr open read map };
+neverallow mediacodec { vendor_qdsp_device vendor_xdsp_device }:chr_file open;

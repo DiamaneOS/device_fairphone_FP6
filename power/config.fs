@@ -6,4 +6,4 @@
 # BoardConfig.mk adds this file to TARGET_FS_CONFIG_GEN.
 
 [AID_VENDOR_POWERSTATS]
-value: 2994
+value: 2995

@@ -109,7 +109,6 @@ PRODUCT_PACKAGES += \
     toolbox_vendor \
     android.hardware.boot-service.qti \
     android.hardware.boot-service.qti.recovery \
-    android.hardware.power-service \
     android.hardware.thermal-service.qti \
     vendor.qti.hardware.lights.service \
     vendor.qti.hardware.vibrator.service \
@@ -193,6 +192,7 @@ $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
 # Hardware bring-up. Each subsystem makefile documents its stock and
 # source-built parts.
+$(call inherit-product, device/fairphone/FP6/power/power.mk)
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
 $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)

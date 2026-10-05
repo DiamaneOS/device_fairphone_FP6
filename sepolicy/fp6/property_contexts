@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Power HAL switches and state (power.te). The exact sched_boost entry, the
+# only one the HAL may set, takes precedence over the prefix and accepts only
+# the three values init acts on.
+vendor.powerhal.                u:object_r:vendor_power_prop:s0
+vendor.powerhal.sched_boost     u:object_r:vendor_power_sched_boost_prop:s0 exact enum 0 1 2

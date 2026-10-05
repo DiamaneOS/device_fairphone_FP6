@@ -65,13 +65,8 @@ hal_client_domain(hal_camera_default, hal_graphics_allocator)
 # fences in capture requests from cameraserver.
 allow hal_camera_default hal_graphics_composer_default:fd use;
 
-# CamX perf locks (launch, snapshot, recording): a permissive boot logged only
-# the binder call into the perf HAL, no IPerf service lookup. If a find denial
-# on vendor_hal_perf2_service or vendor_hal_perf_hwservice shows up, replace
-# this with
-# hal_client_domain(hal_camera_default, vendor_hal_perf); the platform
-# neverallow permits that lookup only for client members.
-binder_call(hal_camera_default, vendor_hal_perf_default)
+# CamX perf locks (launch, snapshot, recording) go to the no-op
+# libqti-perfd-client (device power/), so the camera calls no perf service.
 
 # Left denied: the display-config camera hint (IDisplayConfig would also expose
 # brightness, power mode and writeback capture), IPostProcService registration

@@ -67,7 +67,6 @@ on post-fs-data
     mkdir /data/vendor/tzstorage 0770 system system
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
-    mkdir /data/vendor/perfd 2770 root system
     # Sensor stack state (matches stock).
     mkdir /data/vendor/sensors 0770 system system
     mkdir /data/vendor/tombstones 0771 system system

@@ -51,11 +51,14 @@ The normal and recovery implementations compile with CFI enabled. Their UFS
 header layouts match the pinned kernel interfaces. Runtime slot switching still
 requires device verification.
 
-The product uses the published FP6 power, thermal, lights, vibrator, USB and
-health services. Power has a small Soong build adaptation; the implementations
-remain separate from the device configuration. Required runtime dependencies,
-firmware and policy belong to the generated integration and must be checked
-before boot acceptance.
+The product uses the published FP6 thermal, lights, vibrator, USB and health
+services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the
+FP6 configuration in `power/`: the hint table (`powerhint.json`), its init file
+(the HAL runs as system with CAP_SYS_NICE only) and a no-op
+`libqti-perfd-client` for the stock camera; Qualcomm's closed perf2 daemon is
+not installed. The implementations remain separate from the device
+configuration. Required runtime dependencies, firmware and policy belong to the
+generated integration and must be checked before boot acceptance.
 
 The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
 enabled. Boot, init_boot and recovery use header version 4; recovery excludes the

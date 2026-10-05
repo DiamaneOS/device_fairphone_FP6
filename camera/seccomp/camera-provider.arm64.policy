@@ -74,6 +74,9 @@ sched_getparam: 1
 sched_setscheduler: 1
 # Read-only priority range query, logged once at start.
 sched_get_priority_min: 1
+# Thread nice values (CamX worker threads; seen during capture). PRIO_PROCESS
+# only: no process-group or per-user changes.
+setpriority: arg0 == 0
 
 # debuggerd fallback handler (system/core debuggerd/seccomp_policy/
 # crash_dump.arm64.policy), less the calls already listed.

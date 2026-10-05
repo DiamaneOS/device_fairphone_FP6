@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Ask CamX for a UBWC preview stream: the display hardware rotates only UBWC
+  buffers, so the linear portrait preview was composed by the GPU on every
+  frame. The 16:9 preview is now composed by the display hardware.
 - Allow the calls the camera provider's seccomp log showed: at start
   prctl(PR_GET_DUMPABLE) and sched_get_priority_min (read-only queries), and
   during capture setpriority for its own threads (PRIO_PROCESS only) and

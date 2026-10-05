@@ -1,4 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright 2026 The DiamaneOS Project
-# Stock label (upstream generic/vendor/common/file_contexts line 324).
-/vendor/bin/hw/vendor\.qti\.media\.c2@1\.0-service      u:object_r:mediacodec_exec:s0

@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// Android 14 libui ABI for the stock FP6 libcodec2_vndk.so (built against
+// Android 14). The tools renderer renames its libui.so dependency to uiv34.so
+// and its six android::GraphicBuffer imports to android::GraphicBufV34 (same
+// string lengths; input and output hashes pinned):
+// - GraphicBufferV34.cpp: an Android 14 sized GraphicBuffer (256 bytes;
+//   Android 17's is 3376) that fails closed, so the stock library's own
+//   256-byte allocations never meet the Android 17 constructor;
+// - GraphicBufferMapperV34.cpp: GraphicBufferMapper::lock with six arguments
+//   and unlock(handle), which Android 17 dropped, forwarded to the Android 17
+//   members.
+// Every other libui symbol the stock library imports (mapper, allocator,
+// Fence, Region) has the same layout in Android 17 and still comes from the
+// real libui, which this library links. The version script exports exactly the
+// eight entry points above. Device-authored; no upstream code copied.
+cc_library_shared {
+    name: "uiv34",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: [
+        "GraphicBufferMapperV34.cpp",
+        "GraphicBufferV34.cpp",
+    ],
+    version_script: "libuiv34.map.txt",
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libsync",
+        "libui",
+        "libutils",
+    ],
+}

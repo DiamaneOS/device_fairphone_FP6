@@ -25,7 +25,8 @@ requirements; this configuration is not a release acceptance claim.
 
 The vendor generator supplies the exact stock APN table and carrier XML assets.
 The source CarrierConfig fork consumes that data; the stock carrier-service APK
-is not installed. This replaces the earlier partial FP6CarrierConfigOverlay.
+is not installed. FP6CarrierConfigOverlay, read after that data, only corrects
+stock values set for every carrier (the CDMA world-phone flag).
 Carrier availability, provisioning and the user's Wi-Fi-calling choice remain
 authoritative. The inherited entitlement app uses its source-only HTTPS/polling
 fork; it stays idle when the carrier does not configure that flow. It provides

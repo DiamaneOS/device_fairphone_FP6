@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow the two calls the camera provider's seccomp log showed at start:
+  prctl(PR_GET_DUMPABLE) and sched_get_priority_min, both read-only queries.
 - Label `/data/vendor/tzstorage` as the TEE's storage again, as upstream: the
   line was lost when the Qualcomm file contexts were reduced, so qseecomd,
   which may write that type, could only read the directory.

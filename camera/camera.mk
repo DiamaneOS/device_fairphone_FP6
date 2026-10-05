@@ -13,6 +13,13 @@
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/camera/init.camera.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.camera.rc
 
+# Seccomp loader for the stock provider (camera/seccomp). The tools renderer
+# renames the provider's libhardware.so dependency to libcamxjail.so, which
+# installs the filter from /vendor/etc/seccomp_policy/camera-provider.policy
+# before the provider's main(). Without it the provider does not start.
+PRODUCT_PACKAGES += \
+    libcamxjail
+
 # The stock FP6 feature set (vendor/etc/permissions, identical to the AOSP files):
 # rear camera with flash and autofocus, front camera, FULL hardware level with
 # manual sensor/post-processing, and RAW capture. No concurrent-camera or

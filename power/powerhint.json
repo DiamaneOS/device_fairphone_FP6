@@ -1,0 +1,62 @@
+{
+  "Nodes": [
+    {"Name": "CPUSilverMinFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq"], "Values": ["1708800", "1344000", "1113600", "595200"], "DefaultIndex": 3, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "CPUGoldMinFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq"], "Values": ["2208000", "1401600", "1190400", "633600"], "DefaultIndex": 3, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "CPUPrimeMinFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy7/scaling_min_freq"], "Values": ["2496000", "1651200", "1094400", "960000", "633600"], "DefaultIndex": 4, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "CPUSilverMaxFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq"], "Values": ["1804800", "1113600", "902400"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "CPUGoldMaxFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy4/scaling_max_freq"], "Values": ["2400000", "1401600"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "CPUPrimeMaxFreq", "Paths": ["/sys/devices/system/cpu/cpufreq/policy7/scaling_max_freq"], "Values": ["2496000", "960000"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "GPUMinFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq"], "Values": ["1050000000", "763000000", "510000000", "264000000"], "DefaultIndex": 3, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "GPUMaxFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq"], "Values": ["1050000000", "510000000"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
+    {"Name": "GPUTouchWake", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake"], "Values": ["1", "0"], "DefaultIndex": 1, "ResetOnInit": false, "WriteOnly": true},
+    {"Name": "WaltSchedBoost", "Paths": ["vendor.powerhal.sched_boost"], "Values": ["1", "2", "0"], "DefaultIndex": 2, "ResetOnInit": true, "Type": "Property"},
+    {"Name": "TapToWake", "Paths": ["/sys/bus/spi/devices/spi0.0/gesture_wakeup"], "Values": ["2", "-2"], "DefaultIndex": 1, "ResetOnInit": true, "WriteOnly": true}
+  ],
+  "Actions": [
+    {"PowerHint": "INTERACTION", "Node": "CPUSilverMinFreq", "Value": "1113600", "Duration": 0},
+    {"PowerHint": "INTERACTION", "Node": "CPUGoldMinFreq", "Value": "1190400", "Duration": 0},
+    {"PowerHint": "INTERACTION", "Node": "CPUPrimeMinFreq", "Value": "1094400", "Duration": 0},
+    {"PowerHint": "INTERACTION", "Node": "WaltSchedBoost", "Value": "2", "Duration": 0, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
+
+    {"PowerHint": "LAUNCH", "Node": "CPUSilverMinFreq", "Value": "1344000", "Duration": 3000},
+    {"PowerHint": "LAUNCH", "Node": "CPUGoldMinFreq", "Value": "1401600", "Duration": 3000},
+    {"PowerHint": "LAUNCH", "Node": "CPUPrimeMinFreq", "Value": "1651200", "Duration": 3000},
+    {"PowerHint": "LAUNCH", "Node": "WaltSchedBoost", "Value": "1", "Duration": 3000, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
+    {"PowerHint": "LAUNCH", "Node": "GPUTouchWake", "Value": "1", "Duration": 3000},
+
+    {"PowerHint": "CAMERA_LAUNCH", "Node": "CPUSilverMinFreq", "Value": "1708800", "Duration": 1500},
+    {"PowerHint": "CAMERA_LAUNCH", "Node": "CPUGoldMinFreq", "Value": "2208000", "Duration": 1500},
+    {"PowerHint": "CAMERA_LAUNCH", "Node": "CPUPrimeMinFreq", "Value": "2496000", "Duration": 1500},
+    {"PowerHint": "CAMERA_LAUNCH", "Node": "WaltSchedBoost", "Value": "1", "Duration": 1500, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
+    {"PowerHint": "CAMERA_SHOT", "Node": "CPUSilverMinFreq", "Value": "1708800", "Duration": 1000},
+    {"PowerHint": "CAMERA_SHOT", "Node": "CPUGoldMinFreq", "Value": "2208000", "Duration": 1000},
+    {"PowerHint": "CAMERA_SHOT", "Node": "CPUPrimeMinFreq", "Value": "2496000", "Duration": 1000},
+    {"PowerHint": "CAMERA_STREAMING_LOW", "Node": "CPUSilverMaxFreq", "Value": "902400", "Duration": 0},
+    {"PowerHint": "CAMERA_STREAMING_MID", "Node": "CPUSilverMaxFreq", "Value": "902400", "Duration": 0},
+    {"PowerHint": "CAMERA_STREAMING_HIGH", "Node": "CPUSilverMaxFreq", "Value": "1113600", "Duration": 0},
+
+    {"PowerHint": "EXPENSIVE_RENDERING", "Node": "GPUMinFreq", "Value": "763000000", "Duration": 0},
+    {"PowerHint": "DISPLAY_UPDATE_IMMINENT", "Node": "GPUTouchWake", "Value": "1", "Duration": 100},
+
+    {"PowerHint": "SUSTAINED_PERFORMANCE", "Node": "CPUSilverMaxFreq", "Value": "1113600", "Duration": 0},
+    {"PowerHint": "SUSTAINED_PERFORMANCE", "Node": "CPUGoldMaxFreq", "Value": "1401600", "Duration": 0},
+    {"PowerHint": "SUSTAINED_PERFORMANCE", "Node": "CPUPrimeMaxFreq", "Value": "960000", "Duration": 0},
+    {"PowerHint": "SUSTAINED_PERFORMANCE", "Node": "GPUMaxFreq", "Value": "510000000", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUSilverMinFreq", "Value": "1113600", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUSilverMaxFreq", "Value": "1113600", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUGoldMinFreq", "Value": "1401600", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUGoldMaxFreq", "Value": "1401600", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUPrimeMinFreq", "Value": "960000", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUPrimeMaxFreq", "Value": "960000", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "GPUMinFreq", "Value": "510000000", "Duration": 0},
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "GPUMaxFreq", "Value": "510000000", "Duration": 0},
+
+    {"PowerHint": "DOUBLE_TAP_TO_WAKE", "Node": "TapToWake", "Value": "2", "Duration": 0}
+  ],
+  "AdpfConfig": [
+    {"Name": "ADPF_DEFAULT", "PID_On": true, "PID_Po": 5.0, "PID_Pu": 3.0, "PID_I": 0.001, "PID_I_Init": 200, "PID_I_High": 512, "PID_I_Low": -120, "PID_Do": 500.0, "PID_Du": 0.0,
+     "SamplingWindow_P": 1, "SamplingWindow_I": 0, "SamplingWindow_D": 1,
+     "UclampMin_On": true, "UclampMin_Init": 100, "UclampMin_LoadUp": 200, "UclampMin_LoadReset": 300, "UclampMin_High": 384, "UclampMin_Low": 0,
+     "ReportingRateLimitNs": 166666660, "TargetTimeFactor": 1.0, "StaleTimeFactor": 10.0, "GpuBoost": false}
+  ]
+}

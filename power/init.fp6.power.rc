@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# Power HAL: LineageOS libperfmgr with power/powerhint.json (power.mk).
+
+# The module's own android.hardware.power-service.lineage-libperfmgr.rc runs
+# the HAL as root. This file sorts after it in /vendor/etc/init, and init uses
+# the last definition marked override: the HAL runs as system with CAP_SYS_NICE
+# only, which ADPF needs to set uclamp on other processes' threads. No
+# readproc group: the HAL reads no /proc/<pid> entries. The module file still
+# starts the service at late-fs and restarts it when the framework restarts.
+service vendor.power-hal-aidl /vendor/bin/hw/android.hardware.power-service.lineage-libperfmgr
+    class hal
+    user system
+    group system
+    capabilities SYS_NICE
+    priority -20
+    override
+
+# The sysfs nodes powerhint.json writes, and no others, go to system. They are
+# 0644, so the owner can write them and everyone else keeps read access. The
+# HAL starts writing at sys.boot_completed (vendor.powerhal.init, set at the
+# end of init.fp6.perf.rc); the touch controller's gesture node gets its owner
+# from ueventd.rc.
+on boot
+    chown system system /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
+    chown system system /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+    chown system system /sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq
+    chown system system /sys/devices/system/cpu/cpufreq/policy4/scaling_max_freq
+    chown system system /sys/devices/system/cpu/cpufreq/policy7/scaling_min_freq
+    chown system system /sys/devices/system/cpu/cpufreq/policy7/scaling_max_freq
+    chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq
+    chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq
+    chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake
+
+# WALT sched_boost for the LAUNCH (1, full throttle) and INTERACTION
+# (2, conservative) hints. /proc/sys/walt/sched_boost is root-only and a sysctl
+# cannot be chowned, so the HAL sets vendor.powerhal.sched_boost and init writes
+# one of these fixed values. Writing 0 clears every boost level first, because
+# the kernel counts each level's requests. A/B test without a rebuild:
+# setprop vendor.powerhal.sched_boost.enable false (the hints keep their CPU
+# floors and only skip sched_boost).
+on property:vendor.powerhal.sched_boost=0
+    write /proc/sys/walt/sched_boost 0
+
+on property:vendor.powerhal.sched_boost=1
+    write /proc/sys/walt/sched_boost 0
+    write /proc/sys/walt/sched_boost 1
+
+on property:vendor.powerhal.sched_boost=2
+    write /proc/sys/walt/sched_boost 0
+    write /proc/sys/walt/sched_boost 2

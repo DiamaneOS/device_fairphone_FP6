@@ -83,6 +83,10 @@ firmware_directories /vendor/firmware_mnt/image/
 # PersistentDataBlockService reads and writes it, including the bootloader's
 # unlock-ability flag. Stock rule; without it system_server fails to boot.
 /dev/block/platform/soc/1d84000.ufshc/by-name/frp   0600   system   system
+# The traceability partition: imeiprovd (vendor_imeiprov, no capabilities)
+# reads the two IMEIs from it; SELinux allows it nothing else. Stock reads it
+# from tctd as root.
+/dev/block/platform/soc/1d84000.ufshc/by-name/traceability   0440   root   vendor_imeiprov
 # The stock FP6 FocalTech node is owned by the system fingerprint service.
 /dev/focaltech_fp          0660   system     system
 # The stock NFC HAL runs as nfc and opens the Samsung controller node. Stock

@@ -21,10 +21,11 @@ mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
 writev: 1
 read: 1
 lseek: 1
-# 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 15 PR_SET_NAME,
+# 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 3 PR_GET_DUMPABLE
+# (about 60 calls at start, seen with a kernel syscall trace), 15 PR_SET_NAME,
 # 16 PR_GET_NAME, 39 PR_GET_NO_NEW_PRIVS, 54 PR_PAC_RESET_KEYS (pthread_create),
 # 56 PR_GET_TAGGED_ADDR_CTRL, 61 PR_PAC_GET_ENABLED_KEYS.
-prctl: arg0 == 0x53564d41 || arg0 == 15 || arg0 == 16 || arg0 == 39 || arg0 == 54 || arg0 == 56 || arg0 == 61
+prctl: arg0 == 0x53564d41 || arg0 == 3 || arg0 == 15 || arg0 == 16 || arg0 == 39 || arg0 == 54 || arg0 == 56 || arg0 == 61
 madvise: 1
 mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
 munmap: 1
@@ -71,6 +72,8 @@ rt_sigreturn: 1
 sched_getscheduler: 1
 sched_getparam: 1
 sched_setscheduler: 1
+# Read-only priority range query, logged once at start.
+sched_get_priority_min: 1
 
 # debuggerd fallback handler (system/core debuggerd/seccomp_policy/
 # crash_dump.arm64.policy), less the calls already listed.

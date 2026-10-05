@@ -395,7 +395,7 @@
       "source": "generic/vendor/volcano/file_contexts",
       "source_sha256": "ebc05485fa3306d1055936cd1fd9bf864515abc9241b609520649e57d9bf5de2",
       "path": "vendor-volcano/file_contexts",
-      "sha256": "60e4747226455184459c87b1a7d986447ccf0dc0ffe4378f57d4541804c4a8ca"
+      "sha256": "ad7591fba66b243df2a2582946b28f8dd11fbcf7dcc6110cf6d67bab6c23ab1b"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

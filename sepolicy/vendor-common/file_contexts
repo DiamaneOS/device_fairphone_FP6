@@ -288,6 +288,9 @@
 
 # data files
 /data/vendor/pddump(/.*)?              u:object_r:vendor_pddump_data_file:s0
+# QTEE secure file storage on /data (qseecomd writes it for the TEE; tee.te
+# grants it). Upstream generic/vendor/common/file_contexts line 459.
+/data/vendor/tzstorage(/.*)?           u:object_r:vendor_data_tzstorage_file:s0
 # Remote-processor dumps only: the whole tree would shadow the platform
 # tombstones/wifi label (tombstone_wifi_data_file) the Wi-Fi HAL writes.
 /data/vendor/tombstones/rfs(/.*)?   u:object_r:vendor_tombstone_data_file:s0

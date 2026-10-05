@@ -28,7 +28,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.radio.sib16_support=1
 
 # Preferred network type for each SIM on first use and after a network reset:
-# 26 = NR/LTE/TD-SCDMA/CDMA/EvDo/GSM/WCDMA (stock system build.prop). Without
+# 26 = NR/LTE/GSM/WCDMA (RILConstants; stock system build.prop). Without
 # it the framework falls back to GSM/WCDMA, Settings hides "5G (recommended)"
 # and the Allow-2G switch stores a mask with no LTE or NR.
 PRODUCT_VENDOR_PROPERTIES += \
@@ -119,5 +119,8 @@ $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 
 # Device overlay: IMS package and RTT capabilities for TeleService. Stock
 # carrier defaults are now extracted as data, including their original filters.
+# The CarrierConfig overlay corrects stock values that apply to every carrier
+# (see its vendor.xml); it is read after the stock data.
 PRODUCT_PACKAGES += \
-    FP6TeleServiceOverlay
+    FP6TeleServiceOverlay \
+    FP6CarrierConfigOverlay

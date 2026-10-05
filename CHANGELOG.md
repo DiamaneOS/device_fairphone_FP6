@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove the camera streaming modes' little-core caps from
+  `powerhint.json`: CamX runs on the little cores, so the caps would slow it,
+  and nothing sends those modes. CAMERA_SHOT now also sets `sched_boost`, like
+  CAMERA_LAUNCH, so capture work can leave the little cores. Not yet built.
 - Pass the stock camera's performance hints to the power HAL. CamX's open,
   close and snapshot hints become CAMERA_LAUNCH and CAMERA_SHOT boosts of at
   most 5 s (a hint held until release at most 2 s), ended early when CamX

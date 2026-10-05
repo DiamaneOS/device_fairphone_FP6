@@ -99,6 +99,8 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
 # Vendor users of the remote-processor services (tqftpserv, pd-mapper).
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
+# Vendor user of the power stats HAL.
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk

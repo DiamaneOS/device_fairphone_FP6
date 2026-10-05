@@ -16,6 +16,12 @@ PRODUCT_PACKAGES += \
     android.hardware.power-service.lineage-libperfmgr \
     libqti-perfd-client
 
+# Power stats HAL (power/stats): SoC and remote-processor sleep residency from
+# the qcom_stats driver for batterystats, statsd and dumpsys powerstats. It
+# runs as its own user (config.fs) without capabilities and opens only
+# /dev/stats. Stock FP6 ships no power stats HAL.
+PRODUCT_PACKAGES += android.hardware.power.stats-service.fp6
+
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc

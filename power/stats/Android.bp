@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// Power stats HAL (IPowerStats V2): SoC sleep modes and remote-processor sleep
+// from the qcom_stats driver's /dev/stats, for batterystats, statsd and
+// dumpsys powerstats. Stock FP6 ships no power stats HAL. It runs as its own
+// user without capabilities (the .rc file, power/config.fs) in the platform
+// hal_power_stats_default domain (sepolicy/fp6/power_stats.te). power/power.mk
+// installs it.
+cc_binary {
+    name: "android.hardware.power.stats-service.fp6",
+    vendor: true,
+    relative_install_path: "hw",
+    init_rc: ["android.hardware.power.stats-service.fp6.rc"],
+    vintf_fragments: ["android.hardware.power.stats-service.fp6.xml"],
+    srcs: [
+        "PowerStats.cpp",
+        "QcomStats.cpp",
+        "service.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.power.stats-V2-ndk",
+        "libbase",
+        "libbinder_ndk",
+    ],
+    sanitize: {
+        integer_overflow: true,
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}

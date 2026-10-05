@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# Power stats HAL (power/stats). Own user without capabilities: the only file
+# it opens is /dev/stats, which ueventd gives to this user alone
+# (boot/ueventd.rc).
+service vendor.power.stats-fp6 /vendor/bin/hw/android.hardware.power.stats-service.fp6
+    class hal
+    user vendor_powerstats
+    group vendor_powerstats
+    capabilities

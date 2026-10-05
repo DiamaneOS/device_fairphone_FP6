@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Power stats HAL (android.hardware.power.stats-service.fp6, device
+# power/stats) in the platform hal_power_stats_default domain. It reads the SoC
+# and remote-processor sleep counters through the qcom_stats driver's
+# /dev/stats ioctls (file_contexts; ueventd gives the node to the HAL's own
+# user, read-only) and serves them to the platform clients of IPowerStats
+# (system_server, statsd, dumpstate, audioserver, traced_probes). It opens no
+# other file and uses no sysfs, debugfs or property.
+type vendor_qcom_stats_device, dev_type;
+
+allow hal_power_stats_default vendor_qcom_stats_device:chr_file { open read ioctl };
+# Only the seven counters the HAL reads (power/stats/QcomStats.h): modem,
+# WPSS, ADSP and CDSP sleep (0x9d01-0x9d03, 0x9d05) and the AOSD, CXSD and DDR
+# records (0x9d0a-0x9d0c). Not the APSS, island, SLPI, GPU and display
+# numbers, which the driver maps to the wrong subsystems, and not DDR
+# frequency residency (0x9d0d), which sends a request to the AOSS on each read.
+allowxperm hal_power_stats_default vendor_qcom_stats_device:chr_file ioctl {
+    0x9d01 0x9d02 0x9d03 0x9d05 0x9d0a 0x9d0b 0x9d0c
+};
+
+neverallow { domain -coredomain -vendor_init -hal_power_stats_default } vendor_qcom_stats_device:chr_file { open read write append ioctl };
+neverallow hal_power_stats_default vendor_qcom_stats_device:chr_file { write append };

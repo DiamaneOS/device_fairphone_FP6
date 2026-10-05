@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Run the stock CamX camera provider under a seccomp filter. The tools
+  renderer renames the provider's libhardware.so dependency to our
+  libcamxjail.so (`camera/seccomp`), which links libhardware and installs
+  the filter before the provider's main(), so it covers CamX from its first
+  load. `camera-provider.policy` lists the allowed system calls: threads but
+  no child processes, Unix and QRTR sockets only, no writable and executable
+  mappings. For now calls outside the list are logged (kernel audit record
+  type 1326) and allowed; `seccomp_audit.py` turns those records into policy
+  additions. The provider aborts if the filter cannot be installed.
 - Replace the CodeLinaro power HAL and Qualcomm's closed perf2 daemon, which
   ran as root, with LineageOS's libperfmgr power HAL (`power/`). It runs as
   system with CAP_SYS_NICE only, writes only the CPU and GPU frequency limits,

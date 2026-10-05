@@ -56,9 +56,13 @@ services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the
 FP6 configuration in `power/`: the hint table (`powerhint.json`), its init file
 (the HAL runs as system with CAP_SYS_NICE only) and a no-op
 `libqti-perfd-client` for the stock camera; Qualcomm's closed perf2 daemon is
-not installed. The implementations remain separate from the device
-configuration. Required runtime dependencies, firmware and policy belong to the
-generated integration and must be checked before boot acceptance.
+not installed. `power/stats` is a small power stats HAL of our own: it reports
+the SoC sleep modes and the modem, WPSS, ADSP and CDSP sleep time from the
+qcom_stats driver's `/dev/stats` (no energy meters; the FP6 has no on-device
+power monitor), as its own user without capabilities. The implementations
+remain separate from the device configuration. Required runtime dependencies,
+firmware and policy belong to the generated integration and must be checked
+before boot acceptance.
 
 The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
 enabled. Boot, init_boot and recovery use header version 4; recovery excludes the

@@ -480,6 +480,30 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
 
 These rules are not yet built or runtime-qualified.
 
+## Power stats
+
+The power stats HAL (`android.hardware.power.stats-service.fp6`, device `power/stats`) runs
+in the platform `hal_power_stats_default` domain (`fp6/power_stats.te`); its clients are the
+platform's IPowerStats clients. Stock FP6 ships no power stats HAL.
+
+- Process: its own vendor user and group `vendor_powerstats` (`power/config.fs`), no
+  supplementary groups, no capabilities.
+- Device: `/dev/stats`, the qcom_stats driver's sleep counter node, is
+  `vendor_qcom_stats_device` (`fp6/file_contexts`) and 0400 for the HAL's user
+  (`boot/ueventd.rc`); without the entry it would be root's with the generic `device` label.
+  The HAL may open, read and ioctl it, nothing else; a neverallow keeps other vendor domains
+  off it and the HAL from writing it.
+- ioctls: an `allowxperm` limits the HAL to the seven commands it uses: modem, WPSS, ADSP
+  and CDSP sleep and the AOSD, CXSD and DDR records. The driver's APSS, island, SLPI, GPU and
+  display commands read the wrong subsystem entries (its table gained entries the command
+  mapping does not follow), and DDR frequency residency sends a request to the AOSS on each
+  read; none of them is allowed.
+- Not used: debugfs (the driver's text files, the CPU-subsystem sleep stats and the sysmon
+  stats exist only there), sysfs, properties, and energy meters: the FP6 has no on-device
+  power monitor.
+
+These rules are not yet built or runtime-qualified.
+
 ## Telephony
 
 `telephony/rild.te`, `telephony/nicmd.te` and `telephony/qtelephony.te` are downstream

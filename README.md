@@ -75,55 +75,5 @@ The normal and recovery implementations compile with CFI enabled. Their UFS
 header layouts match the pinned kernel interfaces. Runtime slot switching still
 requires device verification.
 
-The product uses the published FP6 thermal, lights, vibrator, USB and health
-services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the
-FP6 configuration in `power/`: the hint table (`powerhint.json`), its init file
-(the HAL runs as system with CAP_SYS_NICE only) and a no-op
-`libqti-perfd-client` for the stock camera; Qualcomm's closed perf2 daemon is
-not installed. `power/stats` is a small power stats HAL of our own: it reports
-the SoC sleep modes and the modem, WPSS, ADSP and CDSP sleep time from the
-qcom_stats driver's `/dev/stats` (no energy meters; the FP6 has no on-device
-power monitor), as its own user without capabilities. The implementations
-remain separate from the device configuration. Required runtime dependencies,
-firmware and policy belong to the generated integration and must be checked
-before boot acceptance.
-
-The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
-enabled. Boot, init_boot and recovery use header version 4; recovery excludes the
-kernel, matching the stock bootloader layout. Android and recovery use the same
-fstab so encryption definitions cannot drift. Vendor drivers are loaded after
-their firmware mounts, in parallel streams: `boot/modules/` splits the kernel's
-vendor_dlkm `modules.load` into a platform list, loaded first, and one list per
-subsystem, loaded together after it (`boot/init.qcom.rc`). Each list keeps the
-kernel list's order, and together they name every module once; a kernel update
-that changes `modules.load` needs the same change here, or image verification
-fails. Image-header, policy and native product checks remain mandatory before
-flashing.
-
-Recovery has its own `boot/init.recovery.qcom.rc`, imported by the platform
-recovery as `init.recovery.qcom.rc`. It selects configfs and the FP6 controller,
-sets peripheral mode and mounts the current-slot modem firmware read-only before
-requesting ADSP boot. The platform owns ADB/sideload/fastboot compositions;
-normal Android's zygote-triggered gadget setup is not used in recovery. The
-recovery UI uses the panel backlight/max-brightness nodes and RGBX layout.
-First-stage init owns the generated `modules.load.recovery` list. Recovery uses
-the default platform wipe hooks; it adds no device-specific erase operation.
-Native packaging/policy checks and an actual recovery boot are separate gates.
-
-The minimal product explicitly selects the platform recovery runtime group and
-fastbootd. Enabling recovery image generation does not select those packages by
-itself. Image verification must check the recovery/init executables, main init
-script, USB properties and runtime dependencies as well as the image header.
-
-The generic ramdisk is selected separately through the platform's
-`generic_ramdisk.mk`. Verify the actual `init_boot` ramdisk contains an executable,
-statically linked ARM64 `/init`, `snapuserd_ramdisk` and its build properties;
-an image with a valid header and AVB hash can still lack its runtime. The GKI v4
-boot, init_boot and recovery headers carry zero OS-version fields. Version and
-patch information remains in AVB properties. Boot's patch level follows the
-selected vendor/kernel baseline; init_boot follows the platform.
-
-AVB uses the published FP6 chain locations: recovery 1, vbmeta_system 2,
-boot 3 and init_boot 4. Verify all four signatures and child descriptors against
-the selected development key, with verification flags zero. Matching this
-layout and passing host checks do not establish that the device boots.
+Apache-2.0 ([LICENSE](LICENSE)). Third-party notices: [NOTICE](NOTICE) and
+the `provenance.json` files.

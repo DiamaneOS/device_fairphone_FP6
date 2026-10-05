@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The kernel's firmware search path, which tqftpserv probes and may not read
+# (file.te, tqftpserv.te).
+genfscon sysfs /module/firmware_class/parameters/path u:object_r:vendor_sysfs_firmware_path:s0

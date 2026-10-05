@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// tqftpserv and pd-mapper (linux-msm, vendor/qcom/opensource) look for the
+// remote processors' files next to their firmware, in /vendor/firmware. On
+// the FP6 those files are on the modem partition (/vendor/firmware_mnt/image),
+// so these links point there.
+
+// The modem reads its carrier (MCFG) and RF configuration over TFTP as
+// /readonly/firmware/image/modem_pr/...; tqftpserv serves it from here.
+install_symlink {
+    name: "fp6_firmware_modem_pr",
+    vendor: true,
+    installed_location: "firmware/modem_pr",
+    symlink_target: "/vendor/firmware_mnt/image/modem_pr",
+}
+
+// The protection-domain lists pd-mapper loads at start. It exits if one of
+// them cannot be read, so the names must match the modem partition, which
+// DiamaneOS does not flash: these six are the image/*.jsn files of FP6
+// firmware 15.178.0, 16.100.0 and 16.111.0. Check them again for newer
+// firmware.
+install_symlink {
+    name: "fp6_firmware_adspr_jsn",
+    vendor: true,
+    installed_location: "firmware/adspr.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/adspr.jsn",
+}
+
+install_symlink {
+    name: "fp6_firmware_adsps_jsn",
+    vendor: true,
+    installed_location: "firmware/adsps.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/adsps.jsn",
+}
+
+install_symlink {
+    name: "fp6_firmware_adspua_jsn",
+    vendor: true,
+    installed_location: "firmware/adspua.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/adspua.jsn",
+}
+
+install_symlink {
+    name: "fp6_firmware_battmgr_jsn",
+    vendor: true,
+    installed_location: "firmware/battmgr.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/battmgr.jsn",
+}
+
+install_symlink {
+    name: "fp6_firmware_cdspr_jsn",
+    vendor: true,
+    installed_location: "firmware/cdspr.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/cdspr.jsn",
+}
+
+install_symlink {
+    name: "fp6_firmware_modemr_jsn",
+    vendor: true,
+    installed_location: "firmware/modemr.jsn",
+    symlink_target: "/vendor/firmware_mnt/image/modemr.jsn",
+}

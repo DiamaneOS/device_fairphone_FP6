@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# tqftpserv (linux-msm, BSD-3-Clause, DiamaneOS fork in
+# vendor/qcom/opensource/tqftpserv) serves the modem's TFTP requests over QRTR:
+# read-only files from the modem partition and read-write files in
+# /data/vendor/tmp/tqftpserv (modem/init.modem.rc). It
+# replaces Qualcomm's tftp_server (not installed; its imported policy is
+# removed), which started as root with chown, setuid, setgid, setpcap and
+# net_bind_service, and wrote persist, /data/vendor/tombstones and pddump.
+# This domain has no capabilities, no network, no persist, no binder and no
+# properties.
+type vendor_tqftpserv, domain;
+type vendor_tqftpserv_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_tqftpserv)
+
+neverallow vendor_tqftpserv self:global_capability_class_set *;
+neverallow vendor_tqftpserv self:global_capability2_class_set *;
+neverallow vendor_tqftpserv self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+
+# QRTR, without ioctls: one socket publishes TFTP service 4096 (its address
+# through getsockname, getattr) and receives requests; each transfer opens
+# its own socket connected to the requesting port. libqrtr sets a receive
+# timeout (setopt). The kernel binds the sockets on first send; no explicit
+# bind.
+allow vendor_tqftpserv self:qipcrtr_socket { create connect getattr read setopt write };
+
+# Read-only requests (/readonly/firmware/image/...): tqftpserv takes the
+# directory of each remote processor's firmware name and serves the file from
+# there under /vendor/firmware. The modem asks for modem_pr/..., which
+# /vendor/firmware/modem_pr links to on the modem partition (modem/Android.bp).
+# It lists /sys/class/remoteproc, follows its links and reads only the
+# firmware attribute. Reading /vendor/firmware and the modem partition
+# (firmware_file) needs no grant: vendor domains may read vendor_file_type
+# through platform policy.
+allow vendor_tqftpserv vendor_sysfs_ssr:dir { getattr open read search };
+allow vendor_tqftpserv vendor_sysfs_ssr:lnk_file read;
+allow vendor_tqftpserv vendor_sysfs_rproc_firmware:file { open read };
+
+# It first tries the kernel's firmware search path. On the FP6 that is a
+# comma-separated list (firmware_class.path in the boot arguments), which
+# tqftpserv would treat as one directory, so the read stays denied; tqftpserv
+# then uses /vendor/firmware. Not audited: it happens on every request.
+dontaudit vendor_tqftpserv vendor_sysfs_firmware_path:file { open read };
+
+# Read-write requests (/readwrite/...) are files in /data/vendor/tmp/tqftpserv,
+# which init creates for the service's user (modem/init.modem.rc). The modem
+# writes server_check.txt and mcfg.tmp there, reads them back and deletes
+# mcfg.tmp (the TFTP "unlink" option). tqftpserv opens the directory, then
+# opens, creates, truncates, reads, writes and deletes files in it; it does not
+# follow symbolic links there. It cannot rename or link files, change
+# attributes or create directories. /data and /data/vendor/tmp
+# (vendor_data_file) are searched through platform policy.
+type vendor_tqftpserv_data_file, file_type, data_file_type;
+allow vendor_tqftpserv vendor_tqftpserv_data_file:dir { add_name open read remove_name search write };
+allow vendor_tqftpserv vendor_tqftpserv_data_file:file { create open read unlink write };
+
+# The modem's files: no other vendor service may change them or the
+# directory holding them.
+neverallow { domain -coredomain -vendor_init -vendor_tqftpserv } vendor_tqftpserv_data_file:file { create write append rename unlink link setattr relabelto };
+neverallow { domain -coredomain -vendor_init -vendor_tqftpserv } vendor_tqftpserv_data_file:dir { add_name remove_name rename reparent rmdir write };
+
+# stdio_to_kmsg (modem/init.modem.rc): on debuggable builds init passes
+# /dev/kmsg_debug as stdout and stderr, so the request log reaches the kernel
+# log. stdio's buffer setup also probes the device (fstat, a terminal ioctl);
+# that probe stays denied and is not audited.
+userdebug_or_eng(`
+  allow vendor_tqftpserv kmsg_debug_device:chr_file write;
+  dontaudit vendor_tqftpserv kmsg_debug_device:chr_file { getattr ioctl };
+')

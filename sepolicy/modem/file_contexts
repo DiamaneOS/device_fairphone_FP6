@@ -4,3 +4,16 @@
 # stock FP6 vendor/bin/ssr_setup xattr). The MSS, ADSP, CDSP and WPSS
 # recovery switches are already labelled in vendor-volcano/file_contexts.
 /vendor/bin/ssr_setup                   u:object_r:vendor_ssr_setup_exec:s0
+
+# The linux-msm remote-processor services (tqftpserv.te, pd_mapper.te) and the
+# directory of the modem's read-write TFTP files (modem/init.modem.rc).
+/vendor/bin/tqftpserv                   u:object_r:vendor_tqftpserv_exec:s0
+/vendor/bin/pd-mapper                   u:object_r:vendor_pd_mapper_exec:s0
+/data/vendor/tmp/tqftpserv(/.*)?        u:object_r:vendor_tqftpserv_data_file:s0
+
+# The firmware name of each FP6 remote processor, read by tqftpserv and
+# pd-mapper (file.te). ueventd applies these when the processors appear.
+/sys/devices/platform/soc/3000000.remoteproc-adsp/remoteproc/remoteproc[0-9]+/firmware  u:object_r:vendor_sysfs_rproc_firmware:s0
+/sys/devices/platform/soc/32300000.remoteproc-cdsp/remoteproc/remoteproc[0-9]+/firmware u:object_r:vendor_sysfs_rproc_firmware:s0
+/sys/devices/platform/soc/4080000.remoteproc-mss/remoteproc/remoteproc[0-9]+/firmware   u:object_r:vendor_sysfs_rproc_firmware:s0
+/sys/devices/platform/soc/9bb00000.remoteproc-wpss/remoteproc/remoteproc[0-9]+/firmware u:object_r:vendor_sysfs_rproc_firmware:s0

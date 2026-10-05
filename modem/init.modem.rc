@@ -2,7 +2,7 @@
 # Copyright 2026 The DiamaneOS Project
 # Modem subsystem support (installed as /vendor/etc/init/init.fp6.modem.rc).
 # pd-mapper, pm-service and pm-proxy are defined in boot/init.qcom.rc;
-# rmt_storage and tftp_server by their selected stock rc files.
+# rmt_storage by its selected stock rc file; tqftpserv below.
 
 # Subsystem restart (matches stock init.qcom.rc). The kernel probes every
 # remote processor with recovery disabled, so a crash would panic the phone.
@@ -38,3 +38,24 @@ on early-boot
     write /sys/devices/platform/soc/soc:qcom,smp2p-adsp/power/wakeup "enabled"
     write /sys/devices/platform/soc/soc:qcom,smp2p-modem/power/wakeup "enabled"
     write /sys/devices/platform/soc/soc:qcom,smp2p-cdsp/power/wakeup "enabled"
+
+# tqftpserv (modem.mk) serves the modem's TFTP requests over QRTR.
+# Read-write requests (/readwrite/...) go to /data/vendor/tmp/tqftpserv, the
+# directory tqftpserv uses on Android; the modem keeps server_check.txt and
+# mcfg.tmp there. Unlike Qualcomm's tftp_server, which used persist, a factory
+# reset clears it. Only the service's own user may enter it.
+on post-fs-data
+    mkdir /data/vendor/tmp 0711 root root
+    mkdir /data/vendor/tmp/tqftpserv 0700 vendor_tqftpserv vendor_tqftpserv
+
+# Own user (config.fs), no capabilities. The system group only lets it read the
+# modem partition, which is mounted for system (boot/fstab.qcom); SELinux limits
+# it to those files. class core starts after post-fs-data, with the peripheral
+# manager that boots the modem. On debuggable builds its request log goes to
+# the kernel log.
+service vendor.tqftpserv /vendor/bin/tqftpserv
+    class core
+    user vendor_tqftpserv
+    group vendor_tqftpserv system
+    capabilities
+    stdio_to_kmsg

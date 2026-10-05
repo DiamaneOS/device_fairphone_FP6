@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The firmware name of each remote processor,
+# /sys/class/remoteproc/remoteprocN/firmware (file_contexts). tqftpserv and
+# pd-mapper read it to find the files that belong next to the firmware. Only
+# this attribute: the state, recovery and other remoteproc nodes keep their
+# own labels.
+type vendor_sysfs_rproc_firmware, sysfs_type, fs_type;
+
+# The kernel's firmware search path,
+# /sys/module/firmware_class/parameters/path (genfs_contexts). tqftpserv
+# probes it; nothing on the FP6 is allowed to read it (tqftpserv.te).
+type vendor_sysfs_firmware_path, sysfs_type, fs_type;

@@ -186,6 +186,8 @@ AUDIO_FEATURE_ENABLED_PAL_HIDL := false
 AUDIO_FEATURE_ENABLED_AGM_HIDL := true
 AUDIO_FEATURE_ENABLED_DYNAMIC_LOG := false
 AUDIO_FEATURE_ENABLED_GEF_SUPPORT := false
+# The Android.mk modules set CFI themselves; audioadsprpcd is Soong-built.
+CFI_INCLUDE_PATHS += vendor/qcom/opensource/audio-hal/primary-hal/adsprpcd
 
 # Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
 # node and waits for the driver to finish probing before bringing up wlan0.

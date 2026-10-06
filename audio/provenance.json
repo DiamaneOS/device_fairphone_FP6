@@ -8,8 +8,12 @@
       "upstream": "https://gerrit-public.fairphone.software/platform/hardware/qcom/audio-ar",
       "revision": "4d39b3c97e163578e55c74b9e3c2d7262dc5c07c",
       "fork": "https://github.com/DiamaneOS/hardware_qcom_audio-ar",
-      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
-      "changes": "No VINTF fragment (the device manifest declares IAGM); effect libraries not built here (device audio/effects); unused kernel header dependency dropped; CFI and integer overflow sanitizer."
+      "licences": [
+        "BSD-3-Clause",
+        "BSD-3-Clause-Clear",
+        "Apache-2.0"
+      ],
+      "changes": "No VINTF fragment (the device manifest declares IAGM); effect libraries not built here (device audio/effects); unused kernel header dependency dropped; board platform matched without Qualcomm's build macro; CFI and integer overflow sanitizer. Fixes: voice UI keys ignored without a sound trigger HAL and the copy bounded, speaker query replies terminated (both reachable from any app through getParameters); log format strings."
     },
     {
       "component": "PAL (libar-pal)",
@@ -17,7 +21,11 @@
       "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom/opensource/arpal-lx",
       "revision": "6d6f50dba430a80b7eaf2c59cc9d63ced5125e99",
       "fork": "https://github.com/DiamaneOS/vendor_qcom_opensource_arpal-lx",
-      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
+      "licences": [
+        "BSD-3-Clause",
+        "BSD-3-Clause-Clear",
+        "Apache-2.0"
+      ],
       "unlicensed_files": [
         {
           "files": "awinic_ar/ (5 sources, 8 headers)",
@@ -32,7 +40,7 @@
           "status": "Published by Fairphone, no licence header; not compiled for volcano."
         }
       ],
-      "changes": "Kernel UAPI from the device header library (misc/adsp_sleepmon.h) instead of the kernel build output; closed header libraries dropped (their features are compiled out by Fairphone's PAL_MEMLOG_UNSUPPORTED and AUDIO_FEATURE_STATS_UNSUPPORTED); Bluetooth codec and voice UI plugins not built; CFI and integer overflow sanitizer; NOTICE added."
+      "changes": "Kernel UAPI from the device header library (misc/adsp_sleepmon.h) instead of the kernel build output; closed header libraries dropped (their features are compiled out by Fairphone's PAL_MEMLOG_UNSUPPORTED and AUDIO_FEATURE_STATS_UNSUPPORTED); Bluetooth codec and voice UI plugins not built; CFI and integer overflow sanitizer; NOTICE added. Compiler fixes for Android 17: log format strings, constructor order, a switch fall-through, an always-true condition kept with its stock behaviour."
     },
     {
       "component": "AGM (libagm, libagmclient, vendor.qti.hardware.AGMIPC@1.0 and -impl, libsndcardparser, libagm_pcm_plugin, libagm_mixer_plugin, libagm_compress_plugin)",
@@ -40,7 +48,11 @@
       "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom/opensource/agm",
       "revision": "f451a8d153c78aae63fdaeba5e8ee1881fda7fed",
       "fork": "https://github.com/DiamaneOS/vendor_qcom_opensource_agm",
-      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
+      "licences": [
+        "BSD-3-Clause",
+        "BSD-3-Clause-Clear",
+        "Apache-2.0"
+      ],
       "changes": "Closed memory logger header dropped (compiled out by Fairphone's AGM_MEMLOG_UNSUPPORTED); compress plugin uses bionic's compress headers instead of the kernel build output; CFI and integer overflow sanitizer; NOTICE extended."
     },
     {
@@ -49,7 +61,9 @@
       "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom-opensource/audioreach-graphservices",
       "revision": "4d05487f252482978aeba9fc9c4c377ac1adbdb1",
       "fork": null,
-      "licences": ["BSD-3-Clause"],
+      "licences": [
+        "BSD-3-Clause"
+      ],
       "changes": "None; pinned unmodified. Headers only: Fairphone did not publish the graph service sources."
     }
   ],

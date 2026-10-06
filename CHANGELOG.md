@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Build the dm-verity hash trees of system, system_ext, product, vendor,
+  odm, vendor_dlkm and system_dlkm with SHA-256 instead of avbtool's SHA-1
+  default, as stock does. Not yet built; needs a super flash.
 - Run the Bluetooth HCI service under a seccomp filter. The service compiles
   `bluetooth-hci.policy` (`bluetooth/seccomp`) and installs it at the start
   of main(), before it loads Qualcomm's closed HCI implementation, so the

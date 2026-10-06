@@ -7,6 +7,9 @@ genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_0_geni_se/a84000.i2c/i2c-
 # The SoC serial number, readable by no vendor service (soc_serial.te); the
 # rest of /sys/devices/soc0 keeps its vendor-common labels.
 genfscon sysfs /devices/soc0/serial_number u:object_r:vendor_sysfs_soc_serial:s0
+# The switch that turns Qualcomm's embedded USB debugger on, writable by no
+# service (eud.te).
+genfscon sysfs /module/eud/parameters/enable u:object_r:vendor_sysfs_eud_enable:s0
 # UFS LUN 0 (userdata) queue settings that platform init.rc tunes.
 genfscon sysfs /devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/block u:object_r:sysfs_devices_block:s0
 # The root disk's discard cap, the one node there platform init.rc writes

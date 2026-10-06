@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Give the switch that turns Qualcomm's embedded USB debugger (EUD) on,
+  `/sys/module/eud/parameters/enable`, its own SELinux type with a
+  neverallow: only ueventd and vendor_init keep write access (the platform
+  grants them all sysfs types); vold, the USB HAL and vfio_handler lose it.
+  The debugger stays off. Not yet built.
 - Drop stock's `wowlan_triggers=magic_pkt` from the station supplicant
   overlay. The magic-packet wake-up itself is turned off in the driver
   configuration that the tools generate (`gEnableWoW=2`). Not yet built.

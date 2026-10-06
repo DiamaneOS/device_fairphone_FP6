@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Call volume has 15 steps, as media, instead of 5 spread over 15 (the volume
+  keys jumped 1, 5, 8, 12, 15). Not yet built.
 - Enforce the Bluetooth HCI service's seccomp filter: a call outside its list
   now stops the service (SIGSYS, tombstone; init restarts it) instead of only
   being logged. In log mode, pairing, music (AAC), a headset call (mSBC),

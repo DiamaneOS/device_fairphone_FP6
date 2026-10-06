@@ -153,3 +153,10 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     audio.offload.min.duration.secs=30 \
     ro.audio.monitorRotation=true
+
+# Call volume in 15 steps, as media. AOSP's default is 5 call steps, which
+# AudioService spreads over the Bluetooth call range of 15, so the volume keys
+# jump 1, 5, 8, 12, 15. The policy's call curves span 0-100 %, so 15 steps
+# give about 1.7 dB each on the earpiece.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.config.vc_call_vol_steps=15

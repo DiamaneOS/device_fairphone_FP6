@@ -174,6 +174,10 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
+# And the source-built GNSS HAL, which parses the framework's and the modem's
+# location messages; Qualcomm's own builds of these have CFI too.
+CFI_INCLUDE_PATHS += hardware/qcom/gps vendor/qcom/opensource/location \
+    vendor/qcom/opensource/qmi-framework vendor/qcom/opensource/core-utils/fwk-detect
 
 # Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
 # node and waits for the driver to finish probing before bringing up wlan0.

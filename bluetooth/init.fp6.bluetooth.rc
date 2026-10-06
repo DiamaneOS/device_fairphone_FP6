@@ -31,9 +31,21 @@ on early-boot
     chown bluetooth bluetooth /sys/class/tty/ttyHS0/device/hs_uart_operation
     chmod 0660 /sys/class/tty/ttyHS0/device/hs_uart_operation
 
+# Factory Bluetooth address (finding -177), as stock tctd.rc does it.
+# imeiprovd --bt-address (hardware/diamaneos/ims, vendor.imeiprovd-bt) reads it
+# from the traceability partition at post-fs and sets
+# ro.vendor.diamaneos.bt.factory_address; this copies it to the property the
+# HCI implementation reads. The HAL reads it only when Bluetooth is turned on
+# (HCI initialisation), long after this runs. A missing or invalid address sets
+# nothing, so the HAL keeps its stored generated address as before. The address
+# is never logged.
+on property:ro.vendor.diamaneos.bt.factory_address=*
+    setprop ro.vendor.bt.boot.macaddr ${ro.vendor.diamaneos.bt.factory_address}
+
 # Not created on purpose:
 # - /mnt/vendor/persist/bluetooth: the HAL only reads .bt_nv.bin there; if the
-#   directory or file is absent it generates a random address instead.
+#   directory or file is absent it uses ro.vendor.bt.boot.macaddr (above), and
+#   only without that its stored or a newly generated random address.
 # - /data/vendor/bluetooth (optional alternate firmware path and HCI logs) and
 #   /data/vendor/ssrdump (controller crash dumps; the HAL logs "No log dir" and
 #   continues).

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Raise the ADPF uclamp ceiling from 384 to 512: 384 is below the capacity
+  of the A520 little cores (about 454), so a hint session running over its
+  target, SurfaceFlinger included, could never move to a bigger core. Normal
+  frames keep the lower starting values. Not yet built.
 - Remove the camera streaming modes' little-core caps from
   `powerhint.json`: CamX runs on the little cores, so the caps would slow it,
   and nothing sends those modes. CAMERA_SHOT now also sets `sched_boost`, like

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Raise the DDR and L3 floors for up to 3 s during app launches, as stock's
+  perf daemon did: launches start memory-bound. Not yet built.
 - Keep the stock Bluetooth HCI implementation's two firmware-download tags at
   warning level: at info level they logged the Bluetooth address each time
   Bluetooth started, and at debug level HCI command dumps. Not yet built.

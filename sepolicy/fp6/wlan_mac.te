@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The factory Wi-Fi MAC file (finding -180; vendor_diamaneos_wlan_mac_file,
+# hardware/diamaneos/ims): imeiprovd writes it into /mnt/vendor/wlan_mac at
+# post-fs, and boot/ueventd.rc lists that tree as a firmware directory. When the
+# QCA6750 driver asks for wlan/qca_cld/qca6750/wlan_mac.bin, the kernel finds
+# nothing on its own path and hands the request to ueventd (sysfs fallback,
+# boot/init.qcom.rc), which opens the file, reads its size and copies it to the
+# kernel. ueventd also looks there for every other firmware file it has not
+# found in the earlier directories (search only). Stock lets ueventd read all of
+# /mnt/vendor and persist instead.
+allow ueventd mnt_vendor_file:dir search;
+allow ueventd vendor_diamaneos_wlan_mac_file:dir search;
+allow ueventd vendor_diamaneos_wlan_mac_file:file { open getattr read };
+
+# Only ueventd reads the MAC file; init and vendor_init may read most vendor
+# files through platform policy. imeiprovd opens it to write it but may not
+# read it (hardware/diamaneos/ims imeiprov.te).
+neverallow {
+  domain
+  -init
+  -vendor_init
+  -ueventd
+} vendor_diamaneos_wlan_mac_file:file { read map };

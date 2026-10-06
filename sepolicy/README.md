@@ -173,9 +173,6 @@ are not repeated.
 - `system_server` (InputReader), `max_brightness` of the haptics LED device
   (`sysfs_leds`): it sits next to the chip's input device; reading it would
   let InputReader treat the vibrator as a light.
-- `system_server`, `surfaceflinger`, `mediaserver`, `mediaswcodec` and apps,
-  `libubwcp.so` (`vendor_file`): the source-built mapper tries to load it on
-  first use, but UBWC-P support is compiled out, so it would never be used.
 - `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not set
   on this build; CamX uses the public SoC id file. As stock.
 - `hal_bluetooth_default`, `hal_camera_default`, `vendor_hal_gnss_qti`,

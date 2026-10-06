@@ -8,17 +8,18 @@
 # vendor_init writes it from the sys.port_security_mode triggers in
 # boot/init.qcom.usb.rc. The platform already lets vendor_init and ueventd write
 # every sysfs_type file; the rule below states the one vendor_init needs here.
-# The Qualcomm USB HAL keeps its write for enableUsbData (Lockdown, device
-# policy) while the framework's port control is off.
+# The Qualcomm USB HAL gets no write: with port control on
+# (config_usbPortSecuritySupported), the framework turns enableUsbData requests
+# (Lockdown, device policy) into port states and never passes them to the HAL,
+# its only writer of this node. So a compromised HAL cannot turn data back on
+# while the phone is locked.
 type vendor_sysfs_usb_data_disable, sysfs_type, fs_type;
 
 allow vendor_init vendor_sysfs_usb_data_disable:file { open write };
-allow vendor_hal_usb_qti vendor_sysfs_usb_data_disable:file { open write };
 
 # Nothing else may write it: a later rule that adds a writer fails the build.
 neverallow {
   domain
   -vendor_init
   -ueventd
-  -vendor_hal_usb_qti
 } vendor_sysfs_usb_data_disable:file { write append };

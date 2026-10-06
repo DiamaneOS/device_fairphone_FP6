@@ -97,4 +97,10 @@
          which the FP6 vibrator HAL plays as the medium tick
          (Awinic RAM wave 3 at gain 0x40); other clicks keep their own effect. -->
     <item name="config_keyboardHapticFeedbackFixedAmplitude" format="float" type="dimen">0.5</item>
+
+    <!-- The Moments switch: the slider on the side (gpio-keys, EV_SW
+         SW_PEN_INSERTED). The kernel reports 1 with the slider up and 0 with
+         it down; down means Moments on, so on is value 0. -->
+    <integer name="config_momentsSwitchCode">15</integer>
+    <integer name="config_momentsSwitchActiveValue">0</integer>
 </resources>

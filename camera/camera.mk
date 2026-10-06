@@ -53,3 +53,12 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # their own format.
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.camera.outputFormat=1
+
+# User builds: no CamX log output. The closed provider logs the three camera
+# modules' serial numbers at error level at every start (its EEPROM/OTP
+# check), and only silencing the tag stops that. Debuggable builds keep CamX
+# logs for diagnosis.
+ifeq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_PRODUCT_PROPERTIES += \
+    log.tag.CamX=S
+endif

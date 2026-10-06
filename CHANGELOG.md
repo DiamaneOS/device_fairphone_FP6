@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- User builds silence the CamX log tag: the closed camera provider logged the
+  camera modules' serial numbers at every start. Debuggable builds keep CamX
+  logs. Tested by setting the property by hand: no serial lines, camera works.
+  Not yet built.
 - Call volume has 15 steps, as media, instead of 5 spread over 15 (the volume
   keys jumped 1, 5, 8, 12, 15). Not yet built.
 - Enforce the Bluetooth HCI service's seccomp filter: a call outside its list

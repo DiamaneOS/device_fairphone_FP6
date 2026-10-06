@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the imported policy of the display colour service, which is not
+  installed or declared: its domain, executable label and service contexts,
+  and SystemUI's client grant to it. Not yet built.
 - Drop the imported secure-processor (SPU) grants of the gatekeeper HAL and
   qseecomd: the FP6 has no SPU, its drivers are not shipped and the selected
   gatekeeper names no SPU node, so those device nodes never exist. Not yet

@@ -11,10 +11,10 @@
   (only their headers are published), their tuning server, the voice UI
   interface, the deadline manager, calibration and configuration stay
   stock. Adds `misc/adsp_sleepmon.h` to the kernel UAPI headers. SELinux
-  domains and labels unchanged. Not yet built.
+  domains and labels unchanged. Checked on the phone.
 - For the hardened kernel: the EUD debugger's module is no longer loaded (the
   kernel ships without it), and init no longer writes `download_mode` (the
-  kernel makes it read-only; panic dumps are off by default). Not yet built.
+  kernel makes it read-only; panic dumps are off by default). Checked on the phone.
 - Log what the closed thermal engine changes, on userdebug and eng builds
   only: `sepolicy/fp6/thermal_engine_audit.te` adds "avc: granted" records
   for each node it opens for writing, the device nodes it opens, the sockets

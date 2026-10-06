@@ -26,3 +26,8 @@ allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_
 # can retune matching and lockout, and the module's dump homes are under
 # /data/vendor too. Nothing may ever let the HAL open files there.
 neverallow hal_fingerprint_default vendor_data_file:file { open read };
+# Nor may another domain give a directory or file there the HAL's own data
+# label (fingerprint_vendor_data_file, which it can read): today only init,
+# vendor_init and vold_prepare_subdirs create or relabel to it.
+neverallow { domain -init -vendor_init -vold_prepare_subdirs } fingerprint_vendor_data_file:dir { create relabelto };
+neverallow { domain -init -vendor_init } fingerprint_vendor_data_file:file relabelto;

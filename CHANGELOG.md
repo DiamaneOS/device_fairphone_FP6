@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add neverallows that keep every domain except init, vendor_init and
+  vold_prepare_subdirs from creating or relabelling files and directories to
+  the fingerprint HAL's data label, so no other process can plant a
+  configuration the closed fingerprint module would read. No rule changes.
 - Remove the imported policy of the display colour service, which is not
   installed or declared: its domain, executable label and service contexts,
   and SystemUI's client grant to it. Not yet built.

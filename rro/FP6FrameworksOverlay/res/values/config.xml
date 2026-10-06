@@ -97,4 +97,16 @@
          which the FP6 vibrator HAL plays as the medium tick
          (Awinic RAM wave 3 at gain 0x40); other clicks keep their own effect. -->
     <item name="config_keyboardHapticFeedbackFixedAmplitude" format="float" type="dimen">0.5</item>
+
+    <!-- GrapheneOS's USB-C port control (Settings > Security & privacy >
+         Exploit protection > USB-C port). The device side is the USB
+         controller's data switch (boot/init.qcom.usb.rc). The FP6's Type-C
+         and charging run in the ADSP firmware, so charging cannot be turned
+         off: Off and Charging-only both turn data off and refuse new
+         connections. Without this a user build has no USB data at all,
+         because GrapheneOS's first-stage init refuses new USB connections at
+         every boot of a non-debuggable build and only this feature lifts it.
+         No pogo pins, so config_usb_port_security_applies_to_pogo_pins
+         stays false. -->
+    <bool name="config_usbPortSecuritySupported">true</bool>
 </resources>

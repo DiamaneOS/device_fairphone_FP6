@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Turn on GrapheneOS's USB-C port control (`config_usbPortSecuritySupported`):
+  Settings offers Off, Charging-only, the two charging-only-when-locked modes
+  and On, with charging-only when locked as the default on user builds.
+  Without it a user build had no USB data at all, because GrapheneOS's early
+  boot refuses new USB connections and nothing lifted that. Off cannot stop
+  charging on the FP6, so its Settings summary says it works like
+  Charging-only. The USB HAL loses its write to the data switch, which only
+  init triggers use now. Not yet built.
 - Turn USB data off and on when GrapheneOS's USB-C port control asks for it:
   init triggers map `sys.port_security_mode` to the USB controller's
   `dynamic_disable` node (data off, charging continues). The node gets its

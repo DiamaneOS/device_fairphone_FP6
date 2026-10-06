@@ -30,3 +30,18 @@
 - The side-sensor description uses Settings' translated
   `security_settings_enroll_find_sensor_right_side_message` text in every
   locale instead of the Pixel hardware description.
+
+Regenerate the animations after an AOSP update:
+
+```
+make_fingerprint_edu.py packages/apps/Settings/res/raw/fingerprint_edu_lottie_portrait_bottom_right.json res/raw
+```
+
+## USB-C port summary
+
+- Security & privacy > Exploit protection > USB-C port > Off: GrapheneOS's
+  summary says Off turns off the port, which on Pixels includes charging. The
+  FP6 cannot stop charging (Type-C and charging run in the ADSP firmware), so
+  Off turns data off like Charging-only and the summary says so. GrapheneOS
+  ships these strings in English only, so the overlay has no translations
+  either.

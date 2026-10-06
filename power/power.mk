@@ -28,6 +28,13 @@ PRODUCT_PACKAGES += android.hardware.power.stats-service.fp6
 # thresholds. This HAL can make neither placement change, and CamX runs on the
 # little cores, so a cap alone would slow it. Nothing sends the modes, and
 # libqti-perfd-client does not forward CamX's streaming hints.
+#
+# LAUNCH also raises the memory-bus floors stock's perf daemon raised for app
+# launches, for at most 3 s: DDR (bandwidth monitor, request 800000 kHz) and L3
+# (prime latency monitor, request 1344000 kHz). The bus driver rounds a request
+# up to the next level of its table; on LPDDR5 (547, 768, 1555, ... MHz) the
+# DDR floor is 1555 MHz. "setprop vendor.powerhal.membus.enable false" turns
+# the floors off for A/B tests.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc

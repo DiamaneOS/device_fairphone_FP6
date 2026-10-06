@@ -194,7 +194,7 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
 
-# Audio: the stock AudioReach userspace with AOSP source adapters (audio/audio.mk).
+# Audio: the AudioReach HAL, PAL and AGM from source with AOSP adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
 # Hardware bring-up. Each subsystem makefile documents its stock and

@@ -9,8 +9,6 @@
     {"Name": "GPUMinFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq"], "Values": ["1050000000", "763000000", "510000000", "264000000"], "DefaultIndex": 3, "ResetOnInit": true, "WriteOnly": true},
     {"Name": "GPUMaxFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq"], "Values": ["1050000000", "510000000"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
     {"Name": "GPUTouchWake", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake"], "Values": ["1", "0"], "DefaultIndex": 1, "ResetOnInit": false, "WriteOnly": true},
-    {"Name": "DDRMinFreq", "Paths": ["/sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/min_freq"], "Values": ["800000", "681000", "547000"], "DefaultIndex": 2, "ResetOnInit": true, "WriteOnly": true, "AllowFailure": true},
-    {"Name": "L3MinFreq", "Paths": ["/sys/devices/system/cpu/bus_dcvs/L3/soc:qcom,memlat:l3:prime/min_freq"], "Values": ["1344000", "364800"], "DefaultIndex": 1, "ResetOnInit": true, "WriteOnly": true, "AllowFailure": true},
     {"Name": "WaltSchedBoost", "Paths": ["vendor.powerhal.sched_boost"], "Values": ["1", "2", "0"], "DefaultIndex": 2, "ResetOnInit": true, "Type": "Property"},
     {"Name": "TapToWake", "Paths": ["/sys/bus/spi/devices/spi0.0/gesture_wakeup"], "Values": ["2", "-2"], "DefaultIndex": 1, "ResetOnInit": true, "WriteOnly": true}
   ],
@@ -25,8 +23,6 @@
     {"PowerHint": "LAUNCH", "Node": "CPUPrimeMinFreq", "Value": "1651200", "Duration": 3000},
     {"PowerHint": "LAUNCH", "Node": "WaltSchedBoost", "Value": "1", "Duration": 3000, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
     {"PowerHint": "LAUNCH", "Node": "GPUTouchWake", "Value": "1", "Duration": 3000},
-    {"PowerHint": "LAUNCH", "Node": "DDRMinFreq", "Value": "800000", "Duration": 3000, "EnableProperty": "vendor.powerhal.membus.enable"},
-    {"PowerHint": "LAUNCH", "Node": "L3MinFreq", "Value": "1344000", "Duration": 3000, "EnableProperty": "vendor.powerhal.membus.enable"},
 
     {"PowerHint": "CAMERA_LAUNCH", "Node": "CPUSilverMinFreq", "Value": "1708800", "Duration": 1500},
     {"PowerHint": "CAMERA_LAUNCH", "Node": "CPUGoldMinFreq", "Value": "2208000", "Duration": 1500},

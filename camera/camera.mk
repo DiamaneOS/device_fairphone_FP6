@@ -57,6 +57,14 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_PRODUCT_PROPERTIES += \
     ro.media.recorder-max-base-layer-fps=60
 
+# User builds: no CamX log output. The closed provider logs the three camera
+# modules' serial numbers at error level at every start (its EEPROM/OTP
+# check), and only silencing the tag stops that. Debuggable builds keep CamX
+# logs for diagnosis.
+ifeq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_PRODUCT_PROPERTIES += \
+    log.tag.CamX=S
+endif
 
 # The Camera app's FP6 settings (preview, Night, ultra-wide handling) are an overlay
 # on its CameraDeviceConfig overlayable. CamX settings stay in init.camera.rc.

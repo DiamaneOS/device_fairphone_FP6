@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Raise the DDR floor during touch interaction (681 MHz request, stock's
+  scroll boost value): the first scroll frames wait less on memory. Not yet
+  built.
 - Raise the DDR and L3 floors for up to 3 s during app launches, as stock's
   perf daemon did: launches start memory-bound. Not yet built.
 - Keep the stock Bluetooth HCI implementation's two firmware-download tags at

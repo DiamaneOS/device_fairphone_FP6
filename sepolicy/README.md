@@ -83,7 +83,10 @@ Downstream adaptations:
     apexd, init, ueventd, vendor_init, vold, the Bluetooth, Wi-Fi, supplicant
     and radio HALs and tee read; ueventd makes the node 0400 root, so of those
     only the root platform daemons can open it. A neverallow keeps every other
-    domain off it.
+    domain off it. The UFS storage's serial number and its LUNs' SCSI serial
+    and identification pages keep the generic `sysfs` label, readable by 22
+    domains (among them the fingerprint and USB HALs, the composer and tee);
+    ueventd makes them 0400 root too, and no shipped program reads them.
   - Thermal HAL: runs as system with no capabilities
     (`power/init.fp6.thermal.rc`); ueventd gives group system the two trip
     nodes it writes (`trip_point_1_temp` and `trip_point_1_hyst` of each

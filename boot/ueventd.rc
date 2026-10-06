@@ -103,6 +103,14 @@ firmware_directories /vendor/firmware_mnt/image/
 # supplicant, radio and TEE services' domains read it, and those run as their
 # own users (sepolicy/fp6/soc_serial.te).
 /sys/devices/soc0         serial_number    0400   root   root
+# The UFS storage's serial number and the SCSI unit serial and identification
+# pages of its LUNs (the kernel makes them 0444). No shipped program reads
+# them; their generic sysfs label is readable by 22 domains, among them the
+# fingerprint and USB HALs, the composer and the TEE listener, which run as
+# their own users. Root platform daemons can still read them.
+/sys/devices/platform/soc/1d84000.ufshc   string_descriptors/serial_number   0400   root   root
+/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg80   0400   root   root
+/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg83   0400   root   root
 
 # Display power and HDCP control for the composer (matches stock).
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics

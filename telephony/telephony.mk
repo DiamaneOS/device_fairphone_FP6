@@ -12,7 +12,8 @@
 # Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
 # Ordinary calling/SMS/data require carrier qualification on the selected image;
 # emergency handling is simulated, not end-to-end emergency acceptance.
-# AML and eSIM management are deferred. No inactive stock LPA is packaged.
+# AML is deferred. eSIM management is DiamaneOS's own LPA (no stock LPA is
+# packaged), off until the user turns on eSIM support.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
 # QCRIL defaults that stock sets in vendor build.prop and that are not in the
@@ -63,11 +64,17 @@ PRODUCT_PACKAGES += \
     android.hardware.telephony.ims.prebuilt.xml \
     android.hardware.telephony.euicc.prebuilt.xml
 
-# QCRIL directories and database; the stock IMS and LPA apps are only parsed
-# when ro.boot.vendor.qspa.modem=enabled (their manifests carry an <overlay
-# requiredSystemPropertyName=...> gate), which stock sets from a system_ext
-# init script. Only init may set ro.boot.* properties, so the property is set
-# from system_ext as on stock.
+# eSIM manager (packages/apps/DiamaneOSEuicc): manages the profiles on the
+# eUICC in slot 1 through the framework's eUICC card commands. Ships disabled;
+# Settings > Network & internet > eSIM support turns it on and restarts, as
+# GrapheneOS does for Google's LPA. Without it, installed eSIMs work as SIMs.
+PRODUCT_PACKAGES += \
+    DiamaneOSEuicc
+
+# QCRIL directories and database (init.fp6.telephony.rc), and the
+# ro.boot.vendor.qspa.modem gate without which the stock IMS app is not parsed
+# (init.fp6.qspa.rc). Only init may set ro.boot.* properties, so the gate is
+# set from system_ext, as on stock.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/init.fp6.telephony.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.telephony.rc \
     device/fairphone/FP6/telephony/init.fp6.qspa.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.fp6.qspa.rc \

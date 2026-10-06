@@ -108,6 +108,13 @@ firmware_directories /vendor/firmware_mnt/image/
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
 /sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics
 
+# The thermal HAL runs as system (power/init.fp6.thermal.rc) and sets the next
+# severity threshold of each zone it monitors through trip 1. The nodes stay
+# root-owned for the thermal engine, which runs as root; SELinux lets only the
+# two thermal services, ueventd and vendor_init write thermal sysfs.
+/sys/devices/virtual/thermal/thermal_zone*   trip_point_1_temp   0664   root   system
+/sys/devices/virtual/thermal/thermal_zone*   trip_point_1_hyst   0664   root   system
+
 # Double-tap wake gesture of the touch controller, switched by the power HAL
 # (system) for Display > Tap to wake. Stock wrote it as root from vendor init.
 /sys/bus/spi/devices/spi0.0   gesture_wakeup   0660   system   system

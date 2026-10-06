@@ -8,6 +8,9 @@
 # FM and the Codec2 audio service are not included yet.
 $(call soong_config_set_bool,android_hardware_audio,run_64bit,true)
 
+# Effects (audio_effects.xml): AOSP software effects only, no DSP offload
+# halves, plus Qualcomm's VoIP AEC/NS descriptors and volume listener built
+# from source (effects/).
 PRODUCT_PACKAGES += \
     android.hardware.audio.service \
     android.hardware.audio@7.1-impl \
@@ -18,10 +21,14 @@ PRODUCT_PACKAGES += \
     libbundlewrapper \
     libdownmix \
     libdynproc \
-    libeffectproxy \
     libldnhncr \
+    libqcomvoiceprocessing \
     libreverbwrapper \
-    libvisualizer
+    libvisualizer \
+    libvolumelistener
+
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/audio/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_volcano/audio_effects.xml
 
 # The stock policy includes these by absolute path.
 PRODUCT_COPY_FILES += \

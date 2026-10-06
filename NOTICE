@@ -50,3 +50,9 @@ build/make/target/product/base_vendor.mk at GrapheneOS platform_build commit
 7f0398241bc8c4ef5255a8063befa5045e5cfab4. Copyright (C) 2018 The Android
 Open Source Project, Apache License 2.0 (see LICENSE). The selection omits the
 unrelated vendor group and adds fastbootd for dynamic-partition recovery.
+
+audio/effects/voice_processing.c (Apache-2.0) and volume_listener.c
+(BSD-3-Clause, The Linux Foundation and Qualcomm Innovation Center) are
+unmodified copies from CodeLinaro platform/hardware/qcom/audio-ar
+89d32774e85832bd2368032a7eaebc154f77b6d1. Their notices are retained in the
+files and in audio/effects/NOTICE; provenance.json records the hashes.

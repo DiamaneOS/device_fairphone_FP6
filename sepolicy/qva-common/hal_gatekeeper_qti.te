@@ -24,19 +24,10 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# allow access to /dev/spcom
-
-allow vendor_hal_gatekeeper_qti vendor_spcom_device:chr_file rw_file_perms;
-
-# allow access to skp
-allow vendor_hal_gatekeeper_qti vendor_skp_device:chr_file rw_file_perms;
-
-#allow access to /dev/spss_utils
-allow vendor_hal_gatekeeper_qti vendor_spss_utils_device:chr_file rw_file_perms;
-
-allow vendor_hal_gatekeeper_qti vendor_sp_keymaster_device:chr_file rw_file_perms;
-allow vendor_hal_gatekeeper_qti vendor_sp_ssr_device:chr_file rw_file_perms;
-get_prop(vendor_hal_gatekeeper_qti, vendor_spcomlib_prop)
+# DiamaneOS: no secure-processor (SPU) grants. The FP6 has no SPU: its device
+# tree describes none, the SPSS loader and spcom drivers are not shipped, and
+# the selected gatekeeper and its libraries name no SPU node, so /dev/spcom,
+# sp_kernel, spss_utils, sp_keymaster and sp_ssr never exist (finding -85).
 
 get_prop(vendor_hal_gatekeeper_qti, vendor_disable_spu_prop)
 

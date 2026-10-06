@@ -237,7 +237,6 @@
 
 
 
-/vendor/bin/hw/vendor\.qti\.hardware\.display\.color-service  u:object_r:vendor_hal_display_color_default_exec:s0
 
 ###############################################
 # same-process HAL files and their dependencies

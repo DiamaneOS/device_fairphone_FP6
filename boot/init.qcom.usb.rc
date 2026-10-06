@@ -122,16 +122,24 @@ on zygote-start
 #   firmware (qcom-battery suspend_input_current), cut after the data: the
 #   phone draws no current from the port and runs on its battery. Every other
 #   state turns the input back on before data.
-# - User builds start every normal boot with charging off, as GrapheneOS
-#   starts Pixels with the port off from first-stage init: as soon as the
-#   charger firmware is up after the ADSP boots (early-boot), until the
-#   framework applies the stored mode. The qcom-battery class appears only
-#   once the firmware's glink channel is up, so init waits for the node; a
-#   write before that fails, and "on boot" writes again. New USB connections
-#   are already refused from first-stage init (deny_new_usb2). Debuggable
-#   builds keep the port on at boot (USB debugging of early boot); their
-#   boot write of 0 changes nothing and shows in the kernel log when the
-#   firmware takes writes.
+# - User builds start every normal boot with USB data and charging off, as
+#   GrapheneOS starts Pixels with the port off from first-stage init, until
+#   the framework applies the stored mode (ports_enabled turns data back on;
+#   every state but ports_disabled turns charging back on).
+#   - Data: the controller is cut at early-boot, before any USB function is
+#     set up (init's USB property triggers run after "boot", and the gadget
+#     HAL binds the controller when the framework sets functions). So the
+#     write only takes the controller out of the peripheral role that
+#     init.qcom.rc sets and lets it idle; at runtime, with ADB connected, the
+#     same write takes under a second. New connections are refused from
+#     first-stage init anyway (deny_new_usb2).
+#   - Charging: the input is suspended as soon as the charger firmware is up
+#     after the ADSP boots. The qcom-battery class appears only once the
+#     firmware's glink channel is up, so init waits for the node; a write
+#     before that fails, and "on boot" writes again.
+# - Debuggable builds keep the port on at boot (USB debugging of early boot);
+#   their boot write of 0 changes nothing and shows in the kernel log when
+#   the firmware takes writes.
 # - Runtime state only: charger mode and shutdown turn the input back on,
 #   and the ADSP firmware restarts with every boot. Charger mode, recovery
 #   and fastbootd never run early-boot or the framework (and do not load
@@ -141,6 +149,7 @@ on zygote-start
 #   unplugged while locked.
 # Only vendor_init may write either node (sepolicy/fp6/usb_port_security.te).
 on early-boot && property:ro.debuggable=0
+    write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 1
     wait /sys/class/qcom-battery/suspend_input_current 5
     write /sys/class/qcom-battery/suspend_input_current 1
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Make the UFS storage's serial number and its LUNs' SCSI serial and
+  identification pages root-only through ueventd. No shipped program reads
+  them, and their generic sysfs label is readable by 22 system and vendor
+  domains, among them the fingerprint HAL and the composer. Not yet built.
 - Document why four denials stay denied (the audio HAL's kernel wake locks,
   which only sound trigger takes; SystemUI's read of an LE audio property
   that is not set; the IWLAN and call-audio apps' start-up lookups of the GPU

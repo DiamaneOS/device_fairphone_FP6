@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Give the SoC serial number its own SELinux type and make it root-only. No
+  shipped program reads it; the composer's read of all sysfs now excludes it,
+  the thermal engine no longer reads the soc0 files beyond the public ids,
+  and a neverallow keeps vendor services off it. The platform still lets some
+  HAL domains read all sysfs, but those run as their own users. Not yet built.
 - Raise the ADPF uclamp ceiling from 384 to 512: 384 is below the capacity
   of the A520 little cores (about 454), so a hint session running over its
   target, SurfaceFlinger included, could never move to a bigger core. Normal

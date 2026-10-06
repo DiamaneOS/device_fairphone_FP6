@@ -99,7 +99,7 @@
       "source": "generic/vendor/common/hal_graphics_composer_default.te",
       "source_sha256": "911feedb31dfdc67f3e0ddc61d2cbea849504da6d744a95537a9e7d4e51b2a03",
       "path": "vendor-common/hal_graphics_composer_default.te",
-      "sha256": "b7304bbf3b2e8cac5a5e0e9ffc7de581685e6b83addc6d192d2a2ca78395d1eb"
+      "sha256": "eda6202a842a69a5187b60b1cdf2e8bd95098732ff5fd1edac5212d853c50082"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

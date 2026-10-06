@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Read-only SoC identification and thermal zones.
+# Read-only SoC identification and thermal zones. In /sys/devices/soc0 the
+# thermal HAL reads only soc_id and the thermal engine soc_id and hw_platform
+# (both vendor_sysfs_public; strings of both binaries), no other soc0 file.
 allow { hal_thermal_default vendor_thermal-engine } vendor_sysfs_soc:dir search;
 allow { hal_thermal_default vendor_thermal-engine } vendor_sysfs_public:file r_file_perms;
-allow vendor_thermal-engine vendor_sysfs_soc:file r_file_perms;
 r_dir_file(hal_thermal_default, sysfs_thermal)
 
 # The peripheral manager maps remote processors by their sysfs names.

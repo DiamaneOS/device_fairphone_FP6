@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The SoC serial number, /sys/devices/soc0/serial_number (also reached as
+# /sys/bus/soc/devices/soc0/serial_number), gets its own type (genfs line in
+# fp6/genfs_contexts) instead of the soc0 directory's vendor_sysfs_soc. No
+# shipped program reads it: in the built image only kernel code uses the serial
+# (the Wi-Fi driver derives a fallback MAC address from it in-kernel), and the
+# vendor services that read soc0 read only the public soc_id, hw_platform,
+# family and subset files (vendor_sysfs_public, vendor_sys_nonsp_comp). So no
+# vendor rule names this type.
+#
+# It must keep sysfs_type (the platform's sepolicy_tests require it for every
+# sysfs label), and the platform grants read on all of sysfs_type to apexd,
+# init, ueventd, vendor_init, vold, the Bluetooth, Wi-Fi, supplicant and radio
+# HAL attributes, tee and wpa_supplicant_macsec. Those rules cannot be narrowed
+# without changing the platform policy, so ueventd also makes the node 0400
+# root (boot/ueventd.rc): of the processes that run in those domains, only the
+# root ones (init, ueventd, vendor_init, vold, apexd) pass the file mode; the
+# Bluetooth HAL, rild, the Wi-Fi HAL, wpa_supplicant and qseecomd run as their
+# own users without CAP_DAC_OVERRIDE or CAP_DAC_READ_SEARCH.
+type vendor_sysfs_soc_serial, sysfs_type, fs_type;
+
+# Nothing else may read it: a later rule that adds a reader fails the build.
+neverallow {
+  domain
+  -init
+  -ueventd
+  -vendor_init
+  -vold
+  -apexd
+  -hal_bluetooth
+  -hal_telephony_server
+  -hal_wifi
+  -hal_wifi_supplicant
+  -tee
+  -wpa_supplicant_macsec
+} vendor_sysfs_soc_serial:file { open read };

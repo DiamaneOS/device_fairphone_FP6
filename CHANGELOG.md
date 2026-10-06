@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Compress zram with lz4 instead of zstd. Measured over two 20-app relaunch
+  rounds each: relaunch median 137 -> 118 ms, memory stall 0.78 -> 0.47 s,
+  same kills; costs a lower compression ratio (about 4 instead of 6) and a
+  little more kswapd CPU.
 - The source-built gralloc no longer tries to load `libubwcp.so` when UBWC-P
   support is compiled out (`hardware/qcom/display`), so apps, system_server,
   SurfaceFlinger and the media services no longer log its denial; removed

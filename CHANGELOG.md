@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Keep the stock Bluetooth HCI implementation's two firmware-download tags at
+  warning level: at info level they logged the Bluetooth address each time
+  Bluetooth started, and at debug level HCI command dumps. Not yet built.
 - Add neverallows that keep every domain except init, vendor_init and
   vold_prepare_subdirs from creating or relabelling files and directories to
   the fingerprint HAL's data label, so no other process can plant a

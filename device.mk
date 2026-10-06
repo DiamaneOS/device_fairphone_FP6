@@ -289,10 +289,13 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_PACKAGES += timekeepd
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
-# expect, from the stock vendor build.prop, with two exceptions:
+# expect, from the stock vendor build.prop, with three exceptions:
 # - no touch timer override: stock's 3500000 ms kept touch boost active for
 #   about 58 minutes and blocked idle refresh-rate drops; SurfaceFlinger's
 #   default (200 ms, as in Qualcomm's display config) applies instead;
+# - the idle timer is 1500 ms instead of stock's 3500 ms, so a still screen
+#   drops to the panel's idle refresh rate 2 s sooner; touch still raises the
+#   rate at once through the touch timer;
 # - debug.sf.hw, debug.sf.latch_unsignaled and
 #   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
 #   platform, the display HAL or the stock vendor files reads them
@@ -301,7 +304,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.use_color_management=true \
     ro.surface_flinger.protected_contents=true \
     ro.surface_flinger.use_content_detection_for_refresh_rate=true \
-    ro.surface_flinger.set_idle_timer_ms=3500 \
+    ro.surface_flinger.set_idle_timer_ms=1500 \
     ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
     ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
     ro.surface_flinger.max_virtual_display_dimension=4096 \

@@ -91,6 +91,11 @@ Downstream adaptations:
     (`power/init.fp6.thermal.rc`); ueventd gives group system the two trip
     nodes it writes (`trip_point_1_temp` and `trip_point_1_hyst` of each
     thermal zone). Its domain is unchanged.
+  - Thermal engine (closed, root): on userdebug and eng builds,
+    `fp6/thermal_engine_audit.te` logs each node it opens for writing, the
+    device nodes it opens, the sockets it creates, its capability use and its
+    shutdown requests ("avc: granted" records). These rules grant nothing;
+    user builds do not have them.
   - The USB speed node is `sysfs_udc` (in the imported file_contexts and
     genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
     covers camera calibration and download mode.

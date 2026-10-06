@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the imported hwservice contexts of the ANT, ANT HCI and Bluetooth
+  SAR interfaces, whose libraries are not shipped: the Bluetooth HAL could
+  still register them under its own label. Not yet built.
 - Run the boot control HAL as its own user, `vendor_bootctl`, with
   CAP_SYS_RAWIO only (stock: root with every capability). ueventd gives the
   group the GPT disks of the A/B LUNs (sdb, sdc, sde), misc and the UFS BSG

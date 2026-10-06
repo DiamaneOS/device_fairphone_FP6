@@ -29,8 +29,6 @@
 # Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
-com.qualcomm.qti.ant::IAntHci                                   u:object_r:hal_bluetooth_hwservice:s0
-com.dsi.ant::IAnt                                               u:object_r:hal_bluetooth_hwservice:s0
 com.qualcomm.qti.uceservice::IUceService                        u:object_r:vendor_hal_imsrcsd_hwservice:s0
 com.qualcomm.qti.imscmservice::IImsCmService                    u:object_r:vendor_hal_imsrcsd_hwservice:s0
 vendor.qti.ims.callinfo::IService                               u:object_r:vendor_hal_imscallinfo_hwservice:s0

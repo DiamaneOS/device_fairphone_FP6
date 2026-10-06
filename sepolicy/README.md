@@ -400,11 +400,11 @@ stock QRTR sockets (only used for the modem-NV address query, which is off),
 Xpan service registration and HSUART tracing.
 
 The FM, ANT, SAR, config-store and TPI libraries the stock service linked are
-not installed. The imported hwservice_contexts map `com.dsi.ant::IAnt`,
-`com.qualcomm.qti.ant::IAntHci` (vendor-common lines 32-33) and
-`vendor.qti.hardware.bluetooth_sar::IBluetoothSar` (qva-common line 65) to
-`hal_bluetooth_hwservice`, which the HAL may add. Keep those interfaces out of
-the device VINTF manifest.
+not installed. The imported hwservice_contexts lines that mapped
+`com.dsi.ant::IAnt`, `com.qualcomm.qti.ant::IAntHci` and
+`vendor.qti.hardware.bluetooth_sar::IBluetoothSar` to `hal_bluetooth_hwservice`
+are removed, so the HAL can no longer register them: unmapped names fall to
+`default_android_hwservice`, which no domain may add.
 
 Open items (the policy runs enforcing):
 - `/dev/btfmcodec_dev` and `/dev/bt_cp_ctrl` share `hci_attach_dev` with

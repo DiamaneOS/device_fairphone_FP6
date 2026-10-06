@@ -85,6 +85,8 @@ SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
 PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
+# Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
+TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 # AVB is enabled. Release signing replaces the test identities.
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem

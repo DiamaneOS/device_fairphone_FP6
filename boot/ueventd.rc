@@ -70,6 +70,16 @@
 /dev/qseecom              0660   system     drmrpc
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
+# The boot control HAL (vendor_bootctl, CAP_SYS_RAWIO only, stock runs it as
+# root) reads and writes the slot attributes in the GPTs of the LUNs with A/B
+# partitions (sdb: xbl_a, sdc: xbl_b, sde: the rest, stock rawprogram1, 2, 4),
+# the Virtual A/B merge status in misc, and switches the boot LUN through the
+# UFS BSG node. The other LUNs stay root-only.
+/dev/block/sdb            0660   root       vendor_bootctl
+/dev/block/sdc            0660   root       vendor_bootctl
+/dev/block/sde            0660   root       vendor_bootctl
+/dev/block/platform/soc/1d84000.ufshc/by-name/misc   0660   root   vendor_bootctl
+/dev/ufs-bsg*             0660   root       vendor_bootctl
 /sys/class/typec/port0		data_role	0660	system	usb
 /sys/class/typec/port0		power_role	0660	system	usb
 /sys/class/typec/port0		port_type	0660	system	usb

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Drop stock's `wowlan_triggers=magic_pkt` from the station supplicant
+  overlay. The magic-packet wake-up itself is turned off in the driver
+  configuration that the tools generate (`gEnableWoW=2`). Not yet built.
 - Remove the imported hwservice contexts of the ANT, ANT HCI and Bluetooth
   SAR interfaces, whose libraries are not shipped: the Bluetooth HAL could
   still register them under its own label. Not yet built.

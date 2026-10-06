@@ -1,13 +1,14 @@
 # Wi-Fi supplicant configuration
 
-`wpa_supplicant_overlay.conf` and `p2p_supplicant_overlay.conf` are copied
-unchanged from `/vendor/etc/wifi/` of the stock FP6 image FP6.QREL.16.100.0
-(EU). SHA-256:
+`wpa_supplicant_overlay.conf` and `p2p_supplicant_overlay.conf` come from
+`/vendor/etc/wifi/` of the stock FP6 image FP6.QREL.16.100.0 (EU). The P2P
+overlay is unchanged; the station overlay drops stock's
+`wowlan_triggers=magic_pkt` (see below). SHA-256:
 
-| File | SHA-256 |
-| --- | --- |
-| `wpa_supplicant_overlay.conf` | `cc7f31ca31417a4fe57a36f1b177b4de32c6ec70ce5780c1bd10a0be26d22029` |
-| `p2p_supplicant_overlay.conf` | `355c62f3f28d994f39eb96d3a75a12d88d3f4ca32e556801da77ffda73d746cc` |
+| File | Stock | Here |
+| --- | --- | --- |
+| `wpa_supplicant_overlay.conf` | `cc7f31ca31417a4fe57a36f1b177b4de32c6ec70ce5780c1bd10a0be26d22029` | `9e6a4e81a6dc0f4521300647d43026f9b22d0b598bba50340bafb462ad09d644` |
+| `p2p_supplicant_overlay.conf` | `355c62f3f28d994f39eb96d3a75a12d88d3f4ca32e556801da77ffda73d746cc` | same |
 
 `device.mk` installs them to `/vendor/etc/wifi/`, where wpa_supplicant looks
 for overlays. The base template, `wpa_supplicant.conf`, has one provider: the
@@ -30,6 +31,11 @@ Options whose effect is not obvious:
   device.
 - `p2p_no_group_iface=1` runs P2P groups on the P2P device interface instead
   of creating a separate group interface.
+- No wake-on-LAN: a LAN peer must not be able to wake the phone with a magic
+  packet. The station overlay sets no `wowlan_triggers`, and the generated
+  vendor tree sets `gEnableWoW=2` in the driver's `WCNSS_qcom_cfg.ini`, which
+  is what the qcacld driver uses (it ignores cfg80211 WoWLAN triggers):
+  pattern wake-ups stay, the magic-packet wake-up goes.
 
 Still to be checked on the device, with SELinux enforcing and without the
 directories created by hand during bring-up: supplicant socket and state

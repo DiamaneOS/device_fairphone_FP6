@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# USB-C port control. The dwc3-msm controller's dynamic_disable node turns USB
+# data off and on; charging is not affected. It gets its own type (its line in
+# vendor-common/genfs_contexts) instead of vendor_sysfs_usb_device, which also
+# covers the controller role (mode) and other USB nodes.
+#
+# vendor_init writes it from the sys.port_security_mode triggers in
+# boot/init.qcom.usb.rc. The platform already lets vendor_init and ueventd write
+# every sysfs_type file; the rule below states the one vendor_init needs here.
+# The Qualcomm USB HAL keeps its write for enableUsbData (Lockdown, device
+# policy) while the framework's port control is off.
+type vendor_sysfs_usb_data_disable, sysfs_type, fs_type;
+
+allow vendor_init vendor_sysfs_usb_data_disable:file { open write };
+allow vendor_hal_usb_qti vendor_sysfs_usb_data_disable:file { open write };
+
+# Nothing else may write it: a later rule that adds a writer fails the build.
+neverallow {
+  domain
+  -vendor_init
+  -ueventd
+  -vendor_hal_usb_qti
+} vendor_sysfs_usb_data_disable:file { write append };

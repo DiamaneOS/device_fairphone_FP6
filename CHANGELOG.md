@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Run the boot control HAL as its own user, `vendor_bootctl`, with
+  CAP_SYS_RAWIO only (stock: root with every capability). ueventd gives the
+  group the GPT disks of the A/B LUNs (sdb, sdc, sde), misc and the UFS BSG
+  node; the other LUNs stay root-only. Needs the matching
+  `hardware/qcom/bootctrl` change. Not yet built.
 - Build the dm-verity hash trees of system, system_ext, product, vendor,
   odm, vendor_dlkm and system_dlkm with SHA-256 instead of avbtool's SHA-1
   default, as stock does. Not yet built; needs a super flash.

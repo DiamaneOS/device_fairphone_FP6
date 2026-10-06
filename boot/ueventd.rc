@@ -87,6 +87,16 @@ firmware_directories /vendor/firmware_mnt/image/
 # reads the two IMEIs from it; SELinux allows it nothing else. Stock reads it
 # from tctd as root.
 /dev/block/platform/soc/1d84000.ufshc/by-name/traceability   0440   root   vendor_imeiprov
+# The boot control HAL (vendor_bootctl, CAP_SYS_RAWIO only; stock runs it as
+# root) reads and writes the slot attributes in the GPTs of the LUNs with A/B
+# partitions (sdb: xbl_a, sdc: xbl_b, sde: the rest; stock rawprogram1, 2, 4),
+# the Virtual A/B merge status in misc, and switches the boot LUN through the
+# UFS BSG node. The other LUNs stay root-only.
+/dev/block/sdb            0660   root       vendor_bootctl
+/dev/block/sdc            0660   root       vendor_bootctl
+/dev/block/sde            0660   root       vendor_bootctl
+/dev/block/platform/soc/1d84000.ufshc/by-name/misc   0660   root   vendor_bootctl
+/dev/ufs-bsg*             0660   root       vendor_bootctl
 # The stock FP6 FocalTech node is owned by the system fingerprint service.
 /dev/focaltech_fp          0660   system     system
 # The stock NFC HAL runs as nfc and opens the Samsung controller node. Stock

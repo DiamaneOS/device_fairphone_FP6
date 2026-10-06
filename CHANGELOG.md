@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- User builds start every normal boot with charging off, as GrapheneOS
+  starts Pixels with the USB-C port off: init suspends the charger input as
+  soon as the ADSP charger firmware is up (early-boot; it waits for the
+  node, and writes again at boot), and the framework's stored mode turns it
+  back on within seconds, or keeps it off for Off. Charger mode, recovery,
+  fastbootd and debuggable builds are unaffected. Not yet built.
 - USB-C port control Off now also turns off charging while the OS runs, as
   Off does on Pixels: after the data cut, init sets the ADSP charger
   firmware's input suspend (`qcom-battery/suspend_input_current`), so the

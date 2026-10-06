@@ -122,13 +122,33 @@ on zygote-start
 #   firmware (qcom-battery suspend_input_current), cut after the data: the
 #   phone draws no current from the port and runs on its battery. Every other
 #   state turns the input back on before data.
-# - Runtime state only: init also turns the input on at boot, in charger mode
-#   and at shutdown, and the ADSP firmware restarts with every boot.
+# - User builds start every normal boot with charging off, as GrapheneOS
+#   starts Pixels with the port off from first-stage init: as soon as the
+#   charger firmware is up after the ADSP boots (early-boot), until the
+#   framework applies the stored mode. The qcom-battery class appears only
+#   once the firmware's glink channel is up, so init waits for the node; a
+#   write before that fails, and "on boot" writes again. New USB connections
+#   are already refused from first-stage init (deny_new_usb2). Debuggable
+#   builds keep the port on at boot (USB debugging of early boot); their
+#   boot write of 0 changes nothing and shows in the kernel log when the
+#   firmware takes writes.
+# - Runtime state only: charger mode and shutdown turn the input back on,
+#   and the ADSP firmware restarts with every boot. Charger mode, recovery
+#   and fastbootd never run early-boot or the framework (and do not load
+#   this file in recovery and fastbootd).
 # - "charging-only" cuts no data: deny_new_usb2 refuses the next connection,
 #   and the framework switches to charging-only_immediate once the port is
 #   unplugged while locked.
 # Only vendor_init may write either node (sepolicy/fp6/usb_port_security.te).
-on boot
+on early-boot && property:ro.debuggable=0
+    wait /sys/class/qcom-battery/suspend_input_current 5
+    write /sys/class/qcom-battery/suspend_input_current 1
+
+on boot && property:ro.debuggable=0
+    write /sys/class/qcom-battery/suspend_input_current 1
+
+on early-boot && property:ro.debuggable=1
+    wait /sys/class/qcom-battery/suspend_input_current 5
     write /sys/class/qcom-battery/suspend_input_current 0
 
 on charger

@@ -32,6 +32,11 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc
 
+# The thermal HAL (device.mk) runs as system instead of root
+# (init.fp6.thermal.rc); ueventd gives it the two trip nodes it writes.
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/power/init.fp6.thermal.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.thermal.rc
+
 # SurfaceFlinger's main and RenderEngine threads join the top-app cpuset, as on
 # Pixels. AOSP's default (and stock's) is system-background, which this device
 # limits to the silver cores (boot/init.fp6.perf.rc), so SF could never use a

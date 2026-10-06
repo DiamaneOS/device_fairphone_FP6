@@ -21,9 +21,6 @@
 - Let ART compile on the phone for the actual cores (runtime CPU variant
   cortex-a55: LSE atomics, FP16, dot product, no Cortex-A53 workarounds), as
   on Pixel 9, which also has A720 and A520 cores. Not yet built.
-- Raise the DDR floor during touch interaction (681 MHz request, stock's
-  scroll boost value): the first scroll frames wait less on memory. Not yet
-  built.
 - Raise the DDR and L3 floors for up to 3 s during app launches, as stock's
   perf daemon did: launches start memory-bound. Not yet built.
 - Keep the stock Bluetooth HCI implementation's two firmware-download tags at

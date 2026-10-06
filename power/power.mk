@@ -34,10 +34,7 @@ PRODUCT_PACKAGES += android.hardware.power.stats-service.fp6
 # (prime latency monitor, request 1344000 kHz). The bus driver rounds a request
 # up to the next level of its table; on LPDDR5 (547, 768, 1555, ... MHz) the
 # DDR floor is 1555 MHz. "setprop vendor.powerhal.membus.enable false" turns
-# the launch floors off for A/B tests. INTERACTION raises the DDR floor of
-# stock's scroll boost (request 681000 kHz, 768 MHz on LPDDR5) while the HAL
-# holds the hint, 1.4 to 5.65 s after a touch; its switch is
-# vendor.powerhal.interaction_ddr.enable.
+# the floors off for A/B tests.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc

@@ -406,7 +406,7 @@ not installed. The imported hwservice_contexts map `com.dsi.ant::IAnt`,
 `hal_bluetooth_hwservice`, which the HAL may add. Keep those interfaces out of
 the device VINTF manifest.
 
-Before enforcing mode:
+Open items (the policy runs enforcing):
 - `/dev/btfmcodec_dev` and `/dev/bt_cp_ctrl` share `hci_attach_dev` with
   `/dev/ttyHS0`, and `/dev/btfmslim` shares `vendor_bt_device` with
   `/dev/btpower` (vendor-common/file_contexts lines 65, 152-154). They stay
@@ -531,7 +531,8 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
 - Kept as declarations only: Qualcomm's HIDL perf hwservice types and contexts and the
   `vendor_hal_perf` attributes.
 
-These rules are not yet built or runtime-qualified.
+Built: on the 2026-10-05 builds the HAL runs as system with CAP_SYS_NICE only and the camera
+boosts reach it. Not yet runtime-qualified.
 
 ## Power stats
 
@@ -555,7 +556,8 @@ platform's IPowerStats clients. Stock FP6 ships no power stats HAL.
   stats exist only there), sysfs, properties, and energy meters: the FP6 has no on-device
   power monitor.
 
-These rules are not yet built or runtime-qualified.
+Built: on the 2026-10-05 builds the HAL runs as its own user with no capabilities. Not yet
+runtime-qualified.
 
 ## Telephony
 

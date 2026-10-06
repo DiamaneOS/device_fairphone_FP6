@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Log what the closed thermal engine changes, on userdebug and eng builds
+  only: `sepolicy/fp6/thermal_engine_audit.te` adds "avc: granted" records
+  for each node it opens for writing, the device nodes it opens, the sockets
+  it creates, its capability use and its shutdown requests. No access
+  changes; user builds are unchanged. Not yet built.
 - Use the factory Wi-Fi MAC as the driver's hardware address, as stock does,
   instead of the chip's generic Qualcomm one (prefix 00:03:7f; -180).
   - imeiprovd writes the driver's MAC file from the traceability partition

@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Thermal engine audit, debug builds only. The closed engine
+# (/vendor/bin/thermal-engine-v2, vendor-common/thermal-engine.te) runs as root.
+# These rules grant nothing: each one adds an "avc: granted" log record to an
+# access the policy already allows, so a run shows every node the engine opens
+# for writing (with its path), every device node it opens, the sockets and
+# socket files it creates, its capability use and its shutdown requests.
+#
+# Not logged: reads of thermal, CPU and GPU sysfs (the engine polls them, which
+# would flood the log; their modes are checked from a node listing instead),
+# and the writes every domain may make to world-writable nodes, its own
+# process files and the logging and tracing sockets (logd, pmsg, heapprofd,
+# traced_perf, prng_seeder), whose file modes do not depend on the user.
+userdebug_or_eng(`
+  # Nodes it may write: cooling_device*/cur_state and thermal_zone*
+  # attributes, CPU online and cpufreq, GPU clocks, battery supply, backlight.
+  auditallow vendor_thermal-engine {
+    sysfs_thermal
+    sysfs_devices_system_cpu
+    vendor_sysfs_cpufreq_limit
+    vendor_sysfs_kgsl
+    vendor_sysfs_kgsl_limit
+    vendor_sysfs_battery_supply
+    vendor_sysfs_graphics
+  }:file { write append };
+
+  # Device nodes, opened rarely: the CDSP limits partition, UIO, diag
+  # (debug builds), FastRPC and ION.
+  auditallow vendor_thermal-engine vendor_limits_block_device:blk_file { open write append };
+  auditallow vendor_thermal-engine { uio_device vendor_diag_device }:chr_file { open write append };
+  auditallow vendor_thermal-engine { vendor_qdsp_device ion_device }:chr_file open;
+
+  # Client sockets: init creates the four /dev/socket/thermal-* sockets (rc
+  # socket lines); the engine unlinks, binds and chmods its own only when
+  # they are missing.
+  auditallow vendor_thermal-engine vendor_thermal_socket:sock_file { create setattr unlink rename };
+  auditallow vendor_thermal-engine { socket_device vendor_thermal_socket }:dir { add_name remove_name };
+
+  # Sockets it creates: QMI over QRTR, uevents, thermal generic netlink.
+  auditallow vendor_thermal-engine self:{ socket qipcrtr_socket netlink_kobject_uevent_socket netlink_generic_socket } create;
+
+  # Capabilities and thermal shutdown requests (sys.powerctl, set by init).
+  auditallow vendor_thermal-engine self:capability { fsetid sys_boot };
+  auditallow vendor_thermal-engine powerctl_prop:property_service set;
+
+  # Platform grants to every domain that create or change files.
+  auditallow vendor_thermal-engine { cgroup cgroup_v2 }:file { write append };
+  auditallow vendor_thermal-engine { cgroup cgroup_v2 }:dir { add_name remove_name };
+  auditallow vendor_thermal-engine coredump_file:dir add_name;
+  auditallow vendor_thermal-engine coredump_file:file create;
+  auditallow vendor_thermal-engine debugfs_trace_marker:file { write append };
+')

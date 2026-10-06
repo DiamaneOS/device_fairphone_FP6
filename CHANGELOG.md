@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Lower the GPU floor for EXPENSIVE_RENDERING from 763 to 510 MHz: GPU
+  composition rarely needs the pin, the GPU governor still clocks up when
+  busy, and 510 MHz runs at a lower voltage. Not yet built.
 - Let ART compile on the phone for the actual cores (runtime CPU variant
   cortex-a55: LSE atomics, FP16, dot product, no Cortex-A53 workarounds), as
   on Pixel 9, which also has A720 and A520 cores. Not yet built.

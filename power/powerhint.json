@@ -38,7 +38,7 @@
     {"PowerHint": "CAMERA_SHOT", "Node": "CPUPrimeMinFreq", "Value": "2496000", "Duration": 1000},
     {"PowerHint": "CAMERA_SHOT", "Node": "WaltSchedBoost", "Value": "1", "Duration": 1000, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
 
-    {"PowerHint": "EXPENSIVE_RENDERING", "Node": "GPUMinFreq", "Value": "763000000", "Duration": 0},
+    {"PowerHint": "EXPENSIVE_RENDERING", "Node": "GPUMinFreq", "Value": "510000000", "Duration": 0},
     {"PowerHint": "DISPLAY_UPDATE_IMMINENT", "Node": "GPUTouchWake", "Value": "1", "Duration": 100},
 
     {"PowerHint": "SUSTAINED_PERFORMANCE", "Node": "CPUSilverMaxFreq", "Value": "1113600", "Duration": 0},

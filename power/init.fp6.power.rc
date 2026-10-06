@@ -21,9 +21,7 @@ service vendor.power-hal-aidl /vendor/bin/hw/android.hardware.power-service.line
 # 0644, so the owner can write them and everyone else keeps read access. The
 # HAL starts writing at sys.boot_completed (vendor.powerhal.init, set at the
 # end of init.fp6.perf.rc); the touch controller's gesture node gets its owner
-# from ueventd.rc. The memory-bus floors (DDR bandwidth monitor, prime L3
-# latency monitor) come from the bwmon and memlat modules, which load at "on
-# fs" (init.qcom.rc, platform stream).
+# from ueventd.rc.
 on boot
     chown system system /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
     chown system system /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
@@ -34,8 +32,6 @@ on boot
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake
-    chown system system /sys/devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/min_freq
-    chown system system /sys/devices/system/cpu/bus_dcvs/L3/soc:qcom,memlat:l3:prime/min_freq
 
 # WALT sched_boost for the LAUNCH (1, full throttle) and INTERACTION
 # (2, conservative) hints. /proc/sys/walt/sched_boost is root-only and a sysctl

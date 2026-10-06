@@ -510,7 +510,8 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
   0, 1 and 2), and vendor init writes the matching fixed value. The other `vendor.powerhal.*`
   properties (`vendor_power_prop`) are switches the HAL reads and vendor init sets;
   `vendor.powerhal.sched_boost.enable=false` turns the `sched_boost` part of the hints off,
-  `vendor.powerhal.membus.enable=false` the memory-bus floors.
+  `vendor.powerhal.membus.enable=false` the launch memory-bus floors and
+  `vendor.powerhal.interaction_ddr.enable=false` the touch DDR floor.
 - ADPF: setsched on apps, SurfaceFlinger and system_server, with CAP_SYS_NICE, to set uclamp
   on hint-session threads. The domain is an `mlstrustedsubject` because the platform MLS
   constraint on setsched requires equal levels and apps run with categories; setsched is its

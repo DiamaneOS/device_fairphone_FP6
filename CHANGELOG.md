@@ -2,14 +2,23 @@
 
 ## Unreleased
 
+- USB-C port control Off now also turns off charging while the OS runs, as
+  Off does on Pixels: after the data cut, init sets the ADSP charger
+  firmware's input suspend (`qcom-battery/suspend_input_current`), so the
+  phone draws no current from the port and runs on its battery. It is
+  runtime state: every other port state turns the input back on before data,
+  and so do boot, charger mode and shutdown; the firmware also restarts with
+  every boot. So charging powered off, in charger mode, fastboot, fastbootd
+  and recovery is not affected. The node gets its own SELinux type that only
+  vendor_init may write. Settings says Off turns off USB data and charging.
+  Not yet built.
 - Turn on GrapheneOS's USB-C port control (`config_usbPortSecuritySupported`):
   Settings offers Off, Charging-only, the two charging-only-when-locked modes
   and On, with charging-only when locked as the default on user builds.
   Without it a user build had no USB data at all, because GrapheneOS's early
-  boot refuses new USB connections and nothing lifted that. Off cannot stop
-  charging on the FP6, so its Settings summary says it works like
-  Charging-only. The USB HAL loses its write to the data switch, which only
-  init triggers use now. Not yet built.
+  boot refuses new USB connections and nothing lifted that. The USB HAL
+  loses its write to the data switch, which only init triggers use now. Not
+  yet built.
 - Turn USB data off and on when GrapheneOS's USB-C port control asks for it:
   init triggers map `sys.port_security_mode` to the USB controller's
   `dynamic_disable` node (data off, charging continues). The node gets its

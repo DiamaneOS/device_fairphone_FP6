@@ -115,17 +115,39 @@ on zygote-start
 
 # USB-C port control. GrapheneOS's framework sets sys.port_security_mode (and
 # the kernel's deny_new_usb2, which refuses new connections) only when
-# config_usbPortSecuritySupported is true. Data off is dwc3-msm
-# dynamic_disable; Type-C, PD and charging stay with the ADSP firmware, so
-# charging continues. "charging-only" needs no trigger: deny_new_usb2 refuses
-# the next connection, and the framework switches to charging-only_immediate
-# once the port is unplugged while locked. Only vendor_init and the USB HAL
-# may write the node (sepolicy/fp6/usb_port_security.te).
+# config_usbPortSecuritySupported is true.
+# - Data off is dwc3-msm dynamic_disable. Type-C and PD stay with the ADSP
+#   firmware.
+# - Off (ports_disabled) also suspends the charger input in the ADSP charger
+#   firmware (qcom-battery suspend_input_current), cut after the data: the
+#   phone draws no current from the port and runs on its battery. Every other
+#   state turns the input back on before data.
+# - Runtime state only: init also turns the input on at boot, in charger mode
+#   and at shutdown, and the ADSP firmware restarts with every boot.
+# - "charging-only" cuts no data: deny_new_usb2 refuses the next connection,
+#   and the framework switches to charging-only_immediate once the port is
+#   unplugged while locked.
+# Only vendor_init may write either node (sepolicy/fp6/usb_port_security.te).
+on boot
+    write /sys/class/qcom-battery/suspend_input_current 0
+
+on charger
+    write /sys/class/qcom-battery/suspend_input_current 0
+
+on shutdown
+    write /sys/class/qcom-battery/suspend_input_current 0
+
 on property:sys.port_security_mode=ports_disabled
     write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 1
+    write /sys/class/qcom-battery/suspend_input_current 1
 
 on property:sys.port_security_mode=charging-only_immediate
+    write /sys/class/qcom-battery/suspend_input_current 0
     write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 1
 
+on property:sys.port_security_mode=charging-only
+    write /sys/class/qcom-battery/suspend_input_current 0
+
 on property:sys.port_security_mode=ports_enabled
+    write /sys/class/qcom-battery/suspend_input_current 0
     write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 0

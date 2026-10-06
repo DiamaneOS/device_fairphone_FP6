@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Run the thermal HAL as system without capabilities instead of root, as the
+  Pixel thermal HAL runs. ueventd gives group system the two trip nodes it
+  writes; they stay root-owned for the thermal engine. Not yet built.
 - Give the SoC serial number its own SELinux type and make it root-only. No
   shipped program reads it; the composer's read of all sysfs now excludes it,
   the thermal engine no longer reads the soc0 files beyond the public ids,

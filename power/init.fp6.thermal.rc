@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# Thermal HAL (android.hardware.thermal-service.qti, built from
+# vendor/qcom/opensource/thermal-hal): it reports temperatures, cooling-device
+# states and throttling severity to the framework; it applies no mitigation
+# itself (the kernel and the thermal engine do). Its own rc runs it as root.
+# This file sorts after it in /vendor/etc/init, and init uses the last
+# definition marked override: the HAL runs as system with no capabilities, as
+# the Pixel thermal HAL does. Its policy (hal_thermal_default) grants no
+# capability, so as root it used only root's ownership of sysfs files.
+#
+# What it touches (thermalCommon.cpp, thermalConfig.cpp, thermalMonitorNetlink.cpp):
+# reads thermal_zone*/temp, type, trip_point_*_type, cooling_device*/cur_state,
+# /proc/stat, cpu*/online and soc0/soc_id, all world-readable; listens to the
+# kernel's thermal netlink events (generic netlink multicast, open to non-root);
+# writes trip_point_1_temp and trip_point_1_hyst of the zones it monitors
+# (CPU, GPU, NSP, skin, battery and BCL sensors) to get an event at the next
+# severity threshold. ueventd gives those two nodes to group system
+# (boot/ueventd.rc); they stay root-owned, so the root thermal engine still
+# writes them as before.
+service vendor.thermal-hal /vendor/bin/hw/android.hardware.thermal-service.qti
+    interface aidl android.hardware.thermal.IThermal/default
+    class hal
+    user system
+    group system
+    override

@@ -84,6 +84,10 @@ Downstream adaptations:
     and radio HALs and tee read; ueventd makes the node 0400 root, so of those
     only the root platform daemons can open it. A neverallow keeps every other
     domain off it.
+  - Thermal HAL: runs as system with no capabilities
+    (`power/init.fp6.thermal.rc`); ueventd gives group system the two trip
+    nodes it writes (`trip_point_1_temp` and `trip_point_1_hyst` of each
+    thermal zone). Its domain is unchanged.
   - The USB speed node is `sysfs_udc` (in the imported file_contexts and
     genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
     covers camera calibration and download mode.

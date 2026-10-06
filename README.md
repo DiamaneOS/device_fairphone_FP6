@@ -1,108 +1,65 @@
-# Fairphone 6 product configuration
+# Fairphone 6 device configuration
 
-Android product `FP6` (lunch `FP6-cur-userdebug`), installed at
-`device/fairphone/FP6` in the pinned GrapheneOS source workspace. It keeps
-Fairphone's stock product identity (brand, product, device, model) in the build
-properties and fingerprint, as GrapheneOS keeps Google's. Shared product configuration belongs at
-`vendor/diamaneos`.
+Android product `FP6` (`lunch FP6-cur-userdebug`), at `device/fairphone/FP6` in
+the GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 
-This is integration source, not a qualified bootable product. Native product
-graph, selected source HAL compilation and enforcing USER policy checks have
-passed with recorded candidate inputs. Combined installed artifacts and device
-behavior still require verification. Required generated inputs are:
+- Keeps Fairphone's product identity (brand, device, model) in the fingerprint,
+  as GrapheneOS keeps Google's; build ID, number and keys are our own.
+- Needs two generated inputs, and the build fails without either:
+  - `vendor/fairphone/FP6`: selected stock vendor files, HAL, init and VINTF
+    integration;
+  - `device/fairphone/FP6-kernel`: kernel, modules, device tree, board
+    definitions and module load lists.
+- Hardware facts come from Fairphone's `vendor/fairphone/fps` (`51648f54`) and
+  `platform/vendor/qcom/volcano` (`0ce43e69`). No manufacturing product,
+  userdata or keys are imported.
+- Release signing is done by diamaneos-tools (`docs/SIGNING.md`).
 
-- `vendor/fairphone/FP6`: selected stock-derived inputs and reviewed source HAL,
-  init and VINTF integration. Device policy is maintained under `sepolicy/`.
-- `device/fairphone/FP6-kernel`: matched kernel, module and device-tree artifacts,
-  generated product/board definitions and load lists.
+## Layout
 
-Both includes are mandatory. Missing inputs must fail the build. Generated
-artifacts are not stored in this repository. The product uses development
-signing identities and does not set upstream official-build identity.
+| Path | Contents |
+|---|---|
+| `boot/` | fstab, init and ueventd files, module load lists, recovery init |
+| `power/` | power HAL config, camera hint client, power stats HAL, task profiles |
+| `audio/`, `callaudio/` | audio packages, AOSP effects; the call-audio bridge app |
+| `bluetooth/` | HCI service with its seccomp filter |
+| `camera/`, `media/` | stock CamX camera; hardware video encoders (decoders stay software) |
+| `modem/`, `telephony/`, `gnss/`, `nfc/`, `wifi/` | radios and their configuration |
+| `fingerprint/` | fingerprint HAL over the stock module |
+| `timekeep/` | `timekeepd`: keeps the clock across reboots |
+| `compat/` | compatibility libraries for stock vendor files |
+| `rro/`, `overlay/` | resource overlays |
+| `sepolicy/` | device policy ([sepolicy/README.md](sepolicy/README.md)) |
 
-Hardware bindings come from Fairphone Gerrit `vendor/fairphone/fps` at
-`51648f54c2a7d31fc24833adcae3758cb251966f` and
-`platform/vendor/qcom/volcano` at
-`0ce43e6912dd237ea76cfd0324266bde8330d07a`. The handwritten configuration is
-original integration code using those hardware facts; this repository does
-not import their manufacturing product, binary userdata or release keys.
-Partition capacities and AVB/layout must also pass image checks before use.
+## Boot and images
 
-Original code is Apache-2.0; see LICENSE. Framework code remains in its pinned
-upstream projects under its existing licences.
+- 4 KiB pages. Boot, init_boot and recovery use header v4; recovery has no
+  kernel (stock layout). OS version and patch level are in AVB properties.
+- Android and recovery share one fstab (`boot/fstab.qcom`, stock settings).
+- Vendor modules load after the firmware mounts. `boot/modules/` splits the
+  kernel's `modules.load` into a platform list, then per-subsystem lists loaded
+  in parallel. A kernel change to `modules.load` needs the same change here, or
+  the image checks fail.
+- AVB chain as on stock: recovery 1, vbmeta_system 2, boot 3, init_boot 4.
+  vbmeta_system covers pvmfw too (the bootloader rejects a slot without it).
+  dm-verity uses SHA-256.
+- Boot control: Fairphone's `hardware/qcom/bootctrl` and `recovery-ext`, with
+  CFI. It runs as `vendor_bootctl` with CAP_SYS_RAWIO only and can open only
+  the A/B GPT disks, misc and the UFS BSG node.
+- Recovery (`boot/init.recovery.qcom.rc`): USB peripheral mode, modem firmware
+  mounted read-only before ADSP boot, platform wipe hooks only. Includes
+  fastbootd.
 
-`boot/fstab.qcom` retains the published FP6 UFS mount/encryption settings,
-including the shipped early `/odm/persist` mount. Its original copyright and
-licence remain in the file; see NOTICE for provenance. It is installed in the
-vendor ramdisk and vendor image, selected by `androidboot.fstab_suffix=qcom`.
-The optional Google GSI public-key paths are omitted: system, system_ext and
-product use the declared development vbmeta_system chain. No device-specific
-persistent data is included in the source or generated vendor inputs.
+## Services
 
-This mount configuration still requires native fs_mgr, SELinux, encryption and
-image verification before a device boot. Recovery image verification
-remains pending. Existing formattable flags for writable device
-partitions are preserved from the pinned source; this is not a flashing command.
+- Stock FP6 thermal, lights, vibrator, USB and health HALs.
+- Power: LineageOS libperfmgr (unmodified) with `power/powerhint.json`, as
+  system with CAP_SYS_NICE. Camera hints reach it through
+  `libqti-perfd-client`; Qualcomm's perf daemon is not installed.
+- Power stats: our own HAL. It reports SoC and subsystem sleep times from
+  `/dev/stats`; there are no energy meters (no on-device power monitor).
 
-Boot-control services come from pinned Fairphone `hardware/qcom/bootctrl` and
-`vendor/qcom/opensource/recovery-ext` projects. The FP6 UFS BSG configuration
-is selected explicitly. Their original notices remain in those projects.
-The normal and recovery implementations compile with CFI enabled. Their UFS
-header layouts match the pinned kernel interfaces. Runtime slot switching still
-requires device verification. The normal service runs as `vendor_bootctl` with
-CAP_SYS_RAWIO only; `boot/ueventd.rc` gives that group the GPT disks of the
-A/B LUNs (sdb, sdc, sde), misc and the UFS BSG node.
+## Licence
 
-The product uses the published FP6 thermal, lights, vibrator, USB and health
-services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the
-FP6 configuration in `power/`: the hint table (`powerhint.json`), its init file
-(the HAL runs as system with CAP_SYS_NICE only) and a `libqti-perfd-client`
-for the stock camera, which turns its open, close and snapshot hints into
-time-limited power HAL boosts; Qualcomm's closed perf2 daemon is not installed.
-`power/stats` is a small power stats HAL of our own: it reports the SoC sleep
-modes and the modem, WPSS, ADSP and CDSP sleep time from the
-qcom_stats driver's `/dev/stats` (no energy meters; the FP6 has no on-device
-power monitor), as its own user without capabilities. The implementations
-remain separate from the device configuration. Required runtime dependencies,
-firmware and policy belong to the generated integration and must be checked
-before boot acceptance.
-
-The kernel and vendor ELF contract uses 4 KiB pages. Alignment checking remains
-enabled. Boot, init_boot and recovery use header version 4; recovery excludes the
-kernel, matching the stock bootloader layout. Android and recovery use the same
-fstab so encryption definitions cannot drift. Vendor drivers are loaded after
-their firmware mounts, in parallel streams: `boot/modules/` splits the kernel's
-vendor_dlkm `modules.load` into a platform list, loaded first, and one list per
-subsystem, loaded together after it (`boot/init.qcom.rc`). Each list keeps the
-kernel list's order, and together they name every module once; a kernel update
-that changes `modules.load` needs the same change here, or image verification
-fails. Image-header, policy and native product checks remain mandatory before
-flashing.
-
-Recovery has its own `boot/init.recovery.qcom.rc`, imported by the platform
-recovery as `init.recovery.qcom.rc`. It selects configfs and the FP6 controller,
-sets peripheral mode and mounts the current-slot modem firmware read-only before
-requesting ADSP boot. The platform owns ADB/sideload/fastboot compositions;
-normal Android's zygote-triggered gadget setup is not used in recovery. The
-recovery UI uses the panel backlight/max-brightness nodes and RGBX layout.
-First-stage init owns the generated `modules.load.recovery` list. Recovery uses
-the default platform wipe hooks; it adds no device-specific erase operation.
-Native packaging/policy checks and an actual recovery boot are separate gates.
-
-The minimal product explicitly selects the platform recovery runtime group and
-fastbootd. Enabling recovery image generation does not select those packages by
-itself. Image verification must check the recovery/init executables, main init
-script, USB properties and runtime dependencies as well as the image header.
-
-The generic ramdisk is selected separately through the platform's
-`generic_ramdisk.mk`. Verify the actual `init_boot` ramdisk contains an executable,
-statically linked ARM64 `/init`, `snapuserd_ramdisk` and its build properties;
-an image with a valid header and AVB hash can still lack its runtime. The GKI v4
-boot, init_boot and recovery headers carry zero OS-version fields. Version and
-patch information remains in AVB properties. Boot's patch level follows the
-selected vendor/kernel baseline; init_boot follows the platform.
-
-AVB uses the published FP6 chain locations: recovery 1, vbmeta_system 2,
-boot 3 and init_boot 4. Verify all four signatures and child descriptors against
-the selected development key, with verification flags zero. Matching this
-layout and passing host checks do not establish that the device boots.
+Apache-2.0 ([LICENSE](LICENSE)). Third-party files keep their own licences;
+see [NOTICE](NOTICE) and `sepolicy/provenance.json`.

@@ -55,26 +55,26 @@
   support is compiled out (`hardware/qcom/display`), so apps, system_server,
   SurfaceFlinger and the media services no longer log its denial; removed
   from the expected-denials list. The camera provider still loads it itself.
-  Not yet built.
+  Built.
 - Give the switch that turns Qualcomm's embedded USB debugger (EUD) on,
   `/sys/module/eud/parameters/enable`, its own SELinux type with a
   neverallow: only ueventd and vendor_init keep write access (the platform
   grants them all sysfs types); vold, the USB HAL and vfio_handler lose it.
-  The debugger stays off. Not yet built.
+  The debugger stays off. Built.
 - Drop stock's `wowlan_triggers=magic_pkt` from the station supplicant
   overlay. The magic-packet wake-up itself is turned off in the driver
-  configuration that the tools generate (`gEnableWoW=2`). Not yet built.
+  configuration that the tools generate (`gEnableWoW=2`). Checked on the phone.
 - Remove the imported hwservice contexts of the ANT, ANT HCI and Bluetooth
   SAR interfaces, whose libraries are not shipped: the Bluetooth HAL could
-  still register them under its own label. Not yet built.
+  still register them under its own label. Built.
 - Run the boot control HAL as its own user, `vendor_bootctl`, with
   CAP_SYS_RAWIO only (stock: root with every capability). ueventd gives the
   group the GPT disks of the A/B LUNs (sdb, sdc, sde), misc and the UFS BSG
   node; the other LUNs stay root-only. Needs the matching
-  `hardware/qcom/bootctrl` change. Not yet built.
+  `hardware/qcom/bootctrl` change. Checked on the phone.
 - Build the dm-verity hash trees of system, system_ext, product, vendor,
   odm, vendor_dlkm and system_dlkm with SHA-256 instead of avbtool's SHA-1
-  default, as stock does. Not yet built; needs a super flash.
+  default, as stock does. Checked on the phone.
 - Run the Bluetooth HCI service under a seccomp filter. The service compiles
   `bluetooth-hci.policy` (`bluetooth/seccomp`) and installs it at the start
   of main(), before it loads Qualcomm's closed HCI implementation, so the
@@ -85,12 +85,12 @@
   the process. For now calls outside it are logged (kernel audit record type
   1326) and allowed; `seccomp_audit.py --service bluetooth` turns those
   records into policy additions. The service aborts if the filter cannot be
-  installed. Not yet built.
+  installed. Built.
 - Add DiamaneOS's eSIM manager (DiamaneOSEuicc), which manages the profiles on
   the eUICC: list, turn on and off, rename, delete. It ships disabled; the eSIM
   support switch in Settings turns it on and restarts the phone. Mark physical
   slot 1 as a built-in eUICC (`non_removable_euicc_slots`), which stock leaves
-  unset. Not yet built.
+  unset. Checked on the phone.
 - Use AOSP's software audio effects only: our own `audio_effects.xml` lists
   the AOSP bundle, reverb, visualizer, downmix, loudness and dynamics
   effects without DSP offload halves or the effect proxy, so apps' effect
@@ -98,25 +98,23 @@
   visualizer, which are no longer shipped. Qualcomm's VoIP AEC/NS
   descriptors (the DSP's echo cancellation) and volume listener are built
   from unmodified CodeLinaro audio-ar sources (`audio/effects`) under
-  their stock names. Not yet built.
+  their stock names. Checked on the phone.
 - Lower the GPU floor for EXPENSIVE_RENDERING from 763 to 510 MHz: GPU
   composition rarely needs the pin, the GPU governor still clocks up when
-  busy, and 510 MHz runs at a lower voltage. Not yet built.
+  busy, and 510 MHz runs at a lower voltage. Built.
 - Let ART compile on the phone for the actual cores (runtime CPU variant
   cortex-a55: LSE atomics, FP16, dot product, no Cortex-A53 workarounds), as
-  on Pixel 9, which also has A720 and A520 cores. Not yet built.
-- Raise the DDR and L3 floors for up to 3 s during app launches, as stock's
-  perf daemon did: launches start memory-bound. Not yet built.
+  on Pixel 9, which also has A720 and A520 cores. Built.
 - Keep the stock Bluetooth HCI implementation's two firmware-download tags at
   warning level: at info level they logged the Bluetooth address each time
-  Bluetooth started, and at debug level HCI command dumps. Not yet built.
+  Bluetooth started, and at debug level HCI command dumps. Built.
 - Add neverallows that keep every domain except init, vendor_init and
   vold_prepare_subdirs from creating or relabelling files and directories to
   the fingerprint HAL's data label, so no other process can plant a
   configuration the closed fingerprint module would read. No rule changes.
 - Remove the imported policy of the display colour service, which is not
   installed or declared: its domain, executable label and service contexts,
-  and SystemUI's client grant to it. Not yet built.
+  and SystemUI's client grant to it. Built.
 - Drop the imported secure-processor (SPU) grants of the gatekeeper HAL and
   qseecomd: the FP6 has no SPU, its drivers are not shipped and the selected
   gatekeeper names no SPU node, so those device nodes never exist. Not yet
@@ -124,7 +122,7 @@
 - Make the UFS storage's serial number and its LUNs' SCSI serial and
   identification pages root-only through ueventd. No shipped program reads
   them, and their generic sysfs label is readable by 22 system and vendor
-  domains, among them the fingerprint HAL and the composer. Not yet built.
+  domains, among them the fingerprint HAL and the composer. Checked on the phone.
 - Document why four denials stay denied (the audio HAL's kernel wake locks,
   which only sound trigger takes; SystemUI's read of an LE audio property
   that is not set; the IWLAN and call-audio apps' start-up lookups of the GPU
@@ -133,26 +131,26 @@
   all of them.
 - Run the thermal HAL as system without capabilities instead of root, as the
   Pixel thermal HAL runs. ueventd gives group system the two trip nodes it
-  writes; they stay root-owned for the thermal engine. Not yet built.
+  writes; they stay root-owned for the thermal engine. Checked on the phone.
 - Give the SoC serial number its own SELinux type and make it root-only. No
   shipped program reads it; the composer's read of all sysfs now excludes it,
   the thermal engine no longer reads the soc0 files beyond the public ids,
   and a neverallow keeps vendor services off it. The platform still lets some
-  HAL domains read all sysfs, but those run as their own users. Not yet built.
+  HAL domains read all sysfs, but those run as their own users. Checked on the phone.
 - Raise the ADPF uclamp ceiling from 384 to 512: 384 is below the capacity
   of the A520 little cores (about 454), so a hint session running over its
   target, SurfaceFlinger included, could never move to a bigger core. Normal
-  frames keep the lower starting values. Not yet built.
+  frames keep the lower starting values. Built.
 - Remove the camera streaming modes' little-core caps from
   `powerhint.json`: CamX runs on the little cores, so the caps would slow it,
   and nothing sends those modes. CAMERA_SHOT now also sets `sched_boost`, like
-  CAMERA_LAUNCH, so capture work can leave the little cores. Not yet built.
+  CAMERA_LAUNCH, so capture work can leave the little cores. Built.
 - Pass the stock camera's performance hints to the power HAL. CamX's open,
   close and snapshot hints become CAMERA_LAUNCH and CAMERA_SHOT boosts of at
   most 5 s (a hint held until release at most 2 s), ended early when CamX
   releases them; `libqti-perfd-client` sends them from its own thread with
   one-way calls, so the camera never waits for the power HAL. The camera
-  provider becomes a power HAL client, as on Pixels. Not yet built.
+  provider becomes a power HAL client, as on Pixels. Built.
 - Ask CamX for a UBWC preview stream: the display hardware rotates only UBWC
   buffers, so the linear portrait preview was composed by the GPU on every
   frame. The 16:9 preview is now composed by the display hardware.
@@ -172,7 +170,7 @@
   `modprobe`: the platform modules first, then one stream per subsystem at the
   same time, each in the kernel list's order and in the same `vendor_modprobe`
   domain, now with only CAP_SYS_MODULE. init no longer waits for the touch
-  driver, whose probe takes about a second. Not yet built.
+  driver, whose probe takes about a second. Built.
 - Add a power stats HAL (`power/stats`, IPowerStats V2), which stock does
   not have. It reports the SoC sleep modes (AOSD, CXSD, DDR) and the modem,
   WPSS, ADSP and CDSP sleep time from the qcom_stats driver's `/dev/stats`
@@ -180,7 +178,7 @@
   sleep. No energy meters or consumers. It runs as its own user
   (`vendor_powerstats`) without capabilities in the platform
   `hal_power_stats_default` domain; only it may open `/dev/stats`, and only
-  the seven commands it uses. Not yet built.
+  the seven commands it uses. Built.
 - Run the stock CamX camera provider under a seccomp filter. The tools
   renderer renames the provider's libhardware.so dependency to our
   libcamxjail.so (`camera/seccomp`), which links libhardware and installs
@@ -196,7 +194,7 @@
   the GPU wake trigger and the tap-to-wake switch that init hands to it, and
   reaches WALT `sched_boost` only through fixed init property triggers. It adds
   touch, launch, rendering and ADPF boosts. A no-op `libqti-perfd-client`
-  ends the camera's perf2 lookups. Not yet built.
+  ends the camera's perf2 lookups. Built.
 - Replace Qualcomm's closed tftp_server and pd-mapper with the open-source
   linux-msm tqftpserv (our fork, with upstream's pending memory and path
   fixes, unlink and truncation) and pd-mapper, each under its own user with no

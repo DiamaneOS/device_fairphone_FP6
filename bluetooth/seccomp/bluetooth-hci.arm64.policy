@@ -1,0 +1,129 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# System calls the Bluetooth HCI service may make (arm64, minijail syntax):
+# our service.cpp and the stock Qualcomm HCI implementation it loads
+# (android.hardware.bluetooth@1.0/1.1-impl-qti, libbtnv, libsoc_helper,
+# libdiag, libqmi_cci and their AOSP dependencies). Installed as
+# /vendor/etc/seccomp_policy/bluetooth-hci.policy and compiled by the service
+# at the start of main(), before the implementation is loaded. Whether a call
+# outside this list is logged or trapped is set in ../Android.bp
+# (BT_SECCOMP_LOG_ONLY), not here. Duplicate entries are an error.
+#
+# Sources: the dynamic imports of every library in the process (none of the
+# closed libraries makes a system call directly), the call sites and arguments
+# of the closed implementation's kill, socket and timer_create calls, the
+# camera provider's traced baseline on the same OS (bionic, linker, allocator,
+# binder) and the calls the debuggerd fallback handler needs to write a
+# tombstone from a no_new_privs process. No trace yet: the first builds log
+# calls outside the list instead of blocking them.
+
+# HCI traffic, binder and locks, most frequent first.
+futex: 1
+# Binder, the UART (termios, flush, drain) and /dev/btpower. ioctl requests are
+# not filtered here; SELinux limits which devices the service can open.
+ioctl: 1
+read: 1
+write: 1
+# select(): the implementation's receive and Xpan watcher threads.
+pselect6: 1
+# In-band sleep, init, recovery and statistics timers (timer_create with
+# SIGEV_THREAD: bionic runs each callback on its own thread, which waits for
+# the expiry signal).
+timer_settime: 1
+rt_sigtimedwait: 1
+timer_create: 1
+timer_delete: 1
+writev: 1
+ppoll: 1
+
+# Memory. No mapping may be writable and executable at once.
+mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+munmap: 1
+madvise: 1
+mremap: 1
+
+# Threads only (0x10000 CLONE_THREAD): no fork, no child processes. libdiag
+# links system() for its own log-file handling, which this service does not
+# use.
+clone: arg0 & 0x10000
+set_tid_address: 1
+gettid: 1
+getpid: 1
+# pthread_kill, raise and timer_delete signal a thread of this process; abort.
+tgkill: 1
+rt_tgsigqueueinfo: 1
+# 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 3 PR_GET_DUMPABLE,
+# 15 PR_SET_NAME, 16 PR_GET_NAME, 39 PR_GET_NO_NEW_PRIVS, 54 PR_PAC_RESET_KEYS
+# (pthread_create), 56 PR_GET_TAGGED_ADDR_CTRL, 61 PR_PAC_GET_ENABLED_KEYS.
+# Same list as the camera provider's.
+prctl: arg0 == 0x53564d41 || arg0 == 3 || arg0 == 15 || arg0 == 16 || arg0 == 39 || arg0 == 54 || arg0 == 56 || arg0 == 61
+rt_sigprocmask: 1
+rt_sigaction: 1
+sigaltstack: 1
+nanosleep: 1
+getrandom: 1
+clock_gettime: 1
+gettimeofday: 1
+# After a controller failure the implementation kills itself so init restarts
+# it: all six call sites are kill(getpid(), SIGKILL). SIGKILL only; SELinux
+# keeps it from signalling other domains.
+kill: arg1 == 9
+
+# Files: the HIDL library search and load, properties, patch and NVM files,
+# the address file, /proc/self/task/*/comm (HIDL renames the threads), and
+# the implementation's dump files (fsync, unlink; their directory does not
+# exist here).
+openat: 1
+close: 1
+fstat: 1
+newfstatat: 1
+lseek: 1
+pread64: 1
+readlinkat: 1
+getdents64: 1
+faccessat: 1
+fcntl: 1
+dup: 1
+fstatfs: 1
+pipe2: 1
+fsync: 1
+unlinkat: 1
+mkdirat: 1
+# service.cpp and libbtnv set the file mode mask; libbtnv changes the owner of
+# the address file after writing it (persist is read-only for the service).
+umask: 1
+fchown: 1
+# Binder (native handles in debug()) checks the descriptor limit.
+getrlimit: 1
+
+# Sockets: AF_UNIX (1) only: logd, the property service, libdiag's diag
+# socket and tombstoned. Other families fail with EAFNOSUPPORT (97) instead of
+# the default action: libqmi_cci tries AF_MSM_IPC (27), then AF_QIPCRTR (42),
+# only for the modem address query, which is off and has no SELinux grant.
+socket: arg0 == 1; return 97
+connect: 1
+sendto: 1
+recvfrom: 1
+recvmsg: 1
+setsockopt: 1
+getsockname: 1
+
+# Never returning, so absent from any trace's counts.
+exit: 1
+exit_group: 1
+rt_sigreturn: 1
+restart_syscall: 1
+
+# debuggerd fallback handler (system/core debuggerd/seccomp_policy/
+# crash_dump.arm64.policy), less the calls already listed.
+getppid: 1
+sysinfo: 1
+uname: 1
+process_vm_readv: 1
+getuid: 1
+geteuid: 1
+getgid: 1
+getegid: 1
+getgroups: 1

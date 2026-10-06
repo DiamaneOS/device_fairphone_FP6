@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-"""Turn the camera provider's seccomp audit records into policy additions.
+"""Turn a service's seccomp audit records into policy additions.
 
-Collect the kernel records after exercising the camera, for example:
+For the camera provider (default) or, with --service bluetooth, the Bluetooth
+HCI service (bluetooth/seccomp). Collect the kernel records after exercising
+the camera or Bluetooth, for example:
 
     adb logcat -b all -d > logcat.txt
     adb shell su 0 dmesg > dmesg.txt      # or: adb root; adb shell dmesg
@@ -12,13 +14,16 @@ then run
 
     python3 seccomp_audit.py logcat.txt dmesg.txt
     python3 seccomp_audit.py --write logcat.txt dmesg.txt   # append to the policy
+    python3 seccomp_audit.py --service bluetooth logcat.txt dmesg.txt
 
-Log-only builds record every call outside camera-provider.arm64.policy as an
-audit record of type 1326 with code 0x7ffc0000 (SECCOMP_RET_LOG). The record
-names the system call number only, not its arguments: a call that already has
-a rule here means its arguments did not match (find them with strace -f -e on
-the provider before widening the rule). Trap builds leave a tombstone instead
-("seccomp prevented call to disallowed arm64 system call N"), which is read too.
+Log-only builds record every call outside the policy as an audit record of
+type 1326 with code 0x7ffc0000 (SECCOMP_RET_LOG). The record names the system
+call number only, not its arguments: a call that already has a rule means its
+arguments did not match (find them with strace -f -e on the service before
+widening the rule). Trap builds leave a tombstone instead ("seccomp prevented
+call to disallowed arm64 system call N"), which is read too; the Bluetooth
+service also logs trapped calls and calls its policy fails with an errno
+(code 0x5nnnn) as audit records.
 The kernel and logd rate-limit audit records: repeat the run after adding
 frequent calls, until no new records appear.
 """
@@ -29,8 +34,14 @@ import re
 import sys
 from pathlib import Path
 
-PROVIDER = '/vendor/bin/hw/vendor.qti.camera.provider-service_64'
-DOMAIN = 'u:r:hal_camera_default:s0'
+HERE = Path(__file__).resolve().parent
+# Services with a seccomp filter: policy, executable and SELinux domain.
+SERVICES = {
+    'camera': (HERE / 'camera-provider.arm64.policy',
+               '/vendor/bin/hw/vendor.qti.camera.provider-service_64', 'u:r:hal_camera_default:s0'),
+    'bluetooth': (HERE.parent.parent / 'bluetooth/seccomp/bluetooth-hci.arm64.policy',
+                  '/vendor/bin/hw/android.hardware.bluetooth@1.1-service.fp6', 'u:r:hal_bluetooth_default:s0'),
+}
 AUDIT_ARCH_AARCH64 = 'c00000b7'
 ACTIONS = {'0x7ffc0000': 'logged and allowed (RET_LOG)', '0x80000000': 'process killed (RET_KILL_PROCESS)',
            '0x0': 'thread killed (RET_KILL_THREAD)', '0x30000': 'trapped (RET_TRAP)'}
@@ -126,7 +137,15 @@ def policy_names(path):
     return names
 
 
-def read_records(paths):
+def action(code):
+    if code in ACTIONS:
+        return ACTIONS[code]
+    if re.fullmatch(r'0x5[0-9a-f]{4}', code):
+        return f'failed with errno {int(code, 16) & 0xffff} (RET_ERRNO)'
+    return code
+
+
+def read_records(paths, executable, domain):
     records, lost, seen = [], 0, set()
     for path in paths:
         process = None
@@ -137,7 +156,7 @@ def read_records(paths):
             if match:
                 process = match.group(1)
             match = TOMBSTONE_CAUSE.search(line)
-            if match and process == PROVIDER:
+            if match and process == executable:
                 records.append({'syscall': int(match.group(1)), 'code': 'tombstone', 'comm': ''})
                 continue
             match = RECORD.search(line)
@@ -145,7 +164,7 @@ def read_records(paths):
                 continue
             fields = {k: v for k, v in FIELD.findall(match.group(2))}
             exe, subj = decode(fields.get('exe', '""')), fields.get('subj', '')
-            if exe != PROVIDER and subj != DOMAIN:
+            if exe != executable and subj != domain:
                 continue
             # logcat and dmesg carry the same record; its serial is unique per boot.
             key = (match.group(1).rpartition(':')[2], fields.get('syscall'))
@@ -162,14 +181,17 @@ def read_records(paths):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('logs', nargs='+', help='logcat and dmesg output files')
-    parser.add_argument('--policy', type=Path, default=Path(__file__).with_name('camera-provider.arm64.policy'))
+    parser.add_argument('--service', choices=sorted(SERVICES), default='camera')
+    parser.add_argument('--policy', type=Path, help="default: the service's policy in this repository")
     parser.add_argument('--write', action='store_true', help='append the missing calls to the policy')
     args = parser.parse_args()
+    policy, executable, domain = SERVICES[args.service]
+    args.policy = args.policy or policy
     listed = policy_names(args.policy)
-    records, lost = read_records(args.logs)
-    print(f'{len(records)} camera provider seccomp records in {len(args.logs)} files')
+    records, lost = read_records(args.logs, executable, domain)
+    print(f'{len(records)} {args.service} seccomp records in {len(args.logs)} files')
     for code, count in collections.Counter(r['code'] for r in records).most_common():
-        print(f'  {count:6}  {ACTIONS.get(code, code)}')
+        print(f'  {count:6}  {action(code)}')
     if lost:
         print(f'warning: {lost} lines report lost or rate-limited audit records; repeat the run')
     counts = collections.Counter(r['syscall'] for r in records)

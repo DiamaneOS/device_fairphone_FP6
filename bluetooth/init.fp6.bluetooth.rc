@@ -9,6 +9,7 @@
 #   group would let it write controller dumps (with HCI traffic) into
 #   /data/vendor/ssrdump (root:system 0770 in stock) if that directory exists;
 # - no net_raw: the HAL opens no inet raw socket.
+# The service installs its own seccomp filter at start (bluetooth/seccomp).
 service vendor.bluetooth-1-1-fp6 /vendor/bin/hw/android.hardware.bluetooth@1.1-service.fp6
     class hal
     user bluetooth

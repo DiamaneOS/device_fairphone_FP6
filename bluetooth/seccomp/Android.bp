@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// System calls the Bluetooth HCI service may make. The service
+// (../service.cpp) compiles this policy and installs it as a seccomp filter at
+// the start of main(); ../Android.bp sets whether calls outside it are logged
+// or trapped.
+prebuilt_etc {
+    name: "bluetooth-hci.policy",
+    vendor: true,
+    sub_dir: "seccomp_policy",
+    src: "bluetooth-hci.arm64.policy",
+    filename: "bluetooth-hci.policy",
+}

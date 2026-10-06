@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Run the Bluetooth HCI service under a seccomp filter. The service compiles
+  `bluetooth-hci.policy` (`bluetooth/seccomp`) and installs it at the start
+  of main(), before it loads Qualcomm's closed HCI implementation, so the
+  whole process is covered: threads but no child processes, Unix sockets
+  only (other socket families fail), no writable and executable mappings,
+  and kill only as SIGKILL, which the implementation sends itself after a
+  controller failure. The list comes from the imports of every library in
+  the process. For now calls outside it are logged (kernel audit record type
+  1326) and allowed; `seccomp_audit.py --service bluetooth` turns those
+  records into policy additions. The service aborts if the filter cannot be
+  installed. Not yet built.
 - Add DiamaneOS's eSIM manager (DiamaneOSEuicc), which manages the profiles on
   the eUICC: list, turn on and off, rename, delete. It ships disabled; the eSIM
   support switch in Settings turns it on and restarts the phone. Mark physical

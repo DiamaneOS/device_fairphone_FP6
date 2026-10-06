@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The factory Bluetooth address (finding -177): init.fp6.bluetooth.rc copies
+# ro.vendor.diamaneos.bt.factory_address, which imeiprovd sets from the
+# traceability partition (hardware/diamaneos/ims), to ro.vendor.bt.boot.macaddr,
+# as stock tctd.rc does. Commands in vendor rc files run as vendor_init, which
+# reads the source property to expand it and sets the target.
+get_prop(vendor_init, vendor_diamaneos_bt_address_prop)
+set_prop(vendor_init, vendor_bluetooth_address_prop)
+
+# Only vendor_init sets the HAL's address property (init may set any property),
+# and only the HAL, vendor_init, init and dumpstate (which reads every property)
+# may read it.
+neverallow { domain -init -vendor_init } vendor_bluetooth_address_prop:property_service set;
+neverallow {
+  domain
+  -init
+  -vendor_init
+  -dumpstate
+  -hal_bluetooth_default
+} vendor_bluetooth_address_prop:file { open read map };

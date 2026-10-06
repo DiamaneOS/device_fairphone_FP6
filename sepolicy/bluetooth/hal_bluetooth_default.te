@@ -33,6 +33,10 @@ r_dir_file(hal_bluetooth_default, vendor_persist_bluetooth_file)
 set_prop(hal_bluetooth_default, vendor_bluetooth_hal_state_prop)
 get_prop(hal_bluetooth_default, vendor_bluetooth_prop)
 
+# The factory Bluetooth address (ro.vendor.bt.boot.macaddr, property.te), read
+# only. The HAL reads it before falling back to the generated address.
+get_prop(hal_bluetooth_default, vendor_bluetooth_address_prop)
+
 # libsoc_helper: ro.vendor.qti.soc_id, else /sys/devices/soc0/soc_id (stock
 # rule 4660; sysfs types from vendor-common/genfs_contexts).
 get_prop(hal_bluetooth_default, vendor_soc_id_prop)

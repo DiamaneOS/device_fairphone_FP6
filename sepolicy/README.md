@@ -390,7 +390,13 @@ vendor properties and read-only SoC identification. The HAL may set only the
 five properties it writes at run time (SoC name, scram.enabled, a generated
 address and two crash counters); `bluetooth/property_contexts` gives them the
 vendor-internal type `vendor_bluetooth_hal_state_prop`, so no platform domain
-or app can read the address once enforcing. The HCI UART (`hci_attach_dev`)
+or app can read the address once enforcing. The factory address
+(`ro.vendor.bt.boot.macaddr`, which the HAL reads before the generated one) has
+its own vendor-internal type, `vendor_bluetooth_address_prop`: the HAL may only
+read it, and only vendor_init sets it (`bluetooth/vendor_init.te`), when
+`init.fp6.bluetooth.rc` copies the value imeiprovd read from the traceability
+partition, as stock `tctd.rc` does; neverallows keep every other domain except
+init and dumpstate from reading or setting it. The HCI UART (`hci_attach_dev`)
 comes from platform policy, as in stock. The policy omits persist writes, the
 stock QRTR sockets (only used for the modem-NV address query, which is off),
 `/data/vendor/bluetooth`, diag, the FM radio device, the ssgtzd socket, TPI and

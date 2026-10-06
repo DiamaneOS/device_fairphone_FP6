@@ -11,3 +11,9 @@ persist.vendor.qcom.bluetooth.scram.enabled               u:object_r:vendor_blue
 persist.vendor.service.bdroid.bdaddr                      u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
 persist.vendor.service.bdroid.system_delay_crash_count    u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
 persist.vendor.service.bdroid.rxthread.stuck.count        u:object_r:vendor_bluetooth_hal_state_prop:s0 exact string
+# The factory Bluetooth address (property.te). The HCI implementation's
+# BluetoothAddress::GetLocalAddress (0x4fd14) tries, in order: .bt_nv.bin,
+# ro.vendor.bt.bdaddr_path, this property (0x50154), the modem NV (off), then
+# the stored generated address (persist.vendor.service.bdroid.bdaddr), and
+# generates one only when all fail.
+ro.vendor.bt.boot.macaddr                                 u:object_r:vendor_bluetooth_address_prop:s0 exact string

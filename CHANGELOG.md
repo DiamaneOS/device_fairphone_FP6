@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Drop the imported secure-processor (SPU) grants of the gatekeeper HAL and
+  qseecomd: the FP6 has no SPU, its drivers are not shipped and the selected
+  gatekeeper names no SPU node, so those device nodes never exist. Not yet
+  built.
 - Make the UFS storage's serial number and its LUNs' SCSI serial and
   identification pages root-only through ueventd. No shipped program reads
   them, and their generic sysfs label is readable by 22 system and vendor

@@ -1,16 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Stock Qualcomm GNSS HAL, android.hardware.gnss-aidl-service-qti (IGnss v3).
-# Drafted from the stock compiled policy (vendor_sepolicy.cil lines 4914-4953
-# and 8128-8141) and reduced to the selected closure. Before enforcing, reduce
-# it from Qualcomm generic/vendor/common/hal_gnss_qti.te at sepolicy_vndr
-# 67fa928.
+# Qualcomm GNSS HAL, android.hardware.gnss-aidl-service-qti (IGnss v3), built
+# from CodeLinaro source (device gnss/gnss.mk). Drafted from the stock compiled
+# policy (vendor_sepolicy.cil lines 4914-4953 and 8128-8141) and reduced to what
+# the HAL uses. Before enforcing, reduce it from Qualcomm
+# generic/vendor/common/hal_gnss_qti.te at sepolicy_vndr 67fa928.
 # Not granted, because their peers are not installed: peripheral manager and
 # vndbinder (liblbs_core, XTRA service), the location daemons' sockets
 # (loc_launcher, xtra-daemon, lowi-server, xtwifi-client, slim_daemon,
 # edgnss-daemon, engine-service, blpsvc, qsap_location), RIL and SSG sockets,
-# MHI sysfs and the QMS/AON properties.
+# MHI sysfs and the QMS/AON properties. Also not granted: the HAL's own socket
+# in /dev/socket/location, which the source build does not open (it existed
+# only for the XTRA and DGNSS daemons).
 # servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
 # domains without such vendor rules (vendor_hal_gatekeeper_qti,
 # vendor_hal_keymint_qti) register on stock, so the platform hal server rules
@@ -31,10 +33,6 @@ allow vendor_hal_gnss_qti self:qipcrtr_socket create_socket_perms_no_ioctl;
 # 4932-4933; no FIFOs).
 allow vendor_hal_gnss_qti vendor_location_data_file:dir create_dir_perms;
 allow vendor_hal_gnss_qti vendor_location_data_file:file create_file_perms;
-
-# The HAL's own IPC socket in /dev/socket/location (CIL lines 4935-4936).
-allow vendor_hal_gnss_qti vendor_location_socket:dir rw_dir_perms;
-allow vendor_hal_gnss_qti vendor_location_socket:sock_file create_file_perms;
 
 # Modem image version, /vendor/firmware_mnt/verinfo/ver_info.txt, read by the
 # implementation (CIL lines 4947-4949).

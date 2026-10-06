@@ -5,6 +5,13 @@
 // (selected stock vendor file) through HIDL passthrough, without the FM, ANT,
 // SAR, config-store and TPI libraries the stock service links (service.cpp).
 // init.fp6.bluetooth.rc starts it; manifest.xml declares IBluetoothHci 1.1.
+//
+// The service installs a seccomp filter from bluetooth-hci.policy
+// (seccomp/) at the start of main(), before it loads the HCI implementation.
+// BT_SECCOMP_LOG_ONLY: calls outside the policy are logged (kernel audit
+// record type 1326) and allowed, while the service's profile is collected.
+// Without it they are trapped (SIGSYS) and the service dies with a tombstone;
+// init restarts it.
 cc_binary {
     name: "android.hardware.bluetooth@1.1-service.fp6",
     vendor: true,
@@ -18,6 +25,8 @@ cc_binary {
         "liblog",
         "libutils",
     ],
+    static_libs: ["libminijail"],
+    required: ["bluetooth-hci.policy"],
     // The stock service was built with CFI.
     sanitize: {
         cfi: true,
@@ -27,5 +36,6 @@ cc_binary {
         "-Wall",
         "-Werror",
         "-Wextra",
+        "-DBT_SECCOMP_LOG_ONLY",
     ],
 }

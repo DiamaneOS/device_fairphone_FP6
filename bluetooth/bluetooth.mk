@@ -6,7 +6,10 @@
 # (android.hardware.bluetooth@1.1-impl-qti) and its link closure; our own
 # service (service.cpp) registers it in place of the stock service, which also
 # links the FM, ANT, SAR, config-store and TPI libraries. manifest.xml declares
-# IBluetoothHci. The AOSP HCI interfaces are built from source.
+# IBluetoothHci. The AOSP HCI interfaces are built from source. The service
+# installs a seccomp filter before it loads the implementation; its policy
+# (bluetooth/seccomp, /vendor/etc/seccomp_policy/bluetooth-hci.policy) comes
+# with it as a required module.
 # Bluetooth audio is software only (no DSP offload): the AOSP Bluetooth audio
 # provider runs in the audio service and the AOSP "bluetooth" audio module
 # carries A2DP, hearing-aid and LE audio streams.

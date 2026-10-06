@@ -8,14 +8,18 @@
 // the FM, ANT, SAR, config-store and TPI libraries, which the stock service
 // links but never registers on this device, and it does not report
 // connectivity-proxy (Xpan) support to the BT FM codec driver, whose node the
-// Bluetooth user cannot open here.
+// Bluetooth user cannot open here. Before anything else it installs a seccomp
+// filter, so the closed implementation runs under it from its first load.
 
 #define LOG_TAG "android.hardware.bluetooth@1.1-service.fp6"
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -26,7 +30,77 @@
 #include <hidl/LegacySupport.h>
 #include <log/log.h>
 
+// Internal libminijail headers, linked statically from the same source tree,
+// as in camera/seccomp/camxjail.c: minijail's public API cannot make RET_LOG
+// the default action on Android, so the policy is compiled directly.
+#include "syscall_filter.h"
+#include "syscall_wrapper.h"
+
 namespace {
+
+constexpr char kSeccompPolicy[] = "/vendor/etc/seccomp_policy/bluetooth-hci.policy";
+// SECCOMP_FILTER_FLAG_LOG from linux/seccomp.h, which cannot be included next
+// to minijail's bpf.h (both define struct seccomp_data).
+constexpr unsigned kSeccompFilterFlagLog = 1U << 1;
+
+#ifdef BT_SECCOMP_LOG_ONLY
+constexpr block_action kSeccompAction = ACTION_RET_LOG;
+constexpr char kSeccompMode[] = "log-only";
+#else
+constexpr block_action kSeccompAction = ACTION_RET_TRAP;
+constexpr char kSeccompMode[] = "trap";
+#endif
+
+// Installs the seccomp filter for the whole process: our code, the HIDL thread
+// pool, the HCI implementation's load and every thread it starts. Calls outside
+// bluetooth-hci.policy, and listed calls whose arguments do not match their
+// rule, are
+// - logged and allowed (SECCOMP_RET_LOG, kernel audit record type 1326) when
+//   built with BT_SECCOMP_LOG_ONLY, to collect the service's profile;
+// - otherwise trapped: SIGSYS, a tombstone naming the call, and the service
+//   dies (init restarts it).
+// The filter also asks the kernel to log trapped calls and calls the policy
+// answers with an error, so dmesg shows them in both modes. Nothing is
+// executed and the SELinux domain does not change. If the filter cannot be
+// installed the service aborts: it never runs unconfined.
+void InstallSeccompFilter() {
+    const filter_options options = {
+            .action = kSeccompAction,
+            // RET_LOG needs allow_logging, which also makes the compiler skip
+            // unknown system call names instead of failing (log-only builds).
+            .allow_logging = kSeccompAction == ACTION_RET_LOG,
+            .allow_syscalls_for_logging = 0,
+            .allow_duplicate_syscalls = false,
+            .include_libc_compatibility_allowlist = false,
+    };
+    sock_fprog prog = {};
+
+    FILE* policy = fopen(kSeccompPolicy, "re");
+    if (policy == nullptr) {
+        LOG_ALWAYS_FATAL("Cannot open %s: %s", kSeccompPolicy, strerror(errno));
+    }
+    const int compiled = compile_filter(kSeccompPolicy, policy, &prog, &options);
+    fclose(policy);
+    if (compiled != 0) {
+        LOG_ALWAYS_FATAL("Cannot compile %s", kSeccompPolicy);
+    }
+
+    // The service has no CAP_SYS_ADMIN, so the kernel requires no_new_privs.
+    if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0) {
+        LOG_ALWAYS_FATAL("Cannot set no_new_privs: %s", strerror(errno));
+    }
+    // TSYNC applies the filter and no_new_privs to every thread of the process;
+    // a positive result names a thread that could not be synchronised.
+    const int installed = sys_seccomp(SECCOMP_SET_MODE_FILTER,
+                                      SECCOMP_FILTER_FLAG_TSYNC | kSeccompFilterFlagLog, &prog);
+    if (installed != 0) {
+        LOG_ALWAYS_FATAL("Cannot install the seccomp filter: %s",
+                         installed > 0 ? "a thread could not be synchronised" : strerror(errno));
+    }
+    ALOGI("Seccomp filter installed (%s, %u instructions)", kSeccompMode,
+          static_cast<unsigned>(prog.len));
+    free(prog.filter);
+}
 
 constexpr char kSocProperty[] = "persist.vendor.qcom.bluetooth.soc";
 constexpr char kBtPowerDevice[] = "/dev/btpower";
@@ -93,6 +167,7 @@ int main() {
     using android::hardware::joinRpcThreadpool;
     using android::hardware::registerPassthroughServiceImplementation;
 
+    InstallSeccompFilter();
     // As the stock service: files the HAL creates get mode 0644 at most.
     umask(022);
     configureRpcThreadpool(1, true /* callerWillJoin */);

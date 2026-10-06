@@ -199,11 +199,29 @@ are not repeated.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it probes them at start; stock grants read on
   the block devices but never open, and labels none of those BSG nodes.
-- `fp6_callaudio_app`, lookups of `content_capture`, `gpu` and `netstats`:
-  framework start-up probes the bridge does not need.
-- `platform_app` and `system_app`, the absent Google wireless-charger service;
-  SystemUI, `persist.bluetooth.leaudio_dynamic_switcher.mode`: platform app
-  policy, nothing added for apps.
+- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service` and
+  `netstats_service` (and `content_capture` for the bridge): lookups every app
+  process makes at start (ActivityThread's GraphicsEnvironment setup, for GPU
+  driver statistics, and TrafficStats.init). Platform apps get them through
+  `app_api_service`; these two domains have no graphics and keep no traffic
+  statistics, and the framework continues when the lookup returns nothing
+  (calls and Wi-Fi calling work with both denied).
+- `hal_audio_default`, `read append` on `/sys/power/wake_lock`
+  (`sysfs_wake_lock`), once per boot: PAL's `ResourceManager::initWakeLocks`
+  opens the wake-lock nodes at start. Every PAL call of `acquireWakeLock` and
+  `releaseWakeLock` is in sound trigger (`StreamSoundTrigger`,
+  `SoundTriggerEngineGsl`; disassembly of the shipped `libar-pal.so`), which is
+  not shipped. Playback with the screen off is kept awake by audioserver's own
+  wake lock through the framework, and a call's audio runs between the modem
+  and the audio DSP, so neither needs it. Stock grants it to the whole
+  `hal_audio` attribute (`wakelock_use`).
+- `platform_app` and `system_app`, the absent Google wireless-charger service.
+- `platform_app` (SystemUI), `read` of `bluetooth_lea_prop`: SettingsLib's
+  `BluetoothUtils.isAudioSharingSupported` reads
+  `persist.bluetooth.leaudio_dynamic_switcher.mode`, which the platform lets
+  only `bluetooth`, `system_app` and `gmscore_app` read. The property
+  is not set on this build, so the denied read returns the same default.
+  Platform app policy, as on other GrapheneOS devices; nothing added for apps.
 - `untrusted_app`: sandboxed Google Play and other apps probing the device
   (adb properties, `/proc`, `/sys`, `selinuxfs`, the root and `/dev`
   directories, the wallet property, cgroups). Intended.
@@ -562,7 +580,12 @@ module's DSI layer waits for nicmd over TIPC before it allows any data call. No 
 domain may create a TIPC socket (neverallow in `telephony/rild.te`), and the kernel builds
 TIPC for local IPC with network bearer creation blocked, without UDP, crypto or diag modules.
 nicmd keeps its netlink, QRTR, rmnet ioctl and network-wrapper access, datagram sockets
-for interface ioctls and its init-created recovery file. It may `node_bind` TCP and UDP
+for interface ioctls and its init-created recovery file. Its XFRM netlink access is
+needed for Wi-Fi calling, where the modem negotiates the ePDG tunnel and nicmd installs
+the ESP states and policies it receives (write requests); to remove them at teardown or
+rekey it dumps all states and deletes those whose protocol and SPI match, the only read
+request it sends (`telephony/nicmd.te`). Under integrity lockdown that dump includes the
+keys of every IPsec state on the device. It may `node_bind` TCP and UDP
 sockets, to reserve the ephemeral ports the modem's embedded clients use, and read the
 public SoC id for data target detection. It is not a `netdomain` (no TCP connect, no
 `name_bind`); its remote-processor probe (`vendor_sysfs_ssr`) stays denied because the

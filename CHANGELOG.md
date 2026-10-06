@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Document why four denials stay denied (the audio HAL's kernel wake locks,
+  which only sound trigger takes; SystemUI's read of an LE audio property
+  that is not set; the IWLAN and call-audio apps' start-up lookups of the GPU
+  and network statistics services) and why nicmd needs to read XFRM state:
+  it removes the Wi-Fi calling security associations it installs by dumping
+  all of them.
 - Run the thermal HAL as system without capabilities instead of root, as the
   Pixel thermal HAL runs. ueventd gives group system the two trip nodes it
   writes; they stay root-owned for the thermal engine. Not yet built.

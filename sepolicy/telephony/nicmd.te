@@ -30,6 +30,17 @@ allow vendor_nicmd vendor_nicm_data_file:file rw_file_perms;
 allow vendor_nicmd self:udp_socket create_socket_perms;
 allow vendor_nicmd self:tcp_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlmsg_read nlmsg_write };
+# Wi-Fi calling through the modem: the modem negotiates the ePDG tunnel and
+# hands nicmd the ESP security associations (QMI WDS IPsec SA indications,
+# libnicm_modemproxy installSecurity), which nicmd installs in the kernel so
+# the tunnel runs over the phone's Wi-Fi (libnicm_netlink XFRMHelper.cpp:
+# NEWSA, NEWPOLICY, DELSA and DELPOLICY requests, nlmsg_write). To remove them
+# at teardown and rekey it sends a GETSA dump (NLM_F_DUMP, nlmsg_read) and
+# deletes the states whose protocol and SPI match (removeXFRMStateCb); it
+# sends no other read request. Without nlmsg_read the old states would stay
+# after a rekey or teardown. The dump returns every security association with
+# its keys under integrity lockdown, not only nicmd's own. Stock grants the
+# same (vendor_sepolicy.cil 6074).
 allow vendor_nicmd self:netlink_xfrm_socket { create_socket_perms_no_ioctl nlmsg_write nlmsg_read };
 allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;

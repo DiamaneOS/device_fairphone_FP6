@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Drop a still screen to the idle refresh rate after 1.5 s instead of
+  3.5 s: less panel power while reading; touch still raises the rate at
+  once. Optional. Not yet built.
 - Compress zram with lz4 instead of zstd: swapped-out apps decompress
   several times faster and kswapd uses less CPU, for a lower compression
   ratio. Merge only after the 20-app relaunch test. Not yet built.

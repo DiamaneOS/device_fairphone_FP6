@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// Qualcomm's VoIP pre-processing descriptors and volume listener, built from
+// the unmodified CodeLinaro audio-ar sources listed in provenance.json instead
+// of the closed stock builds. Library names, effect UUIDs, descriptors and the
+// exported AELI symbol match stock; audio_effects.xml loads both into the audio
+// HAL process. include/PalDefs.h is ours: the one PAL type the listener uses.
+
+package {
+    default_applicable_licenses: ["fp6_audio_effects_license"],
+}
+
+license {
+    name: "fp6_audio_effects_license",
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+        "SPDX-license-identifier-BSD-3-Clause",
+    ],
+    license_text: ["NOTICE"],
+}
+
+cc_defaults {
+    name: "fp6_audio_effects_defaults",
+    vendor: true,
+    relative_install_path: "soundfx",
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    header_libs: ["libhardware_headers"],
+    // The stock libraries were built with CFI and the integer sanitizer.
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+    },
+    // Upstream flags: only the AELI symbol is exported.
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-fvisibility=hidden",
+    ],
+}
+
+// AEC and NS descriptors for VoIP capture. They carry the hardware-tunnel
+// flag, so the audio HAL runs the DSP's tuned echo canceller and noise
+// suppressor; the library itself processes no audio.
+cc_library_shared {
+    name: "libqcomvoiceprocessing",
+    defaults: ["fp6_audio_effects_defaults"],
+    srcs: ["voice_processing.c"],
+    header_libs: ["libaudioeffects"],
+    // Upstream flags this source needs (GNU designators, unused helpers).
+    cflags: [
+        "-Wno-gnu-designator",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+    ],
+}
+
+// Sends the speaker volume level to the stock HAL for gain-dependent
+// calibration (audio_hw_send_gain_dep_calibration and two related exports of
+// /vendor/lib64/hw/audio.primary.volcano.so).
+cc_library_shared {
+    name: "libvolumelistener",
+    defaults: ["fp6_audio_effects_defaults"],
+    srcs: ["volume_listener.c"],
+    local_include_dirs: ["include"],
+    cflags: ["-DPLATFORM_NAME=volcano"],
+}

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Use AOSP's software audio effects only: our own `audio_effects.xml` lists
+  the AOSP bundle, reverb, visualizer, downmix, loudness and dynamics
+  effects without DSP offload halves or the effect proxy, so apps' effect
+  parameters no longer reach Qualcomm's closed offload bundle and
+  visualizer, which are no longer shipped. Qualcomm's VoIP AEC/NS
+  descriptors (the DSP's echo cancellation) and volume listener are built
+  from unmodified CodeLinaro audio-ar sources (`audio/effects`) under
+  their stock names. Not yet built.
 - Lower the GPU floor for EXPENSIVE_RENDERING from 763 to 510 MHz: GPU
   composition rarely needs the pin, the GPU governor still clocks up when
   busy, and 510 MHz runs at a lower voltage. Not yet built.

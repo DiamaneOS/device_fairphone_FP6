@@ -49,7 +49,9 @@ Boot-control services come from pinned Fairphone `hardware/qcom/bootctrl` and
 is selected explicitly. Their original notices remain in those projects.
 The normal and recovery implementations compile with CFI enabled. Their UFS
 header layouts match the pinned kernel interfaces. Runtime slot switching still
-requires device verification.
+requires device verification. The normal service runs as `vendor_bootctl` with
+CAP_SYS_RAWIO only; `boot/ueventd.rc` gives that group the GPT disks of the
+A/B LUNs (sdb, sdc, sde), misc and the UFS BSG node.
 
 The product uses the published FP6 thermal, lights, vibrator, USB and health
 services. Power is LineageOS's libperfmgr power HAL, pinned unmodified, with the

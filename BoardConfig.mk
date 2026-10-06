@@ -109,6 +109,8 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 # Vendor user of the power stats HAL.
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
+# Vendor user of the boot control HAL; boot/ueventd.rc gives it its nodes.
+TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk

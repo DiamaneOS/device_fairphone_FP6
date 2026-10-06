@@ -1,13 +1,23 @@
 # Wi-Fi supplicant configuration
 
-`wpa_supplicant_overlay.conf` and `p2p_supplicant_overlay.conf` are copied
-unchanged from `/vendor/etc/wifi/` of the stock FP6 image FP6.QREL.16.100.0
-(EU). SHA-256:
+## Supplicant overlays
 
-| File | SHA-256 |
-| --- | --- |
-| `wpa_supplicant_overlay.conf` | `cc7f31ca31417a4fe57a36f1b177b4de32c6ec70ce5780c1bd10a0be26d22029` |
-| `p2p_supplicant_overlay.conf` | `355c62f3f28d994f39eb96d3a75a12d88d3f4ca32e556801da77ffda73d746cc` |
+`wpa_supplicant_overlay.conf` and `p2p_supplicant_overlay.conf` come from
+`/vendor/etc/wifi/` of the stock FP6 image.
+
+| File | Stock SHA-256 | Here |
+| --- | --- | --- |
+| `wpa_supplicant_overlay.conf` | `cc7f31ca31417a4fe57a36f1b177b4de32c6ec70ce5780c1bd10a0be26d22029` | stock without `wowlan_triggers=magic_pkt` |
+| `p2p_supplicant_overlay.conf` | `355c62f3f28d994f39eb96d3a75a12d88d3f4ca32e556801da77ffda73d746cc` | unchanged |
+
+- `device.mk` installs them to `/vendor/etc/wifi/`, where wpa_supplicant looks
+  for overlays.
+- The base template, `wpa_supplicant.conf`, has one provider: the
+  `wpa_supplicant.conf` module in `hardware/qcom/wlan/qcwcn/config`
+  (DiamaneOS/hardware_qcom_wlan).
+- The supplicant, its services and the permission file come from
+  `vendor/diamaneos/config/wifi.mk`.
+- `init.qcom.rc` creates `/data/vendor/wifi/wpa/sockets`.
 
 ## Hardware address
 
@@ -25,6 +35,12 @@ unchanged from `/vendor/etc/wifi/` of the stock FP6 image FP6.QREL.16.100.0
   - The Qualcomm driver handles those itself and enables RRM by default.
 - `p2p_no_group_iface=1` runs P2P groups on the P2P device interface instead
   of creating a separate group interface.
+- No magic-packet wake-up: a LAN peer must not be able to wake the phone.
+  - The station overlay sets no `wowlan_triggers`.
+  - The generated vendor tree sets `gEnableWoW=2` in the driver's
+    `WCNSS_qcom_cfg.ini`. The qcacld driver uses that value and ignores
+    cfg80211 WoWLAN triggers.
+  - Pattern wake-ups stay on.
 
 Still to be checked on the device, with SELinux enforcing and without the
 directories created by hand during bring-up: supplicant socket and state

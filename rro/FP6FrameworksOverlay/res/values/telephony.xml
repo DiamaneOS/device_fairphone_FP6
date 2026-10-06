@@ -21,7 +21,13 @@
     <bool name="config_telephony5gStandalone">true</bool>
     <bool name="config_telephony5gNonStandalone">true</bool>
 
-    <!-- Keep eUICC hardware capabilities for existing profiles. Profile management is deferred. -->
+    <!-- The built-in eUICC is physical slot 1. Stock sets no slots; without this Android
+         treats the eSIM as removable. -->
+    <integer-array name="non_removable_euicc_slots">
+        <item>1</item>
+    </integer-array>
+
+    <!-- eUICC radio capabilities (stock values), reported to the LPA. -->
     <string-array name="config_telephonyEuiccDeviceCapabilities" translatable="false">
         <item>gsm,9</item>
         <item>utran,10</item>

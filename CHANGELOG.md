@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add DiamaneOS's eSIM manager (DiamaneOSEuicc), which manages the profiles on
+  the eUICC: list, turn on and off, rename, delete. It ships disabled; the eSIM
+  support switch in Settings turns it on and restarts the phone. Mark physical
+  slot 1 as a built-in eUICC (`non_removable_euicc_slots`), which stock leaves
+  unset. Not yet built.
 - Use AOSP's software audio effects only: our own `audio_effects.xml` lists
   the AOSP bundle, reverb, visualizer, downmix, loudness and dynamics
   effects without DSP offload halves or the effect proxy, so apps' effect

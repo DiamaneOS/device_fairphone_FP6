@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Compress zram with lz4 instead of zstd: swapped-out apps decompress
+  several times faster and kswapd uses less CPU, for a lower compression
+  ratio. Merge only after the 20-app relaunch test. Not yet built.
 - Lower the GPU floor for EXPENSIVE_RENDERING from 763 to 510 MHz: GPU
   composition rarely needs the pin, the GPU governor still clocks up when
   busy, and 510 MHz runs at a lower voltage. Not yet built.

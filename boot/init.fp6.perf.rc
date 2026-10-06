@@ -126,7 +126,12 @@ on property:sys.boot_completed=1
     write /sys/power/mem_sleep s2idle
     write /sys/devices/system/cpu/qcom_lpm/parameters/sleep_disabled N
 
-    # Memory: zram swap (fstab.qcom), reclaim and read-ahead.
+    # Memory: zram swap (fstab.qcom), reclaim and read-ahead. zram compresses
+    # with lz4 instead of the kernel's default zstd (picked only because the
+    # GKI config has no lzo): several times faster to decompress, so swapped
+    # apps come back sooner and kswapd uses less CPU, at a lower compression
+    # ratio. The algorithm must be set before swapon_all sizes the device.
+    write /sys/block/zram0/comp_algorithm lz4
     swapon_all /vendor/etc/fstab.qcom
     write /proc/sys/vm/swappiness 100
     write /proc/sys/vm/page-cluster 0

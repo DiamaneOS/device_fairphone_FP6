@@ -68,6 +68,14 @@
 # file permissions. As stock, init.qcom.rc turns on the sysfs fallback and
 # ueventd loads the ADSP, CDSP, modem, Wi-Fi, GPU and other firmware from here.
 firmware_directories /vendor/firmware_mnt/image/
+# The factory Wi-Fi MAC: the QCA6750 driver asks for
+# wlan/qca_cld/qca6750/wlan_mac.bin at probe. imeiprovd --wlan-mac
+# (hardware/diamaneos/ims) writes it from the traceability partition into this
+# RAM-backed tree at post-fs; only ueventd may read it (sepolicy/fp6/wlan_mac.te).
+# Searched last, so a file of that name anywhere above would win (the image
+# check no-wlan-mac-link keeps /vendor/firmware free of one). The kernel's own
+# firmware path does not reach /mnt/vendor, so only ueventd ever opens it.
+firmware_directories /mnt/vendor/wlan_mac/
 
 /dev/kgsl                 0666   system     system
 /dev/kgsl-3d0             0666   system     system

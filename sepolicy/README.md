@@ -116,7 +116,11 @@ Downstream adaptations:
     HAL for high-throughput TCP tuning; the rest of `/proc/sys/net` stays
     read-only to it. `/data/vendor/tombstones` is no longer labelled as a
     whole (only `rfs/`), so the platform `tombstones/wifi` label for the HAL's
-    ring-buffer logs applies.
+    ring-buffer logs applies. The factory MAC file the driver loads
+    (`vendor_diamaneos_wlan_mac_file`, written by imeiprovd) is read only by
+    ueventd, which serves it as firmware (`wlan_mac.te`; a neverallow keeps
+    every other domain but init and vendor_init off it). Stock lets ueventd
+    read all of `/mnt/vendor` and persist instead.
   - The genfs lines for these tuning nodes are in `fp6/genfs_contexts`.
   - Touch: the controller's double-tap wake switch (`gesture_wakeup`) is
     `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the

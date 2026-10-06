@@ -3,9 +3,9 @@
 
 // The QCA6750 host driver requests its configuration through the kernel
 // firmware loader, at the path the stock vendor image links. Stock also links
-// wlan_mac.bin to /mnt/vendor/persist; the kernel may not read that label
-// (platform neverallow), so the driver uses its next MAC source instead and
-// the link is not installed.
+// wlan_mac.bin to /mnt/vendor/persist; here imeiprovd writes that file at boot
+// and ueventd serves it from /mnt/vendor/wlan_mac (boot/ueventd.rc), so no
+// link is installed.
 install_symlink {
     name: "fp6_wlan_cfg_ini",
     vendor: true,

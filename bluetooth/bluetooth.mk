@@ -61,7 +61,7 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # ("BD Address: ..." in PatchDLManager::ReadTlvInfo and
 # NvmTagsManager::DownloadNvmTags), and HCI command dumps at debug level under
 # the first tag. Keep both tags at warning; their other info lines (firmware
-# versions) go too. The address is random per install (not the factory one).
+# versions) go too. The address is the factory one (init.fp6.bluetooth.rc).
 PRODUCT_VENDOR_PROPERTIES += \
     log.tag.vendor.qti.bluetooth@1.1-patch_dl_manager=W \
     log.tag.vendor.qti.bluetooth@1.1-nvm_tags_manager=W

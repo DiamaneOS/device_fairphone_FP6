@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Use the factory Bluetooth address. imeiprovd now reads it from the
+  traceability partition at boot and sets
+  `ro.vendor.diamaneos.bt.factory_address`; `init.fp6.bluetooth.rc` copies
+  it to `ro.vendor.bt.boot.macaddr`, as stock's `tctd.rc` does, which the HCI
+  implementation reads before falling back to its stored generated address
+  (prefix 22:22). The HAL property gets its own type, read only by the HAL
+  and set only by vendor_init. Existing pairings may need pairing again once.
+  Not yet built.
 - Compress zram with lz4 instead of zstd. Measured over two 20-app relaunch
   rounds each: relaunch median 137 -> 118 ms, memory stall 0.78 -> 0.47 s,
   same kills; costs a lower compression ratio (about 4 instead of 6) and a

@@ -21,6 +21,8 @@
 type vendor_sysfs_soc_serial, sysfs_type, fs_type;
 
 # Nothing else may read it: a later rule that adds a reader fails the build.
+# The HAL attributes are expanded in the compiled policy the neverallow check
+# reads, so their concrete domains are named as well.
 neverallow {
   domain
   -init
@@ -32,6 +34,10 @@ neverallow {
   -hal_telephony_server
   -hal_wifi
   -hal_wifi_supplicant
+  -hal_bluetooth_default
+  -hal_bluetooth_btlinux
+  -hal_wifi_default
+  -hal_wifi_supplicant_default
   -tee
   -wpa_supplicant_macsec
 } vendor_sysfs_soc_serial:file { open read };

@@ -68,12 +68,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
   - It reports SoC and subsystem sleep times from `/dev/stats`.
   - There are no energy meters: the phone has no on-device power monitor.
 
-Boot-control services come from pinned Fairphone `hardware/qcom/bootctrl` and
-`vendor/qcom/opensource/recovery-ext` projects. The FP6 UFS BSG configuration
-is selected explicitly. Their original notices remain in those projects.
-The normal and recovery implementations compile with CFI enabled. Their UFS
-header layouts match the pinned kernel interfaces. Runtime slot switching still
-requires device verification.
+## Licence
 
 Apache-2.0 ([LICENSE](LICENSE)). Third-party notices: [NOTICE](NOTICE) and
 the `provenance.json` files.

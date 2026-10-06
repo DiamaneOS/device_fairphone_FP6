@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- USB-C port > Off. GrapheneOS's text describes Pixels, where Off also
+         stops charging. On the FP6, charging runs in the ADSP firmware, so
+         Off turns data off and refuses new connections like Charging-only,
+         and charging continues. GrapheneOS ships this text in English only,
+         so there are no translations to replace. -->
+    <string name="usbc_port_off_summary">Turns off USB data on the USB-C port. Charging stays on: this device can’t turn it off, so this works like Charging-only.</string>
+</resources>

@@ -513,8 +513,10 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
   `min_freq` and `max_freq` and the GPU wake trigger `touch_wake` (`vendor_sysfs_kgsl_limit`,
   `fp6/file_contexts`), and the touch gesture switch (`touch.te`). Init chowns exactly these
   to system; the rest of the CPU and GPU sysfs stays root-owned with its platform or Qualcomm
-  label. The thermal engine keeps the read and write it had on these nodes under their old
-  labels, and system_server keeps read on the CPU nodes (its CPU monitor, debuggable builds).
+  label. SELinux keeps the thermal engine's read and write on these nodes under the new
+  labels, but init makes them system-owned and the root engine has no dac_override, so it
+  can no longer write the 0644 CPU and GPU frequency nodes. system_server keeps read on the
+  CPU nodes (its CPU monitor, debuggable builds).
 - `sched_boost`: `/proc/sys/walt/sched_boost` is root-only and a sysctl cannot be chowned.
   The HAL may set only `vendor.powerhal.sched_boost` (`vendor_power_sched_boost_prop`, values
   0, 1 and 2), and vendor init writes the matching fixed value. The other `vendor.powerhal.*`

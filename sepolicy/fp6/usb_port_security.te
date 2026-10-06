@@ -27,12 +27,11 @@ neverallow {
 # Off also suspends the charger input in the ADSP charger firmware:
 # /sys/class/qcom-battery/suspend_input_current, a class attribute of
 # qti_battery_charger (its line in fp6/genfs_contexts; it had the generic
-# sysfs label). 1 stops the phone drawing current from the port, 0 resumes.
-# vendor_init writes it from the same triggers, at boot, in charger mode and
-# at shutdown. No service uses it.
+# sysfs label). vendor_init writes it from the triggers in
+# boot/init.qcom.usb.rc and stats it for init's wait. No service uses it.
 type vendor_sysfs_usb_input_suspend, sysfs_type, fs_type;
 
-allow vendor_init vendor_sysfs_usb_input_suspend:file { open write };
+allow vendor_init vendor_sysfs_usb_input_suspend:file { getattr open write };
 
 # Nothing else may write it: a later rule that adds a writer fails the build.
 neverallow {

@@ -134,8 +134,8 @@ Downstream adaptations:
     absent `qcom-haptics` sysfs node and persist haptics calibration are
     removed too.
   - USB-C port control (`usb_port_security.te`), two nodes with their own
-    types, written by vendor_init from the `sys.port_security_mode` triggers
-    in `boot/init.qcom.usb.rc`:
+    types, written by vendor_init from the `sys.port_security_mode` and boot
+    triggers in `boot/init.qcom.usb.rc`:
     - the USB controller's `dynamic_disable` (data off, charging kept):
       `vendor_sysfs_usb_data_disable`, relabelled in
       `vendor-common/genfs_contexts` from `vendor_sysfs_usb_device`, which

@@ -8,10 +8,10 @@
 //
 // The service installs a seccomp filter from bluetooth-hci.policy
 // (seccomp/) at the start of main(), before it loads the HCI implementation.
-// BT_SECCOMP_LOG_ONLY: calls outside the policy are logged (kernel audit
-// record type 1326) and allowed, while the service's profile is collected.
-// Without it they are trapped (SIGSYS) and the service dies with a tombstone;
-// init restarts it.
+// Calls outside the policy are trapped (SIGSYS): the service dies with a
+// tombstone and init restarts it. Building with -DBT_SECCOMP_LOG_ONLY logs
+// and allows them instead (kernel audit record type 1326), to collect a new
+// profile.
 cc_binary {
     name: "android.hardware.bluetooth@1.1-service.fp6",
     vendor: true,
@@ -36,6 +36,5 @@ cc_binary {
         "-Wall",
         "-Werror",
         "-Wextra",
-        "-DBT_SECCOMP_LOG_ONLY",
     ],
 }

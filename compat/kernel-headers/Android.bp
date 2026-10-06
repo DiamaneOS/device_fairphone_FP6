@@ -3,8 +3,9 @@
 
 // Sanitized UAPI headers from the pinned FP6 kernel trees (see provenance.json),
 // generated with the kernel's own scripts/headers_install.sh. The source-built
-// Qualcomm display stack expects them under these module names, which other
-// Android distributions generate during their kernel build.
+// Qualcomm display stack and PAL (misc/adsp_sleepmon.h) expect them under these
+// module names, which other Android distributions generate during their kernel
+// build.
 
 package {
     default_applicable_licenses: ["fp6_kernel_uapi_headers_license"],

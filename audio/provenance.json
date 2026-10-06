@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "note": "The AudioReach primary HAL, PAL, AGM, the AGM ALSA plugins and audioadsprpcd are built from Fairphone's published FP6 audio sources (branch odm/public-build/target/16/fp6), the same sources as the stock FP6.QREL.16.111.0 build apart from Fairphone's publication changes (closed headers dropped, memory logger and feature statistics compiled out). DiamaneOS forks carry only build changes; each fork's NOTICE reproduces its licences. Module names and install paths match stock.",
+  "sources": [
+    {
+      "component": "primary HAL (audio.primary.volcano), audioadsprpcd",
+      "path": "vendor/qcom/opensource/audio-hal/primary-hal",
+      "upstream": "https://gerrit-public.fairphone.software/platform/hardware/qcom/audio-ar",
+      "revision": "4d39b3c97e163578e55c74b9e3c2d7262dc5c07c",
+      "fork": "https://github.com/DiamaneOS/hardware_qcom_audio-ar",
+      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
+      "changes": "No VINTF fragment (the device manifest declares IAGM); effect libraries not built here (device audio/effects); unused kernel header dependency dropped; CFI and integer overflow sanitizer."
+    },
+    {
+      "component": "PAL (libar-pal)",
+      "path": "vendor/qcom/opensource/pal",
+      "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom/opensource/arpal-lx",
+      "revision": "6d6f50dba430a80b7eaf2c59cc9d63ced5125e99",
+      "fork": "https://github.com/DiamaneOS/vendor_qcom_opensource_arpal-lx",
+      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
+      "unlicensed_files": [
+        {
+          "files": "awinic_ar/ (5 sources, 8 headers)",
+          "status": "Published by Fairphone, no licence header (Copyright AWINIC Technology CO., LTD). Used as published (owner decision, 2026-10-06). Compiled into libar-pal as in stock; nothing in PAL or the HAL calls it (stock neither). The amplifier calibration is loaded by the kernel aw882xx driver."
+        },
+        {
+          "files": "utils/inc/VUIInterfaceProxy.h, vui-dmgr/inc/vui_dmgr_audio_intf.h",
+          "status": "Published by Fairphone, no licence header: interface declarations written by community contributors (Git history). Included in libar-pal."
+        },
+        {
+          "files": "mink/inc/CPeripheralAccessControl.h, peripheral_utils/inc/peripheralStateUtils.h",
+          "status": "Published by Fairphone, no licence header; not compiled for volcano."
+        }
+      ],
+      "changes": "Kernel UAPI from the device header library (misc/adsp_sleepmon.h) instead of the kernel build output; closed header libraries dropped (their features are compiled out by Fairphone's PAL_MEMLOG_UNSUPPORTED and AUDIO_FEATURE_STATS_UNSUPPORTED); Bluetooth codec and voice UI plugins not built; CFI and integer overflow sanitizer; NOTICE added."
+    },
+    {
+      "component": "AGM (libagm, libagmclient, vendor.qti.hardware.AGMIPC@1.0 and -impl, libsndcardparser, libagm_pcm_plugin, libagm_mixer_plugin, libagm_compress_plugin)",
+      "path": "vendor/qcom/opensource/agm",
+      "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom/opensource/agm",
+      "revision": "f451a8d153c78aae63fdaeba5e8ee1881fda7fed",
+      "fork": "https://github.com/DiamaneOS/vendor_qcom_opensource_agm",
+      "licences": ["BSD-3-Clause", "BSD-3-Clause-Clear", "Apache-2.0"],
+      "changes": "Closed memory logger header dropped (compiled out by Fairphone's AGM_MEMLOG_UNSUPPORTED); compress plugin uses bionic's compress headers instead of the kernel build output; CFI and integer overflow sanitizer; NOTICE extended."
+    },
+    {
+      "component": "graph service headers (gsl, acdb, ar_osal, spf)",
+      "path": "vendor/qcom/opensource/audio/graphservices",
+      "upstream": "https://gerrit-public.fairphone.software/platform/vendor/qcom-opensource/audioreach-graphservices",
+      "revision": "4d05487f252482978aeba9fc9c4c377ac1adbdb1",
+      "fork": null,
+      "licences": ["BSD-3-Clause"],
+      "changes": "None; pinned unmodified. Headers only: Fairphone did not publish the graph service sources."
+    }
+  ],
+  "closed": [
+    "libar-gsl, libar-acdb, libar-gpr, liblx-osal, liblx-ar_util: AudioReach graph services (only their headers are published)",
+    "libats: AudioReach tuning server, started by AGM (no diag access)",
+    "libvui_intf: voice UI interface linked by PAL",
+    "libadm: audio deadline manager, loaded by PAL with dlopen",
+    "ACDB calibration and workspace (vendor/etc/acdbdata), mixer paths, resource manager, card definitions, use-case key/value table and microphone characteristics",
+    "ADSP firmware with the AudioReach SPF engine and its modules (Fluence, speaker protection, Awinic DSP algorithm)",
+    "aw882xx_acf.bin amplifier firmware; the per-unit aw_cali.bin stays in persist"
+  ]
+}

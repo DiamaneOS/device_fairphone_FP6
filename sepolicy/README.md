@@ -303,12 +303,13 @@ runtime audio directory, selected allocator and sound-card state access. The
 FastRPC listener receives only its DSP transport, firmware/RFSA, audio-DSP state
 and DSP-service lookup.
 
-The stock primary HAL registers the PAL and AGM HIDL services (`IPAL`, `IAGM`)
-in its own process. `qva-common/hwservice_contexts` labels them
-`vendor_hal_audio_internal_hwservice` (`audio/hwservice.te`) instead of
-`hal_audio_hwservice`, so only `hal_audio_default` may register and look them
-up; audioserver, system_server and the Bluetooth stack, which are hal_audio
-clients, cannot reach them.
+The primary HAL, PAL and AGM are built from source (`audio/provenance.json`)
+and keep the stock domains and labels. The HAL registers the AGM HIDL service
+(`IAGM`) in its own process and no PAL HIDL service (`IPAL` keeps its label).
+`qva-common/hwservice_contexts` labels both `vendor_hal_audio_internal_hwservice`
+(`audio/hwservice.te`) instead of `hal_audio_hwservice`, so only
+`hal_audio_default` may register and look them up; audioserver, system_server
+and the Bluetooth stack, which are hal_audio clients, cannot reach them.
 
 The kernel may not search `/mnt/vendor` (a platform neverallow), so it cannot
 follow the amplifier calibration link into persist; the amplifier then uses its

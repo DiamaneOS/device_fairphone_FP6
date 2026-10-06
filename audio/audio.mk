@@ -1,12 +1,29 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Audio for bring-up: the stock AudioReach userspace (primary HAL, PAL,
-# AGM, graph services, calibration and configuration) comes from the selected
+# Audio: the AudioReach primary HAL, PAL, AGM, its ALSA plugins and
+# audioadsprpcd are built from Fairphone's published FP6 sources (DiamaneOS
+# forks, provenance.json) under their stock names. The graph services
+# (Fairphone published only their headers), the voice UI interface, the
+# deadline manager, ACDB calibration and configuration stay from the selected
 # stock vendor files. The AOSP audio service, HIDL adapters, effects and
 # interface libraries are built from source. Sound trigger, Bluetooth audio,
 # FM and the Codec2 audio service are not included yet.
 $(call soong_config_set_bool,android_hardware_audio,run_64bit,true)
+
+# The board flags in BoardConfig.mk select the build variant (no PAL HIDL
+# service, AGM HIDL inside the HAL process).
+PRODUCT_PACKAGES += \
+    audio.primary.volcano \
+    audioadsprpcd \
+    libagm \
+    libagm_compress_plugin \
+    libagm_mixer_plugin \
+    libagm_pcm_plugin \
+    libagmclient \
+    libar-pal \
+    libsndcardparser \
+    vendor.qti.hardware.AGMIPC@1.0-impl
 
 # Effects (audio_effects.xml): AOSP software effects only, no DSP offload
 # halves, plus Qualcomm's VoIP AEC/NS descriptors and volume listener built

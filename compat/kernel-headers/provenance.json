@@ -77,6 +77,15 @@
       "revision": "1ee0ba29a2f578d4c2c6c0105219d082f7d595d8",
       "source": "smmu-proxy/include/uapi/linux/qti-smmu-proxy.h",
       "sha256": "54fffbdc53205074fdedb5e9517ca9327f3eb25dc3642f13b338245848fa0946"
+    },
+    {
+      "path": "include/misc/adsp_sleepmon.h",
+      "kernel_tree": "kernel_platform/msm-kernel",
+      "repository": "kernel_qcom-6.1",
+      "revision": "2d006c35354ff1be1aef4cd1066b3f4967a0a457",
+      "source": "kernel_platform/msm-kernel/include/uapi/misc/adsp_sleepmon.h",
+      "sha256": "2048c4a192c76402b820330ef8ecdf451b8b9f60496c67eb06b4c05688526f92",
+      "note": "Added 2026-10-06 for the source-built PAL (ADSP sleep monitor ioctl). headers_install.sh leaves it byte-identical. kernel_qcom-6.1 is the kernel repository the builds use."
     }
   ]
 }

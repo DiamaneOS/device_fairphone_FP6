@@ -175,6 +175,18 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
 
+# Audio: the AudioReach primary HAL, PAL and AGM are built from Fairphone's
+# published FP6 sources (audio/audio.mk); their Android.mk files read these
+# flags. The HAL links PAL directly and registers only the AGM HIDL service,
+# which libagmclient (PAL and the ALSA plugins) uses inside the HAL process.
+# Off: the PAL HIDL service (no client), dynamic logging (closed library) and
+# the generic effect framework (its closed library is not shipped).
+TARGET_USES_QCOM_MM_AUDIO := true
+AUDIO_FEATURE_ENABLED_PAL_HIDL := false
+AUDIO_FEATURE_ENABLED_AGM_HIDL := true
+AUDIO_FEATURE_ENABLED_DYNAMIC_LOG := false
+AUDIO_FEATURE_ENABLED_GEF_SUPPORT := false
+
 # Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
 # node and waits for the driver to finish probing before bringing up wlan0.
 BOARD_WLAN_DEVICE := qcwcn

@@ -56,3 +56,10 @@ audio/effects/voice_processing.c (Apache-2.0) and volume_listener.c
 unmodified copies from CodeLinaro platform/hardware/qcom/audio-ar
 89d32774e85832bd2368032a7eaebc154f77b6d1. Their notices are retained in the
 files and in audio/effects/NOTICE; provenance.json records the hashes.
+
+The AudioReach primary HAL, PAL and AGM are not in this repository: they are
+built from DiamaneOS forks of Fairphone's published FP6 audio sources, listed
+with their licences in audio/provenance.json. Each fork's NOTICE reproduces
+its licences. Fairphone publishes PAL's Awinic calibration code (awinic_ar/)
+and two small interface headers without a licence header; they are used as
+published.

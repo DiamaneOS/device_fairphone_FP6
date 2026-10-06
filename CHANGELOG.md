@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Build the AudioReach primary HAL, PAL, AGM with its HIDL service and ALSA
+  plugins, and audioadsprpcd from Fairphone's published FP6 sources
+  (DiamaneOS forks, `audio/provenance.json`) instead of shipping the stock
+  blobs, under the same names and with CFI and the integer overflow
+  sanitizer as stock. The HAL no longer registers the PAL HIDL service, so
+  `IPAL` leaves the manifest and the framework matrix. The graph services
+  (only their headers are published), their tuning server, the voice UI
+  interface, the deadline manager, calibration and configuration stay
+  stock. Adds `misc/adsp_sleepmon.h` to the kernel UAPI headers. SELinux
+  domains and labels unchanged. Not yet built.
 - For the hardened kernel: the EUD debugger's module is no longer loaded (the
   kernel ships without it), and init no longer writes `download_mode` (the
   kernel makes it read-only; panic dumps are off by default). Not yet built.

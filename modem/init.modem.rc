@@ -24,12 +24,6 @@ service vendor.ssr_setup /vendor/bin/ssr_setup
 
 on early-boot
     start vendor.ssr_setup
-    # No full RAM dump over USB after a kernel panic: reboot instead (stock only
-    # does this when persist.sys.oem.debug.enable_ramdump=false, init.target.rc
-    # 394-396). The node is fp_mmitest_sysfs, which the platform lets
-    # vendor_init write (its rule on sysfs_type); download_mode reads 0 on the
-    # phone.
-    write /sys/module/qcom_dload_mode/parameters/download_mode 0
 
 on property:persist.vendor.ssr.restart_level=*
     start vendor.ssr_setup

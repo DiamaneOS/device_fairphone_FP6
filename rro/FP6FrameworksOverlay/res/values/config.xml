@@ -32,6 +32,28 @@
     <integer name="config_defaultRefreshRate">0</integer>
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
+    <!-- Cap the panel at 60 Hz while the camera app previews. The preview is
+         30 fps, so 60 Hz carries it with a frame to spare and saves panel
+         power. More importantly it fixes photo-mode preview jank: the 4:3
+         preview (1600x1200) is above the display's 1088-line inline-rotation
+         limit, so SurfaceFlinger composes it on the GPU (~10 ms per frame). At
+         90/120 Hz that overruns the composite deadline every frame
+         ("SurfaceFlinger Stuffing"); at 60 Hz the 16.7 ms deadline absorbs it
+         and the frames land on time. It also smooths the video->photo switch,
+         where the composition type flips.
+
+         CameraServiceProxy already asks for a 60 Hz render rate while a camera
+         previews (frameworks_base 89ac1c80), but that is only a render-rate
+         vote: the physical panel keeps running at its peak and SurfaceFlinger
+         still composes against the short deadline. The high-refresh denylist is
+         the framework's one knob that pins the *physical* mode (it votes the
+         lowest supported mode >= 60 Hz, which is 60 Hz here) for a focused
+         package, so it is what actually caps the panel. Listing only the
+         shipped camera app keeps every other app at full refresh. -->
+    <string-array name="config_highRefreshRateBlacklist" translatable="false">
+        <item>app.grapheneos.camera</item>
+    </string-array>
+
     <!-- FP6.QREL.16.100.0 factory FrameworksResTarget_Vendor overlay. -->
     <dimen name="rounded_corner_radius">20dp</dimen>
     <string name="config_mainDisplayShape" translatable="false">M20 0h1040s20 0 20 20v2360s0 20 -20 20h-1040s-20 0 -20 -20v-2360s0 -20 20 -20</string>

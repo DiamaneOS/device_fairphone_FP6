@@ -19,6 +19,7 @@
     {"PowerHint": "INTERACTION", "Node": "CPUGoldMinFreq", "Value": "1190400", "Duration": 0},
     {"PowerHint": "INTERACTION", "Node": "CPUPrimeMinFreq", "Value": "1094400", "Duration": 0},
     {"PowerHint": "INTERACTION", "Node": "WaltSchedBoost", "Value": "2", "Duration": 0, "EnableProperty": "vendor.powerhal.sched_boost.enable"},
+    {"PowerHint": "INTERACTION", "Node": "DDRMinFreq", "Value": "681000", "Duration": 0, "EnableProperty": "vendor.powerhal.interaction_ddr.enable"},
 
     {"PowerHint": "LAUNCH", "Node": "CPUSilverMinFreq", "Value": "1344000", "Duration": 3000},
     {"PowerHint": "LAUNCH", "Node": "CPUGoldMinFreq", "Value": "1401600", "Duration": 3000},

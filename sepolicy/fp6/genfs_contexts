@@ -46,3 +46,6 @@ genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_max_freq u:object_r:v
 # monitor's and the prime cluster's L3 latency monitor's min_freq.
 genfscon sysfs /devices/system/cpu/bus_dcvs/DDR/24091000.qcom,bwmon-ddr/min_freq u:object_r:vendor_sysfs_bus_dcvs_limit:s0
 genfscon sysfs /devices/system/cpu/bus_dcvs/L3/soc:qcom,memlat:l3:prime/min_freq u:object_r:vendor_sysfs_bus_dcvs_limit:s0
+# USB-C port control: the charger firmware's input suspend, which Off sets
+# (usb_port_security.te).
+genfscon sysfs /class/qcom-battery/suspend_input_current u:object_r:vendor_sysfs_usb_input_suspend:s0

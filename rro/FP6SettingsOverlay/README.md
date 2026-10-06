@@ -40,8 +40,10 @@ make_fingerprint_edu.py packages/apps/Settings/res/raw/fingerprint_edu_lottie_po
 ## USB-C port summary
 
 - Security & privacy > Exploit protection > USB-C port > Off: GrapheneOS's
-  summary says Off turns off the port, which on Pixels includes charging. The
-  FP6 cannot stop charging (Type-C and charging run in the ADSP firmware), so
-  Off turns data off like Charging-only and the summary says so. GrapheneOS
-  ships these strings in English only, so the overlay has no translations
-  either.
+  summary says Off turns off the port.
+- On the FP6, Off turns off USB data and charging, while the ADSP firmware
+  keeps running Type-C and USB PD.
+- The overlay's summary names those two and keeps GrapheneOS's note on the
+  separate charging mode.
+- GrapheneOS ships these strings in English only, so the overlay has no
+  translations either.

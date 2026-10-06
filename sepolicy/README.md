@@ -133,16 +133,21 @@ Downstream adaptations:
     events nor drive the chip's force-feedback input node. The grants for the
     absent `qcom-haptics` sysfs node and persist haptics calibration are
     removed too.
-  - USB-C port control: the USB controller's `dynamic_disable` node, which
-    turns USB data off and leaves charging alone, is
-    `vendor_sysfs_usb_data_disable` (`usb_port_security.te`, relabelled in
-    `vendor-common/genfs_contexts`) instead of `vendor_sysfs_usb_device`,
-    which also covers the controller role. vendor_init writes it from the
-    `sys.port_security_mode` triggers in `boot/init.qcom.usb.rc`. The USB HAL
-    may not: with port control on, the framework never passes
-    `enableUsbData` to the HAL, its only writer. A neverallow keeps every
-    other domain from writing it, except ueventd, which the platform lets
-    write all of sysfs.
+  - USB-C port control (`usb_port_security.te`), two nodes with their own
+    types, written by vendor_init from the `sys.port_security_mode` triggers
+    in `boot/init.qcom.usb.rc`:
+    - the USB controller's `dynamic_disable` (data off, charging kept):
+      `vendor_sysfs_usb_data_disable`, relabelled in
+      `vendor-common/genfs_contexts` from `vendor_sysfs_usb_device`, which
+      also covers the controller role. The USB HAL may not write it: with
+      port control on, the framework never passes `enableUsbData` to the
+      HAL, its only writer;
+    - the charger firmware's input suspend
+      (`/sys/class/qcom-battery/suspend_input_current`, which Off sets):
+      `vendor_sysfs_usb_input_suspend` (`fp6/genfs_contexts`), until now the
+      generic `sysfs` label.
+    Neverallows keep every other domain from writing either, except ueventd,
+    which the platform lets write all of sysfs.
   Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
   `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
   (its fstab line is gone: nothing on the FP6 mounts `/product/vm-system`). The modem's `study` partition has

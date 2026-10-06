@@ -311,10 +311,12 @@ and keep the stock domains and labels. The HAL registers the AGM HIDL service
 `hal_audio_default` may register and look them up; audioserver, system_server
 and the Bluetooth stack, which are hal_audio clients, cannot reach them.
 
-The kernel may not search `/mnt/vendor` (a platform neverallow), so it cannot
-follow the amplifier calibration link into persist; the amplifier then uses its
-default calibration. These rules are not yet runtime-qualified under enforcing
-mode; collect denials on the device before adding any grant.
+The kernel may not search `/mnt/vendor` (a platform neverallow) and does not
+need to: the amplifier driver leaves calibration to userspace. At each speaker
+start the audio HAL's PAL reads the per-unit calibration from persist and writes
+it to the DSP (logged as "Awinic set cali re success"; checked on the phone, as
+on stock). These rules are not yet runtime-qualified under enforcing mode;
+collect denials on the device before adding any grant.
 
 ## Modem
 

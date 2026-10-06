@@ -78,7 +78,8 @@ allow hal_graphics_composer_default vendor_vm_cp_pixel_device:chr_file r_file_pe
 allow hal_graphics_composer_default vendor_vm_hlos_device:chr_file r_file_perms;
 
 # Access /sys/devices/virtual/graphics/fb0
-r_dir_file(hal_graphics_composer_default, sysfs_type)
+# DiamaneOS: not the SoC serial number (fp6/soc_serial.te).
+r_dir_file(hal_graphics_composer_default, { sysfs_type -vendor_sysfs_soc_serial })
 
 # Allow reading/writing to '/data/vendor/display/*'
 allow hal_graphics_composer_default vendor_display_vendor_data_file:dir create_dir_perms;

@@ -98,6 +98,12 @@ firmware_directories /vendor/firmware_mnt/image/
 /sys/class/typec/port0		port_type	0660	system	usb
 /sys/class/typec/port0-partner	accessory_mode	0440	system	usb
 
+# The SoC serial number: root only (the kernel makes it 0444). No shipped
+# program reads it; platform sysfs rules still let the Bluetooth, Wi-Fi,
+# supplicant, radio and TEE services' domains read it, and those run as their
+# own users (sepolicy/fp6/soc_serial.te).
+/sys/devices/soc0         serial_number    0400   root   root
+
 # Display power and HDCP control for the composer (matches stock).
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
 /sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics

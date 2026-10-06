@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Turn USB data off and on when GrapheneOS's USB-C port control asks for it:
+  init triggers map `sys.port_security_mode` to the USB controller's
+  `dynamic_disable` node (data off, charging continues). The node gets its
+  own SELinux type that only vendor_init and the USB HAL may write. Inert
+  until the framework's port control is turned on. Not yet built.
 - Use AOSP's software audio effects only: our own `audio_effects.xml` lists
   the AOSP bundle, reverb, visualizer, downmix, loudness and dynamics
   effects without DSP offload halves or the effect proxy, so apps' effect

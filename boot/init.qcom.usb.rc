@@ -112,3 +112,20 @@ on zygote-start
     mount functionfs ptp /dev/usb-ffs/ptp rmode=0770,fmode=0660,uid=1024,gid=1024,no_disconnect=1
 
     setprop sys.usb.configfs 2
+
+# USB-C port control. GrapheneOS's framework sets sys.port_security_mode (and
+# the kernel's deny_new_usb2, which refuses new connections) only when
+# config_usbPortSecuritySupported is true. Data off is dwc3-msm
+# dynamic_disable; Type-C, PD and charging stay with the ADSP firmware, so
+# charging continues. "charging-only" needs no trigger: deny_new_usb2 refuses
+# the next connection, and the framework switches to charging-only_immediate
+# once the port is unplugged while locked. Only vendor_init and the USB HAL
+# may write the node (sepolicy/fp6/usb_port_security.te).
+on property:sys.port_security_mode=ports_disabled
+    write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 1
+
+on property:sys.port_security_mode=charging-only_immediate
+    write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 1
+
+on property:sys.port_security_mode=ports_enabled
+    write /sys/devices/platform/soc/a600000.ssusb/dynamic_disable 0

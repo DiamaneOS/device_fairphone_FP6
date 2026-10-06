@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- The source-built gralloc no longer tries to load `libubwcp.so` when UBWC-P
+  support is compiled out (`hardware/qcom/display`), so apps, system_server,
+  SurfaceFlinger and the media services no longer log its denial; removed
+  from the expected-denials list. The camera provider still loads it itself.
+  Not yet built.
 - Give the switch that turns Qualcomm's embedded USB debugger (EUD) on,
   `/sys/module/eud/parameters/enable`, its own SELinux type with a
   neverallow: only ueventd and vendor_init keep write access (the platform

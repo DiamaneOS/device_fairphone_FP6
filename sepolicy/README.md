@@ -499,15 +499,18 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
 - Nodes: the HAL may write, not read, `scaling_min_freq` and `scaling_max_freq` of the three
   CPU policies (`vendor_sysfs_cpufreq_limit`, `fp6/genfs_contexts`), the GPU devfreq
   `min_freq` and `max_freq` and the GPU wake trigger `touch_wake` (`vendor_sysfs_kgsl_limit`,
-  `fp6/file_contexts`), and the touch gesture switch (`touch.te`). Init chowns exactly these
-  to system; the rest of the CPU and GPU sysfs stays root-owned with its platform or Qualcomm
-  label. The thermal engine keeps the read and write it had on these nodes under their old
-  labels, and system_server keeps read on the CPU nodes (its CPU monitor, debuggable builds).
+  `fp6/file_contexts`), the `min_freq` floors of the DDR bandwidth monitor and the prime L3
+  latency monitor in `bus_dcvs` (`vendor_sysfs_bus_dcvs_limit`, `fp6/genfs_contexts`), and
+  the touch gesture switch (`touch.te`). Init chowns exactly these to system; the rest of the
+  CPU, GPU and bus sysfs stays root-owned with its platform or Qualcomm label. The thermal
+  engine keeps the read and write it had on these nodes under their old labels, and
+  system_server keeps read on the CPU nodes (its CPU monitor, debuggable builds).
 - `sched_boost`: `/proc/sys/walt/sched_boost` is root-only and a sysctl cannot be chowned.
   The HAL may set only `vendor.powerhal.sched_boost` (`vendor_power_sched_boost_prop`, values
   0, 1 and 2), and vendor init writes the matching fixed value. The other `vendor.powerhal.*`
   properties (`vendor_power_prop`) are switches the HAL reads and vendor init sets;
-  `vendor.powerhal.sched_boost.enable=false` turns the `sched_boost` part of the hints off.
+  `vendor.powerhal.sched_boost.enable=false` turns the `sched_boost` part of the hints off,
+  `vendor.powerhal.membus.enable=false` the memory-bus floors.
 - ADPF: setsched on apps, SurfaceFlinger and system_server, with CAP_SYS_NICE, to set uclamp
   on hint-session threads. The domain is an `mlstrustedsubject` because the platform MLS
   constraint on setsched requires equal levels and apps run with categories; setsched is its
@@ -521,8 +524,9 @@ grants of the composer, SurfaceFlinger, the camera and the old power HAL are rem
   system_server) and, the only vendor one, the camera provider
   (`camera/hal_camera_default.te`). A client reaches every IPower method: boosts, modes such
   as SUSTAINED_PERFORMANCE, EXPENSIVE_RENDERING or DOUBLE_TAP_TO_WAKE, and ADPF hint sessions.
-  Their effects stay within the grants above: frequency floors and caps, the three
-  `sched_boost` values, the GPU wake trigger, tap-to-wake and uclamp on session threads.
+  Their effects stay within the grants above: CPU, GPU and memory-bus frequency floors and
+  caps, the three `sched_boost` values, the GPU wake trigger, tap-to-wake and uclamp on
+  session threads.
 - Not granted: reads of the nodes (dumpsys shows request indexes, not values), the debug
   configuration in `/data/vendor/etc` (`vendor.powerhal.config.debug`), the Pixel-only
   `/proc/vendor_sched`, the display `idle_state` nodes (the Qualcomm display driver has

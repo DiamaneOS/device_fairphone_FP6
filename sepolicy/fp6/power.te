@@ -14,16 +14,28 @@ type vendor_sysfs_cpufreq_limit, fs_type, sysfs_type;
 # wake trigger (touch_wake) (fp6/file_contexts). The rest of the GPU sysfs
 # stays vendor_sysfs_kgsl.
 type vendor_sysfs_kgsl_limit, fs_type, sysfs_type;
+# Memory-bus floors: min_freq of the DDR bandwidth monitor and of the prime
+# cluster's L3 latency monitor under /sys/devices/system/cpu/bus_dcvs
+# (fp6/genfs_contexts). The rest of bus_dcvs stays sysfs_devices_system_cpu.
+type vendor_sysfs_bus_dcvs_limit, fs_type, sysfs_type;
 
 # The HAL only writes these nodes (powerhint.json marks them WriteOnly).
-allow hal_power_default { vendor_sysfs_cpufreq_limit vendor_sysfs_kgsl_limit }:file w_file_perms;
+allow hal_power_default {
+    vendor_sysfs_cpufreq_limit
+    vendor_sysfs_kgsl_limit
+    vendor_sysfs_bus_dcvs_limit
+}:file w_file_perms;
 
 # Keep the access the nodes had under their old labels for the processes the
 # relabelling would otherwise cut off: the thermal engine may read and write
 # all of sysfs_devices_system_cpu and vendor_sysfs_kgsl
 # (vendor-common/thermal-engine.te), and system_server's CPU monitor
 # (debuggable builds) reads scaling_max_freq.
-allow vendor_thermal-engine { vendor_sysfs_cpufreq_limit vendor_sysfs_kgsl_limit }:file rw_file_perms;
+allow vendor_thermal-engine {
+    vendor_sysfs_cpufreq_limit
+    vendor_sysfs_kgsl_limit
+    vendor_sysfs_bus_dcvs_limit
+}:file rw_file_perms;
 allow system_server vendor_sysfs_cpufreq_limit:file r_file_perms;
 
 # ADPF: the HAL sets uclamp_min on the threads of each hint session with

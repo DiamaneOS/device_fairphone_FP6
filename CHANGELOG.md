@@ -6,7 +6,7 @@
   only: `sepolicy/fp6/thermal_engine_audit.te` adds "avc: granted" records
   for each node it opens for writing, the device nodes it opens, the sockets
   it creates, its capability use and its shutdown requests. No access
-  changes; user builds are unchanged. Not yet built.
+  changes; user builds are unchanged. Checked on the phone.
 - Use the factory Wi-Fi MAC as the driver's hardware address, as stock does,
   instead of the chip's generic Qualcomm one (prefix 00:03:7f; -180).
   - imeiprovd writes the driver's MAC file from the traceability partition
@@ -15,17 +15,17 @@
     read it (`sepolicy/fp6/wlan_mac.te`).
   - Android still randomises the address per network. Its stored factory
     MAC changes only after the stored value is cleared or the phone is reset.
-  - Not yet built.
+  - Checked on the phone.
 - User builds silence the CamX log tag: the closed camera provider logged the
   camera modules' serial numbers at every start. Debuggable builds keep CamX
   logs. Tested by setting the property by hand: no serial lines, camera works.
-  Not yet built.
+  Checked on the phone.
 - Call volume has 15 steps, as media, instead of 5 spread over 15 (the volume
-  keys jumped 1, 5, 8, 12, 15). Not yet built.
+  keys jumped 1, 5, 8, 12, 15). Checked on the phone.
 - Enforce the Bluetooth HCI service's seccomp filter: a call outside its list
   now stops the service (SIGSYS, tombstone; init restarts it) instead of only
   being logged. In log mode, pairing, music (AAC), a headset call (mSBC),
-  on/off cycles and scans logged no call outside the list. Not yet built.
+  on/off cycles and scans logged no call outside the list. Checked on the phone.
 - Use the factory Bluetooth address. imeiprovd now reads it from the
   traceability partition at boot and sets
   `ro.vendor.diamaneos.bt.factory_address`; `init.fp6.bluetooth.rc` copies

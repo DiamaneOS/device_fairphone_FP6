@@ -53,6 +53,16 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_PRODUCT_PROPERTIES += \
     bluetooth.core.le.max_number_of_concurrent_connections=10
 
+# The stock HCI implementation logs the Bluetooth address at info level each
+# time Bluetooth starts, when it writes it into the controller's NVM tags
+# ("BD Address: ..." in PatchDLManager::ReadTlvInfo and
+# NvmTagsManager::DownloadNvmTags), and HCI command dumps at debug level under
+# the first tag. Keep both tags at warning; their other info lines (firmware
+# versions) go too. The address is random per install (not the factory one).
+PRODUCT_VENDOR_PROPERTIES += \
+    log.tag.vendor.qti.bluetooth@1.1-patch_dl_manager=W \
+    log.tag.vendor.qti.bluetooth@1.1-nvm_tags_manager=W
+
 # Not set on purpose:
 # - ro.bluetooth.a2dp_offload.supported and ro.bluetooth.leaudio_offload.supported
 #   (default false): stock offload needs the Qualcomm Bluetooth audio stack.

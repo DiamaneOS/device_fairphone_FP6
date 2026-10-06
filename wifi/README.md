@@ -17,6 +17,13 @@ for overlays. The base template, `wpa_supplicant.conf`, has one provider: the
 permission file come from `vendor/diamaneos/config/wifi.mk`. `init.qcom.rc`
 creates `/data/vendor/wifi/wpa/sockets`.
 
+The station's hardware address is the factory MAC from the traceability
+partition, as on stock: imeiprovd (`hardware/diamaneos/ims`) writes the
+driver's `wlan_mac.bin` at boot, and ueventd serves it from
+`/mnt/vendor/wlan_mac/` (`boot/ueventd.rc`). The driver reads it only with
+`read_mac_addr_from_mac_file=1` in `WCNSS_qcom_cfg.ini` (stock value). Android
+randomises the address per network on top of it.
+
 Options whose effect is not obvious:
 
 - `p2p_disabled=1` is in the station overlay only. It keeps wlan0 from being

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Use the factory Wi-Fi MAC as the driver's hardware address, as stock does,
+  instead of the chip's generic Qualcomm one (prefix 00:03:7f; -180).
+  - imeiprovd writes the driver's MAC file from the traceability partition
+    at post-fs, into a RAM-backed tree; ueventd lists that tree as a
+    firmware directory (`boot/ueventd.rc`) and is the only service that may
+    read it (`sepolicy/fp6/wlan_mac.te`).
+  - Android still randomises the address per network. Its stored factory
+    MAC changes only after the stored value is cleared or the phone is reset.
+  - Not yet built.
 - User builds silence the CamX log tag: the closed camera provider logged the
   camera modules' serial numbers at every start. Debuggable builds keep CamX
   logs. Tested by setting the property by hand: no serial lines, camera works.

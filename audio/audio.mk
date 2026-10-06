@@ -23,6 +23,7 @@ PRODUCT_PACKAGES += \
     libagmclient \
     libar-pal \
     libsndcardparser \
+    vendor.qti.hardware.AGMIPC@1.0 \
     vendor.qti.hardware.AGMIPC@1.0-impl
 
 # Effects (audio_effects.xml): AOSP software effects only, no DSP offload

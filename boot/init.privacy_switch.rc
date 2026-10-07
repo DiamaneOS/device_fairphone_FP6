@@ -1,0 +1,10 @@
+# The Moments switch's kernel floor: the privacy switch driver learns once per
+# boot which sensors the switch blocks (a mask: 1 microphone, 2 camera) and
+# refuses every later write. Until this write it blocks everything while the
+# switch is down. system_server keeps the property equal to the owner's
+# Moments action; a change takes effect at the next boot.
+#
+# After init.rc's post-fs-data, which loads the persistent properties and
+# waits for them, and before the audio and camera services start.
+on post-fs-data
+    write /sys/kernel/privacy_switch/policy ${persist.diamaneos.privacy_switch.policy:-0}

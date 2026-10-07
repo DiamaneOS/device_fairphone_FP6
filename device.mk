@@ -90,6 +90,11 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
+# Seals the Moments switch's kernel floor once per boot (system_ext, so it runs
+# as init; the policy property is platform-only).
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/init.privacy_switch.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.privacy_switch.rc
+
 # The vendor_dlkm load list split into streams that init.qcom.rc loads in
 # parallel. Together they must list every module of the kernel's
 # modules.load once, each in its order (image verification checks this).

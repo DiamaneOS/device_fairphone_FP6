@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Seal the Moments switch's kernel microphone block once per boot. A
+  system_ext init script writes the owner's choice to the privacy switch
+  driver (`/sys/kernel/privacy_switch/policy`) after post-fs-data; the kernel
+  refuses later writes. Only init may write the node and only system_server
+  sets the policy property (`sepolicy/system-ext-private/privacy_switch.te`).
+  The framework overlay names the kernel's status file. Not built into a
+  kernel or tested on the phone yet.
 - The camera provider can no longer write `/data/vendor/camera/coredump`
   (owned by system, mode 0500): CamX created an empty dump folder there for
   every `dumpsys media.camera` even with its core dumps turned off.

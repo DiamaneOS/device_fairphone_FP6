@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Moments switch's kernel floor (privacy switch driver, diamaneos_privsw).
+# - The kernel learns once per boot which sensors the switch blocks: init
+#   writes /sys/kernel/privacy_switch/policy (init.privacy_switch.rc) and the
+#   kernel refuses every later write. Only init may write it here too; the
+#   platform also lets vendor_init and ueventd write all sysfs.
+# - system_server reads what the kernel enforces, keeps the policy property
+#   for the next boot equal to the owner's choice and shows the kernel's mask
+#   to Settings. Only system_server sets the properties.
+
+type sysfs_privacy_switch, fs_type, sysfs_type;
+type sysfs_privacy_switch_policy, fs_type, sysfs_type;
+system_internal_prop(privacy_switch_prop)
+
+allow init sysfs_privacy_switch:dir search;
+allow init sysfs_privacy_switch_policy:file { open write };
+
+allow system_server sysfs_privacy_switch:dir search;
+allow system_server sysfs_privacy_switch:file r_file_perms;
+set_prop(system_server, privacy_switch_prop)
+
+get_prop(system_app, privacy_switch_prop)
+
+neverallow { domain -init -vendor_init -ueventd } sysfs_privacy_switch_policy:file no_w_file_perms;
+neverallow { domain -init -vendor_init -ueventd } sysfs_privacy_switch:file no_w_file_perms;
+neverallow { domain -init -system_server } privacy_switch_prop:property_service set;

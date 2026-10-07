@@ -101,14 +101,21 @@
     <!-- Camera and microphone access toggles, as on GrapheneOS's Pixels:
          software sensor privacy. The framework blocks the camera and
          microphone app ops and the camera service blocks or mutes cameras,
-         whatever the HALs do; the FP6 has no hardware toggle, so the
-         config_supportsHardware*Toggle values stay false. -->
+         whatever the HALs do. config_supportsHardware*Toggle stay false: the
+         only hardware state is the Moments switch's kernel floor, which the
+         input service reports as a hardware microphone toggle while it
+         blocks (config_momentsKernelFloorPath). -->
     <bool name="config_supportsCamToggle">true</bool>
     <bool name="config_supportsMicToggle">true</bool>
 
-    <!-- The Moments switch: the slider on the side (gpio-keys, EV_SW
-         SW_PEN_INSERTED). The kernel reports 1 with the slider up and 0 with
-         it down; down means Moments on, so on is value 0. -->
+    <!-- The Moments switch: the slider on the side (privacy switch driver,
+         EV_SW SW_PEN_INSERTED, as gpio-keys reported it). The kernel reports 1
+         with the slider up and 0 with it down; down means Moments on, so on
+         is value 0. -->
     <integer name="config_momentsSwitchCode">15</integer>
     <integer name="config_momentsSwitchActiveValue">0</integer>
+
+    <!-- The kernel floor: the privacy switch driver (diamaneos_privsw) reports
+         what it blocks while the slider is down. -->
+    <string name="config_momentsKernelFloorPath" translatable="false">/sys/kernel/privacy_switch/enforced</string>
 </resources>

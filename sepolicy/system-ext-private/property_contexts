@@ -116,3 +116,7 @@ ro.vendor.config.qspa.       u:object_r:vendor_qspa_prop:s0
 # writes to the kernel at the next boot, and what the kernel enforces now.
 persist.diamaneos.privacy_switch.policy    u:object_r:privacy_switch_prop:s0 exact int
 diamaneos.privacy_switch.enforced          u:object_r:privacy_switch_prop:s0 exact int
+
+# Camera privacy disconnects apps instead of muting (camera/camera.mk). AOSP's
+# type for the ro.camera.* settings cameraserver reads: only vendor_init sets it.
+ro.camera.disableCameraMute                u:object_r:camera_config_prop:s0 exact bool

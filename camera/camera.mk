@@ -34,6 +34,15 @@ PRODUCT_COPY_FILES += \
 PRODUCT_VENDOR_PROPERTIES += \
     ro.camera.disableHeicUltraHDR=true
 
+# Camera privacy (the Moments switch, the camera access toggle) disconnects
+# apps and refuses new opens instead of muting: AOSP's path for cameras
+# without mute support. CamX lists a black test pattern but fails when it is
+# switched while streaming, and with the kernel camera floor it stays in a
+# phase-detect sensor mode the blocked sensor cannot feed. Labelled in
+# sepolicy/system-ext-private/property_contexts.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.camera.disableCameraMute=true
+
 # Stock (system build.prop): the CamX provider takes the tuning path Fairphone
 # shipped and validated. vendor_init may set it (sepolicy/camera/vendor_init.te).
 PRODUCT_VENDOR_PROPERTIES += \

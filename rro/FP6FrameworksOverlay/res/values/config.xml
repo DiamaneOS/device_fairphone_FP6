@@ -118,4 +118,14 @@
     <!-- The kernel floor: the privacy switch driver's (diamaneos_privsw) state:
          what it enforces this boot and what it blocks now. -->
     <string name="config_momentsKernelFloorPath" translatable="false">/sys/kernel/privacy_switch/state</string>
+    <!-- GrapheneOS's USB-C port control (Settings > Security & privacy >
+         Exploit protection > USB-C port). The device side is the USB
+         controller's data switch and, for Off, the charger input switch in
+         the ADSP charger firmware (boot/init.qcom.usb.rc): Off turns off data
+         and charging, Charging-only turns off data. Without this a user
+         build has no USB data at all, because GrapheneOS's first-stage init
+         refuses new USB connections at every boot of a non-debuggable build
+         and only this feature lifts it. No pogo pins, so
+         config_usb_port_security_applies_to_pogo_pins stays false. -->
+    <bool name="config_usbPortSecuritySupported">true</bool>
 </resources>

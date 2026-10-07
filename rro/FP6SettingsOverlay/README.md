@@ -21,3 +21,9 @@
 - The side-sensor description uses Settings' translated
   `security_settings_enroll_find_sensor_right_side_message` text in every
   locale instead of the Pixel hardware description.
+- Security & privacy > Exploit protection > USB-C port > Off: GrapheneOS's
+  summary says Off turns off the port. On the FP6 Off turns off USB data and
+  charging, while the ADSP firmware keeps running Type-C and USB PD, so the
+  summary names those two and keeps GrapheneOS's note on the separate
+  charging mode. GrapheneOS ships these strings in English only, so the
+  overlay has no translations either.

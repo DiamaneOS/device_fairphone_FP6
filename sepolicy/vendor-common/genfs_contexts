@@ -143,7 +143,7 @@ genfscon sysfs /devices/platform/soc/a400000.ssusb/mode                 u:object
 genfscon sysfs /devices/platform/soc/a600000.ssusb/mode                 u:object_r:vendor_sysfs_usb_device:s0
 genfscon sysfs /devices/platform/soc/a800000.ssusb/mode                 u:object_r:vendor_sysfs_usb_device:s0
 genfscon sysfs /devices/platform/soc/4e00000.ssusb/mode                 u:object_r:vendor_sysfs_usb_device:s0
-genfscon sysfs /devices/platform/soc/a600000.ssusb/dynamic_disable      u:object_r:vendor_sysfs_usb_device:s0
+genfscon sysfs /devices/platform/soc/a600000.ssusb/dynamic_disable      u:object_r:vendor_sysfs_usb_data_disable:s0
 
 genfscon sysfs /devices/platform/hypervisor/hypervisor:qcom,gh-watchdog/wakeup_enable u:object_r:vendor_sysfs_wdog_device:s0
 

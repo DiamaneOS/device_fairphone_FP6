@@ -45,3 +45,6 @@ genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_min_freq u:object_r:v
 genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
 genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_min_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
 genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+# USB-C port control: the charger firmware's input suspend, which Off sets
+# (usb_port_security.te).
+genfscon sysfs /class/qcom-battery/suspend_input_current u:object_r:vendor_sysfs_usb_input_suspend:s0

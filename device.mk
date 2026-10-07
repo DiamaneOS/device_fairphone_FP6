@@ -288,6 +288,11 @@ PRODUCT_VENDOR_PROPERTIES += \
 # time_daemon and TimeService app stay out.
 PRODUCT_PACKAGES += timekeepd
 
+# Settings shows the Fairphone firmware release of the booted slot, which
+# fwrelease (firmware/) finds once per boot from the partition hashes and the
+# table the vendor tree installs (/vendor/etc/diamaneos/firmware-releases.txt).
+PRODUCT_PACKAGES += fwrelease
+
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with two exceptions:
 # - no touch timer override: stock's 3500000 ms kept touch boost active for

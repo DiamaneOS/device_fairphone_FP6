@@ -112,3 +112,10 @@ dontaudit hal_camera_default default_prop:file read;
 # it, so the registration stays denied; the library logs the failure and the
 # provider carries on. Not audited: it is retried at every provider start.
 dontaudit hal_camera_default vendor_hal_offlinecamera_service:service_manager add;
+
+# The provider runs with no_new_privs (camxjail seccomp, camera/seccomp), so
+# debuggerd writes its crash and watchdog-abort tombstones and its ANR and
+# bug-report stack dumps through the in-process fallback handler. That handler
+# needs AOSP's fallback rules (denied before: write on tombstoned_crash_socket;
+# logcat "missing crash_dump_fallback() in selinux policy?").
+crash_dump_fallback(hal_camera_default)

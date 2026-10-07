@@ -11,6 +11,11 @@
 on post-fs-data
     mkdir /data/vendor/camera 0770 camera camera
     restorecon_recursive /data/vendor/camera
+    # CamX core dumps hold camera state, metadata and logs. The settings turn the
+    # dumps off, but CamX still creates an empty DumpOnly_* folder for every
+    # dumpsys media.camera. The provider (user cameraserver) may not write here;
+    # mkdir also fixes the owner and mode of a directory CamX created earlier.
+    mkdir /data/vendor/camera/coredump 0500 system system
     # Stock init.target.rc created these persist directories 0777 system system,
     # and persist is not reflashed, so the phone keeps that mode. The provider
     # only reads the factory calibration in persist/camera (dualcam_cali.bin,

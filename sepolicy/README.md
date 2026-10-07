@@ -170,6 +170,27 @@ Downstream adaptations:
   `ro.vendor.build.security_patch` (`vendor_security_patch_level_prop`) for the
   "Vendor security update" row; the platform grants it to shell, keystore and
   vendor_init only.
+- `firmware/` is fwrelease's policy (device `firmware/`, the "Fairphone
+  firmware" row; implemented, not yet built):
+  - It runs as its own user without capabilities and may only open and read
+    the firmware partitions and set `ro.vendor.diamaneos.firmware_release`.
+  - The property is vendor restricted. Settings (`system_app`) reads it, as do
+    init, vendor_init and dumpstate through platform grants; shell does not.
+  - The 17 firmware partitions that shared `vendor_custom_ab_block_device`
+    with vbmeta, dtbo, pvmfw, multiimgqti and qweslicstore are
+    `vendor_firmware_image_block_device` (UFS lines of
+    `vendor-volcano/file_contexts`; the eMMC lines, absent on the FP6, keep
+    the old type). The new type has the old one's grants: update_engine
+    read-write, fastbootd read-write in recovery, init relabel, boot control
+    getattr. modem, bluetooth, uefi, uefisecapp and xbl keep their types.
+  - ueventd makes the 44 nodes 0640 root:vendor_fwrelease. The XBL LUNs share
+    `vendor_xbl_block_device` but stay 0660 root:vendor_bootctl, so fwrelease
+    cannot open them.
+  - Neverallows: no capabilities, block writes or ioctls, network sockets or
+    other properties for fwrelease; only it (and init, vendor_init) sets the
+    property; only the readers above read it. Who reads the firmware
+    partitions is an image check, not a neverallow: init and the recovery
+    domains read all block devices through platform grants.
 - Use platform init/ueventd permissions where they already implement selected
   operations. Omitted firmware-handler transitions must be revisited if the
   product activates those handlers.

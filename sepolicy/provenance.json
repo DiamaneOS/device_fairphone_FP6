@@ -979,7 +979,7 @@
       "source": "generic/private/property_contexts",
       "source_sha256": "be8f1623c027264299137373a9567c515a720ed03b2b2a67be031c6be95109b2",
       "path": "system-ext-private/property_contexts",
-      "sha256": "8fd7a8edb5d47ea5dcd2f7e64e20bde9cb47740c3d08ad7a274d140c86cd5eaa"
+      "sha256": "25fccff7ae8a73a017a4156765f82da0281fe49b0c570f086ab52e1946a10021"
     },
     {
       "project": "qualcomm-sepolicy",
@@ -1147,7 +1147,7 @@
       "source": "generic/vendor/common/hal_audio_default.te",
       "source_sha256": "a45518cf9a36d8636fe3f64901c19545e16a349149b57c7d3e1fd8737f81bf31",
       "path": "audio/hal_audio_default.te",
-      "sha256": "21f00b47b3f98ae653dc019d9b41149b1d437f31ea7c290070799dcc38d2b401"
+      "sha256": "8e88f00ed374afb20598d3965c730524b4af13c136df97c0c0bfce5b9be99d07"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

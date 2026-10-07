@@ -5,7 +5,8 @@
 #   writes /sys/kernel/privacy_switch/policy (init.privacy_switch.rc) and the
 #   kernel refuses every later write. Only init may write it here too; the
 #   platform also lets vendor_init and ueventd write all sysfs.
-# - system_server reads what the kernel enforces, keeps the policy property
+# - system_server reads the kernel's state (what it enforces, what it blocks
+#   now; the state and enforced files), keeps the policy property
 #   for the next boot equal to the owner's choice and shows the kernel's mask
 #   to Settings. Only system_server sets the properties.
 

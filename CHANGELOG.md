@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- The framework overlay points the Moments kernel floor at the switch
+  driver's `state` file, so Android shows a hardware microphone block only
+  while the kernel blocks (system_server already reads that directory).
+  Userdebug and eng builds add AGM's `agmcap`, `tinymix` and a two-entry
+  `backend_conf.xml` for capturing the microphones past Android in the kernel
+  floor test; user builds ship none of them.
 - Seal the Moments switch's kernel microphone block once per boot. A
   system_ext init script writes the owner's choice to the privacy switch
   driver (`/sys/kernel/privacy_switch/policy`) after post-fs-data; the kernel

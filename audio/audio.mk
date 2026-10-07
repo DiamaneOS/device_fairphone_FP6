@@ -26,6 +26,15 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.AGMIPC@1.0 \
     vendor.qti.hardware.AGMIPC@1.0-impl
 
+# Test tools on userdebug and eng builds only: AGM's agmcap captures a
+# microphone straight from the AGM virtual card, past Android's audio service
+# and its privacy blocks, and tinymix sets the codec route for it (the Moments
+# switch's kernel floor test). User builds ship neither.
+PRODUCT_PACKAGES_DEBUG += \
+    agmcap \
+    fp6_agm_backend_conf \
+    tinymix
+
 # Effects (audio_effects.xml): AOSP software effects only, no DSP offload
 # halves, plus Qualcomm's VoIP AEC/NS descriptors and volume listener built
 # from source (effects/).

@@ -98,6 +98,14 @@
          (Awinic RAM wave 3 at gain 0x40); other clicks keep their own effect. -->
     <item name="config_keyboardHapticFeedbackFixedAmplitude" format="float" type="dimen">0.5</item>
 
+    <!-- Camera and microphone access toggles, as on GrapheneOS's Pixels:
+         software sensor privacy. The framework blocks the camera and
+         microphone app ops and the camera service blocks or mutes cameras,
+         whatever the HALs do; the FP6 has no hardware toggle, so the
+         config_supportsHardware*Toggle values stay false. -->
+    <bool name="config_supportsCamToggle">true</bool>
+    <bool name="config_supportsMicToggle">true</bool>
+
     <!-- The Moments switch: the slider on the side (gpio-keys, EV_SW
          SW_PEN_INSERTED). The kernel reports 1 with the slider up and 0 with
          it down; down means Moments on, so on is value 0. -->

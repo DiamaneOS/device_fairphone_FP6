@@ -115,7 +115,7 @@
     <integer name="config_momentsSwitchCode">15</integer>
     <integer name="config_momentsSwitchActiveValue">0</integer>
 
-    <!-- The kernel floor: the privacy switch driver (diamaneos_privsw) reports
-         what it blocks while the slider is down. -->
-    <string name="config_momentsKernelFloorPath" translatable="false">/sys/kernel/privacy_switch/enforced</string>
+    <!-- The kernel floor: the privacy switch driver's (diamaneos_privsw) state:
+         what it enforces this boot and what it blocks now. -->
+    <string name="config_momentsKernelFloorPath" translatable="false">/sys/kernel/privacy_switch/state</string>
 </resources>

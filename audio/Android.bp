@@ -9,3 +9,12 @@ install_symlink {
     installed_location: "firmware/aw_cali.bin",
     symlink_target: "/mnt/vendor/persist/factory/audio/aw_cali.bin",
 }
+
+// Userdebug and eng only (PRODUCT_PACKAGES_DEBUG in audio.mk): agmcap's backend
+// formats, for capturing the microphones past Android in tests.
+prebuilt_etc {
+    name: "fp6_agm_backend_conf",
+    vendor: true,
+    src: "backend_conf.xml",
+    filename: "backend_conf.xml",
+}

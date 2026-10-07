@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- Userdebug and eng only (PRODUCT_PACKAGES_DEBUG): the backend formats AGM's
+     agmcap test tool reads, for capturing the built-in microphones past Android
+     (the Moments switch's kernel floor test). Values as the FP6 resource
+     manager configures these backends for the handset and voice-activation
+     microphones. The HAL and PAL never read this file. -->
+<config>
+    <device name="CODEC_DMA-LPAIF_RXTX-TX-3" rate="48000" ch="1" bits="16" />
+    <device name="CODEC_DMA-LPAIF_VA-TX-0" rate="48000" ch="1" bits="16" />
+</config>

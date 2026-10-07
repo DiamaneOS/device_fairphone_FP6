@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Reports the Fairphone firmware release of the booted slot (firmware/main.cpp).
+
+# Once per boot, after boot completes, so its reads do not slow down boot.
+on property:sys.boot_completed=1
+    start vendor.fwrelease
+
+# The slot suffix is an argument, so the service reads no property. Own user
+# and group (config.fs), no capabilities: the group is what lets it read the
+# firmware partitions (boot/ueventd.rc). Idle I/O class and the lowest CPU
+# priority; init stops it after 60 s if a read hangs.
+service vendor.fwrelease /vendor/bin/fwrelease ${ro.boot.slot_suffix}
+    user vendor_fwrelease
+    group vendor_fwrelease
+    capabilities
+    ioprio idle 7
+    priority 19
+    timeout_period 60
+    oneshot
+    disabled

@@ -95,6 +95,55 @@ firmware_directories /mnt/vendor/wlan_mac/
 # reads the two IMEIs from it; SELinux allows it nothing else. Stock reads it
 # from tctd as root.
 /dev/block/platform/soc/1d84000.ufshc/by-name/traceability   0440   root   vendor_imeiprov
+# The firmware partitions of both slots: fwrelease (firmware/, no
+# capabilities) reads the booted slot's through this group to report the
+# installed release; SELinux lets it only read them. Owner root keeps write
+# access for update_engine, which runs as root without CAP_DAC_OVERRIDE.
+# Unlisted, they would be 0600 root.
+/dev/block/platform/soc/1d84000.ufshc/by-name/abl_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/abl_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/aop_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/aop_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/aop_config_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/aop_config_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/bluetooth_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/bluetooth_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/cpucp_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/cpucp_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/cpucp_dtb_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/cpucp_dtb_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/devcfg_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/devcfg_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/dsp_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/dsp_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/featenabler_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/featenabler_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/hyp_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/hyp_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/imagefv_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/imagefv_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/keymaster_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/keymaster_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/modem_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/modem_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/multiimgoem_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/multiimgoem_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/qupfw_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/qupfw_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/shrm_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/shrm_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/tz_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/tz_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/uefi_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/uefi_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/uefisecapp_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/uefisecapp_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_config_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_config_b   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_ramdump_a   0640   root   vendor_fwrelease
+/dev/block/platform/soc/1d84000.ufshc/by-name/xbl_ramdump_b   0640   root   vendor_fwrelease
 # The boot control HAL (vendor_bootctl, CAP_SYS_RAWIO only; stock runs it as
 # root) reads and writes the slot attributes in the GPTs of the LUNs with A/B
 # partitions (sdb: xbl_a, sdc: xbl_b, sde: the rest; stock rawprogram1, 2, 4),

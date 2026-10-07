@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# fwrelease (firmware/). Its table, /vendor/etc/diamaneos/firmware-releases.txt,
+# keeps the generic vendor_configs_file label, which every domain may read.
+# The relabelled firmware partitions are in vendor-volcano/file_contexts.
+/(vendor|system/vendor)/bin/fwrelease    u:object_r:vendor_fwrelease_exec:s0

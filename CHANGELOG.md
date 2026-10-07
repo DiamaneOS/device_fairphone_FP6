@@ -30,6 +30,21 @@
   seccomp jail (no_new_privs), debuggerd uses the in-process fallback handler,
   which SELinux denied (`crash_dump_fallback(hal_camera_default)`, as for
   rild).
+- Show the installed Fairphone firmware release in Settings (About phone >
+  Android version > Fairphone firmware). `fwrelease` (`firmware/`) hashes
+  the booted slot's 22 A/B firmware partitions up to their image lengths
+  once per boot, after boot completes, compares them with the table the
+  vendor tree installs and sets `ro.vendor.diamaneos.firmware_release` to
+  the release, `mixed` or `unknown`.
+  - Own user without capabilities (`firmware/config.fs`), idle I/O, lowest
+    CPU priority, stopped after 60 s; O_DIRECT reads leave the page cache
+    alone.
+  - ueventd gives its group read access to the 44 partition nodes. The 17
+    of them that shared `vendor_custom_ab_block_device` with vbmeta, dtbo,
+    pvmfw, multiimgqti and qweslicstore get their own type with the same
+    grants, so it cannot read those.
+  - Only Settings, init, vendor_init and dumpstate read the property; shell
+    does not. Implemented, not yet built.
 - Build the AudioReach primary HAL, PAL, AGM with its HIDL service and ALSA
   plugins, and audioadsprpcd from Fairphone's published FP6 sources
   (DiamaneOS forks, `audio/provenance.json`) instead of shipping the stock

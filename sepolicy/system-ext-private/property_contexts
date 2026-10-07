@@ -111,3 +111,8 @@ ro.vendor.power.tuning.support             u:object_r:vendor_exported_system_pro
 
 # qspa
 ro.vendor.config.qspa.       u:object_r:vendor_qspa_prop:s0
+
+# The Moments switch's kernel floor (privacy_switch.te): the policy init
+# writes to the kernel at the next boot, and what the kernel enforces now.
+persist.diamaneos.privacy_switch.policy    u:object_r:privacy_switch_prop:s0 exact int
+diamaneos.privacy_switch.enforced          u:object_r:privacy_switch_prop:s0 exact int

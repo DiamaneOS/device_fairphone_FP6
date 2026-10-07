@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Fairphone firmware release of the booted slot ("16.111.0", "mixed" or
+# "unknown"), set once per boot by fwrelease (property.te, fwrelease.te).
+ro.vendor.diamaneos.firmware_release u:object_r:vendor_diamaneos_firmware_release_prop:s0 exact string

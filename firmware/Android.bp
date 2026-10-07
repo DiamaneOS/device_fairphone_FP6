@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// fwrelease: reports the Fairphone firmware release of the booted slot
+// (ro.vendor.diamaneos.firmware_release) from partition hashes (see main.cpp).
+
+cc_defaults {
+    name: "fwrelease_defaults",
+    srcs: ["FirmwareRelease.cpp"],
+    shared_libs: [
+        "libbase",
+        "libcrypto",
+    ],
+    sanitize: {
+        integer_overflow: true,
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+cc_binary {
+    name: "fwrelease",
+    defaults: ["fwrelease_defaults"],
+    vendor: true,
+    init_rc: ["fwrelease.rc"],
+    srcs: ["main.cpp"],
+    shared_libs: ["liblog"],
+}
+
+// Table parsing, prefix hashing and the decision: one release, mixed,
+// unknown (no match, short partition, unread partition), byte-identical
+// releases.
+cc_test_host {
+    name: "fwrelease_test",
+    defaults: ["fwrelease_defaults"],
+    srcs: ["tests/FirmwareReleaseTest.cpp"],
+}

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Camera privacy (the Moments switch, the camera access toggle) disconnects
+  camera apps and refuses new opens instead of muting, AOSP's path for
+  cameras without mute support (`ro.camera.disableCameraMute`, read by the
+  camera service). CamX's test-pattern mute failed while streaming and, with
+  the kernel camera floor, crashed in a loop. Not tested on the phone yet.
 - The framework overlay points the Moments kernel floor at the switch
   driver's `state` file, so Android shows a hardware microphone block only
   while the kernel blocks (system_server already reads that directory).

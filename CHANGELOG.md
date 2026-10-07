@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The camera provider leaves tombstones and stack dumps again: under its
+  seccomp jail (no_new_privs), debuggerd uses the in-process fallback handler,
+  which SELinux denied (`crash_dump_fallback(hal_camera_default)`, as for
+  rild).
 - Build the AudioReach primary HAL, PAL, AGM with its HIDL service and ALSA
   plugins, and audioadsprpcd from Fairphone's published FP6 sources
   (DiamaneOS forks, `audio/provenance.json`) instead of shipping the stock

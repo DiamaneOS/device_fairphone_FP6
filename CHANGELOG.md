@@ -43,6 +43,13 @@
 - For the hardened kernel: the EUD debugger's module is no longer loaded (the
   kernel ships without it), and init no longer writes `download_mode` (the
   kernel makes it read-only; panic dumps are off by default). Checked on the phone.
+- eSIM downloads: DiamaneOS's eSIM manager now downloads profiles (its own
+  INTERNET permission; it stays in the platform's priv_app domain, so no
+  policy change). Not yet built.
+- Keep the framework's eUICC transport log tags (`TransApdu`, `ApduSender-0`,
+  `ApduSender-1`) at info: at verbose they log every eUICC command and answer
+  in full, with ICCIDs and, during a download, the matching ID, the IMEI and
+  the EID (-181). Not yet built.
 - Log what the closed thermal engine changes, on userdebug and eng builds
   only: `sepolicy/fp6/thermal_engine_audit.te` adds "avc: granted" records
   for each node it opens for writing, the device nodes it opens, the sockets

@@ -67,6 +67,18 @@
   now stops the service (SIGSYS, tombstone; init restarts it) instead of only
   being logged. In log mode, pairing, music (AAC), a headset call (mSBC),
   on/off cycles and scans logged no call outside the list. Checked on the phone.
+- Build the GNSS HAL, its IGnss implementation and the six location libraries
+  from CodeLinaro source (`hardware/qcom/gps`, `vendor/qcom/opensource/location`,
+  `core-utils`) instead of Qualcomm's closed builds. The QMI client is the
+  public QMI framework, linked into `libloc_api_v02`, so the GNSS process
+  loads no closed code. As in Qualcomm's builds: CFI on all of them, the
+  integer overflow sanitizer on the HAL and the QMI LOC client.
+  - The libraries load only `libgnss` and `libloc_api_v02`: Qualcomm's IZat,
+    XTRA, NTRIP and other add-on libraries cannot load.
+  - The HAL opens no socket for the XTRA and DGNSS daemons, so
+    `/dev/socket/location` and the HAL's socket rules are gone.
+  - The stock `gps.conf`, `izat.conf` (pinned edits) and `sap.conf` stay;
+    SUPL and PSDS settings work as before. Not yet built.
 - Use the factory Bluetooth address. imeiprovd now reads it from the
   traceability partition at boot and sets
   `ro.vendor.diamaneos.bt.factory_address`; `init.fp6.bluetooth.rc` copies

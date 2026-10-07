@@ -174,6 +174,10 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
+# And the source-built GNSS HAL, which parses the framework's and the modem's
+# location messages; Qualcomm's own builds of these have CFI too.
+CFI_INCLUDE_PATHS += hardware/qcom/gps vendor/qcom/opensource/location \
+    vendor/qcom/opensource/qmi-framework vendor/qcom/opensource/core-utils/fwk-detect
 
 # Audio: the AudioReach primary HAL, PAL and AGM are built from Fairphone's
 # published FP6 sources (audio/audio.mk); their Android.mk files read these

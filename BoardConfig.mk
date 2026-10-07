@@ -97,6 +97,7 @@ BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/nfc
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/bluetooth
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/modem
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/timekeep
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/firmware
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/media
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
@@ -109,6 +110,8 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 # Vendor user of the power stats HAL.
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
+# Vendor user of fwrelease; boot/ueventd.rc gives it the firmware partitions.
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/firmware/config.fs
 # Vendor user of the boot control HAL; boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 

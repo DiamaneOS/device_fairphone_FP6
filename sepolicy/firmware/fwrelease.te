@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# fwrelease (firmware/) reports the Fairphone firmware release of the booted
+# slot. Once per boot it hashes the slot's 22 A/B firmware partitions up to
+# their image lengths, compares them with the table in the vendor image and
+# sets ro.vendor.diamaneos.firmware_release (property.te). It runs as its own
+# user without capabilities (fwrelease.rc); ueventd gives its group read
+# access to the 44 partition nodes of both slots (boot/ueventd.rc). It gets
+# exactly: read access to those partitions and setting its one property.
+type vendor_fwrelease, domain;
+type vendor_fwrelease_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_fwrelease)
+
+# The firmware partitions. 17 of them shared vendor_custom_ab_block_device with
+# vbmeta, dtbo, pvmfw, multiimgqti and qweslicstore; they now have this type
+# (vendor-volcano/file_contexts), so fwrelease cannot open those. The others
+# have their own types already: modem and bluetooth vendor_modem_block_device,
+# uefi and uefisecapp vendor_uefi_block_device, xbl vendor_xbl_block_device.
+# vendor_xbl_block_device also labels the two XBL LUNs (sdb, sdc); ueventd
+# keeps those 0660 root:vendor_bootctl, so fwrelease cannot open them.
+type vendor_firmware_image_block_device, dev_type;
+
+# The grants vendor_custom_ab_block_device has, for the new type: A/B updates
+# (update_engine, and update_engine_sideload in recovery) and fastbootd write
+# the partitions, init restores their labels, boot control reads their
+# attributes (vendor-common update_engine_common.te, fastbootd.te, init.te,
+# hal_bootctl.te). Platform rules on dev_type apply to both types alike.
+allow update_engine_common vendor_firmware_image_block_device:blk_file rw_file_perms;
+recovery_only(`
+  allow fastbootd vendor_firmware_image_block_device:blk_file rw_file_perms;
+')
+allow init vendor_firmware_image_block_device:{ blk_file lnk_file } relabelto;
+allow hal_bootctl_default vendor_firmware_image_block_device:blk_file getattr;
+
+# Open /dev/block/by-name/<partition><slot>: search the block directories (the
+# links are dev_type, which every domain may read) and read the partitions,
+# with O_DIRECT. No ioctl, no stat.
+allow vendor_fwrelease block_device:dir search;
+allow vendor_fwrelease {
+  vendor_firmware_image_block_device
+  vendor_modem_block_device
+  vendor_uefi_block_device
+  vendor_xbl_block_device
+}:blk_file { open read };
+
+# Its one property; the table in /vendor/etc is vendor_configs_file, which
+# every domain may read.
+set_prop(vendor_fwrelease, vendor_diamaneos_firmware_release_prop)
+
+# --- least privilege, enforced by neverallow ---
+neverallow vendor_fwrelease self:global_capability_class_set *;
+neverallow vendor_fwrelease self:global_capability2_class_set *;
+# Reads block devices only: no writes, no ioctls.
+neverallow vendor_fwrelease dev_type:blk_file { write append ioctl };
+neverallow vendor_fwrelease self:{ tcp_socket udp_socket rawip_socket icmp_socket sctp_socket packet_socket
+  netlink_route_socket qipcrtr_socket vsock_socket } create;
+neverallow vendor_fwrelease {
+  property_type
+  -vendor_diamaneos_firmware_release_prop
+}:property_service set;
+# Who may read the firmware partitions is an image check (firmware-image-readers
+# in the tools), not a neverallow: init and the recovery domains read all
+# block devices through platform grants.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The camera provider can no longer write `/data/vendor/camera/coredump`
+  (owned by system, mode 0500): CamX created an empty dump folder there for
+  every `dumpsys media.camera` even with its core dumps turned off.
 - The camera provider leaves tombstones and stack dumps again: under its
   seccomp jail (no_new_privs), debuggerd uses the in-process fallback handler,
   which SELinux denied (`crash_dump_fallback(hal_camera_default)`, as for

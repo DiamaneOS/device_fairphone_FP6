@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Drop a still screen to the idle refresh rate after 1.5 s instead of
+  3.5 s: less panel power while reading; touch still raises the rate at
+  once. Not yet built.
 - Camera privacy (the Moments switch, the camera access toggle) disconnects
   camera apps and refuses new opens instead of muting, AOSP's path for
   cameras without mute support (`ro.camera.disableCameraMute`, read by the

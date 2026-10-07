@@ -119,6 +119,36 @@
   support switch in Settings turns it on and restarts the phone. Mark physical
   slot 1 as a built-in eUICC (`non_removable_euicc_slots`), which stock leaves
   unset. Checked on the phone.
+- User builds start every normal boot with USB data and charging off, as
+  GrapheneOS starts Pixels with the USB-C port off: at early-boot init cuts
+  the USB controller and, as soon as the ADSP charger firmware is up (it
+  waits for the node, and writes again at boot), suspends the charger
+  input. The framework's stored mode then turns them back on within seconds
+  as the mode allows (On: both; Charging-only modes: charging; Off:
+  neither). Charger mode, recovery, fastbootd and debuggable builds are
+  unaffected. Not yet built.
+- USB-C port control Off now also turns off charging while the OS runs, as
+  Off does on Pixels: after the data cut, init sets the ADSP charger
+  firmware's input suspend (`qcom-battery/suspend_input_current`), so the
+  phone draws no current from the port and runs on its battery. It is
+  runtime state: every other port state turns the input back on before data,
+  and so do boot, charger mode and shutdown; the firmware also restarts with
+  every boot. So charging powered off, in charger mode, fastboot, fastbootd
+  and recovery is not affected. The node gets its own SELinux type that only
+  vendor_init may write. Settings says Off turns off USB data and charging.
+  Not yet built.
+- Turn on GrapheneOS's USB-C port control (`config_usbPortSecuritySupported`):
+  Settings offers Off, Charging-only, the two charging-only-when-locked modes
+  and On, with charging-only when locked as the default on user builds.
+  Without it a user build had no USB data at all, because GrapheneOS's early
+  boot refuses new USB connections and nothing lifted that. The USB HAL
+  loses its write to the data switch, which only init triggers use now. Not
+  yet built.
+- Turn USB data off and on when GrapheneOS's USB-C port control asks for it:
+  init triggers map `sys.port_security_mode` to the USB controller's
+  `dynamic_disable` node (data off, charging continues). The node gets its
+  own SELinux type that only vendor_init and the USB HAL may write. Inert
+  until the framework's port control is turned on. Not yet built.
 - Use AOSP's software audio effects only: our own `audio_effects.xml` lists
   the AOSP bundle, reverb, visualizer, downmix, loudness and dynamics
   effects without DSP offload halves or the effect proxy, so apps' effect

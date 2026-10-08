@@ -307,6 +307,14 @@ TEST_F(SessionTest, DeadClientCancelsRunningOperation) {
     EXPECT_TRUE(mCb->events.empty());
 }
 
+TEST_F(SessionTest, WatchingALocalClientFreesTheCookieOnce) {
+    // linkToDeath fails for an in-process callback and frees the cookie itself.
+    EXPECT_EQ(mSession->watchClient(), STATUS_OK);
+    mSession->authenticate(1, &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
+}
+
 TEST_F(SessionTest, MatchAfterCancelIsDropped) {
     // A late scan result must not unlock after the framework cancelled.
     mModule.cancelReportsCanceled = true;

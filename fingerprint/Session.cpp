@@ -104,16 +104,18 @@ Session::Session(fingerprint_device_t* device, int32_t userId,
 
 Session::~Session() = default;
 
-void Session::watchClient() {
+binder_status_t Session::watchClient() {
     mDeathRecipient = ndk::ScopedAIBinder_DeathRecipient(AIBinder_DeathRecipient_new(onClientDied));
+    // The only owner of the cookie: libbinder_ndk calls this once for every link,
+    // also when AIBinder_linkToDeath fails.
     AIBinder_DeathRecipient_setOnUnlinked(mDeathRecipient.get(), [](void* cookie) {
         delete static_cast<std::weak_ptr<Session>*>(cookie);
     });
     auto cookie = new std::weak_ptr<Session>(ref<Session>());
-    if (AIBinder_linkToDeath(mCb->asBinder().get(), mDeathRecipient.get(), cookie) != STATUS_OK) {
-        // Local (in-process) callbacks cannot die separately.
-        delete cookie;
-    }
+    binder_status_t status =
+            AIBinder_linkToDeath(mCb->asBinder().get(), mDeathRecipient.get(), cookie);
+    // Local (in-process) callbacks cannot die separately.
+    return status == STATUS_INVALID_OPERATION ? STATUS_OK : status;
 }
 
 void Session::onClientDied(void* cookie) {

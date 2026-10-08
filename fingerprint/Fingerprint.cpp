@@ -88,6 +88,16 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
     if (sensorId != kSensorId || cb == nullptr) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
+    auto session = ndk::SharedRefBase::make<Session>(mDevice, userId, cb, [this](const Session* s) {
+        std::lock_guard lock(mSessionMutex);
+        if (mSession.get() == s) mSession.reset();
+    });
+    // A client that died before the link gets no death notice, so its session
+    // would never be detached: refuse it before touching the module.
+    if (binder_status_t status = session->watchClient(); status != STATUS_OK) {
+        LOG(ERROR) << "can't watch the session's client: " << status;
+        return ndk::ScopedAStatus::fromStatus(status);
+    }
     // Templates live in the user's device-encrypted vendor storage.
     const std::string path = ::android::base::StringPrintf("/data/vendor_de/%d/fpdata", userId);
     if (mkdir(path.c_str(), 0700) != 0 && errno != EEXIST) {
@@ -100,11 +110,6 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
             return ndk::ScopedAStatus::fromServiceSpecificError(err);
         }
     }
-    auto session = ndk::SharedRefBase::make<Session>(mDevice, userId, cb, [this](const Session* s) {
-        std::lock_guard lock(mSessionMutex);
-        if (mSession.get() == s) mSession.reset();
-    });
-    session->watchClient();
     std::shared_ptr<Session> previous;
     {
         std::lock_guard lock(mSessionMutex);

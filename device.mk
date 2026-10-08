@@ -23,10 +23,17 @@ PRODUCT_VIRTUAL_AB_COMPRESSION_METHOD := lz4
 PRODUCT_VENDOR_PROPERTIES += ro.virtual_ab.compression.threads=true
 PRODUCT_PACKAGES += snapuserd.recovery
 
+# The stock GPU driver and graphics mapper are HIDL HALs. Android only includes
+# hwservicemanager by default for devices shipping at API 34 or older, and
+# without it HIDL, including passthrough HALs, is unavailable.
+PRODUCT_PACKAGES += hwservicemanager
+
 # The display composer (built from source) registers its QService, and the
 # stock peripheral manager its service, on /dev/vndbinder. Android only includes
 # vndservicemanager for devices shipping at API 29 or older, and this product
 # does not inherit base_vendor.mk.
+PRODUCT_PACKAGES += vndservicemanager
+
 # Remote key provisioning, as stock: without a hostname keystore2 treats it as
 # off, and stock declares the TEE KeyMint RKP-only (no factory attestation
 # key). The hostname only switches it on. The server rkpd talks to is set by
@@ -97,9 +104,49 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.qti \
     android.hardware.health-service.qti_recovery
 
-# composer failed to present under Android 17 when tried without
-# libsdmextension and is untested with it; source is kept so we can patch and
-# harden the code that handles every app's buffers. Configuration values follow
+# Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
+# its interface repositories). The stock Android 14 composer does not present
+# under Android 17 without libsdmextension and is untested with it. The source
+# build allows patching and hardening the code that handles every app's
+# buffers. Configuration values follow the usual setup for Qualcomm 6.1-kernel
+# platforms. Stock declares a wide-colour panel.
+$(call soong_config_set,qtidisplay,default,true)
+$(call soong_config_set,qtidisplay,drmpp,true)
+$(call soong_config_set,qtidisplay,gralloc4,true)
+$(call soong_config_set,qtidisplay,headless,false)
+$(call soong_config_set,qtidisplay,llvmcov,false)
+$(call soong_config_set,qtidisplay,llvmsa,false)
+$(call soong_config_set,qtidisplay,smmu_proxy,false)
+$(call soong_config_set,qtidisplay,ubwcp_headers,false)
+$(call soong_config_set,qtidisplay,udfps,false)
+$(call soong_config_set,qtidisplay,var1,false)
+$(call soong_config_set,qtidisplay,var2,false)
+$(call soong_config_set,qtidisplay,var3,false)
+$(call soong_config_set,qtidisplay,wide_color,true)
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.mapper@4.0-impl-qti-display \
+    vendor.qti.hardware.display.allocator-service \
+    vendor.qti.hardware.display.composer-service \
+    vendor.qti.hardware.display.composer-service.rc \
+    vendor.qti.hardware.display.composer-service.xml \
+    vendor.qti.hardware.display.mapper@4.0.vendor \
+    vendor.display.config@2.0.vendor \
+    libdisplayconfig.qti \
+    libdrmutils \
+    libfilefinder \
+    libgpu_tonemapper \
+    libgralloc.qti \
+    libqdMetaData \
+    libqdutils \
+    libsdedrm \
+    libsdmcore \
+    libsdmdal \
+    libsdmutils
+
+# tinyxml2 with the Android 14 ABI for the stock display color manager (see
+# compat/tinyxml2-v34).
+PRODUCT_PACKAGES += libtxml2v34
+
 $(call inherit-product, vendor/diamaneos/config/wifi.mk)
 # Hardware subsystems. Each subsystem makefile documents its stock and
 # source-built parts.
@@ -122,6 +169,62 @@ PRODUCT_VENDOR_PROPERTIES += \
 # and pass-through for an unspecified colour space.
 PRODUCT_VENDOR_PROPERTIES += \
     debug.angle.feature_overrides_enabled=preferLinearFilterForYUV:mapUnspecifiedColorSpaceToPassThrough
+
+# Display composition settings the selected Qualcomm composer and SurfaceFlinger
+# expect (identical to the stock vendor build.prop).
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.surface_flinger.use_color_management=true \
+    ro.surface_flinger.protected_contents=true \
+    ro.surface_flinger.use_content_detection_for_refresh_rate=true \
+    ro.surface_flinger.set_touch_timer_ms=3500000 \
+    ro.surface_flinger.set_idle_timer_ms=3500 \
+    ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
+    ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
+    ro.surface_flinger.max_virtual_display_dimension=4096 \
+    ro.surface_flinger.clear_slots_with_set_layer_buffer=false \
+    ro.surface_flinger.supports_background_blur=0 \
+    ro.surface_flinger.has_wide_color_display=true \
+    ro.surface_flinger.has_HDR_display=true \
+    ro.surface_flinger.wcg_composition_dataspace=143261696 \
+    persist.sys.sf.color_saturation=1.0 \
+    persist.sys.sf.color_mode=9 \
+    debug.sf.hw=0 \
+    debug.sf.latch_unsignaled=1 \
+    debug.sf.auto_latch_unsignaled=1 \
+    debug.sf.disable_client_composition_cache=0 \
+    debug.sf.enable_gl_backpressure=1 \
+    debug.sf.enable_advanced_sf_phase_offset=1 \
+    debug.sf.use_phase_offsets_as_durations=1 \
+    debug.sf.late.app.duration=13666666 \
+    debug.sf.early.app.duration=13666666 \
+    debug.sf.earlyGl.app.duration=13666666 \
+    debug.sf.early.sf.duration=10500000 \
+    debug.sf.earlyGl.sf.duration=10500000 \
+    debug.sf.late.sf.duration=10500000 \
+    debug.sf.predict_hwc_composition_strategy=0 \
+    debug.sf.treat_170m_as_sRGB=1 \
+    vendor.gralloc.disable_ubwc=0 \
+    vendor.display.disable_scaler=0 \
+    vendor.display.disable_excl_rect=0 \
+    vendor.display.disable_excl_rect_partial_fb=1 \
+    vendor.display.comp_mask=0 \
+    vendor.display.enable_optimize_refresh=0 \
+    vendor.display.use_smooth_motion=1 \
+    vendor.display.disable_stc_dimming=1 \
+    vendor.display.enable_dpps_dynamic_fps=1 \
+    vendor.display.vds_allow_hwc=1 \
+    vendor.display.enable_async_vds_creation=1 \
+    vendor.display.enable_rounded_corner=1 \
+    vendor.display.disable_3d_adaptive_tm=1 \
+    vendor.display.disable_sdr_dimming=0 \
+    vendor.display.enable_rc_support=1 \
+    vendor.display.disable_sdr_histogram=1 \
+    vendor.display.enable_hdr10_gpu_target=1 \
+    vendor.display.enable_display_extensions=1 \
+    vendor.display.disable_offline_rotator=1 \
+    vendor.display.enable_async_powermode=0 \
+    vendor.display.disable_hw_recovery_dump=1 \
+    vendor.display.enable_early_wakeup=1
 
 # Declare the phone baseline and only the hardware that currently works; add
 # radio, camera, sensor and other features as their stacks are brought up.

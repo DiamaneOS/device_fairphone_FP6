@@ -3,14 +3,6 @@
 <!-- Device-specific interfaces supplied by the selected FP6 vendor services. -->
 <compatibility-matrix version="1.0" type="framework">
     <hal format="aidl">
-        <name>vendor.qti.hardware.display.color</name>
-        <version>1</version>
-        <interface>
-            <name>IDisplayColor</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="aidl">
         <name>vendor.qti.hardware.display.config</name>
         <version>11</version>
         <interface>
@@ -18,11 +10,11 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <hal format="aidl">
-        <name>vendor.qti.hardware.display.postproc</name>
-        <version>1</version>
+    <hal format="hidl">
+        <name>vendor.qti.hardware.display.mapper</name>
+        <version>4.0</version>
         <interface>
-            <name>IDisplayPostproc</name>
+            <name>IQtiMapper</name>
             <instance>default</instance>
         </interface>
     </hal>

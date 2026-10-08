@@ -645,8 +645,8 @@ for interface ioctls and its init-created recovery file. Its XFRM netlink access
 needed for Wi-Fi calling, where the modem negotiates the ePDG tunnel and nicmd installs
 the ESP states and policies it receives (write requests); to remove them at teardown or
 rekey it dumps all states and deletes those whose protocol and SPI match, the only read
-request it sends (`telephony/nicmd.te`). Under integrity lockdown that dump includes the
-keys of every IPsec state on the device. It may `node_bind` TCP and UDP
+request it sends (`telephony/nicmd.te`). That dump covers every IPsec state on the
+device, with the keys zeroed by lockdown and the kernel's own XFRM redaction. It may `node_bind` TCP and UDP
 sockets, to reserve the ephemeral ports the modem's embedded clients use, and read the
 public SoC id for data target detection. It is not a `netdomain` (no TCP connect, no
 `name_bind`); its remote-processor probe (`vendor_sysfs_ssr`) stays denied because the

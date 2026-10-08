@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The fingerprint HAL rejects a press-to-auth parcelable whose size would
+  overflow the parcel position, instead of aborting in the integer overflow
+  sanitizer. Not yet built.
 - A fingerprint session that was closed or replaced, or whose client died,
   refuses new requests with `EX_ILLEGAL_STATE` instead of still driving the
   sensor module and disturbing the active session. Not yet built.

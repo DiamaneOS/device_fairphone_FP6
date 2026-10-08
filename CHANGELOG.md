@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+- The call-audio bridge sends an audioserver status again, once a second,
+  when the radio daemon did not receive it but is still registered (a oneway
+  call also fails while the daemon's binder buffer is full). A lost "server
+  died" goes before the following OK, on which the daemon re-sends the call
+  state, so in-call audio recovers after an audioserver restart. Not yet
+  built.
+- The fingerprint HAL skips enrollment id 0 in `removeEnrollments`: the
+  legacy module reads it as "all of the user's fingerprints", so a caller
+  passing 0 removed every enrollment. Not yet built.
+- Init waits for `ssr_setup` at early-boot, before the ADSP, CDSP and WPSS
+  boot, so subsystem restart is on before any remote processor starts. It
+  was started without waiting, after the DSPs had already booted: a crash in
+  that window panicked the phone. The wait is bounded to 5 s; the property
+  trigger runs it again after boot. Not yet built.
+- The display colour manager's tinyxml2 (`compat/tinyxml2-v34`) takes
+  upstream's character-reference fix: each digit is checked before it is
+  added, so an overlong numeric reference is rejected instead of wrapping
+  around to another character (`provenance.json` records the backport).
+  Not yet built.
+- The fingerprint HAL rejects a press-to-auth parcelable whose size would
+  overflow the parcel position, instead of aborting in the integer overflow
+  sanitizer. Not yet built.
+- A fingerprint session that was closed or replaced, or whose client died,
+  refuses new requests with `EX_ILLEGAL_STATE` instead of still driving the
+  sensor module and disturbing the active session. Not yet built.
+- The fingerprint HAL no longer frees its client-death cookie twice when
+  linking to the client fails (libbinder_ndk already frees it), and refuses
+  a session whose client has already died before it touches the module.
+  Not yet built.
 - Drop a still screen to the idle refresh rate after 1.5 s instead of
   3.5 s: less panel power while reading; touch still raises the rate at
   once. Not yet built.

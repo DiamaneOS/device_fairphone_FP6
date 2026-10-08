@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The fingerprint HAL skips enrollment id 0 in `removeEnrollments`: the
+  legacy module reads it as "all of the user's fingerprints", so a caller
+  passing 0 removed every enrollment. Not yet built.
 - Init waits for `ssr_setup` at early-boot, before the ADSP, CDSP and WPSS
   boot, so subsystem restart is on before any remote processor starts. It
   was started without waiting, after the DSPs had already booted: a crash in

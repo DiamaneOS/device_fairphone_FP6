@@ -146,6 +146,7 @@ int fakeCancel(fingerprint_device_t*) {
     return 0;
 }
 int fakeRemove(fingerprint_device_t*, uint32_t gid, uint32_t fid) {
+    record("remove");
     fingerprint_msg_t msg = {};
     msg.type = FINGERPRINT_TEMPLATE_REMOVED;
     msg.data.removed.finger = {.gid = gid, .fid = fid};
@@ -287,6 +288,15 @@ TEST_F(SessionTest, CancellationAfterCompletionIsIgnored) {
 TEST_F(SessionTest, RemovalReportsRemovedIdsOnce) {
     mSession->removeEnrollments({3, 4});
     EXPECT_EQ(mCb->events, (Events{"removed 2"}));
+}
+
+TEST_F(SessionTest, RemovalNeverAsksTheModuleToRemoveAll) {
+    // Id 0 is the legacy module's "all templates"; ids keep their full 32 bits.
+    mSession->removeEnrollments({0});
+    mSession->removeEnrollments({3, 0, -2});
+    EXPECT_EQ(mCb->events, (Events{"removed 0", "removed 2"}));
+    std::lock_guard lock(mModule.callsMutex);
+    EXPECT_EQ(mModule.calls, (std::vector<std::string>{"remove", "remove"}));
 }
 
 TEST_F(SessionTest, ClosedSessionIgnoresLateMessages) {

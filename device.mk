@@ -11,6 +11,14 @@ PRODUCT_BUILD_SUPER_PARTITION := true
 PRODUCT_BUILD_RECOVERY_IMAGE := true
 # Userdata is formatted through recovery, never packaged from a reference image.
 PRODUCT_BUILD_USERDATA_IMAGE := false
+# Casefolded shared storage, as stock and Pixels: file names in /sdcard compare
+# case-insensitively without a FUSE lookup (project quota is always on for f2fs).
+# The feature is fixed when /data is formatted: after any wipe (Settings,
+# recovery, bootloader lock/unlock) the next boot's vold formats it and reads
+# these properties. Never use fastboot -w on the FP6: the bootloader reports
+# ext4 for an encrypted userdata, so the computer would write the wrong
+# filesystem. Never ship a build that turns this back off.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 # Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed
 # snapshots that the userspace snapshot daemon merges (the kernel has dm-user
@@ -314,6 +322,18 @@ PRODUCT_PACKAGES += timekeepd
 #   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
 #   platform, the display HAL or the stock vendor files reads them
 #   (unsignaled latching is debug.sf.auto_latch_unsignaled).
+# These properties are the second block below.
+
+# Encrypted microSD (adopted storage): metadata encryption with
+# dm-default-key AES-256-XTS, and file encryption v2 with AES-256-XTS contents
+# and AES-256-HCTR2 names (wide-block, so names sharing a prefix don't share
+# ciphertext). The card has no inline crypto engine, so no wrapped keys. These
+# are the card format's constants: changing one strands adopted cards.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.crypto.volume.metadata.method=dm-default-key \
+    ro.crypto.volume.metadata.encryption=aes-256-xts \
+    ro.crypto.volume.options=aes-256-xts:aes-256-hctr2:v2
+
 PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.use_color_management=true \
     ro.surface_flinger.protected_contents=true \

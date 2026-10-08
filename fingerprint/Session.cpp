@@ -497,6 +497,12 @@ ndk::ScopedAStatus Session::removeEnrollments(const std::vector<int32_t>& enroll
     if (op == 0) return sessionClosed();
     // The module reports each removal before remove() returns.
     for (int32_t id : enrollmentIds) {
+        // The legacy module removes every template of the user for id 0, which
+        // AIDL does not have: it matches no enrollment, so remove nothing.
+        if (id == 0) {
+            LOG(WARNING) << "remove(0) skipped";
+            continue;
+        }
         if (int err = mDevice->remove(mDevice, mUserId, id); err != 0)
             LOG(ERROR) << "remove(" << id << "): " << err;
     }

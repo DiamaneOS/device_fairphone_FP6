@@ -38,9 +38,9 @@ allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlms
 # at teardown and rekey it sends a GETSA dump (NLM_F_DUMP, nlmsg_read) and
 # deletes the states whose protocol and SPI match (removeXFRMStateCb); it
 # sends no other read request. Without nlmsg_read the old states would stay
-# after a rekey or teardown. The dump returns every security association with
-# its keys under integrity lockdown, not only nicmd's own. Stock grants the
-# same (vendor_sepolicy.cil 6074).
+# after a rekey or teardown. The dump returns every security association, not
+# only nicmd's own, with its keys zeroed (lockdown and the kernel's own XFRM
+# redaction). Stock grants the same (vendor_sepolicy.cil 6074).
 allow vendor_nicmd self:netlink_xfrm_socket { create_socket_perms_no_ioctl nlmsg_write nlmsg_read };
 allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;

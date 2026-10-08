@@ -48,6 +48,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
     };
     private static final long RECONNECT_MS = 1000;
     private static final long UNDECLARED_RETRY_MS = 60_000;
+    private static final long RESEND_MS = 1000;
 
     private final int slot;
     private final String instance;
@@ -60,6 +61,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
     private volatile boolean enabled;
     private volatile Object activation = new Object();
     private final Runnable reconnect = this::connect;
+    private final Runnable resend = this::resendPending;
 
     // Slot thread only.
     private StatusRelay relay;
@@ -220,12 +222,26 @@ final class SlotClient implements AudioServerMonitor.Listener {
         Request current = request;
         if (status == StatusRelay.NONE || service == null || current == null
                 || !current.current()) return;
-        try {
-            service.setError(status);
+        handler.removeCallbacks(resend, current);
+        while (status != StatusRelay.NONE) {
+            try {
+                service.setError(status);
+            } catch (RemoteException e) {
+                // Usually the daemon died and its death notice re-registers. A oneway call also
+                // fails without a death, for example while the daemon's binder buffer is full:
+                // try again while this registration lasts (invalidate() removes the retry).
+                Log.w(TAG, "slot " + slot + ": audio status not delivered; retrying");
+                relay.onSendFailed(status);
+                handler.postAtTime(resend, current, SystemClock.uptimeMillis() + RESEND_MS);
+                return;
+            }
             relay.onSent(status);
-        } catch (RemoteException e) {
-            // The death notice follows and re-registers.
+            status = relay.pending();
         }
+    }
+
+    private void resendPending() {
+        send(relay.pending());
     }
 
     /** Stock AudioController.setParameters, plus retries while audioserver recovers. */

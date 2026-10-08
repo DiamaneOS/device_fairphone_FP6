@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The fingerprint HAL no longer frees its client-death cookie twice when
+  linking to the client fails (libbinder_ndk already frees it), and refuses
+  a session whose client has already died before it touches the module.
+  Not yet built.
 - Camera privacy (the Moments switch, the camera access toggle) disconnects
   camera apps and refuses new opens instead of muting, AOSP's path for
   cameras without mute support (`ro.camera.disableCameraMute`, read by the

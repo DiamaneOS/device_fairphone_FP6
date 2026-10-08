@@ -62,8 +62,9 @@ class Session : public BnSession {
             std::function<void(const Session*)> onDetach = nullptr);
     ~Session() override;
 
-    // Links to the client's death; call once after construction.
-    void watchClient();
+    // Links to the client's death; call once after construction. Fails if the
+    // client has died already (STATUS_DEAD_OBJECT).
+    binder_status_t watchClient();
 
     // Called for every message from the module while this is the active session.
     void onMessage(const fingerprint_msg_t* msg);

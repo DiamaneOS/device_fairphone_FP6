@@ -299,6 +299,28 @@ TEST_F(SessionTest, ClosedSessionIgnoresLateMessages) {
     EXPECT_EQ(mModule.cancels, 0);
 }
 
+TEST_F(SessionTest, ClosedSessionRejectsNewRequests) {
+    // The fake module has no pre_enroll, post_enroll or get_authenticator_id:
+    // a call into it would crash.
+    mSession->close();
+    EXPECT_EQ(mSession->authenticate(1, &mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->enroll(HardwareAuthToken{}, &mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->removeEnrollments({3}).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->generateChallenge().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->revokeChallenge(1).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->getAuthenticatorId().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mModule.authenticates.load(), 0);
+    EXPECT_EQ(mCb->events, (Events{"closed"}));
+}
+
+TEST_F(SessionTest, ReplacedSessionRejectsNewRequests) {
+    mSession->detach(false);
+    EXPECT_EQ(mSession->detectInteraction(&mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->resetLockout(HardwareAuthToken{}).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->enumerateEnrollments().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_TRUE(mCb->events.empty());
+}
+
 TEST_F(SessionTest, DeadClientCancelsRunningOperation) {
     mSession->authenticate(1, &mSignal);
     mSession->detach(true);

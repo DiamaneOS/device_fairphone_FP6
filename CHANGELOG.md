@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- A fingerprint session that was closed or replaced, or whose client died,
+  refuses new requests with `EX_ILLEGAL_STATE` instead of still driving the
+  sensor module and disturbing the active session. Not yet built.
 - The fingerprint HAL no longer frees its client-death cookie twice when
   linking to the client fails (libbinder_ndk already frees it), and refuses
   a session whose client has already died before it touches the module.

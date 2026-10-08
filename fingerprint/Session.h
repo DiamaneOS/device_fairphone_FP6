@@ -108,8 +108,12 @@ class Session : public BnSession {
     ndk::ScopedAStatus setIgnoreDisplayTouches(bool shouldIgnore) override;
 
   private:
-    // Starts a new operation; the caller holds moduleMutex().
+    // Starts a new operation and returns its id, or 0 once the session is
+    // detached; the caller holds moduleMutex().
     uint64_t beginOperation(OpKind kind);
+    // True once the session is closed or its client died. The caller holds
+    // moduleMutex(), so detach() cannot change the answer before the module call.
+    bool detached();
     // True while `op` is this session's running, unfinished operation; caller holds mMutex.
     bool runningLocked(uint64_t op) const;
     // True while an operation of `kind` is running; caller holds mMutex.

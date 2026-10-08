@@ -95,6 +95,11 @@ AcquiredInfo toAidlAcquired(int32_t info, int32_t* vendorCode) {
     return AcquiredInfo::INSUFFICIENT;
 }
 
+// A closed session, or one whose client died, never reaches the module again.
+ndk::ScopedAStatus sessionClosed() {
+    return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+}
+
 }  // namespace
 
 Session::Session(fingerprint_device_t* device, int32_t userId,
@@ -127,6 +132,7 @@ void Session::onClientDied(void* cookie) {
 
 uint64_t Session::beginOperation(OpKind kind) {
     std::lock_guard lock(mMutex);
+    if (mDetached) return 0;
     if (!mOpEnded) LOG(WARNING) << "operation " << mOp << " replaced before it ended";
     mOp = ++mNextOp;
     mOpKind = kind;
@@ -135,6 +141,11 @@ uint64_t Session::beginOperation(OpKind kind) {
     mRemoved.clear();
     mHeldMatch = false;
     return mOp;
+}
+
+bool Session::detached() {
+    std::lock_guard lock(mMutex);
+    return mDetached;
 }
 
 bool Session::runningLocked(uint64_t op) const {
@@ -401,6 +412,7 @@ ndk::ScopedAStatus Session::generateChallenge() {
     uint64_t challenge;
     {
         std::lock_guard moduleLock(moduleMutex());
+        if (detached()) return sessionClosed();
         challenge = mDevice->pre_enroll(mDevice);
     }
     if (challenge == 0) LOG(ERROR) << "pre_enroll returned no challenge";
@@ -412,6 +424,7 @@ ndk::ScopedAStatus Session::revokeChallenge(int64_t challenge) {
     LOG(INFO) << "revokeChallenge";
     {
         std::lock_guard moduleLock(moduleMutex());
+        if (detached()) return sessionClosed();
         if (int err = mDevice->post_enroll(mDevice); err != 0) LOG(ERROR) << "post_enroll: " << err;
     }
     mCb->onChallengeRevoked(challenge);
@@ -423,6 +436,7 @@ ndk::ScopedAStatus Session::enroll(const HardwareAuthToken& hat,
     // The trusted app verifies the HAT before it starts enrolling.
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kEnroll);
+    if (op == 0) return sessionClosed();
     LOG(INFO) << "enroll";
     hw_auth_token_t token = toLegacy(hat);
     if (int err = mDevice->enroll(mDevice, &token, mUserId, kEnrollTimeoutSec); err != 0) {
@@ -437,6 +451,7 @@ ndk::ScopedAStatus Session::authenticate(int64_t operationId,
                                          std::shared_ptr<ICancellationSignal>* out) {
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kAuthenticate);
+    if (op == 0) return sessionClosed();
     {
         std::lock_guard lock(mMutex);
         mAuthOperationId = operationId;
@@ -453,6 +468,7 @@ ndk::ScopedAStatus Session::authenticate(int64_t operationId,
 ndk::ScopedAStatus Session::detectInteraction(std::shared_ptr<ICancellationSignal>* out) {
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kDetectInteraction);
+    if (op == 0) return sessionClosed();
     auto detect = fp6::reservedOp<fp6::DetectInteractionFn>(mDevice, fp6::kDetectInteraction);
     if (detect == nullptr) {
         failOperation(op);
@@ -467,6 +483,7 @@ ndk::ScopedAStatus Session::detectInteraction(std::shared_ptr<ICancellationSigna
 ndk::ScopedAStatus Session::enumerateEnrollments() {
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kEnumerate);
+    if (op == 0) return sessionClosed();
     if (int err = mDevice->enumerate(mDevice); err != 0) {
         LOG(ERROR) << "enumerate: " << err;
         failOperation(op);
@@ -477,6 +494,7 @@ ndk::ScopedAStatus Session::enumerateEnrollments() {
 ndk::ScopedAStatus Session::removeEnrollments(const std::vector<int32_t>& enrollmentIds) {
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kRemove);
+    if (op == 0) return sessionClosed();
     // The module reports each removal before remove() returns.
     for (int32_t id : enrollmentIds) {
         if (int err = mDevice->remove(mDevice, mUserId, id); err != 0)
@@ -495,6 +513,7 @@ ndk::ScopedAStatus Session::getAuthenticatorId() {
     uint64_t id;
     {
         std::lock_guard moduleLock(moduleMutex());
+        if (detached()) return sessionClosed();
         id = mDevice->get_authenticator_id(mDevice);
     }
     mCb->onAuthenticatorIdRetrieved(static_cast<int64_t>(id));
@@ -504,6 +523,7 @@ ndk::ScopedAStatus Session::getAuthenticatorId() {
 ndk::ScopedAStatus Session::invalidateAuthenticatorId() {
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kInvalidateAuthenticatorId);
+    if (op == 0) return sessionClosed();
     auto invalidate = fp6::reservedOp<fp6::InvalidateAuthenticatorIdFn>(
             mDevice, fp6::kInvalidateAuthenticatorId);
     uint64_t id = 0;
@@ -524,6 +544,7 @@ ndk::ScopedAStatus Session::resetLockout(const HardwareAuthToken& hat) {
     // rejection it reports an error and also returns a failure code.
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kResetLockout);
+    if (op == 0) return sessionClosed();
     auto reset = fp6::reservedOp<fp6::ResetLockoutFn>(mDevice, fp6::kResetLockout);
     hw_auth_token_t token = toLegacy(hat);
     if (reset == nullptr) {

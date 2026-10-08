@@ -4,7 +4,8 @@
 // tinyxml2 9.0.0 with the ABI of the Android 14 VNDK copy the Qualcomm display
 // color manager was built against. Android 17 ships tinyxml2 11, whose ABI
 // differs, so the prebuilt's dependency is renamed to this library by the tools
-// renderer. Sources are the unmodified AOSP files listed in provenance.json.
+// renderer. Sources are the AOSP files listed in provenance.json, with the
+// character-reference fixes it records.
 
 package {
     default_applicable_licenses: ["fp6_tinyxml2_v34_license"],

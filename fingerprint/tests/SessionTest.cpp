@@ -146,6 +146,7 @@ int fakeCancel(fingerprint_device_t*) {
     return 0;
 }
 int fakeRemove(fingerprint_device_t*, uint32_t gid, uint32_t fid) {
+    record("remove");
     fingerprint_msg_t msg = {};
     msg.type = FINGERPRINT_TEMPLATE_REMOVED;
     msg.data.removed.finger = {.gid = gid, .fid = fid};
@@ -289,6 +290,15 @@ TEST_F(SessionTest, RemovalReportsRemovedIdsOnce) {
     EXPECT_EQ(mCb->events, (Events{"removed 2"}));
 }
 
+TEST_F(SessionTest, RemovalNeverAsksTheModuleToRemoveAll) {
+    // Id 0 is the legacy module's "all templates"; ids keep their full 32 bits.
+    mSession->removeEnrollments({0});
+    mSession->removeEnrollments({3, 0, -2});
+    EXPECT_EQ(mCb->events, (Events{"removed 0", "removed 2"}));
+    std::lock_guard lock(mModule.callsMutex);
+    EXPECT_EQ(mModule.calls, (std::vector<std::string>{"remove", "remove"}));
+}
+
 TEST_F(SessionTest, ClosedSessionIgnoresLateMessages) {
     mSession->authenticate(1, &mSignal);
     deliver(authenticated(kUser, 3));
@@ -299,12 +309,42 @@ TEST_F(SessionTest, ClosedSessionIgnoresLateMessages) {
     EXPECT_EQ(mModule.cancels, 0);
 }
 
+TEST_F(SessionTest, ClosedSessionRejectsNewRequests) {
+    // The fake module has no pre_enroll, post_enroll or get_authenticator_id:
+    // a call into it would crash.
+    mSession->close();
+    EXPECT_EQ(mSession->authenticate(1, &mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->enroll(HardwareAuthToken{}, &mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->removeEnrollments({3}).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->generateChallenge().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->revokeChallenge(1).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->getAuthenticatorId().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mModule.authenticates.load(), 0);
+    EXPECT_EQ(mCb->events, (Events{"closed"}));
+}
+
+TEST_F(SessionTest, ReplacedSessionRejectsNewRequests) {
+    mSession->detach(false);
+    EXPECT_EQ(mSession->detectInteraction(&mSignal).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->resetLockout(HardwareAuthToken{}).getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_EQ(mSession->enumerateEnrollments().getExceptionCode(), EX_ILLEGAL_STATE);
+    EXPECT_TRUE(mCb->events.empty());
+}
+
 TEST_F(SessionTest, DeadClientCancelsRunningOperation) {
     mSession->authenticate(1, &mSignal);
     mSession->detach(true);
     sendError(FINGERPRINT_ERROR_CANCELED);
     EXPECT_EQ(mModule.cancels, 1);
     EXPECT_TRUE(mCb->events.empty());
+}
+
+TEST_F(SessionTest, WatchingALocalClientFreesTheCookieOnce) {
+    // linkToDeath fails for an in-process callback and frees the cookie itself.
+    EXPECT_EQ(mSession->watchClient(), STATUS_OK);
+    mSession->authenticate(1, &mSignal);
+    deliver(authenticated(kUser, 3));
+    EXPECT_EQ(mCb->events, (Events{"success 3"}));
 }
 
 TEST_F(SessionTest, MatchAfterCancelIsDropped) {

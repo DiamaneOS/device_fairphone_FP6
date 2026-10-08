@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Label the Moments privacy switch's wakeup source `sysfs_wakeup`, as the
+  other wakeup sources: the suspend service could not read its statistics
+  (seen on the phone). Not yet built.
 - The call-audio bridge sends an audioserver status again, once a second,
   when the radio daemon did not receive it but is still registered (a oneway
   call also fails while the daemon's binder buffer is full). A lost "server

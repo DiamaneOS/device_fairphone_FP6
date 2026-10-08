@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Init waits for `ssr_setup` at early-boot, before the ADSP, CDSP and WPSS
+  boot, so subsystem restart is on before any remote processor starts. It
+  was started without waiting, after the DSPs had already booted: a crash in
+  that window panicked the phone. The wait is bounded to 5 s; the property
+  trigger runs it again after boot. Not yet built.
 - The display colour manager's tinyxml2 (`compat/tinyxml2-v34`) takes
   upstream's character-reference fix: each digit is checked before it is
   added, so an overlong numeric reference is rejected instead of wrapping

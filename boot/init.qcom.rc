@@ -217,6 +217,9 @@ on boot
 # Their firmware is on /vendor/firmware_mnt, mounted by mount_all --early.
 on early-boot
     start vendor.pd_mapper
+    # Subsystem restart must be enabled before the first remote processor
+    # boots (vendor.ssr_setup, modem/init.modem.rc); init waits for it.
+    exec_start vendor.ssr_setup
     # Unlike stock, which writes these from a background script, init waits
     # here: the DSP loaders boot the remote processor synchronously, so a slow
     # or failing DSP start delays the rest of early-boot and class core.

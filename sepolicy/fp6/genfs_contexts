@@ -3,6 +3,7 @@
 # Wakeup sources of the fingerprint, hall and NFC devices, read by system_suspend.
 genfscon sysfs /devices/platform/soc/soc:focalfp_ft9362/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s0
+genfscon sysfs /devices/platform/soc/soc:privacy-switch/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_0_geni_se/a84000.i2c/i2c-1/1-0027/wakeup u:object_r:sysfs_wakeup:s0
 # The SoC serial number, readable by no vendor service (soc_serial.te); the
 # rest of /sys/devices/soc0 keeps its vendor-common labels.

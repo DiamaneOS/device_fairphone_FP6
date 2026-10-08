@@ -106,6 +106,50 @@ public final class StatusRelayTest {
         assertEquals(NONE, relay.onAudioStatus(OK, 2));
     }
 
+    /** A oneway setError can fail while the daemon lives (full binder buffer): no death follows. */
+    @Test
+    public void lostReportIsSentAgain() {
+        StatusRelay relay = new StatusRelay(OK, 0);
+        sendIfAny(relay, relay.onRegistered());
+        assertEquals(SERVER_DIED, relay.onAudioStatus(SERVER_DIED, 1));
+        relay.onSendFailed(SERVER_DIED);
+        assertEquals(SERVER_DIED, sendIfAny(relay, relay.pending()));
+        assertEquals(NONE, relay.pending());
+    }
+
+    /** audioserver came back before the retry: the daemon still gets the death, then OK. */
+    @Test
+    public void lostDeathGoesBeforeTheRecovery() {
+        StatusRelay relay = new StatusRelay(OK, 0);
+        sendIfAny(relay, relay.onRegistered());
+        relay.onSendFailed(relay.onAudioStatus(SERVER_DIED, 1));
+        assertEquals(SERVER_DIED, sendIfAny(relay, relay.onAudioStatus(OK, 2)));
+        assertEquals(OK, sendIfAny(relay, relay.pending()));
+        assertEquals(NONE, relay.pending());
+    }
+
+    @Test
+    public void lostRecoveryIsSentAgain() {
+        StatusRelay relay = new StatusRelay(OK, 0);
+        sendIfAny(relay, relay.onRegistered());
+        sendIfAny(relay, relay.onAudioStatus(SERVER_DIED, 1));
+        relay.onSendFailed(relay.onAudioStatus(OK, 2));
+        assertEquals(OK, sendIfAny(relay, relay.pending()));
+        assertEquals(NONE, relay.pending());
+    }
+
+    @Test
+    public void newRegistrationStartsFromTheCurrentStatus() {
+        StatusRelay relay = new StatusRelay(OK, 0);
+        sendIfAny(relay, relay.onRegistered());
+        relay.onSendFailed(relay.onAudioStatus(SERVER_DIED, 1));
+        relay.onAudioStatus(OK, 2);
+        relay.onUnregistered();
+        assertEquals(NONE, relay.pending());
+        assertEquals(OK, sendIfAny(relay, relay.onRegistered()));
+        assertEquals(NONE, relay.pending());
+    }
+
     @Test
     public void unsentStatusIsRetriedOnNextChange() {
         StatusRelay relay = new StatusRelay(OK, 0);

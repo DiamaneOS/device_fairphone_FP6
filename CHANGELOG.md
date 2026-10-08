@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- The call-audio bridge sends an audioserver status again, once a second,
+  when the radio daemon did not receive it but is still registered (a oneway
+  call also fails while the daemon's binder buffer is full). A lost "server
+  died" goes before the following OK, on which the daemon re-sends the call
+  state, so in-call audio recovers after an audioserver restart. Not yet
+  built.
 - The fingerprint HAL skips enrollment id 0 in `removeEnrollments`: the
   legacy module reads it as "all of the user's fingerprints", so a caller
   passing 0 removed every enrollment. Not yet built.

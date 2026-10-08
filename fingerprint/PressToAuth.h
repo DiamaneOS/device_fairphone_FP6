@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <android/binder_parcel_utils.h>
 
 // Reader for the parcelable SystemUI attaches to fingerprint authentication
@@ -27,6 +29,8 @@ struct PressToAuth {
             return status;
         }
         if (size < 4) return STATUS_BAD_VALUE;
+        // As the NDK backend: start + size must not overflow.
+        if (start > INT32_MAX - size) return STATUS_BAD_VALUE;
         if (AParcel_getDataPosition(parcel) - start < size) {
             if (binder_status_t status = AParcel_readBool(parcel, &pressToAuthEnabled);
                 status != STATUS_OK) {

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# Wakeup sources of the fingerprint, hall and NFC devices, read by system_suspend.
+# Wakeup sources of the fingerprint, hall, privacy switch and NFC devices, read by system_suspend.
 genfscon sysfs /devices/platform/soc/soc:focalfp_ft9362/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/soc:privacy-switch/wakeup u:object_r:sysfs_wakeup:s0

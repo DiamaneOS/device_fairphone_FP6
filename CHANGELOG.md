@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- The display colour manager's tinyxml2 (`compat/tinyxml2-v34`) takes
+  upstream's character-reference fix: each digit is checked before it is
+  added, so an overlong numeric reference is rejected instead of wrapping
+  around to another character (`provenance.json` records the backport).
+  Not yet built.
 - The fingerprint HAL rejects a press-to-auth parcelable whose size would
   overflow the parcel position, instead of aborting in the integer overflow
   sanitizer. Not yet built.

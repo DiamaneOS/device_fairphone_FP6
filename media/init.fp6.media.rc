@@ -23,10 +23,9 @@
 # sched_setscheduler).
 # Seccomp: libc2hwjail_avservices (media/seccomp), which the service loads in
 # place of libavservices_minijail, installs DiamaneOS's filter
-# (/vendor/etc/seccomp_policy/codec2-service.policy) before the service's
-# main(), and the service's own SetUpMinijail call stacks the stock policies
-# (codec2.vendor.{base,ext}-arm64.policy) on top. The phone checks confirm
-# Seccomp: 2 and both filters in its status.
+# (/vendor/etc/seccomp_policy/codec2-service.policy) when main() calls
+# SetUpMinijail, and the stock policies (codec2.vendor.{base,ext}-arm64.policy)
+# on top. The phone checks confirm Seccomp: 2 and both filters in its status.
 # /data/vendor/media (stock init.qcom.rc, 0770 mediacodec media) is not
 # created: the Qualcomm codecs only write dumps there, and dumps are off in
 # the stock target specification (max_*_for_dump 0).
@@ -51,9 +50,10 @@ service vendor-qti-media-c2-hal-1-0 /vendor/bin/hw/vendor.qti.media.c2@1.0-servi
 # keeps the first value it is given: with the switch on, the first action
 # sets the decoding state, and the second action's setprop lines change
 # nothing. Any other value, or none, leaves hardware decoding off.
-# libc2hwjail_avservices checks the result in the codec service before it
-# starts (the mode, the target variant, the target specification and the
-# decoder node), and stops the service if anything differs.
+# libc2hwjail_avservices checks the result in the codec service when it builds
+# its store (the mode, the target variant, the target specification and the
+# decoder node); if anything differs the store offers no hardware codec, and
+# the service still registers it.
 on zygote-start && property:persist.diamaneos.hw_video_decode=1
     setprop ro.vendor.diamaneos.hw_video_decode 1
     # The framework's codec list and the Qualcomm target specification with

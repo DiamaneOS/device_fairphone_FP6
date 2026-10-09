@@ -1,35 +1,30 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
-// Configuration check and seccomp loader for the stock Qualcomm Codec2 video
-// service (c2hwjail.cpp). The tools renderer renames the service's
+// Seccomp filter and codec gate for the stock Qualcomm Codec2 video service
+// (c2hwjail.cpp). The tools renderer renames the service's
 // libavservices_minijail.so dependency to libc2hwjail_avservices.so (same
-// length), so the dynamic linker loads this library, and runs its checks and
-// its filter installation, before the service's main(). It links
-// libavservices_minijail in turn: the service's own SetUpMinijail call still
-// resolves there and stacks the stock policy on top. codec2-service.policy
-// lists the allowed system calls.
+// length). The library defines the two functions the service's main() calls
+// through its dependencies, android::SetUpMinijail and the Codec2 HIDL
+// ComponentStore constructor, and calls the real ones (it links
+// libavservices_minijail; the service links libcodec2_hidl@1.2):
+// - SetUpMinijail installs DiamaneOS's filter (codec2-service.policy), then
+//   the stock policy on top;
+// - the store constructor checks the codec configuration and wraps the
+//   Qualcomm store so it offers only the codecs this boot allows, or none.
+// The service always registers its store; nothing runs from an ELF
+// constructor and nothing aborts on a failed check.
 //
 // C2HWJAIL_LOG_ONLY: calls outside the policy are logged (kernel audit record
-// type 1326) and allowed, to collect a profile. Without it they are trapped
-// (SIGSYS) and the service dies with a tombstone.
-cc_library_shared {
-    name: "libc2hwjail_avservices",
-    vendor: true,
-    compile_multilib: "64",
-    srcs: ["c2hwjail.cpp"],
-    header_libs: ["libcutils_headers"],
-    shared_libs: [
-        "libavservices_minijail",
-        "libbase",
-        "libjsoncpp",
-        "liblog",
+// type 1326) and allowed, to collect a profile. Without it they fail with
+// EPERM (also logged as type 1326) instead of killing the service.
+cc_defaults {
+    name: "libc2hwjail_defaults",
+    srcs: [
+        "c2hwjail_check.cpp",
+        "c2hwjail_store.cpp",
     ],
     static_libs: ["libminijail"],
-    // Exports nothing: the static minijail symbols must not interpose on
-    // anything the service loads later.
-    version_script: "libc2hwjail.map.txt",
-    required: ["codec2-service.policy"],
     cflags: [
         "-Wall",
         "-Werror",
@@ -39,10 +34,56 @@ cc_library_shared {
     ],
 }
 
+cc_library_shared {
+    name: "libc2hwjail_avservices",
+    defaults: ["libc2hwjail_defaults"],
+    vendor: true,
+    compile_multilib: "64",
+    srcs: ["c2hwjail.cpp"],
+    header_libs: [
+        "libcodec2_headers",
+        "libcutils_headers",
+        // C2Buffer.h includes hardware/gralloc.h.
+        "libhardware_headers",
+    ],
+    shared_libs: [
+        "libavservices_minijail",
+        "libbase",
+        "libjsoncpp",
+        "liblog",
+    ],
+    // Exports only the two functions above: the static minijail symbols must
+    // not interpose on anything the service loads later.
+    version_script: "libc2hwjail.map.txt",
+    required: ["codec2-service.policy"],
+}
+
 prebuilt_etc {
     name: "codec2-service.policy",
     vendor: true,
     sub_dir: "seccomp_policy",
     src: "codec2-service.arm64.policy",
     filename: "codec2-service.policy",
+}
+
+// Host test of the failure paths: the configuration check returns no codec
+// for every inconsistent state, the filtering store offers only the allowed
+// components, and the installed filter fails disallowed calls with EPERM.
+cc_test_host {
+    name: "c2hwjail_host_test",
+    defaults: ["libc2hwjail_defaults"],
+    srcs: ["tests/c2hwjail_test.cpp"],
+    // libcodec2_headers has no host variant; the headers themselves build.
+    include_dirs: ["frameworks/av/media/codec2/core/include"],
+    header_libs: [
+        "libcutils_headers",
+        "libhardware_headers",
+        "libsystem_headers",
+    ],
+    static_libs: [
+        "libbase",
+        "libjsoncpp",
+        "liblog",
+    ],
+    data: ["codec2-service.arm64.policy"],
 }

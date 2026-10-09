@@ -1,0 +1,6 @@
+# DiamaneOS: vold checks an adopted microSD card with e2fsck -f -p in fsck_untrusted before it
+# mounts the card (system/vold encrypted-sd). e2fsck links the bootstrap libraries; AOSP's
+# fsck_untrusted.te grants them to fsck instead of fsck_untrusted. The two ioctls are e2fsck's
+# read-only block queries, as AOSP grants them to fsck.
+use_bootstrap_libs(fsck_untrusted)
+allowxperm fsck_untrusted vold_device:blk_file ioctl { BLKDISCARDZEROES BLKROGET };

@@ -79,8 +79,11 @@
     <!-- FP6.QREL.16.100.0 factory framework-res: the touch controller can wake
          the phone on a double tap while the screen is off or shows the
          always-on display. Settings then offers Display > Tap to wake (off
-         until turned on); the power HAL switches the controller's wake
-         gesture (Mode::DOUBLE_TAP_TO_WAKE). -->
+         until turned on). With the double-tap sensor in doze.xml, the
+         DiamaneOS Settings switch drives Android's doze double tap
+         (doze_pulse_on_double_tap) instead of the power HAL mode, so SystemUI
+         checks the proximity sensor first; the power HAL ignores
+         Mode::DOUBLE_TAP_TO_WAKE. -->
     <bool name="config_supportDoubleTapWake">true</bool>
 
     <!-- The source-built display HAL applies colour transforms in hardware

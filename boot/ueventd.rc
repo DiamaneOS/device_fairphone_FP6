@@ -190,9 +190,12 @@ firmware_directories /mnt/vendor/wlan_mac/
 /sys/devices/virtual/thermal/thermal_zone*   trip_point_1_temp   0664   root   system
 /sys/devices/virtual/thermal/thermal_zone*   trip_point_1_hyst   0664   root   system
 
-# Double-tap wake gesture of the touch controller, switched by the power HAL
-# (system) for Display > Tap to wake. Stock wrote it as root from vendor init.
+# Wake gestures of the touch controller, switched by the sensors HAL (system)
+# for Display > Tap to wake (double tap) and Tap to check phone (single tap).
+# Stock wrote it as root from vendor init.
 /sys/bus/spi/devices/spi0.0   gesture_wakeup   0660   system   system
+# Taps the controller reported, read only by the sensors HAL.
+/sys/bus/spi/devices/spi0.0   wake_gesture     0400   system   system
 
 # USB controller role and speed for the USB HAL (matches stock).
 /sys/bus/platform/devices/a600000.ssusb	dynamic_disable	0220	root	usb

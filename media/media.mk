@@ -33,10 +33,13 @@
 # open the two codec nodes (sepolicy/media).
 # The Qualcomm library enables every codec if it cannot read its target
 # specification. The codec service therefore loads libc2hwjail_avservices
-# (media/seccomp) before its main(): it checks that the property, the file it
-# names and the decoder node match this boot's state and aborts the service
-# otherwise, then installs DiamaneOS's seccomp filter, which the stock filter
-# stacks on.
+# (media/seccomp) in place of libavservices_minijail: when main() sets up its
+# sandbox it installs DiamaneOS's seccomp filter (the stock one stacks on
+# top), and when main() builds the Codec2 store it checks that the property,
+# the file it names and the decoder node match this boot's state and wraps
+# the Qualcomm store so that only the allowed codecs are offered: none if
+# anything differs. The service always registers its store, so media and
+# the system services that query it at boot never wait for it.
 # Not included: the Codec2 audio service (c2audio), the OMX core, Wi-Fi
 # display, VPP, video power optimisation and secure (DRM) video.
 
@@ -51,9 +54,9 @@ PRODUCT_PACKAGES += \
     uiv34 \
     libstagefright_bqhelper_v34compat
 
-# Configuration check and seccomp loader for the codec service (media/seccomp).
-# The tools renderer renames the service's libavservices_minijail.so
-# dependency to it; without it the service does not start.
+# Seccomp filter and codec gate for the codec service (media/seccomp). The
+# tools renderer renames the service's libavservices_minijail.so dependency
+# to it; without it the service does not start.
 PRODUCT_PACKAGES += \
     libc2hwjail_avservices
 

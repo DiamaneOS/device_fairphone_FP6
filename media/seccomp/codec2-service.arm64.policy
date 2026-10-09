@@ -3,19 +3,19 @@
 #
 # System calls the stock Qualcomm Codec2 video service may make (arm64,
 # minijail syntax), installed as /vendor/etc/seccomp_policy/codec2-service.policy
-# and compiled by libc2hwjail_avservices before the service's main(). Whether a
-# call outside this list is logged or trapped is set in Android.bp
-# (C2HWJAIL_LOG_ONLY), not here. Duplicate entries are an error.
+# and installed by libc2hwjail_avservices when the service's main() calls
+# SetUpMinijail. A call outside this list, or a listed call whose arguments do
+# not match, fails with EPERM (kernel audit record type 1326), or with
+# C2HWJAIL_LOG_ONLY (Android.bp) is logged and allowed; it never kills the
+# service. Duplicate entries are an error.
 #
-# The service's own main() then stacks the stock Qualcomm policy
-# (codec2.vendor.base-arm64.policy and codec2.vendor.ext-arm64.policy) on top,
-# so after that a call must pass both. This list is the stock one with these
-# changes:
+# The stock Qualcomm policy (codec2.vendor.base-arm64.policy and
+# codec2.vendor.ext-arm64.policy) is then stacked on top, so a call must pass
+# both. This list is the stock one with these changes:
 # - argument limits: no fork (threads only), no in-place mremap, prctl only for
 #   the options listed, setpriority for threads and processes only;
-# - AF_UNIX sockets only, for logd and tombstoned: this filter is in place
-#   before the service's first log line, the stock one only after it. No other
-#   socket family, so no network;
+# - AF_UNIX sockets only, for logd and tombstoned (the stock list has no
+#   socket call at all). No other socket family, so no network;
 # - the prctl options and fcntl the stock SetUpMinijail needs to install its
 #   filter, and the calls of the debuggerd fallback handler
 #   (system/core debuggerd/seccomp_policy/crash_dump.arm64.policy);

@@ -35,4 +35,25 @@
 
     <!-- Lower Wi-Fi transmit power near the head and during calls (SAR). -->
     <bool name="config_wifi_framework_enable_sar_tx_power_limit">true</bool>
+
+    <!-- Hotspot, as stock declares it: a new random MAC address at each start
+         (Android's default once AP randomisation is declared), automatic
+         channel selection, WPA3 (SAE), 802.11ac and ax, the 6 GHz band, HE
+         single-user beamforming and up to 32 clients. Stock's 802.11be value is
+         left out: the QCA6750 is an 802.11ax chip, and hostapd is built
+         without be. Other values left out: wifi/README.md. -->
+    <bool name="config_wifi_ap_mac_randomization_supported">true</bool>
+    <bool name="config_wifi_softap_acs_supported">true</bool>
+    <bool name="config_wifi_softap_sae_supported">true</bool>
+    <bool name="config_wifi_softap_ieee80211ac_supported">true</bool>
+    <bool name="config_wifiSoftapIeee80211axSupported">true</bool>
+    <bool name="config_wifiSoftap6ghzSupported">true</bool>
+    <bool name="config_wifiSoftapHeSuBeamformerSupported">true</bool>
+    <bool name="config_wifiSoftapHeSuBeamformeeSupported">true</bool>
+    <integer name="config_wifiHardwareSoftapMaxClientCount">32</integer>
+    <!-- Lower the transmit power while the hotspot is on (SAR), as stock. -->
+    <bool name="config_wifi_framework_enable_soft_ap_sar_tx_power_limit">true</bool>
+
+    <!-- Wi-Fi Direct with random device and group addresses. -->
+    <bool name="config_wifi_p2p_mac_randomization_supported">true</bool>
 </resources>

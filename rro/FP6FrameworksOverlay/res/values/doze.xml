@@ -19,4 +19,15 @@
          before. -->
     <bool name="config_dozeAlwaysOnEnabled">false</bool>
     <bool name="config_dozeEnabled">false</bool>
+
+    <!-- Tap to check phone (Display > Lock screen, System > Gestures) wakes the
+         screen on a single tap, Display > Tap to wake (config.xml) on a double
+         tap. The touch controller reports both taps to our sensors sub-HAL
+         (sensors/), and SystemUI checks the proximity sensor first
+         (FP6SystemUIOverlay). Both stay off until the user turns them on;
+         Android defaults them to on. -->
+    <string name="config_dozeTapSensorType" translatable="false">de.diamaneos.sensor.single_tap</string>
+    <bool name="config_dozeTapGestureEnabled">false</bool>
+    <string name="config_dozeDoubleTapSensorType" translatable="false">de.diamaneos.sensor.double_tap</string>
+    <bool name="config_dozeDoubleTapGestureEnabled">false</bool>
 </resources>

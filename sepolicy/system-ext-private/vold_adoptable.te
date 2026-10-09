@@ -1,0 +1,4 @@
+# DiamaneOS: forgetting an adopted microSD card destroys its per-user keys. vold finds the users by
+# listing /data/misc_ce and /data/misc_de (fscrypt_destroy_volume_keys); AOSP lets vold create and
+# write those directories but not list them, so the keys stayed (seen on the FP6 2026-10-09).
+allow vold system_userdir_file:dir read;

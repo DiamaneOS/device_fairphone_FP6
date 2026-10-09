@@ -13,6 +13,10 @@ r_dir_file({ vendor_per_mgr vendor_per_proxy }, vendor_sysfs_ssr)
 # The Wi-Fi HAL switches the QCA6750 driver on through /dev/wlan and
 # publishes the driver version, as in stock.
 allow hal_wifi_default vendor_wlan_device:chr_file w_file_perms;
+# Creating the hotspot interface: a NET_ADMIN query for an interface that does not exist yet makes the
+# kernel try to load a module of that name (dev_load), which needs sys_module. The driver is already
+# loaded; never grant module loading. Same as AOSP's netd.
+dontaudit hal_wifi_default self:capability sys_module;
 set_prop(hal_wifi_default, vendor_wifi_version)
 # High-throughput TCP tuning: libwifi-hal saves the TCP small-queue limit, raises
 # it on the driver's throughput-change event and restores it. Only this sysctl

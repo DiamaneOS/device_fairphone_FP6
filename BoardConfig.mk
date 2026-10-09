@@ -209,3 +209,8 @@ WIFI_DRIVER_STATE_OFF := "OFF"
 # reloads them into a single combination mode after first configuration; start
 # in that same mode (the legacy STA/AP default modes cannot be re-selected).
 WIFI_HAL_INTERFACE_COMBINATIONS := {{{STA}, 1}, {{AP}, 1}, {{P2P, NAN}, 1}}
+# Hotspot: AOSP's hostapd (external/wpa_supplicant_8) for nl80211, with
+# 802.11ax like stock's. As for the supplicant, no driver command library is
+# set, so it uses AOSP's stub.
+BOARD_HOSTAPD_DRIVER := NL80211
+WIFI_FEATURE_HOSTAPD_11AX := true

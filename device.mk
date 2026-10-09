@@ -182,8 +182,7 @@ PRODUCT_PACKAGES += libtxml2v34
 # Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
 # driver; the vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
 # fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
-# (BoardConfig.mk). Station mode only: hostapd (hotspot) is not shipped, and the
-# stock cnss-daemon is not selected.
+# (BoardConfig.mk). The stock cnss-daemon is not selected.
 PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom/wlan/cld80211-lib \
     hardware/qcom/wlan/qcwcn
@@ -198,6 +197,22 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
+# Hotspot, Wi-Fi Direct and Wi-Fi Aware, as GrapheneOS has them on Pixels and
+# the stock FP6 declares them. hostapd is AOSP's, with its own init file and
+# policy (BoardConfig.mk). The driver creates p2p0 and wifi-aware0; Aware uses
+# wifi-aware0, as on stock. The Wi-Fi overlay declares the hotspot and P2P
+# capabilities, MAC randomization included (wifi/README.md).
+PRODUCT_PACKAGES += hostapd
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.wifi.direct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.direct.xml \
+    frameworks/native/data/etc/android.hardware.wifi.aware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.aware.xml
+PRODUCT_VENDOR_PROPERTIES += wifi.aware.interface=wifi-aware0
+# User builds keep hostapd at info level, like the supplicant
+# (vendor/diamaneos/config/wifi.mk): with Wi-Fi verbose logging its debug lines
+# carry the hotspot's and its clients' addresses.
+ifeq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_VENDOR_PROPERTIES += log.tag.hostapd=I
+endif
 
 # Audio: the AudioReach HAL, PAL and AGM from source with AOSP adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)

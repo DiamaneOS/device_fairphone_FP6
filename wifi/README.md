@@ -1,4 +1,4 @@
-# Wi-Fi supplicant configuration
+# Wi-Fi configuration
 
 `wpa_supplicant_overlay.conf` and `p2p_supplicant_overlay.conf` come from
 `/vendor/etc/wifi/` of the stock FP6 image FP6.QREL.16.100.0 (EU). The P2P
@@ -44,8 +44,40 @@ Options whose effect is not obvious:
   is what the qcacld driver uses (it ignores cfg80211 WoWLAN triggers):
   pattern wake-ups stay, the magic-packet wake-up goes.
 
+## Hotspot, Wi-Fi Direct and Wi-Fi Aware
+
+All three are on, as GrapheneOS has them on Pixels and the stock FP6 declares
+them (`android.hardware.wifi.direct` and `android.hardware.wifi.aware`).
+
+- **Hotspot:** AOSP's hostapd from `external/wpa_supplicant_8` (802.11ax, no
+  driver command library; `BoardConfig.mk`), with its own init file, VINTF
+  fragment and SELinux domain (`hal_wifi_hostapd_default`); no device rules.
+  Stock's hostapd, Qualcomm's older build of the same code, is not used. The
+  Wi-Fi HAL has the driver create the hotspot interface (wlan1). As on
+  GrapheneOS, Android's defaults apply: a new random address at each start,
+  WPA2/WPA3 transition security, and the hotspot turns off after 10 minutes
+  without clients.
+- **Wi-Fi Direct:** the supplicant runs P2P on the driver's p2p0
+  (`p2p_supplicant_overlay.conf`). The Wi-Fi overlay declares P2P MAC
+  randomization, so Android has the supplicant use random device and group
+  addresses.
+- **Aware:** `wifi.aware.interface=wifi-aware0`, as on stock. The driver
+  creates its own NAN interface and expects the NAN commands there.
+
+Stock overlay values left out:
+
+- 802.11be for the hotspot: the QCA6750 is an 802.11ax chip, and hostapd is
+  built without be.
+- So that the behaviour is GrapheneOS's on Pixels (Android's defaults): DFS
+  channels in automatic channel selection, an Enhanced Open (OWE) hotspot,
+  changing the hotspot's country without a restart, several Aware networks on
+  one data interface, and stock's hotspot name ("Fairphone 6 AP"; Android
+  names it AndroidAP with four random digits).
+
 Still to be checked on the device, with SELinux enforcing and without the
 directories created by hand during bring-up: supplicant socket and state
 paths and labels; WPA2/WPA3 (and any supported enterprise) connect and
-reconnect; background scanning, sleep/wake and roaming; MAC randomization;
-Wi-Fi Direct and concurrency.
+reconnect; background scanning, sleep/wake and roaming; MAC randomization,
+including the hotspot's address and Wi-Fi Direct's, which depend on the
+driver accepting a new address; hotspot with WPA2 and WPA3 clients, alone and
+next to a station connection; Wi-Fi Direct discovery and groups; Aware.

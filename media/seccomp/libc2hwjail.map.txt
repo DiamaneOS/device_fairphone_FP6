@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-/* libc2hwjail_avservices exports nothing (see Android.bp). */
+/* libc2hwjail_avservices exports exactly the two functions the codec */
+/* service's main() calls through it (see c2hwjail.cpp). */
 {
+  global:
+    _ZN7android13SetUpMinijailERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_;
+    _ZN7android8hardware5media2c24V1_25utils14ComponentStoreC1ERKNSt3__110shared_ptrI16C2ComponentStoreEE;
   local:
     *;
 };

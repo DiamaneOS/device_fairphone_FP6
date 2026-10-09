@@ -737,8 +737,8 @@ DAC group (`mediacodec`) keeps the codec off them.
   running boot; only init and `vendor_init` set it; the codec service and Settings read it).
   Both accept only 0 and 1.
 - No network: the platform neverallows cover tcp, udp and rawip sockets; DiamaneOS's seccomp
-  filter (`media/seccomp`) allows no socket family but AF_UNIX, and the stock one no
-  `socket` at all.
+  filter (`media/seccomp`) fails every socket family but AF_UNIX with EPERM, and the stock
+  one has no `socket` at all.
 - Other grants: `SYS_NICE`, `vendor.media.target_variant` (the service finds its target
   specification through it; without the read it would register every codec) and the
   gralloc and Adreno properties. `vendor_init` sets `vendor.media.target_variant` from the

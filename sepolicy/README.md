@@ -719,22 +719,31 @@ These rules are not yet runtime-qualified under enforcing mode.
 ## Media
 
 `media/` holds the policy for the stock Qualcomm Codec2 video service
-(`vendor.qti.media.c2@1.0-service`, platform domain `mediacodec`), which exposes only the
-hardware encoders (owner decision 2026-09-27; decoders stay the software codecs in the
-sandboxed `mediaswcodec`). Every app except isolated processes is a Codec2 client and can
-call it. The platform vendor policy already makes `mediacodec` the Codec2 HIDL server and a
-gralloc and GPU client, and gives it read-write access to every `video_device` node. That
-type also labels the camera V4L2, subdevice, media, JPEG and CVP nodes and the Iris decoder
-node, so the DAC group is what keeps the codec off them: it runs in group `mediacodec`, and
-`boot/ueventd.rc` gives that group only the encoder node `/dev/video33`; the decoder node
-`/dev/video32` is root-only. The platform neverallows cover tcp, udp and rawip sockets; the
-stock seccomp policies the service applies forbid `socket` and `connect` entirely. The
-device grants add only what the encoder path uses: `SYS_NICE`, the read-only
-`vendor.media.target_variant` (the service finds the target specification that limits it
-to the encoders through it; without the read it would register every codec) and the
-gralloc and Adreno properties. `vendor_init` may set `vendor.media.target_variant` from the
-vendor build.prop. The file context restores upstream `generic/vendor/common/file_contexts`
-line 324.
+(`vendor.qti.media.c2@1.0-service`, platform domain `mediacodec`). It exposes the hardware
+encoders, and the three non-secure hardware decoders only when the owner turns on
+Hardware video decoding (off by default; `media/media.mk`). Every app except isolated
+processes is a Codec2 client and can call it. The platform vendor policy makes `mediacodec`
+the Codec2 HIDL server and a gralloc and GPU client, and gives it every `video_device`
+node. That type also labels the camera V4L2, subdevice, media, JPEG and CVP nodes, so the
+DAC group (`mediacodec`) keeps the codec off them.
+- Codec nodes: `/dev/video32` (decoder) and `/dev/video33` (encoder) have their own type,
+  `vendor_video_codec_device`, which only `mediacodec` may open (neverallow), with the
+  V4L2 ioctls only (`video_ioctl2` is the driver's only handler). The decoder node is
+  root-only unless decoding is on; `vendor_init` changes its owner and mode at zygote-start
+  through the platform's setattr grant on every device node.
+- Properties: `persist.diamaneos.hw_video_decode` (the owner's choice; only Settings sets
+  it, `system-ext-private/hw_video_decode.te`; public and system restricted because the
+  vendor rc triggers on it) and `ro.vendor.diamaneos.hw_video_decode` (the state of the
+  running boot; only init and `vendor_init` set it; the codec service and Settings read it).
+  Both accept only 0 and 1.
+- No network: the platform neverallows cover tcp, udp and rawip sockets; DiamaneOS's seccomp
+  filter (`media/seccomp`) allows no socket family but AF_UNIX, and the stock one no
+  `socket` at all.
+- Other grants: `SYS_NICE`, `vendor.media.target_variant` (the service finds its target
+  specification through it; without the read it would register every codec) and the
+  gralloc and Adreno properties. `vendor_init` sets `vendor.media.target_variant` from the
+  vendor build.prop and switches it when decoding is on. The file context restores
+  upstream `generic/vendor/common/file_contexts` line 324.
 
 The composer's `IDisplayConfig` lookup (refresh rates for perf hints, which are off) is
 denied and not audited: the service exposes screen writeback and panel controls. FastRPC is

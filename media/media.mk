@@ -1,12 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Video recording, the Iris video core and the hardware video encoders.
-# Hardware encoders only (owner decision 2026-09-27): every decoder stays the
-# platform software decoder in the sandboxed mediaswcodec
-# (com.android.media.swcodec). Decoders parse untrusted media; hardware
-# decoders would move that parsing into closed code, the video driver and the
-# video firmware.
+# Video recording, the Iris video core and the hardware video codecs.
+#
+# Hardware encoders always; hardware decoders only when the owner turns on
+# Settings > Security & privacy > Exploit protection > Hardware video decoding
+# (off by default; persist.diamaneos.hw_video_decode, takes effect at the next
+# boot). Off, every decoder is the platform software decoder in the sandboxed
+# mediaswcodec (com.android.media.swcodec). On, the Qualcomm H.264, HEVC and
+# VP9 decoders (no secure and no low-latency variant) decode in the codec
+# service instead: that saves battery and plays high-resolution video more
+# smoothly, but lets untrusted video reach closed decoder code, the video
+# driver and the video firmware. media/init.fp6.media.rc applies the choice
+# at zygote-start, before the codec service and the media framework start.
 #
 # The stock Qualcomm Codec2 service (vendor.qti.media.c2@1.0-service, HIDL
 # IComponentStore/default, declared in manifest.xml), its libqcodec2 plugins,
@@ -14,21 +20,23 @@
 # SM7635 codec list and target specification and the Iris firmware
 # (vpu20_2v.mbn, which msm_video.ko requests at probe) come from the selected
 # stock vendor files (vendor/fairphone/FP6). The frozen Codec2 HIDL and
-# bufferpool2 AIDL interfaces are built from source. No hardware decoder is
-# reachable:
-# - the service registers only the codecs its target specification names
-#   ("codecs-available"); the tools renderer installs a pinned copy of the
-#   stock specification that names the five encoders and no decoder, and
-#   libqcodec2_v4l2codec skips every codec not listed;
-# - the codec list (media_codecs_volcano_v1.xml) is a pinned copy without the
-#   decoder section, so MediaCodec cannot pick a hardware decoder even if the
-#   service listed one;
-# - the decoder node /dev/video32 is root-only (boot/ueventd.rc), so no
-#   process but root can open it.
-# If the service cannot read its target specification (property unreadable,
-# file missing or not parsable) the Qualcomm library enables every codec and
-# logs "List of Supported Codecs is Empty"; the other two layers still keep
-# decoders out, and the phone checks look for that line.
+# bufferpool2 AIDL interfaces are built from source. The tools renderer
+# derives two pinned configurations from the stock codec list and target
+# specification:
+# - _volcano_v1 (off): the target specification names the five encoders and
+#   no decoder ("codecs-available"; libqcodec2_v4l2codec registers only the
+#   codecs listed), and the codec list has no decoder section, so MediaCodec
+#   cannot pick a hardware decoder even if the service listed one;
+# - _volcano_v1_hwdec (on): the same plus the three decoders, in both files.
+# The decoder node /dev/video32 is root-only unless hardware decoding is on
+# (boot/ueventd.rc, media/init.fp6.media.rc), and only the codec service may
+# open the two codec nodes (sepolicy/media).
+# The Qualcomm library enables every codec if it cannot read its target
+# specification. The codec service therefore loads libc2hwjail_avservices
+# (media/seccomp) before its main(): it checks that the property, the file it
+# names and the decoder node match this boot's state and aborts the service
+# otherwise, then installs DiamaneOS's seccomp filter, which the stock filter
+# stacks on.
 # Not included: the Codec2 audio service (c2audio), the OMX core, Wi-Fi
 # display, VPP, video power optimisation and secure (DRM) video.
 
@@ -42,6 +50,12 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     uiv34 \
     libstagefright_bqhelper_v34compat
+
+# Configuration check and seccomp loader for the codec service (media/seccomp).
+# The tools renderer renames the service's libavservices_minijail.so
+# dependency to it; without it the service does not start.
+PRODUCT_PACKAGES += \
+    libc2hwjail_avservices
 
 # SoC video variant. Stock init.qti.media.sh derives it at boot from
 # /sys/devices/soc0/soc_id and the video core's fused SKU
@@ -59,9 +73,14 @@ FP6_MEDIA_VARIANT := _volcano_v1
 # media_codecs_performance$(FP6_MEDIA_VARIANT).xml (stock init.qti.media.rc
 # copies the first into the other two at post-fs-data). Without them the
 # hardware encoders are not listed at all.
+# ro.media.xml_variant.codecs is not set here: media/init.fp6.media.rc sets
+# it at zygote-start (a read-only property keeps the first value), and with
+# hardware video decoding on it also switches vendor.media.target_variant, to
+# $(FP6_MEDIA_VARIANT)_hwdec. Unset, the framework finds no Qualcomm codec
+# list and lists no hardware codec at all. The performance list stays the
+# same in both states.
 PRODUCT_VENDOR_PROPERTIES += \
     vendor.media.target_variant=$(FP6_MEDIA_VARIANT) \
-    ro.media.xml_variant.codecs=$(FP6_MEDIA_VARIANT) \
     ro.media.xml_variant.codecs_performance=$(FP6_MEDIA_VARIANT)
 
 # Stock vendor build.prop values (lines 341 and 343). Both are debug_prop

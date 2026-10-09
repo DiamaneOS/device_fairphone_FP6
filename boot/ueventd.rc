@@ -276,13 +276,15 @@ firmware_directories /mnt/vendor/wlan_mac/
 
 # Video codec (media/init.fp6.media.rc, group mediacodec): msm_vidc registers
 # the Iris decoder at the fixed minor 32 and the encoder at 33. The Codec2
-# service exposes only the encoders, so its group gets only the encoder node.
-# The decoder node is root-only: hardware decoding is not used (the software
-# decoders run in the sandboxed mediaswcodec), and no other process needs it.
-# Both nodes are owned by root, so no system-uid process gets them through
-# the owner bits; their SELinux type is the codec service's alone
-# (sepolicy/media). The video core's media-controller node (media2) stays in
-# the camera block rule: the encoders never open a media node. These lines
-# must stay after the camera block: ueventd applies the last matching rule.
+# service's group gets the encoder node. The decoder node is root-only: by
+# default no hardware decoder is used (the software decoders run in the
+# sandboxed mediaswcodec), and only when the owner turns hardware video
+# decoding on does init.fp6.media.rc give it to the same group, at
+# zygote-start. Both nodes are owned by root, so no system-uid process gets
+# them through the owner bits; their SELinux type is the codec service's
+# alone (sepolicy/media). The video core's media-controller node (media2)
+# stays in the camera block rule: the codecs never open a media node. These
+# lines must stay after the camera block: ueventd applies the last matching
+# rule.
 /dev/video32              0600   root       root
 /dev/video33              0660   root       mediacodec

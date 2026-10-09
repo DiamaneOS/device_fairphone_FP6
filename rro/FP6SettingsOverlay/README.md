@@ -1,6 +1,8 @@
 # FP6 Settings overlay
 
 - `config_show_smooth_display`: show Display > Smooth display.
+- `config_show_hardware_video_decoding`: show Security & privacy > Exploit
+  protection > Hardware video decoding (device `media/media.mk`).
 - Side fingerprint sensor education. AOSP's side-sensor animations draw a
   tablet with the sensor on its top edge. The files in `res/raw` are derived
   from AOSP Settings' `fingerprint_edu_lottie_portrait_bottom_right.json`

@@ -3,4 +3,14 @@
 # media/media.mk sets vendor.media.target_variant in the vendor build.prop,
 # which init loads with vendor_init's permissions. Stock set it from its
 # init.qti.media.sh domain (vendor_qti_init_shell), which is not installed.
+# media/init.fp6.media.rc switches it when hardware video decoding is on.
 set_prop(vendor_init, vendor_video_prop)
+
+# media/init.fp6.media.rc, at zygote-start: hardware video decoding for this
+# boot. The action's property trigger needs read access to the owner's choice
+# (init refuses vendor triggers on properties vendor_init cannot read); then
+# it sets the boot state (property.te), the codec list variant (platform
+# media_variant_prop, which vendor_init may set) and the decoder node's owner
+# and mode (the platform lets vendor_init setattr every device node).
+get_prop(vendor_init, diamaneos_hw_video_decode_prop)
+set_prop(vendor_init, vendor_diamaneos_hw_video_decode_prop)

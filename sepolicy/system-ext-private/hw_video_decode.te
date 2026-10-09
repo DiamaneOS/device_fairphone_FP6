@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Hardware video decoding (system-ext-public/hw_video_decode.te). Settings
+# (system_app) stores the owner's choice; init applies it at the next boot
+# (media/init.fp6.media.rc). Nothing else may set it: a domain that could
+# would turn on the hardware decoders for every app.
+set_prop(system_app, diamaneos_hw_video_decode_prop)
+
+neverallow {
+  domain
+  -init
+  -system_app
+} diamaneos_hw_video_decode_prop:property_service set;

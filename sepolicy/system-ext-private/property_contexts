@@ -120,3 +120,7 @@ diamaneos.privacy_switch.enforced          u:object_r:privacy_switch_prop:s0 exa
 # Camera privacy disconnects apps instead of muting (camera/camera.mk). AOSP's
 # type for the ro.camera.* settings cameraserver reads: only vendor_init sets it.
 ro.camera.disableCameraMute                u:object_r:camera_config_prop:s0 exact bool
+
+# Hardware video decoding: the owner's choice, applied at the next boot
+# (hw_video_decode.te). BoolSetting stores "1" or "0".
+persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1

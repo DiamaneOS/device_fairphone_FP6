@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# persist.diamaneos.hw_video_decode: the owner's choice for hardware video
+# decoding (Settings > Security & privacy > Exploit protection; "1" on, "0"
+# off, unset is off). Public and system restricted because the vendor
+# media/init.fp6.media.rc triggers on it at zygote-start, and init accepts a
+# vendor trigger only on a property vendor_init can read. Rules:
+# system-ext-private/hw_video_decode.te.
+system_restricted_prop(diamaneos_hw_video_decode_prop)

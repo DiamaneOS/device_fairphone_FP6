@@ -2,7 +2,8 @@
 # Copyright 2026 The DiamaneOS Project
 
 # The stock Qualcomm Codec2 video service (vendor.qti.media.c2@1.0-service),
-# hardware encoders only (media/media.mk), in the platform mediacodec domain.
+# hardware encoders, and hardware decoders when the owner turns them on
+# (media/media.mk), in the platform mediacodec domain.
 # The platform vendor policy (system/sepolicy/vendor/mediacodec.te) already
 # makes it the Codec2 HIDL server (hal_codec2), a gralloc/allocator client and
 # a GPU same-process-HAL user, and gives it read-write access to every
@@ -13,9 +14,10 @@
 # DAC group (mediacodec; media/init.fp6.media.rc and boot/ueventd.rc) is what
 # keeps it off the camera nodes. The two codec nodes have their own type,
 # vendor_video_codec_device (below), which no other domain may use; the
-# decoder node is root-only, which keeps the service off it. The platform
-# neverallows cover only tcp, udp and rawip sockets; the stock seccomp
-# policies are what forbid socket() and connect() entirely.
+# decoder node's DAC (root-only unless hardware decoding is on) keeps the
+# service off the decoder while it is off. The platform neverallows cover
+# only tcp, udp and rawip sockets; the seccomp filters (DiamaneOS's,
+# media/seccomp, and the stock one) allow no socket family but AF_UNIX.
 # Reduced from the pinned Qualcomm generic/vendor/common/mediacodec.te,
 # qva/vendor/common/mediacodec.te and qva/vendor/volcano/mediacodec.te and the
 # stock compiled policy, bound to this domain and to what the encoder path of
@@ -71,13 +73,19 @@ neverallow mediacodec { vendor_qdsp_device vendor_xdsp_device }:chr_file open;
 
 # The Iris codec nodes (device.te, file_contexts): open, map and the V4L2
 # ioctls. msm_vidc's only ioctl handler is video_ioctl2, the V4L2 dispatcher,
-# so type 'V' (0x56) is its whole ioctl surface.
+# so type 'V' (0x56) is its whole ioctl surface. getattr also serves the
+# configuration check in libc2hwjail_avservices, which stats the decoder node.
 allow mediacodec vendor_video_codec_device:chr_file rw_file_perms;
 allowxperm mediacodec vendor_video_codec_device:chr_file ioctl { 0x5600-0x56ff };
 
+# Hardware video decoding for this boot (property.te): libc2hwjail_avservices
+# checks the codec configuration against it, and uiv34 lets Codec2 output to a
+# Surface only when it is on.
+get_prop(mediacodec, vendor_diamaneos_hw_video_decode_prop)
+
 # Only the codec service may use the codec nodes. ueventd (create, setattr),
-# init and vendor_init (setattr) keep their platform grants, which open
-# neither.
+# init and vendor_init (setattr, for the decoder node's owner and mode) keep
+# their platform grants, which open neither.
 neverallow {
   domain
   -mediacodec

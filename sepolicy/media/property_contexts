@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Hardware video decoding for this boot (property.te, media/init.fp6.media.rc).
+ro.vendor.diamaneos.hw_video_decode u:object_r:vendor_diamaneos_hw_video_decode_prop:s0 exact enum 0 1

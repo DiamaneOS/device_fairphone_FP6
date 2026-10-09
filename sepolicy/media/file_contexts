@@ -2,3 +2,10 @@
 # Copyright 2026 The DiamaneOS Project
 # Stock label (upstream generic/vendor/common/file_contexts line 324).
 /vendor/bin/hw/vendor\.qti\.media\.c2@1\.0-service      u:object_r:mediacodec_exec:s0
+# The Iris video codec nodes (boot/ueventd.rc): decoder at minor 32, encoder
+# at 33. Their own type instead of video_device, which the platform also
+# grants to system_server, surfaceflinger, mediaserver and the camera HALs
+# and which the composer holds here: only the codec service may use these
+# (mediacodec.te).
+/dev/video32                                            u:object_r:vendor_video_codec_device:s0
+/dev/video33                                            u:object_r:vendor_video_codec_device:s0

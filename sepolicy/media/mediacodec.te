@@ -11,10 +11,11 @@
 # video_device is not narrow: it also labels the camera V4L2, subdevice,
 # media, JPEG and CVP nodes (vendor-common/file_contexts), so the service's
 # DAC group (mediacodec; media/init.fp6.media.rc and boot/ueventd.rc) is what
-# keeps it off the camera nodes and off the hardware decoder node until those
-# nodes get their own types. The platform neverallows cover only tcp, udp and
-# rawip sockets; the stock seccomp policies are what forbid socket() and
-# connect() entirely.
+# keeps it off the camera nodes. The two codec nodes have their own type,
+# vendor_video_codec_device (below), which no other domain may use; the
+# decoder node is root-only, which keeps the service off it. The platform
+# neverallows cover only tcp, udp and rawip sockets; the stock seccomp
+# policies are what forbid socket() and connect() entirely.
 # Reduced from the pinned Qualcomm generic/vendor/common/mediacodec.te,
 # qva/vendor/common/mediacodec.te and qva/vendor/volcano/mediacodec.te and the
 # stock compiled policy, bound to this domain and to what the encoder path of
@@ -67,3 +68,17 @@ dontaudit mediacodec vendor_hal_vnddisplayconfig_service:service_manager find;
 dontaudit mediacodec vendor_qdsp_device:chr_file open;
 dontaudit mediacodec vendor_xdsp_device:chr_file { getattr open read map };
 neverallow mediacodec { vendor_qdsp_device vendor_xdsp_device }:chr_file open;
+
+# The Iris codec nodes (device.te, file_contexts): open, map and the V4L2
+# ioctls. msm_vidc's only ioctl handler is video_ioctl2, the V4L2 dispatcher,
+# so type 'V' (0x56) is its whole ioctl surface.
+allow mediacodec vendor_video_codec_device:chr_file rw_file_perms;
+allowxperm mediacodec vendor_video_codec_device:chr_file ioctl { 0x5600-0x56ff };
+
+# Only the codec service may use the codec nodes. ueventd (create, setattr),
+# init and vendor_init (setattr) keep their platform grants, which open
+# neither.
+neverallow {
+  domain
+  -mediacodec
+} vendor_video_codec_device:chr_file { open read write ioctl map append lock };

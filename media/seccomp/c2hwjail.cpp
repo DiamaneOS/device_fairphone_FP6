@@ -83,16 +83,24 @@ constexpr char kDecoderNode[] = "/dev/video32";
 // The target specifications are a few kilobytes.
 constexpr size_t kMaxSpecBytes = 1 << 20;
 
-const std::set<std::string> kEncoders = {
-        "c2.qti.avc.encoder",      "c2.qti.hevc.encoder", "c2.qti.hevc.encoder.cq",
-        "c2.qti.hevc.encoder.hdr", "c2.qti.heic.encoder",
-};
+// Built on first use: the constructor below can run before this file's dynamic initialisers, so
+// namespace-scope std::set objects would still be unconstructed (null tree) when it reads them.
+const std::set<std::string>& Encoders() {
+    static const std::set<std::string> names = {
+            "c2.qti.avc.encoder",      "c2.qti.hevc.encoder", "c2.qti.hevc.encoder.cq",
+            "c2.qti.hevc.encoder.hdr", "c2.qti.heic.encoder",
+    };
+    return names;
+}
 // No secure (DRM) and no low-latency variant.
-const std::set<std::string> kDecoders = {
-        "c2.qti.avc.decoder",
-        "c2.qti.hevc.decoder",
-        "c2.qti.vp9.decoder",
-};
+const std::set<std::string>& Decoders() {
+    static const std::set<std::string> names = {
+            "c2.qti.avc.decoder",
+            "c2.qti.hevc.decoder",
+            "c2.qti.vp9.decoder",
+    };
+    return names;
+}
 
 // Adds the strings of a codec list to names; a missing list counts as empty.
 void AddCodecNames(const Json::Value& list, const char* what, std::set<std::string>* names) {
@@ -154,9 +162,9 @@ void CheckCodecConfiguration() {
     AddCodecNames(available["decoders"], "codecs-available.decoders", &listed);
     AddCodecNames(available["encoders"], "codecs-available.encoders", &listed);
     AddCodecNames(video["OptionalCodecs"], "OptionalCodecs", &listed);
-    std::set<std::string> allowed = kEncoders;
+    std::set<std::string> allowed = Encoders();
     if (decoders) {
-        allowed.insert(kDecoders.begin(), kDecoders.end());
+        allowed.insert(Decoders().begin(), Decoders().end());
     }
     if (listed != allowed) {
         LOG_ALWAYS_FATAL("%s lists %zu codecs, not the %zu this boot allows", path.c_str(),

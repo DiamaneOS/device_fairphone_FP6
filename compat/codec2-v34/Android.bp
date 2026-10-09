@@ -13,13 +13,15 @@
 //                              libstagefright_bqhelper_v34compat.so
 // Each library links the library it stands in for, so every other symbol
 // still comes from the real Android 17 library. Device-authored; no upstream
-// code copied. Both are needed although the service exposes only encoders:
-// the Android linker binds every symbol when a library loads, and the service
+// code copied. Both are needed even with only the encoders exposed: the
+// Android linker binds every symbol when a library loads, and the service
 // links libcodec2_hidl@1.2 (which links @1.1 and @1.0) and libcodec2_vndk.
 
 // - GraphicBufferV34.cpp: an Android 14 sized GraphicBuffer (256 bytes;
-//   Android 17's is 3376) that fails closed, so the stock library's own
-//   256-byte allocations never meet the Android 17 constructor;
+//   Android 17's is 3376), so the stock library's own 256-byte allocations
+//   never meet the Android 17 constructor. It fails closed unless hardware
+//   video decoding is on; then it wraps the decoders' Surface buffers as
+//   Android 14's did (CLONE_HANDLE only);
 // - GraphicBufferMapperV34.cpp: GraphicBufferMapper::lock with six arguments
 //   and unlock(handle), which Android 17 dropped, forwarded to the Android 17
 //   members.

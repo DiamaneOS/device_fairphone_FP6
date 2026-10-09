@@ -12,6 +12,11 @@
          locks the panel to one rate, so we keep the AOSP switch. -->
     <bool name="config_show_smooth_display">true</bool>
 
+    <!-- Show Security & privacy > Exploit protection > Hardware video decoding:
+         the FP6 can switch the Qualcomm hardware video decoders on (off by
+         default; device media/media.mk). -->
+    <bool name="config_show_hardware_video_decoding">true</bool>
+
     <!-- Labels for the colour modes in the framework's config_availableColorModes
          (0, 256, 257). Settings pairs this list, by position, with its own
          translated config_color_mode_options_strings: Natural, Boosted,

@@ -3,6 +3,8 @@
 ## Switches and lists
 
 - `config_show_smooth_display`: show Display > Smooth display.
+- `config_show_hardware_video_decoding`: show Security & privacy > Exploit
+  protection > Hardware video decoding (device `media/media.mk`).
 - `config_color_mode_options_values`: pairs Settings' colour-mode names with
   the panel's modes (0 natural, 256 boosted, 257 adaptive).
   - Keep its length and order equal to Settings' own names list. A length

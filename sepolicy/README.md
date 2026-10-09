@@ -212,12 +212,16 @@ of the same name (`provenance.json`).
 
 ### Touch and vibrator
 
-- The touch controller's double-tap wake switch (`gesture_wakeup`) is
-  `vendor_sysfs_touch_gesture`. The rest of the touch device keeps the
+- The touch controller's wake-gesture switch (`gesture_wakeup`) is
+  `vendor_sysfs_touch_gesture` and its tap report (`wake_gesture`) is
+  `vendor_sysfs_touch_wake_gesture`. The rest of the touch device keeps the
   factory-test type `fp_mmitest_sysfs`.
-  - Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE).
+  - Only the sensors HAL uses them, for Tap to wake (double tap) and Tap to
+    check phone (single tap): it writes the switch and reads the report
+    (`fp6/touch.te`).
   - The HAL may search the device directory but not use its factory-test
     files.
+  - The power HAL no longer has access.
 - The Awinic haptics nodes the vibrator HAL writes (`activate`, `brightness`,
   `duration`, `gain`, `loop`, `seq`) are `vendor_sysfs_aw_vibrator`
   (`vibrator.te`).
@@ -623,11 +627,10 @@ not imported.
   through system_server) and one vendor client, the camera provider
   (`camera/hal_camera_default.te`).
   - A client reaches every IPower method: boosts, modes such as
-    SUSTAINED_PERFORMANCE, EXPENSIVE_RENDERING or DOUBLE_TAP_TO_WAKE, and ADPF
-    hint sessions.
+    SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
+    DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
   - Their effects stay within the grants above: frequency floors and caps, the
-    `sched_boost` values, the GPU wake trigger, tap-to-wake and uclamp on
-    session threads.
+    `sched_boost` values, the GPU wake trigger and uclamp on session threads.
 - Not granted:
   - reads of the nodes (dumpsys shows request indexes, not values);
   - the debug configuration in `/data/vendor/etc`

@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// Single and double tap from the touch controller as sensors for SystemUI's
+// doze service: Tap to check phone and Display > Tap to wake (TapSubHal.cpp). The AOSP sensors multi-HAL loads it from
+// /odm/etc/sensors/hals.conf, next to the Qualcomm sub-HAL it loads from
+// /vendor/etc/sensors/hals.conf, so the stock-derived vendor list stays as it
+// is. It runs in the multi-HAL process (hal_sensors_default; sepolicy/fp6/
+// touch.te).
+cc_library_shared {
+    name: "sensors.fp6.tap",
+    device_specific: true,
+    relative_install_path: "hw",
+    compile_multilib: "first",
+    srcs: ["TapSubHal.cpp"],
+    header_libs: ["android.hardware.sensors@2.X-multihal.header"],
+    shared_libs: [
+        "android.hardware.sensors@1.0",
+        "android.hardware.sensors@2.0",
+        "android.hardware.sensors@2.0-ScopedWakelock",
+        "android.hardware.sensors@2.1",
+        "libbase",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}
+
+prebuilt_etc {
+    name: "fp6_odm_sensors_hals_conf",
+    device_specific: true,
+    src: "hals.conf",
+    sub_dir: "sensors",
+    filename: "hals.conf",
+}

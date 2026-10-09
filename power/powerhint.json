@@ -9,8 +9,7 @@
     {"Name": "GPUMinFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq"], "Values": ["1050000000", "763000000", "510000000", "264000000"], "DefaultIndex": 3, "ResetOnInit": true, "WriteOnly": true},
     {"Name": "GPUMaxFreq", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq"], "Values": ["1050000000", "510000000"], "DefaultIndex": 0, "ResetOnInit": true, "WriteOnly": true},
     {"Name": "GPUTouchWake", "Paths": ["/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake"], "Values": ["1", "0"], "DefaultIndex": 1, "ResetOnInit": false, "WriteOnly": true},
-    {"Name": "WaltSchedBoost", "Paths": ["vendor.powerhal.sched_boost"], "Values": ["1", "2", "0"], "DefaultIndex": 2, "ResetOnInit": true, "Type": "Property"},
-    {"Name": "TapToWake", "Paths": ["/sys/bus/spi/devices/spi0.0/gesture_wakeup"], "Values": ["2", "-2"], "DefaultIndex": 1, "ResetOnInit": true, "WriteOnly": true}
+    {"Name": "WaltSchedBoost", "Paths": ["vendor.powerhal.sched_boost"], "Values": ["1", "2", "0"], "DefaultIndex": 2, "ResetOnInit": true, "Type": "Property"}
   ],
   "Actions": [
     {"PowerHint": "INTERACTION", "Node": "CPUSilverMinFreq", "Value": "1113600", "Duration": 0},
@@ -47,9 +46,7 @@
     {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUPrimeMinFreq", "Value": "960000", "Duration": 0},
     {"PowerHint": "FIXED_PERFORMANCE", "Node": "CPUPrimeMaxFreq", "Value": "960000", "Duration": 0},
     {"PowerHint": "FIXED_PERFORMANCE", "Node": "GPUMinFreq", "Value": "510000000", "Duration": 0},
-    {"PowerHint": "FIXED_PERFORMANCE", "Node": "GPUMaxFreq", "Value": "510000000", "Duration": 0},
-
-    {"PowerHint": "DOUBLE_TAP_TO_WAKE", "Node": "TapToWake", "Value": "2", "Duration": 0}
+    {"PowerHint": "FIXED_PERFORMANCE", "Node": "GPUMaxFreq", "Value": "510000000", "Duration": 0}
   ],
   "AdpfConfig": [
     {"Name": "ADPF_DEFAULT", "PID_On": true, "PID_Po": 5.0, "PID_Pu": 3.0, "PID_I": 0.001, "PID_I_Init": 200, "PID_I_High": 512, "PID_I_Low": -120, "PID_Do": 500.0, "PID_Du": 0.0,

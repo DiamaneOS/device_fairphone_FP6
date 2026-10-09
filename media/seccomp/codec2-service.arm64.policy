@@ -1,0 +1,117 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# System calls the stock Qualcomm Codec2 video service may make (arm64,
+# minijail syntax), installed as /vendor/etc/seccomp_policy/codec2-service.policy
+# and compiled by libc2hwjail_avservices before the service's main(). Whether a
+# call outside this list is logged or trapped is set in Android.bp
+# (C2HWJAIL_LOG_ONLY), not here. Duplicate entries are an error.
+#
+# The service's own main() then stacks the stock Qualcomm policy
+# (codec2.vendor.base-arm64.policy and codec2.vendor.ext-arm64.policy) on top,
+# so after that a call must pass both. This list is the stock one with these
+# changes:
+# - argument limits: no fork (threads only), no in-place mremap, prctl only for
+#   the options listed, setpriority for threads and processes only;
+# - AF_UNIX sockets only, for logd and tombstoned: this filter is in place
+#   before the service's first log line, the stock one only after it. No other
+#   socket family, so no network;
+# - the prctl options and fcntl the stock SetUpMinijail needs to install its
+#   filter, and the calls of the debuggerd fallback handler
+#   (system/core debuggerd/seccomp_policy/crash_dump.arm64.policy);
+# - _llseek (no such call on arm64) is dropped.
+
+futex: 1
+# ioctl requests are filtered by the SELinux policy: V4L2 only on the codec
+# nodes (sepolicy/media), plus binder, DMA-BUF heaps and gralloc.
+ioctl: 1
+ppoll: 1
+pselect6: 1
+read: 1
+write: 1
+writev: 1
+pread64: 1
+lseek: 1
+close: 1
+dup: 1
+fcntl: 1
+openat: 1
+readlinkat: 1
+faccessat: 1
+getdents64: 1
+getcwd: 1
+fstat: 1
+newfstatat: 1
+fstatfs: 1
+ftruncate: 1
+memfd_create: 1
+# libqcodec2_utils removes its own dump files (dumps are off in the target
+# specification); SELinux leaves the service no writable directory to use it on.
+unlinkat: 1
+# No mapping may be writable and executable at once.
+mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+# Moving remaps only, as in AOSP's media policies (hardened_malloc does not
+# remap on Android).
+mremap: arg3 == 3 || arg3 == MREMAP_MAYMOVE
+munmap: 1
+madvise: 1
+# Threads only (0x10000 CLONE_THREAD): no fork, no child processes.
+clone: arg0 & 0x10000
+set_tid_address: 1
+exit: 1
+exit_group: 1
+restart_syscall: 1
+rt_sigreturn: 1
+rt_sigprocmask: 1
+rt_sigaction: 1
+sigaltstack: 1
+nanosleep: 1
+clock_gettime: 1
+gettimeofday: 1
+getrandom: 1
+eventfd2: 1
+inotify_init1: 1
+inotify_add_watch: 1
+inotify_rm_watch: 1
+pipe2: 1
+sched_yield: 1
+# The codec threads raise their priority (SYS_NICE in the rc). PRIO_PROCESS
+# only: no process-group or per-user changes.
+setpriority: arg0 == 0
+sched_setscheduler: 1
+sched_get_priority_max: 1
+sched_setaffinity: 1
+sched_getaffinity: 1
+getpid: 1
+gettid: 1
+getuid: 1
+geteuid: 1
+getgid: 1
+getegid: 1
+getgroups: 1
+getrlimit: 1
+# 0x53564d41 PR_SET_VMA (bionic and hardened_malloc name anonymous mappings),
+# 3 PR_GET_DUMPABLE, 15 PR_SET_NAME (libqcodec2_base names its threads),
+# 16 PR_GET_NAME, 22 PR_SET_SECCOMP and 38 PR_SET_NO_NEW_PRIVS (the stock
+# SetUpMinijail adds its filter), 39 PR_GET_NO_NEW_PRIVS, 54 PR_PAC_RESET_KEYS
+# (pthread_create), 55 PR_SET_TAGGED_ADDR_CTRL and 56 PR_GET_TAGGED_ADDR_CTRL
+# (bionic heap tagging), 61 PR_PAC_GET_ENABLED_KEYS.
+prctl: arg0 == 0x53564d41 || arg0 == 3 || arg0 == 15 || arg0 == 16 || arg0 == 22 || arg0 == 38 || arg0 == 39 || arg0 == 54 || arg0 == 55 || arg0 == 56 || arg0 == 61
+# 1 AF_UNIX (logd, and tombstoned for the debuggerd fallback handler). SELinux
+# decides which sockets it may connect to.
+socket: arg0 == 1
+connect: 1
+sendto: 1
+recvfrom: 1
+recvmsg: 1
+
+# debuggerd fallback handler (crash_dump.arm64.policy), less the calls already
+# listed.
+getppid: 1
+setsockopt: 1
+sysinfo: 1
+uname: 1
+process_vm_readv: 1
+tgkill: 1
+rt_tgsigqueueinfo: 1

@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// Configuration check and seccomp loader for the stock Qualcomm Codec2 video
+// service (c2hwjail.cpp). The tools renderer renames the service's
+// libavservices_minijail.so dependency to libc2hwjail_avservices.so (same
+// length), so the dynamic linker loads this library, and runs its checks and
+// its filter installation, before the service's main(). It links
+// libavservices_minijail in turn: the service's own SetUpMinijail call still
+// resolves there and stacks the stock policy on top. codec2-service.policy
+// lists the allowed system calls.
+//
+// C2HWJAIL_LOG_ONLY: calls outside the policy are logged (kernel audit record
+// type 1326) and allowed, to collect a profile. Without it they are trapped
+// (SIGSYS) and the service dies with a tombstone.
+cc_library_shared {
+    name: "libc2hwjail_avservices",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: ["c2hwjail.cpp"],
+    header_libs: ["libcutils_headers"],
+    shared_libs: [
+        "libavservices_minijail",
+        "libbase",
+        "libjsoncpp",
+        "liblog",
+    ],
+    static_libs: ["libminijail"],
+    // Exports nothing: the static minijail symbols must not interpose on
+    // anything the service loads later.
+    version_script: "libc2hwjail.map.txt",
+    required: ["codec2-service.policy"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        // As libjsoncpp itself is built.
+        "-DJSON_USE_EXCEPTION=0",
+    ],
+}
+
+prebuilt_etc {
+    name: "codec2-service.policy",
+    vendor: true,
+    sub_dir: "seccomp_policy",
+    src: "codec2-service.arm64.policy",
+    filename: "codec2-service.policy",
+}

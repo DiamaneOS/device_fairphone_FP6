@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Hardware video decoding, off by default: Settings > Security & privacy >
+  Exploit protection can turn on the Qualcomm H.264, HEVC and VP9 decoders
+  (no secure or low-latency variant) from the next boot. The codec service now
+  loads its own configuration check and seccomp filter before its main(): it
+  stops unless the codec list it will register matches the boot's state, and
+  the filter no longer depends on the stock binary installing one (finding
+  -47). The codec nodes get their own SELinux type, open only to the codec
+  service, and are owned by root. Not yet built.
 - Label the Moments privacy switch's wakeup source `sysfs_wakeup`, as the
   other wakeup sources: the suspend service could not read its statistics
   (seen on the phone). Not yet built.

@@ -11,6 +11,10 @@ set_prop(vendor_init, vendor_video_prop)
 # (init refuses vendor triggers on properties vendor_init cannot read); then
 # it sets the boot state (property.te), the codec list variant (platform
 # media_variant_prop, which vendor_init may set) and the decoder node's owner
-# and mode (the platform lets vendor_init setattr every device node).
+# and mode (the platform lets vendor_init setattr every device node). Its
+# "wait /dev/video32" runs in vendor_init and stats the node until it exists:
+# without getattr every stat fails, so it polled for its full 5 s (about 500
+# denials, seen on the phone) before the chown and chmod went ahead.
 get_prop(vendor_init, diamaneos_hw_video_decode_prop)
 set_prop(vendor_init, vendor_diamaneos_hw_video_decode_prop)
+allow vendor_init vendor_video_codec_device:chr_file getattr;

@@ -27,10 +27,11 @@
 # DiamaneOS: no secure-processor (SPU) grants. The FP6 has no SPU: its device
 # tree describes none, the SPSS loader and spcom drivers are not shipped, and
 # the selected gatekeeper and its libraries name no SPU node, so /dev/spcom,
-# sp_kernel, spss_utils, sp_keymaster and sp_ssr never exist.
+# sp_kernel, spss_utils, sp_keymaster and sp_ssr never exist. Nor does the
+# secure-processor DMA-BUF heap (qcom,secure-sp-tz): the device tree defines
+# no such heap.
 
 get_prop(vendor_hal_gatekeeper_qti, vendor_disable_spu_prop)
 
 # As each dma buf is seperate device, need to allow access to those devices
 allow vendor_hal_gatekeeper_qti vendor_dmabuf_qseecom_heap_device:chr_file r_file_perms;
-allow vendor_hal_gatekeeper_qti vendor_dmabuf_secure_sp_tz_heap_device:chr_file r_file_perms;

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Power stats HAL (IPowerStats V2): SoC sleep modes and remote-processor sleep
 // from the qcom_stats driver's /dev/stats, for batterystats, statsd and
 // dumpsys powerstats. Stock FP6 ships no power stats HAL. It runs as its own

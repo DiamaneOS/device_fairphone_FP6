@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // AIDL fingerprint service for the FP6 FocalTech module. It replaces the stock
 // wrapper so the sensor is reported as a power-button sensor; the stock module
 // and its trusted app still do all matching, storage and lockout handling.

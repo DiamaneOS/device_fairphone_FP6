@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // tqftpserv and pd-mapper (linux-msm, vendor/qcom/opensource) look for the
 // remote processors' files next to their firmware, in /vendor/firmware. On
 // the FP6 those files are on the modem partition (/vendor/firmware_mnt/image),

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Seccomp loader for the stock CamX camera provider (camxjail.c). The tools
 // renderer renames the provider's libhardware.so dependency to libcamxjail.so,
 // so the dynamic linker loads it, and runs its filter installation, before the

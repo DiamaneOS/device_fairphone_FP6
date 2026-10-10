@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // timekeepd: keeps the system clock across reboots on top of the read-only
 // PMIC RTC (see main.cpp). It replaces Qualcomm's time_daemon, which talks
 // QMI to the modem and needs a vendor app.

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // The amplifier driver requests the factory calibration through firmware_class.
 // Keep the device's own calibration in persist; never package another unit's data.
 install_symlink {

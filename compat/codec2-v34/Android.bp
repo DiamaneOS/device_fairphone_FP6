@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Android 14 ABI for the stock Qualcomm Codec2 framework libraries (FP6 stock
 // vendor libcodec2_vndk.so and libcodec2_hidl@1.0/1.1/1.2.so, built against
 // Android 14). The tools renderer renames one dependency of each consumer to

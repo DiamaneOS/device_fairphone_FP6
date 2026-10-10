@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // FP6 call-audio bridge. The stock radio daemon (qcrilNrd) serves
 // IQcRilAudio/slot1 and /slot2 and sends each call's audio parameters (vsid,
 // call_state, call_type, crs_call) to a registered client, which applies them

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // FP6 hardware configuration as static vendor runtime resource overlays, so the
 // generic system image stays device independent.
 

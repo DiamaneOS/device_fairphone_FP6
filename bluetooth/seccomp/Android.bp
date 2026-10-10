@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // System calls the Bluetooth HCI service may make. The service
 // (../service.cpp) compiles this policy and installs it as a seccomp filter at
 // the start of main(); ../Android.bp sets whether calls outside it are logged

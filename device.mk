@@ -429,6 +429,8 @@ PRODUCT_VENDOR_PROPERTIES += vendor.gatekeeper.is_security_level_spu=0
 $(call inherit-product, vendor/fairphone/FP6/device-vendor.mk)
 # Kernel artifacts are produced from the independently pinned kernel workspace.
 $(call inherit-product, device/fairphone/FP6-kernel/device-kernel.mk)
+# The kernel's GPL-2.0 text and source location, in the vendor licence list.
+PRODUCT_PACKAGES += fp6_kernel_notice
 
 # Source-built protected VM firmware for the FP6 pvmfw partitions.
 PRODUCT_BUILD_PVMFW_IMAGE := true

@@ -1,4 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 android_test {
     name: "FP6CallAudioLifecycleTests",
     srcs: ["src/**/*.java", ":FP6CallAudioJavaSources", ":FP6CallAudioAidlSources"],

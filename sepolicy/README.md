@@ -139,6 +139,9 @@ of the same name (`provenance.json`).
 - Templates live in `/data/vendor_de/<user>/fpdata`
   (`fingerprint_vendor_data_file`), which the platform `hal_fingerprint` rules
   cover.
+- `qseecomd` has no grant on Qualcomm fingerprint data
+  (`/mnt/vendor/persist/qti_fp`): the sensor and its trusted app are
+  FocalTech's.
 - The stock module registers a factory binder service at start. The HAL
   answers that registration inside its own process
   (`fingerprint/ModuleFactoryService.h`), so it never reaches servicemanager.

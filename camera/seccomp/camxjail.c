@@ -23,6 +23,7 @@
 #define LOG_TAG "camxjail"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,12 @@
 #endif
 
 __attribute__((constructor)) static void camxjail_install(void) {
+    // A dump reader that closes its pipe early must not kill the provider:
+    // its writes then fail with EPIPE instead of raising SIGPIPE.
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+        ALOGW("cannot ignore SIGPIPE: %s", strerror(errno));
+    }
+
     const struct filter_options options = {
             .action = CAMXJAIL_ACTION,
             // RET_LOG needs allow_logging, which also makes the compiler skip

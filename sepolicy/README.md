@@ -158,6 +158,16 @@ of the same name (`provenance.json`).
   directories with the HAL's data label or relabel directories to it; only
   init and vendor_init may relabel files to it.
 
+### TEE node
+
+- `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may send two
+  commands to `/dev/smcinvoke`: invoke (`0x9801`) and create a callback
+  server (`0x9803`) (`tee_ioctl.te`).
+  - The limit covers the opened node. SELinux does not check commands on
+    the object and server descriptors the driver hands out.
+- The platform's reference HAL domains with a grant on the node are not
+  limited: no installed file can start them.
+
 ### Hardware identifiers
 
 - `/sys/devices/soc0/serial_number` is `vendor_sysfs_soc_serial`

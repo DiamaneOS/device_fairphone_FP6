@@ -217,7 +217,7 @@ endif
 # Audio: the AudioReach HAL, PAL and AGM from source with AOSP adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
-# Hardware bring-up. Each subsystem makefile documents its stock and
+# Hardware subsystems. Each subsystem makefile documents its stock and
 # source-built parts.
 $(call inherit-product, device/fairphone/FP6/power/power.mk)
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)

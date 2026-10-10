@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony for bring-up: the stock Qualcomm radio daemon (qcrilNrd),
+# Telephony: the stock Qualcomm radio daemon (qcrilNrd),
 # its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
 # native modem services come from the
 # selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
@@ -77,7 +77,7 @@ PRODUCT_PACKAGES += \
 # at verbose level, on every build (TransmitApduLogicalChannelInvocation
 # "Send:"/"Response:", ApduSender "Full APDU response"): profile lists with
 # ICCIDs and, during a download, the activation code's matching ID, the IMEI
-# and the eUICC certificate with the EID (-181). Keep these tags at info.
+# and the eUICC certificate with the EID. Keep these tags at info.
 PRODUCT_VENDOR_PROPERTIES += \
     log.tag.TransApdu=I \
     log.tag.ApduSender-0=I \

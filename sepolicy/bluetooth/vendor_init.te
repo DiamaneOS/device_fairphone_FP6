@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# The factory Bluetooth address (finding -177): init.fp6.bluetooth.rc copies
+# The factory Bluetooth address: init.fp6.bluetooth.rc copies
 # ro.vendor.diamaneos.bt.factory_address, which imeiprovd sets from the
 # traceability partition (hardware/diamaneos/ims), to ro.vendor.bt.boot.macaddr,
 # as stock tctd.rc does. Commands in vendor rc files run as vendor_init, which

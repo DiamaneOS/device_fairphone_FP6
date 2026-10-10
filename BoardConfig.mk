@@ -120,8 +120,7 @@ include hardware/diamaneos/ims/ims-board.mk
 include hardware/diamaneos/ims/wlan-board.mk
 include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 
-# Development identity only. AVB remains enabled; release signing replaces
-# test identities rather than relabelling these artifacts.
+# AVB is enabled; release signing replaces the test identities.
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096

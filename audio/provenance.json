@@ -29,7 +29,7 @@
       "unlicensed_files": [
         {
           "files": "awinic_ar/ (5 sources, 8 headers)",
-          "status": "Published by Fairphone, no licence header (Copyright AWINIC Technology CO., LTD). Used as published (owner decision, 2026-10-06). Compiled into libar-pal as in stock; nothing in PAL or the HAL calls it (stock neither). The amplifier calibration is loaded by the kernel aw882xx driver."
+          "status": "Published by Fairphone, no licence header (Copyright AWINIC Technology CO., LTD). Used as published. Compiled into libar-pal as in stock; nothing in PAL or the HAL calls it (stock neither). The amplifier calibration is loaded by the kernel aw882xx driver."
         },
         {
           "files": "utils/inc/VUIInterfaceProxy.h, vui-dmgr/inc/vui_dmgr_audio_intf.h",

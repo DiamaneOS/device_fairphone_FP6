@@ -10,9 +10,7 @@
 # configuration service and telephony features are built from source. Carrier
 # data is extracted from the authenticated stock package without its code.
 # Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
-# Ordinary calling/SMS/data require carrier qualification on the selected image;
-# emergency handling is simulated, not end-to-end emergency acceptance.
-# AML is deferred. eSIM management is DiamaneOS's own LPA (no stock LPA is
+# eSIM management is DiamaneOS's own LPA (no stock LPA is
 # packaged), off until the user turns on eSIM support.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).

@@ -451,7 +451,7 @@
       "source": "qva/vendor/common/hal_gatekeeper_qti.te",
       "source_sha256": "835559e3dc6090d2890a36a0547a91a9f87a2b0c2f358e64dc4ee42727638246",
       "path": "qva-common/hal_gatekeeper_qti.te",
-      "sha256": "8f79d91c62390f22b5d53c997b5af7cb074d143040fe48b7f35bb808e988d73d"
+      "sha256": "04f2243eb2f99bb76899a253e2607ad4d5a1f3f0caafd3db18a777497f340144"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -523,7 +523,7 @@
       "source": "qva/vendor/common/qseecomd.te",
       "source_sha256": "98b8df12c3c0518a2a0ff178e669f5405679d12d97ed18287bd4f4266e202c3c",
       "path": "qva-common/qseecomd.te",
-      "sha256": "defa0094dd2ac986fe84d06d602b1ffbd34a8549d6cd775ffef9172d09eb2f1b"
+      "sha256": "acef9d6ecafe133a99b84729c32c8d2c2f106f9b835e17844142678f0e1c8c21"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -979,7 +979,7 @@
       "source": "generic/private/property_contexts",
       "source_sha256": "be8f1623c027264299137373a9567c515a720ed03b2b2a67be031c6be95109b2",
       "path": "system-ext-private/property_contexts",
-      "sha256": "25fccff7ae8a73a017a4156765f82da0281fe49b0c570f086ab52e1946a10021"
+      "sha256": "bcf1f73744513ff93fe8433ccc2b890357eeb139510b738bfa607f5f30d44042"
     },
     {
       "project": "qualcomm-sepolicy",
@@ -1155,7 +1155,7 @@
       "source": "generic/vendor/common/ssr_setup.te",
       "source_sha256": "e640747756a5515fce30d954f4b3c98690c69130ec35ab436794c9efd15e1486",
       "path": "modem/ssr_setup.te",
-      "sha256": "74ab6d8f01be5d39bae21f954873797c39720530d5818874552e25c454400575"
+      "sha256": "a3b67607939392277623c05d86ad5bcbc0eb28a75363196d6c9b55ac6e9c2f8b"
     }
   ]
 }

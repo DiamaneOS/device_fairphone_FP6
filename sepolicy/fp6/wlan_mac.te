@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# The factory Wi-Fi MAC file (finding -180; vendor_diamaneos_wlan_mac_file,
+# The factory Wi-Fi MAC file (vendor_diamaneos_wlan_mac_file,
 # hardware/diamaneos/ims): imeiprovd writes it into /mnt/vendor/wlan_mac at
 # post-fs, and boot/ueventd.rc lists that tree as a firmware directory. When the
 # QCA6750 driver asks for wlan/qca_cld/qca6750/wlan_mac.bin, the kernel finds

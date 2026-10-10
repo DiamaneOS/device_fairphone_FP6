@@ -27,7 +27,7 @@
 # DiamaneOS: no secure-processor (SPU) grants. The FP6 has no SPU: its device
 # tree describes none, the SPSS loader and spcom drivers are not shipped, and
 # the selected gatekeeper and its libraries name no SPU node, so /dev/spcom,
-# sp_kernel, spss_utils, sp_keymaster and sp_ssr never exist (finding -85).
+# sp_kernel, spss_utils, sp_keymaster and sp_ssr never exist.
 
 get_prop(vendor_hal_gatekeeper_qti, vendor_disable_spu_prop)
 

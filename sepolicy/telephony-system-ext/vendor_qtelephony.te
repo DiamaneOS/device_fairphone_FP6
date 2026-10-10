@@ -19,7 +19,7 @@ allow vendor_qtelephony radio_service:service_manager find;
 allow vendor_qtelephony system_api_service:service_manager find;
 allow vendor_qtelephony app_api_service:service_manager find;
 # The app's in-process audio client looks up AudioFlinger and media metrics
-# on every voice call (image test 2026-10-05: about 30 denied lookups per call,
+# on every voice call (about 30 denied lookups per call,
 # one second apart, so its audio thread waits in libbinder's retry loop). Any
 # app may look these up; the in-call audio keys stay limited to their owners
 # in AudioFlinger, so this grants no call control.

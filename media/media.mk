@@ -65,7 +65,7 @@ PRODUCT_PACKAGES += \
 # (/sys/devices/platform/soc/aa00000.qcom,vidc/sku_version): for the SM7635
 # SoC ids (636, 640, 641, 712) sku_version 1 selects _volcano_v1 (the
 # IRIS_MULTIPIPE_DISABLE fuse, 4K30 encode), anything else _volcano_v0. The
-# phone reads soc_id 636 and sku_version 1 (checked 2026-09-27), so the value
+# phone reads soc_id 636 and sku_version 1, so the value
 # is fixed here instead of running a shell script at boot; only the
 # _volcano_v1 files are selected.
 FP6_MEDIA_VARIANT := _volcano_v1

@@ -283,7 +283,7 @@
       "source": "generic/vendor/common/tee.te",
       "source_sha256": "1fc472afd8cf08a187a93c6f02d7362c63e37b0f3ef617d33d74cfd72254573e",
       "path": "vendor-common/tee.te",
-      "sha256": "c89b5449f24e1659368f09748542d7b014a9debc01c7e5e950464ce1fd494b94"
+      "sha256": "44219cb2d8381e85b030861751802bb9dafcdb271e3ab2ac462cc92a3f1326d7"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -523,7 +523,7 @@
       "source": "qva/vendor/common/qseecomd.te",
       "source_sha256": "98b8df12c3c0518a2a0ff178e669f5405679d12d97ed18287bd4f4266e202c3c",
       "path": "qva-common/qseecomd.te",
-      "sha256": "f84ed46e0c8e865daefa27b9386800501b03c02df60bfdaa84f8cdc86526fa36"
+      "sha256": "223c232c26f5de617dbda1e3473006e2714c47bb76924b35f216f68b0e24a43e"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

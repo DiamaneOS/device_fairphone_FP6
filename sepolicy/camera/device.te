@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The camera sub-device nodes (/dev/v4l-subdev*: sensors, actuators, EEPROM,
+# OIS, flash): file_contexts in vendor-common, hal_camera_default.te.
+type vendor_camera_subdev_device, dev_type;

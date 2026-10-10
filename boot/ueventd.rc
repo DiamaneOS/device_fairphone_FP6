@@ -178,9 +178,8 @@ firmware_directories /mnt/vendor/wlan_mac/
 /sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg80   0400   root   root
 /sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg83   0400   root   root
 
-# Display power and HDCP control for the composer (matches stock).
+# Display power control for the composer (matches stock).
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
-/sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics
 
 # The thermal HAL runs as system (power/init.fp6.thermal.rc) and sets the next
 # severity threshold of each zone it monitors through trip 1. The nodes stay

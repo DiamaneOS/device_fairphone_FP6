@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Bluetooth for bring-up (stock-first). The selected stock vendor files
+# Bluetooth. The selected stock vendor files
 # supply the Qualcomm HIDL HCI implementation
 # (android.hardware.bluetooth@1.1-impl-qti) and its link closure; our own
 # service (service.cpp) registers it in place of the stock service, which also

@@ -31,7 +31,7 @@ on early-boot
     chown bluetooth bluetooth /sys/class/tty/ttyHS0/device/hs_uart_operation
     chmod 0660 /sys/class/tty/ttyHS0/device/hs_uart_operation
 
-# Factory Bluetooth address (finding -177), as stock tctd.rc does it.
+# Factory Bluetooth address, as stock tctd.rc does it.
 # imeiprovd --bt-address (hardware/diamaneos/ims, vendor.imeiprovd-bt) reads it
 # from the traceability partition at post-fs and sets
 # ro.vendor.diamaneos.bt.factory_address; this copies it to the property the

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Modem subsystem (MSS, 4080000.remoteproc-mss) for bring-up. The stock
+# Modem subsystem (MSS, 4080000.remoteproc-mss). The stock
 # peripheral manager boots it: pm-proxy votes for the internal modem and
 # pm-service starts it through /dev/remoteprocN (boot/ueventd.rc gives the node
 # to system, owner-only). pm-service, pm-proxy, rmt_storage, ssr_setup and

@@ -10,7 +10,7 @@
 #
 # Features match what the stock image declares for reader, NDEF and host card
 # emulation (stock vendor/etc/permissions/android.hardware.nfc{,.hce,.hcef}.xml,
-# byte-for-byte AOSP files). Not declared yet: android.hardware.nfc.uicc and
+# byte-for-byte AOSP files). Not declared: android.hardware.nfc.uicc and
 # android.hardware.se.omapi.uicc (SIM card emulation and OMAPI need the modem,
 # the SIM1 secure-element HAL in the radio daemon and a SIM test), and
 # android.hardware.nfc.ese / se.omapi.ese (the FP6 has no embedded secure

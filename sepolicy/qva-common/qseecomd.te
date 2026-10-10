@@ -27,7 +27,7 @@
 
 # DiamaneOS: no qsee_ipc_irq_spss grant. libspl names the SPSS interrupt
 # bridge, but its module (qsee_ipc_irq_bridge) is not shipped and the FP6 has
-# no secure processor, so the node never exists (finding -85).
+# no secure processor, so the node never exists.
 allow tee tee_device:chr_file rw_file_perms;
 hal_client_domain(tee, vendor_hal_soter);
 unix_socket_connect(tee, property, init)

@@ -8,7 +8,7 @@
 # deadline manager, ACDB calibration and configuration stay from the selected
 # stock vendor files. The AOSP audio service, HIDL adapters, effects and
 # interface libraries are built from source. Sound trigger, Bluetooth audio,
-# FM and the Codec2 audio service are not included yet.
+# FM and the Codec2 audio service are not included.
 $(call soong_config_set_bool,android_hardware_audio,run_64bit,true)
 
 # The board flags in BoardConfig.mk select the build variant (no PAL HIDL

@@ -290,6 +290,8 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 
 - `qseecomd` on the raw UFS LUN 0 node: a platform neverallow on `device`
   forbids it. RPMB and LUN 4 have their own labels.
+- `qseecomd` on `/mnt/vendor/persist/drm`: no DRM service or provisioning
+  client is installed to use that store.
 - `fsck` on `vm-bootsys`: nothing on the FP6 mounts `/product/vm-system`.
 
 ## system_ext and product rules

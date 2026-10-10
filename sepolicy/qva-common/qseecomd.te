@@ -28,7 +28,8 @@
 # DiamaneOS: no qsee_ipc_irq_spss grant. libspl names the SPSS interrupt
 # bridge, but its module (qsee_ipc_irq_bridge) is not shipped and the FP6 has
 # no secure processor, so the node never exists.
-allow tee tee_device:chr_file rw_file_perms;
+# DiamaneOS: the grant on the TEE node is in fp6/tee_node.te, on the node's
+# own label.
 unix_socket_connect(tee, property, init)
 # Allow access to qsee data file
 allow tee vendor_data_qsee_file:dir create_dir_perms;

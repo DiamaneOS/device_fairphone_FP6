@@ -61,7 +61,10 @@ may access, and why. It describes the policy of a release (`user`) build.
 - `vendor_per_mgr` may use QRTR sockets (`qipcrtr_socket`, no ioctls): its QMI
   libraries open AF_QIPCRTR sockets.
 - No label or ueventd rule for `/dev/qseecom`: the legacy QSEECom driver is
-  not shipped. `/dev/smcinvoke` is the only `tee_device` node.
+  not shipped. `/dev/smcinvoke` is the only TEE node, and no node carries the
+  platform's `tee_device` label (see "TEE node").
+- The imported `tee_device` grants of `qseecomd` and KeyMint are removed;
+  their grants on the node are in `fp6/tee_node.te`.
 - No label for the HDCP level node (`/sys/devices/virtual/hdcp/msm_hdcp`): the
   display driver is built without HDCP, so the node does not exist.
 - No QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
@@ -140,9 +143,9 @@ of the same name (`provenance.json`).
 ### Fingerprint
 
 - `/dev/focaltech_fp` is `ff_device` (stock label).
-- The fingerprint HAL may open, read, write and ioctl that node and QSEECom
-  (`tee_device`), and open, read and ioctl the two QSEECom heaps
-  (`fingerprint.te`).
+- The fingerprint HAL may open, read, write and ioctl that node
+  (`fingerprint.te`) and the TEE node (`tee_node.te`), and open, read and
+  ioctl the two QSEECom heaps (`fingerprint.te`).
 - Templates live in `/data/vendor_de/<user>/fpdata`
   (`fingerprint_vendor_data_file`), which the platform `hal_fingerprint` rules
   cover.
@@ -162,13 +165,18 @@ of the same name (`provenance.json`).
 
 ### TEE node
 
-- `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may send two
-  commands to `/dev/smcinvoke`: invoke (`0x9801`) and create a callback
-  server (`0x9803`) (`tee_ioctl.te`).
+- `/dev/smcinvoke` is `vendor_smcinvoke_device`, the type Qualcomm's public
+  policy declares for it, not the platform's `tee_device`.
+  - The platform grants `tee_device` to its reference DRM, CAS, Keymaster,
+    KeyMint, Gatekeeper, AuthGraph, Secretkeeper and hwcrypto HAL domains.
+    With no node under that label, those grants reach nothing.
+- Only `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may open,
+  read, write or send commands to the node; a neverallow keeps every other
+  domain off it (`tee_node.te`).
+- The four may send two commands: invoke (`0x9801`) and create a callback
+  server (`0x9803`).
   - The limit covers the opened node. SELinux does not check commands on
     the object and server descriptors the driver hands out.
-- The platform's reference HAL domains with a grant on the node are not
-  limited: no installed file can start them.
 
 ### Hardware identifiers
 

@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Commands on the TEE node (/dev/smcinvoke, tee_device). Its four users,
+# qseecomd (tee), KeyMint, Gatekeeper and the fingerprint HAL, send two
+# commands to the node: invoke on the root object (0x9801) and create a
+# callback server (0x9803). The driver has three more: accept (0x9802) and
+# acknowledge (0x9804), which belong to server descriptors, and a log call
+# (0x98ff) that none of the four sends.
+#
+# These rules limit the opened node only. SELinux does not check commands on
+# the object and server descriptors that the driver hands out.
+#
+# They grant nothing by themselves. The ioctl permission comes from the
+# platform policy and qva-common/qseecomd.te (tee), from
+# vendor-common/hal_keymint_qti.te, from the platform hal_gatekeeper rules and
+# from fingerprint.te.
+allowxperm tee tee_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm vendor_hal_keymint_qti tee_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm vendor_hal_gatekeeper_qti tee_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm hal_fingerprint_default tee_device:chr_file ioctl { 0x9801 0x9803 };

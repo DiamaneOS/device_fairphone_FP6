@@ -36,7 +36,8 @@ dontaudit vendor_hal_keymint_qti firmware_file:dir search;
 get_prop(vendor_hal_keymint_qti, vendor_tee_listener_prop)
 get_prop(vendor_hal_keymint_qti, vendor_disable_spu_prop)
 
-allow vendor_hal_keymint_qti tee_device:chr_file rw_file_perms;
+# DiamaneOS: the grant on the TEE node is in fp6/tee_node.te, on the node's
+# own label.
 
 # As each dma buf is seperate device, need to allow access to those devices
 allow vendor_hal_keymint_qti vendor_dmabuf_qseecom_heap_device:chr_file r_file_perms;

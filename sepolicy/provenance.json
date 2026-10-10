@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "bf4b1041cff8c3d3e98184ddb13035075c503c11a976696dd97c7abd16530d9e"
+      "sha256": "38f689712bc02bbc1c6871237e0ab09541d83b8590b7a93541ded976d9af3df2"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

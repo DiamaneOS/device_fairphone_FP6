@@ -20,6 +20,11 @@
 allow hal_camera_default self:capability sys_nice;
 wakelock_use(hal_camera_default)
 
+# The camera sub-devices (/dev/v4l-subdev*) have their own type instead of
+# video_device, which the composer and platform media services also hold:
+# only the provider programs the sensors, actuators, OIS and flash.
+allow hal_camera_default vendor_camera_subdev_device:chr_file rw_file_perms;
+
 # ToF laser autofocus (sensors.vl53l1.so opens /dev/stmvl53l1_ranging).
 allow hal_camera_default vl53l1_device:chr_file rw_file_perms;
 # UBWC-P linear views of compressed camera buffers (libubwcp, /dev/ubwcp).

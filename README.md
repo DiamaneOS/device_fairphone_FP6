@@ -30,6 +30,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 | `timekeep/` | `timekeepd`: keeps the clock across reboots |
 | `firmware/` | `fwrelease`: finds the installed Fairphone firmware release for Settings |
 | `compat/` | compatibility libraries for stock vendor files |
+| `display/` | display configuration: brightness table and high-brightness limits |
 | `rro/` | resource overlays |
 | `sepolicy/` | device policy ([sepolicy/README.md](sepolicy/README.md)) |
 
@@ -56,6 +57,25 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 - Recovery (`boot/init.recovery.qcom.rc`): USB peripheral mode, modem firmware
   mounted read-only before ADSP boot, platform wipe hooks only. Includes
   fastbootd.
+
+## Display
+
+- Brightness comes from `display/display_port_130.xml`: a table measured on the
+  panel (white, 20 % window), 36 points from panel level 10 (2.0 nits) to 3480
+  (1151 nits).
+- Brightness is linear in nits, so equal slider steps look about equal.
+  - Android allows a shaped brightness-to-backlight map only through
+    `evenDimmer`. While it is on, Android offers no Extra dim switch.
+- The manual slider ends at level 2048 (757 nits). Above it only white gets
+  brighter: mid greys stay put and colours oversaturate.
+- The band above is for sunlight: automatic brightness at 10000 lux or more,
+  without a time limit, also in battery saver. The curve reaches the top at
+  20000 lux.
+- Levels 3481 to 4094 (up to 1364 nits) are not used.
+- Range, default and dim values are in
+  `rro/FP6FrameworksOverlay/res/values/brightness.xml`. Its minimum must equal
+  the table's first backlight point; the image checks compare the table with
+  the measured panel curve.
 
 ## Services
 

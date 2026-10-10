@@ -262,8 +262,8 @@ PRODUCT_PACKAGES += \
     FP6SettingsOverlay \
     FP6SystemUIOverlay
 
-# Stock brightness map and high-brightness limits (display_port_130.xml link to
-# the selected stock display configuration; Android.bp).
+# Measured brightness table, manual range and high-brightness limits
+# (display/display_port_130.xml; Android.bp).
 PRODUCT_PACKAGES += fp6_displayconfig_port130
 
 # Fingerprint: our AIDL service (fingerprint/) drives the stock FocalTech

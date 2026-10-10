@@ -23,12 +23,14 @@ install_symlink {
     symlink_target: "libfingerprint.default.so",
 }
 
-// Stock's display configuration (brightness map and high-brightness limits) is
-// named after stock's display ID. Our display HAL reports another ID, so the
-// framework finds it through the port-based name (port 130).
-install_symlink {
+// Display configuration of the built-in panel: the measured brightness table,
+// the manual range and the high-brightness limits. The display HAL reports its
+// own display ID, so the framework finds the file through the port-based name
+// (port 130).
+prebuilt_etc {
     name: "fp6_displayconfig_port130",
     vendor: true,
-    installed_location: "etc/displayconfig/display_port_130.xml",
-    symlink_target: "display_id_4630947039571902850.xml",
+    src: "display/display_port_130.xml",
+    sub_dir: "displayconfig",
+    filename: "display_port_130.xml",
 }

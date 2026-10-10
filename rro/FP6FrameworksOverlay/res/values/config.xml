@@ -132,4 +132,11 @@
          and only this feature lifts it. No pogo pins, so
          config_usb_port_security_applies_to_pogo_pins stays false. -->
     <bool name="config_usbPortSecuritySupported">true</bool>
+
+    <!-- No copy of the lock credential's check data on the frp partition. That
+         partition is not encrypted, and the copy (salt, stretch parameters and
+         Gatekeeper handle) is only read to ask for the old lock after a
+         factory reset. GrapheneOS clears factory reset protection at every
+         boot, so nothing reads it. -->
+    <bool name="config_enableCredentialFactoryResetProtection">false</bool>
 </resources>

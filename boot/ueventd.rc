@@ -81,7 +81,6 @@ firmware_directories /mnt/vendor/wlan_mac/
 /dev/kgsl-3d0             0666   system     system
 /dev/membuf               0664   system     system
 /dev/dma_heap/qcom,*      0444   system     system
-/dev/qseecom              0660   system     drmrpc
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
 # The stock FP6 RPMB rule lets the system-owned qseecomd listener serve

@@ -122,6 +122,11 @@ of the same name (`provenance.json`).
   provider.
 - `libllvm-qgl.so` is a same-process HAL library (`file_contexts`).
 - The composer keeps state in `/data/vendor/display`.
+- `qseecomd` has no secure-display grants: no framebuffer nodes, no graphics
+  allocator client rules and no vndbinder access. No secure-display listener
+  is installed.
+  - It stays a composer client: its output-protection listener links the
+    composer's display config interface.
 - init may `setattr` `vendor_sysfs_graphics` files: `init.qcom.rc` hands the
   panel brightness node to system.
 - The DisplayPort and audio-codec extcon devices are `sysfs_extcon`, which

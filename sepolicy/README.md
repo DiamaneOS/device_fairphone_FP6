@@ -755,6 +755,11 @@ Grants:
 
 - `sys_nice` and wake locks.
 - The ToF node and UBWC-P.
+- The camera sub-device nodes (`/dev/v4l-subdev*`: sensors, actuators, OIS,
+  flash), under their own type `vendor_camera_subdev_device`.
+  - Only the provider may open them.
+  - They do not share `video_device`, which the composer and platform media
+    services also hold.
 - FastRPC with read-only opens: the secure node (the ADSP sensors PD of the
   CamX sensor direct channel), the non-secure node (the CDSP offloads) and
   `/vendor/dsp`.

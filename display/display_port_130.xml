@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<!-- Display configuration of the built-in panel. The framework finds it by
+     port (130), because the display HAL reports its own display ID.
+
+     The brightness table is measured on the panel (white, 20 % window). The
+     display HAL writes panel level int(1 + backlight * 4093); the kernel maps
+     levels above 2048 onto the panel's high-brightness band, where only white
+     gets brighter (mid greys stay put, colours oversaturate).
+
+     - Brightness is linear in nits, so the slider and the brightness ramps
+       (both HLG over brightness) are perceptually even. Only evenDimmer can
+       give brightness -> backlight a shape; it is used for that alone.
+     - Floor: level 10, 2.0 nits. Top: level 3480, 1151 nits.
+     - The manual range ends at level 2048 (757 nits), the high-brightness
+       transition. The band above is for sunlight. -->
+<displayConfiguration>
+  <!-- backlight -> nits for the whole panel. The framework cuts it to the
+       range of the overlay (brightness.xml). evenDimmer below has the same
+       points inside that range and is the map in use. -->
+  <screenBrightnessMap interpolation="linear">
+    <point><value>0.0</value><nits>1.885</nits></point>
+    <point><value>0.002199</value><nits>2.002</nits></point>
+    <point><value>0.0046421</value><nits>2.182</nits></point>
+    <point><value>0.0095285</value><nits>2.435</nits></point>
+    <point><value>0.0144149</value><nits>2.790</nits></point>
+    <point><value>0.0193013</value><nits>3.146</nits></point>
+    <point><value>0.0241877</value><nits>3.601</nits></point>
+    <point><value>0.0290741</value><nits>4.099</nits></point>
+    <point><value>0.0354264</value><nits>4.808</nits></point>
+    <point><value>0.0415344</value><nits>5.549</nits></point>
+    <point><value>0.0461764</value><nits>6.329</nits></point>
+    <point><value>0.0522844</value><nits>7.317</nits></point>
+    <point><value>0.0598583</value><nits>8.919</nits></point>
+    <point><value>0.0686538</value><nits>11.25</nits></point>
+    <point><value>0.078671</value><nits>14.40</nits></point>
+    <point><value>0.0903983</value><nits>18.81</nits></point>
+    <point><value>0.1031029</value><nits>24.66</nits></point>
+    <point><value>0.1187394</value><nits>33.34</nits></point>
+    <point><value>0.1319326</value><nits>41.59</nits></point>
+    <point><value>0.1463475</value><nits>51.64</nits></point>
+    <point><value>0.1668703</value><nits>67.96</nits></point>
+    <point><value>0.184217</value><nits>83.43</nits></point>
+    <point><value>0.2032739</value><nits>102.5</nits></point>
+    <point><value>0.2228195</value><nits>124.9</nits></point>
+    <point><value>0.2440753</value><nits>152.2</nits></point>
+    <point><value>0.2770584</value><nits>199.5</nits></point>
+    <point><value>0.3144393</value><nits>262.1</nits></point>
+    <point><value>0.3393599</value><nits>311.0</nits></point>
+    <point><value>0.3662351</value><nits>369.9</nits></point>
+    <point><value>0.3984853</value><nits>449.0</nits></point>
+    <point><value>0.4412412</value><nits>569.0</nits></point>
+    <point><value>0.4883949</value><nits>715.3</nits></point>
+    <point><value>0.5001222</value><nits>757.2</nits></point>
+    <point><value>0.5631567</value><nits>809.3</nits></point>
+    <point><value>0.6349866</value><nits>890.5</nits></point>
+    <point><value>0.7327144</value><nits>1003.5</nits></point>
+    <point><value>0.85</value><nits>1151.1</nits></point>
+    <point><value>0.9281701</value><nits>1262.2</nits></point>
+    <point><value>1</value><nits>1363.9</nits></point>
+  </screenBrightnessMap>
+
+  <!-- Above the transition: automatic brightness only, at 10000 lux or more.
+       timeMaxSecs above timeWindowSecs means no time limit: a sunlight
+       session is never cut short. Battery saver does not block it. -->
+  <highBrightnessMode enabled="true">
+    <transitionPoint>0.5001222</transitionPoint>
+    <minimumLux>10000</minimumLux>
+    <timing>
+      <timeWindowSecs>1800</timeWindowSecs>
+      <timeMaxSecs>86400</timeMaxSecs>
+      <timeMinSecs>60</timeMinSecs>
+    </timing>
+    <allowInLowPowerMode>true</allowInLowPowerMode>
+    <minimumHdrPercentOfScreen>0.1</minimumHdrPercentOfScreen>
+    <sdrHdrRatioMap>
+      <point><sdrNits>2.000</sdrNits><hdrRatio>8.000</hdrRatio></point>
+      <point><sdrNits>500.000</sdrNits><hdrRatio>1.5</hdrRatio></point>
+    </sdrHdrRatioMap>
+  </highBrightnessMode>
+
+  <screenBrightnessRampFastDecrease>0.06</screenBrightnessRampFastDecrease>
+  <screenBrightnessRampFastIncrease>0.06</screenBrightnessRampFastIncrease>
+  <screenBrightnessRampSlowDecrease>0.04</screenBrightnessRampSlowDecrease>
+  <screenBrightnessRampSlowIncrease>0.04</screenBrightnessRampSlowIncrease>
+  <screenBrightnessRampIncreaseMaxMillis>3000</screenBrightnessRampIncreaseMaxMillis>
+  <screenBrightnessRampDecreaseMaxMillis>3000</screenBrightnessRampDecreaseMaxMillis>
+
+  <!-- nits, backlight and brightness per point. transitionPoint 0 and a flat
+       lux map: no software dimming below the panel floor, no lux-dependent
+       floor. -->
+  <evenDimmer enabled="true">
+    <transitionPoint>0</transitionPoint>
+    <brightnessMapping>
+      <brightnessPoint><nits>2.002</nits><backlight>0.002199</backlight><brightness>0.0000000</brightness></brightnessPoint>
+      <brightnessPoint><nits>2.182</nits><backlight>0.0046421</backlight><brightness>0.0001566</brightness></brightnessPoint>
+      <brightnessPoint><nits>2.435</nits><backlight>0.0095285</backlight><brightness>0.0003768</brightness></brightnessPoint>
+      <brightnessPoint><nits>2.790</nits><backlight>0.0144149</backlight><brightness>0.0006858</brightness></brightnessPoint>
+      <brightnessPoint><nits>3.146</nits><backlight>0.0193013</backlight><brightness>0.0009956</brightness></brightnessPoint>
+      <brightnessPoint><nits>3.601</nits><backlight>0.0241877</backlight><brightness>0.0013915</brightness></brightnessPoint>
+      <brightnessPoint><nits>4.099</nits><backlight>0.0290741</backlight><brightness>0.0018249</brightness></brightnessPoint>
+      <brightnessPoint><nits>4.808</nits><backlight>0.0354264</backlight><brightness>0.0024419</brightness></brightnessPoint>
+      <brightnessPoint><nits>5.549</nits><backlight>0.0415344</backlight><brightness>0.0030868</brightness></brightnessPoint>
+      <brightnessPoint><nits>6.329</nits><backlight>0.0461764</backlight><brightness>0.0037656</brightness></brightnessPoint>
+      <brightnessPoint><nits>7.317</nits><backlight>0.0522844</backlight><brightness>0.0046254</brightness></brightnessPoint>
+      <brightnessPoint><nits>8.919</nits><backlight>0.0598583</backlight><brightness>0.0060195</brightness></brightnessPoint>
+      <brightnessPoint><nits>11.25</nits><backlight>0.0686538</backlight><brightness>0.0080481</brightness></brightnessPoint>
+      <brightnessPoint><nits>14.40</nits><backlight>0.078671</backlight><brightness>0.0107893</brightness></brightnessPoint>
+      <brightnessPoint><nits>18.81</nits><backlight>0.0903983</backlight><brightness>0.0146271</brightness></brightnessPoint>
+      <brightnessPoint><nits>24.66</nits><backlight>0.1031029</backlight><brightness>0.0197181</brightness></brightnessPoint>
+      <brightnessPoint><nits>33.34</nits><backlight>0.1187394</backlight><brightness>0.0272718</brightness></brightnessPoint>
+      <brightnessPoint><nits>41.59</nits><backlight>0.1319326</backlight><brightness>0.0344514</brightness></brightnessPoint>
+      <brightnessPoint><nits>51.64</nits><backlight>0.1463475</backlight><brightness>0.0431974</brightness></brightnessPoint>
+      <brightnessPoint><nits>67.96</nits><backlight>0.1668703</backlight><brightness>0.0573998</brightness></brightnessPoint>
+      <brightnessPoint><nits>83.43</nits><backlight>0.184217</backlight><brightness>0.0708625</brightness></brightnessPoint>
+      <brightnessPoint><nits>102.5</nits><backlight>0.2032739</backlight><brightness>0.0874582</brightness></brightnessPoint>
+      <brightnessPoint><nits>124.9</nits><backlight>0.2228195</backlight><brightness>0.1069517</brightness></brightnessPoint>
+      <brightnessPoint><nits>152.2</nits><backlight>0.2440753</backlight><brightness>0.1307095</brightness></brightnessPoint>
+      <brightnessPoint><nits>199.5</nits><backlight>0.2770584</backlight><brightness>0.1718722</brightness></brightnessPoint>
+      <brightnessPoint><nits>262.1</nits><backlight>0.3144393</backlight><brightness>0.2263497</brightness></brightnessPoint>
+      <brightnessPoint><nits>311.0</nits><backlight>0.3393599</backlight><brightness>0.2689048</brightness></brightnessPoint>
+      <brightnessPoint><nits>369.9</nits><backlight>0.3662351</backlight><brightness>0.3201624</brightness></brightnessPoint>
+      <brightnessPoint><nits>449.0</nits><backlight>0.3984853</backlight><brightness>0.3889990</brightness></brightnessPoint>
+      <brightnessPoint><nits>569.0</nits><backlight>0.4412412</backlight><brightness>0.4934288</brightness></brightnessPoint>
+      <brightnessPoint><nits>715.3</nits><backlight>0.4883949</backlight><brightness>0.6207460</brightness></brightnessPoint>
+      <brightnessPoint><nits>757.2</nits><backlight>0.5001222</backlight><brightness>0.6572094</brightness></brightnessPoint>
+      <brightnessPoint><nits>809.3</nits><backlight>0.5631567</backlight><brightness>0.7025493</brightness></brightnessPoint>
+      <brightnessPoint><nits>890.5</nits><backlight>0.6349866</backlight><brightness>0.7732134</brightness></brightnessPoint>
+      <brightnessPoint><nits>1003.5</nits><backlight>0.7327144</backlight><brightness>0.8715514</brightness></brightnessPoint>
+      <brightnessPoint><nits>1151.1</nits><backlight>0.85</backlight><brightness>1.0000000</brightness></brightnessPoint>
+    </brightnessMapping>
+    <luxToMinimumNitsMap>
+      <point><value>0</value><nits>2.002</nits></point>
+      <point><value>1</value><nits>2.002</nits></point>
+    </luxToMinimumNitsMap>
+  </evenDimmer>
+
+  <!-- Doze and always-on display: backlight of panel level 146. -->
+  <defaultDozeBrightness>0.0354264</defaultDozeBrightness>
+</displayConfiguration>

@@ -63,3 +63,13 @@ with their licences in audio/provenance.json. Each fork's NOTICE reproduces
 its licences. Fairphone publishes PAL's Awinic calibration code (awinic_ar/)
 and two small interface headers without a licence header; they are used as
 published.
+
+display/display_port_130.xml: the brightness table is DiamaneOS's own
+measurement of the panel. The HDR ratio map, the ramp rates, the lux threshold
+and the HDR screen share are the values of the stock display configuration,
+FP6.QREL.16.111.0 EU vendor/etc/displayconfig/
+display_id_4630947039571902850.xml, SHA-256
+d25a2f52cd62a4f1b5a06c4e519240347fe98e5b1d75690ff6d9ddb0ad4e4afe.
+Copyright (c) 2023 The Linux Foundation (BSD-3-Clause); changes Copyright (c)
+2023 Qualcomm Innovation Center, Inc. (BSD-3-Clause-Clear). Nothing else of
+that file is used.

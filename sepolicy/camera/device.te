@@ -3,3 +3,5 @@
 # The camera sub-device nodes (/dev/v4l-subdev*: sensors, actuators, EEPROM,
 # OIS, flash): file_contexts in vendor-common, hal_camera_default.te.
 type vendor_camera_subdev_device, dev_type;
+# Only the camera provider opens them.
+neverallow { domain -hal_camera_default } vendor_camera_subdev_device:chr_file { open read write append ioctl map };

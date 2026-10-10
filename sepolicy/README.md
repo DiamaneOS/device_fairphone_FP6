@@ -69,6 +69,12 @@ may access, and why. It describes the policy of a release (`user`) build.
   - The kernel `qseecom_proxy.ko` is a different component and stays.
 - No secure-processor (SPU) grants for the gatekeeper HAL and `qseecomd`: the
   FP6 has no SPU, so those device nodes never exist.
+- Not imported for `qseecomd` (`tee`), because nothing on the FP6 matches:
+  - The SOTER and `qdutils` display client lines: the policy has no server
+    for either interface, and no rule uses those client attributes.
+  - The user-contig heap: the device tree defines no such heap.
+  - `vendor_qfp-daemon_data_file` and `vendor_sysfs_sectouch`: no file
+    context or genfs entry assigns these labels.
 - The FP6 fingerprint service
   (`android.hardware.biometrics.fingerprint-service.fp6`) is
   `hal_fingerprint_default_exec` (`vendor-common/file_contexts`).

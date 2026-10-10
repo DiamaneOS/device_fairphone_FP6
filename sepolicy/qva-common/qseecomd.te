@@ -29,7 +29,6 @@
 # bridge, but its module (qsee_ipc_irq_bridge) is not shipped and the FP6 has
 # no secure processor, so the node never exists.
 allow tee tee_device:chr_file rw_file_perms;
-hal_client_domain(tee, vendor_hal_soter);
 unix_socket_connect(tee, property, init)
 # Allow access to qsee data file
 allow tee vendor_data_qsee_file:dir create_dir_perms;
@@ -43,8 +42,6 @@ dontaudit tee rootfs:dir { read };
 
 wakelock_use(tee)
 r_dir_file(tee, firmware_file)
-allow tee vendor_qfp-daemon_data_file:dir create_dir_perms;
-allow tee vendor_qfp-daemon_data_file:file create_file_perms;
 allow tee vendor_persist_qti_fp_file:dir create_dir_perms;
 allow tee vendor_persist_qti_fp_file:file create_file_perms;
 
@@ -54,6 +51,5 @@ allowxperm tee vendor_rpmb_device:chr_file ioctl {MMC_IOC_MULTI_CMD};
 # As each dma buf is seperate device, need to allow access to those devices
 allow tee vendor_dmabuf_qseecom_heap_device:chr_file r_file_perms;
 allow tee vendor_dmabuf_qseecom_ta_heap_device:chr_file r_file_perms;
-allow tee vendor_dmabuf_user_contig_heap_device:chr_file r_file_perms;
 # Allow get prop  access for User space reboot property
 get_prop(tee, userspace_reboot_exported_prop);

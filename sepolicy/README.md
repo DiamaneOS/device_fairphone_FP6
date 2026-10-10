@@ -60,6 +60,8 @@ may access, and why. It describes the policy of a release (`user`) build.
   service is not installed.
 - `vendor_per_mgr` may use QRTR sockets (`qipcrtr_socket`, no ioctls): its QMI
   libraries open AF_QIPCRTR sockets.
+- No label or ueventd rule for `/dev/qseecom`: the legacy QSEECom driver is
+  not shipped. `/dev/smcinvoke` is the only `tee_device` node.
 - No QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
   `hal_qseecom.te` and its file and service contexts are not imported.
   - No installed file looks it up. KeyMint, Gatekeeper, the fingerprint module

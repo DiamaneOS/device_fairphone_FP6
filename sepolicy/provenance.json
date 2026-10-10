@@ -451,7 +451,7 @@
       "source": "qva/vendor/common/hal_gatekeeper_qti.te",
       "source_sha256": "835559e3dc6090d2890a36a0547a91a9f87a2b0c2f358e64dc4ee42727638246",
       "path": "qva-common/hal_gatekeeper_qti.te",
-      "sha256": "04f2243eb2f99bb76899a253e2607ad4d5a1f3f0caafd3db18a777497f340144"
+      "sha256": "c23ef9ad6081d059f8dfa820e2463aa3f413ddd5eb625d1bbe9154d52e6bad56"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

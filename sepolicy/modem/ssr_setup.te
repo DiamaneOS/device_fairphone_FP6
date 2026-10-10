@@ -45,7 +45,7 @@ allow vendor_ssr_setup vendor_sysfs_ssr_toggle:file rw_file_perms;
 # persist.vendor.ssr.restart_level
 get_prop(vendor_ssr_setup, vendor_ssr_prop)
 
-# Enforcing follow-up (not granted; permissive bring-up): the ro.arch read,
+# Not granted: the ro.arch read,
 # libmdmdetect's probes of the absent /sys/bus/esoc and /sys/bus/msm_subsys,
 # and traversal of the /sys/devices/platform/soc/<rproc>/remoteproc/ dirs.
 # Grant only what the permissive boot's denial log shows.

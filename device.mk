@@ -383,8 +383,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.display.disable_hw_recovery_dump=1 \
     vendor.display.enable_early_wakeup=1
 
-# Declare the phone baseline and only the hardware that currently works; add
-# radio, camera and other features as their stacks are brought up.
+# Declare the phone baseline and the hardware features the device supports.
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
@@ -455,7 +454,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # MTP cancels pending transfers in one batch, as stock. On the DWC3 controller,
 # cancelling them one by one fails after the first, which by the code aborts
-# PC-to-phone copies of 4 GB or more (not yet tested on the phone).
+# PC-to-phone copies of 4 GB or more.
 PRODUCT_VENDOR_PROPERTIES += sys.usb.mtp.batchcancel=1
 
 # USB tethering over NCM, as Pixels: Tethering defaults to RNDIS, which this

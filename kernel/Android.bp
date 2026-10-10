@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+// The kernel, its modules and the device tree come prebuilt from
+// device/fairphone/FP6-kernel and sit outside the files Android lists licences
+// for. This notice file puts the GPL-2.0 text and the source location into the
+// vendor partition's licence list (Settings > About phone > Legal information).
+
+package {
+    default_applicable_licenses: ["fp6_kernel_license"],
+}
+
+license {
+    name: "fp6_kernel_license",
+    license_kinds: ["SPDX-license-identifier-GPL-2.0-only"],
+    license_text: ["COPYING"],
+}
+
+prebuilt_etc {
+    name: "fp6_kernel_notice",
+    src: "linux-kernel.txt",
+    filename: "linux-kernel.txt",
+    sub_dir: "notices",
+    vendor: true,
+}

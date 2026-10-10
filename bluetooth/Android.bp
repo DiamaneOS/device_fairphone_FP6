@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Bluetooth HCI service: registers the stock Qualcomm HCI implementation
 // (selected stock vendor file) through HIDL passthrough, without the FM, ANT,
 // SAR, config-store and TPI libraries the stock service links (service.cpp).

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Stand-in for Qualcomm's closed libqti-perfd-client.so, which sent perf locks
 // and hints to the perf2 daemon. The stock camera (camera.qcom.so) and SDM
 // composition extension (libsdmextension.so) load it by name. The camera's

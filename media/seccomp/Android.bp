@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Seccomp filter and codec gate for the stock Qualcomm Codec2 video service
 // (c2hwjail.cpp). The tools renderer renames the service's
 // libavservices_minijail.so dependency to libc2hwjail_avservices.so (same

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
 // Single and double tap from the touch controller as sensors for SystemUI's
 // doze service: Tap to check phone and Display > Tap to wake (TapSubHal.cpp). The AOSP sensors multi-HAL loads it from
 // /odm/etc/sensors/hals.conf, next to the Qualcomm sub-HAL it loads from

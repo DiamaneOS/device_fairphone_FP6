@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+license {
+    name: "fp6_device_license",
+    visibility: [":__subpackages__"],
+    license_kinds: ["SPDX-license-identifier-Apache-2.0"],
+    license_text: ["LICENSE"],
+}
+
 // The QCA6750 host driver requests its configuration through the kernel
 // firmware loader, at the path the stock vendor image links. Stock also links
 // wlan_mac.bin to /mnt/vendor/persist; here imeiprovd writes that file at boot

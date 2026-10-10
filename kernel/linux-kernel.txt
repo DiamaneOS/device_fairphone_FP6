@@ -1,0 +1,4 @@
+Linux kernel, kernel modules and device tree for the Fairphone 6.
+Licence: GPL-2.0. Some modules are dual-licensed.
+Source: https://github.com/DiamaneOS/kernel_qcom-6.1
+The commit a build uses is named in https://github.com/DiamaneOS/device_fairphone_FP6-kernels

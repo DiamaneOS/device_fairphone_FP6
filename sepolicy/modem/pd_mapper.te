@@ -7,8 +7,8 @@
 # domain lists (*.jsn) next to each remote processor's firmware, under
 # /vendor/firmware, which links them from the modem partition
 # (modem/Android.bp). It replaces Qualcomm's pd-mapper (its imported policy,
-# pd_services.te, is removed), which held setuid, setgid, setpcap and
-# net_bind_service, used the legacy IPC router socket and its ioctl, and read
+# pd_services.te, is left out), which holds setuid, setgid, setpcap and
+# net_bind_service, uses the legacy IPC router socket and its ioctl, and reads
 # vendor_sysfs_data and a debug property.
 # This domain has no capabilities, no network, no files to write, no binder
 # and no properties.

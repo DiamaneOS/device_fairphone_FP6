@@ -10,8 +10,8 @@
 # to it: no rule here or in fp6/tee_node.te lets it use the TEE node, the
 # QSEECom heap, the crypto engine node, qseecomd's socket, the memory-buffer
 # driver and its bitstream node, or the codec service's file descriptors. The
-# grants below are the ones the service had, and needed, while it ran without
-# the hardware-backed library.
+# grants below are what the service needs when it runs without the
+# hardware-backed library.
 type hal_drm_widevine_sw, domain;
 
 hal_server_domain(hal_drm_widevine_sw, hal_drm)

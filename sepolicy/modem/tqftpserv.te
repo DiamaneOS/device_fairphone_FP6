@@ -4,10 +4,10 @@
 # tqftpserv (linux-msm, BSD-3-Clause, DiamaneOS fork in
 # vendor/qcom/opensource/tqftpserv) serves the modem's TFTP requests over QRTR:
 # read-only files from the modem partition and read-write files in
-# /data/vendor/tmp/tqftpserv (modem/init.modem.rc). It
-# replaces Qualcomm's tftp_server (not installed; its imported policy is
-# removed), which started as root with chown, setuid, setgid, setpcap and
-# net_bind_service, and wrote persist, /data/vendor/tombstones and pddump.
+# /data/vendor/tmp/tqftpserv (modem/init.modem.rc). It replaces Qualcomm's
+# tftp_server (not installed; its imported policy is left out), which starts
+# as root with chown, setuid, setgid, setpcap and net_bind_service, and writes
+# persist, /data/vendor/tombstones and pddump.
 # This domain has no capabilities, no network, no persist, no binder and no
 # properties.
 type vendor_tqftpserv, domain;

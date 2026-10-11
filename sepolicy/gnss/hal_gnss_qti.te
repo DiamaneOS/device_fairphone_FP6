@@ -11,8 +11,8 @@
 # (loc_launcher, xtra-daemon, lowi-server, xtwifi-client, slim_daemon,
 # edgnss-daemon, engine-service, blpsvc, qsap_location), RIL and SSG sockets,
 # MHI sysfs and the QMS/AON properties. Also not granted: the HAL's own socket
-# in /dev/socket/location, which the source build does not open (it existed
-# only for the XTRA and DGNSS daemons).
+# in /dev/socket/location, which the source build does not open (it serves
+# only the XTRA and DGNSS daemons).
 # servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
 # domains without such vendor rules (vendor_hal_gatekeeper_qti,
 # vendor_hal_keymint_qti) register on stock, so the platform hal server rules

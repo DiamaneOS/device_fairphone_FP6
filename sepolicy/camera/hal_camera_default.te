@@ -131,6 +131,7 @@ dontaudit hal_camera_default zygote_config_prop:file read;
 # The provider runs with no_new_privs (camxjail seccomp, camera/seccomp), so
 # debuggerd writes its crash and watchdog-abort tombstones and its ANR and
 # bug-report stack dumps through the in-process fallback handler. That handler
-# needs AOSP's fallback rules (denied before: write on tombstoned_crash_socket;
-# logcat "missing crash_dump_fallback() in selinux policy?").
+# needs AOSP's fallback rules (without them the write on
+# tombstoned_crash_socket is denied; logcat "missing crash_dump_fallback() in
+# selinux policy?").
 crash_dump_fallback(hal_camera_default)

@@ -4,9 +4,9 @@
 # not shipped. With the driver loaded, writing 1 to
 # /sys/module/eud/parameters/enable (0644 root) would turn the debugger on. The
 # generic sysfs label would let vold, the USB HAL and vfio_handler write it;
-# its own type (genfs line in
-# fp6/genfs_contexts) leaves only the platform's sysfs_type writers, ueventd
-# and vendor_init, which act only on the reviewed ueventd and init files.
+# its own type (genfs line in fp6/genfs_contexts) leaves only the platform's
+# sysfs_type writers, ueventd and vendor_init, which act only on the image's
+# ueventd and init files.
 # Reads stay as the platform grants them: the value only tells whether EUD is on.
 type vendor_sysfs_eud_enable, sysfs_type, fs_type;
 

@@ -2,10 +2,9 @@
 # Copyright 2026 The DiamaneOS Project
 # FocalTech fingerprint sensor node and the QSEECom path to its trusted app,
 # bound to the fingerprint HAL (stock ff_device label). Each grant is the set
-# the stock module used on permissive boots before these rules existed: open,
-# read, write and ioctl on the node and on QSEECom; open, read and ioctl on
-# the read-only (0444) QSEECom heaps. The grant on the TEE node itself is in
-# tee_node.te. Templates live in
+# the stock module uses: open, read, write and ioctl on the node and on
+# QSEECom; open, read and ioctl on the read-only (0444) QSEECom heaps. The
+# grant on the TEE node itself is in tee_node.te. Templates live in
 # /data/vendor_de/<user>/fpdata (fingerprint_vendor_data_file, created by
 # vold), which the platform hal_fingerprint rules already cover.
 type ff_device, dev_type;
@@ -13,14 +12,12 @@ allow hal_fingerprint_default ff_device:chr_file { open read write ioctl };
 allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_qseecom_ta_heap_device }:chr_file { open read ioctl };
 
 # The module also registers a factory/debug binder service,
-# FocalFingerprintService, whose one dispatcher (invokeCommand) has no caller
-# check. It registers it every time it opens and fails without it, and has no
-# switch for it. The HAL answers that registration inside its own process
-# (fingerprint/ModuleFactoryService.h), so the service never reaches
-# servicemanager. It also stays unlabelled: it falls back to
-# default_android_service, on which the platform forbids every add, find and
-# list rule, so no policy can ever grant it. Any label would make it findable
-# by shell, system_app and dumpstate.
+# FocalFingerprintService, which has no caller check and no switch; the HAL
+# keeps it from servicemanager (see fingerprint/ModuleFactoryService.h). It
+# also stays unlabelled: it falls back to default_android_service, on which
+# the platform forbids every add, find and list rule, so no policy can ever
+# grant it. Any label would make it findable by shell, system_app and
+# dumpstate.
 
 # That /data config (/data/vendor/fingerprint/ft9391/Private/ff_config.json)
 # can retune matching and lockout, and the module's dump homes are under

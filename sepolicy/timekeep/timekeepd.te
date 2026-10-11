@@ -8,8 +8,8 @@
 # - vendor.timekeepd (vendor_timekeepd) keeps running and saves the offset
 #   whenever the clock changes. It cannot set the clock.
 # They replace Qualcomm's time_daemon (not installed; its imported policy is
-# removed), which also held CAP_SYS_TIME but spoke QMI to the modem, wrote
-# persist and the SMEM log and served libtime_genoff clients. None of that is
+# left out), which also holds CAP_SYS_TIME but speaks QMI to the modem, writes
+# persist and the SMEM log and serves libtime_genoff clients. None of that is
 # granted here: no sockets, binder, properties, /dev/rtc0 or persist.
 type vendor_timekeepd, domain;
 type vendor_timekeepd_restore, domain;

@@ -3,7 +3,7 @@
 
 # Bluetooth HCI service (bluetooth/service.cpp) hosting the stock Qualcomm HCI
 # implementation. Drafted for the stock service it replaces
-# (android.hardware.bluetooth@1.1-service-qti), which needed the same device
+# (android.hardware.bluetooth@1.1-service-qti), which needs the same device
 # and property access, from the stock compiled vendor policy
 # (vendor_sepolicy.cil, rules for hal_bluetooth_default and hal_bluetooth).
 # Before enforcing, reduce it from Qualcomm

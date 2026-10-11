@@ -4,7 +4,7 @@
 # Power HAL: LineageOS's maintained libperfmgr power HAL (IPower v7, ADPF),
 # built from hardware/lineage/interfaces and hardware/google/pixel (both pinned
 # unmodified in the manifest) and driven by powerhint.json. It replaces the
-# CodeLinaro power HAL and Qualcomm's closed perf2 daemon, which ran as root:
+# CodeLinaro power HAL and Qualcomm's closed perf2 daemon, which run as root:
 # this HAL runs as system with CAP_SYS_NICE only (init.fp6.power.rc) in a
 # narrow hal_power_default domain (sepolicy/fp6/power.te).
 PRODUCT_SOONG_NAMESPACES += \

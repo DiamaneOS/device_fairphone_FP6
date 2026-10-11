@@ -5,7 +5,7 @@ package {
     default_applicable_licenses: ["fp6_device_license"],
 }
 
-// Stand-in for Qualcomm's closed libqti-perfd-client.so, which sent perf locks
+// Stand-in for Qualcomm's closed libqti-perfd-client.so, which sends perf locks
 // and hints to the perf2 daemon. The stock camera (camera.qcom.so) and SDM
 // composition extension (libsdmextension.so) load it by name. The camera's
 // open, close and snapshot hints become time-limited power HAL boosts

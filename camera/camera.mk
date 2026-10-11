@@ -20,6 +20,15 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libcamxjail
 
+# The stock camera table. Without this property the stock provider loads
+# Qualcomm's generic table, which has the main and front cameras only. With it
+# the provider loads the FP6 table: the ultra-wide camera, its macro mode and
+# two combined cameras that switch lenses by zoom as well. Stock sets it in the
+# system build.prop. Only the camera provider may read it
+# (sepolicy/system-ext-private/camera_table.te).
+PRODUCT_SYSTEM_EXT_PROPERTIES += \
+    ro.vendor.qti.va_aosp.support=1
+
 # The stock FP6 feature set (vendor/etc/permissions, identical to the AOSP files):
 # rear camera with flash and autofocus, front camera, FULL hardware level with
 # manual sensor/post-processing, and RAW capture. No concurrent-camera or

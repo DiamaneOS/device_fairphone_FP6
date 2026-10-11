@@ -41,6 +41,14 @@
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/media/init.fp6.media.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.media.rc
 
+# DRM HALs (android.hardware.drm). ClearKey is built from the platform source;
+# media/init.fp6.drm.rc runs it without the group that owns the TEE node.
+PRODUCT_PACKAGES += \
+    android.hardware.drm-service.clearkey
+
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/media/init.fp6.drm.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.drm.rc
+
 # Android 14 ABI compat libraries for the stock Codec2 framework libraries
 # (see compat/codec2-v34). The tools renderer renames one dependency of
 # libcodec2_vndk (libui.so, plus its GraphicBuffer imports) and of

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# DRM HALs (media/media.mk).
+
+# ClearKey, built from the platform source
+# (android.hardware.drm-service.clearkey). The module's own rc file gives the
+# service the drmrpc group, which owns the TEE node (/dev/smcinvoke, boot/
+# ueventd.rc). ClearKey never uses the TEE. This file sorts after the module's
+# in /vendor/etc/init, and init uses the last definition marked override: the
+# same service without that group.
+service vendor.drm-clearkey-service /vendor/bin/hw/android.hardware.drm-service.clearkey
+    class hal
+    user media
+    group mediadrm
+    ioprio rt 4
+    task_profiles ProcessCapacityHigh
+    interface aidl android.hardware.drm.IDrmFactory/clearkey
+    override

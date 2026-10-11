@@ -912,6 +912,14 @@ Other:
     AOSP system heaps only.
 - There is no provenance entry for these files.
 
+### DRM
+
+- ClearKey (`hal_drm_clearkey_aidl`) runs under the platform policy alone; no
+  device rule.
+  - Its service runs without the `drmrpc` group (`media/init.fp6.drm.rc`), and
+    the TEE node does not carry the label the platform grants DRM HALs
+    (see "TEE node").
+
 ## Recovery
 
 - The recovery executable uses the boot-control service over IPC; it does not

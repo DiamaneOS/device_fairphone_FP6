@@ -7,30 +7,24 @@
 # Settings > Security & privacy > Exploit protection > Hardware video decoding
 # (persist.diamaneos.hw_video_decode, takes effect at the next boot):
 # - protected video only, the default: the secure Qualcomm H.264, HEVC and VP9
-#   decoders, which read only protected buffers that a DRM session fills.
-#   Widevine's hardware-backed library needs them. Clear video stays in the
-#   platform software decoders in the sandboxed mediaswcodec
-#   (com.android.media.swcodec);
-# - all video: the secure decoders and the three clear ones (no low-latency
-#   variant). That saves battery and plays high-resolution video more
-#   smoothly, but lets every video reach closed decoder code, the video driver
-#   and the video firmware;
+#   decoders, which read only protected buffers that a DRM session fills
+#   (Widevine's hardware-backed library needs them). Clear video stays in the
+#   platform software decoders in the sandboxed mediaswcodec;
+# - all video: also the three clear decoders (no low-latency variant). That
+#   saves battery and plays high-resolution video more smoothly, but lets
+#   every video reach closed decoder code, the video driver and the video
+#   firmware;
 # - never: no hardware decoder, and Widevine protects in software
 #   (media/init.fp6.drm.rc).
 # Any app that opens a DRM session can still use a secure decoder, so the
 # default keeps ordinary video away from the closed decoder code, not every
-# app. media/init.fp6.media.rc applies the choice at zygote-start and
-# early-boot, before the codec service and the media framework start.
+# app. media/init.fp6.media.rc applies the choice before the codec service and
+# the media framework start.
 #
-# The stock Qualcomm Codec2 service (vendor.qti.media.c2@1.0-service, HIDL
-# IComponentStore/default, declared in manifest.xml), its libqcodec2 plugins,
-# the Android 14 Codec2 framework libraries they were built against, the
-# SM7635 codec list and target specification and the Iris firmware
-# (vpu20_2v.mbn, which msm_video.ko requests at probe) come from the selected
-# stock vendor files (vendor/fairphone/FP6). The frozen Codec2 HIDL and
-# bufferpool2 AIDL interfaces are built from source. The tools renderer
-# derives three pinned configurations from the stock codec list and target
-# specification:
+# The codec service, its plugins and the Iris firmware (vpu20_2v.mbn) are
+# stock (vendor/fairphone/FP6; manifest.xml declares the service's HIDL
+# IComponentStore/default). The tools renderer derives three pinned
+# configurations from the stock codec list and target specification:
 # - _volcano_v1 (never): the target specification names the five encoders and
 #   no decoder ("codecs-available"; libqcodec2_v4l2codec registers only the
 #   codecs listed), and the codec list has no decoder section, so MediaCodec
@@ -44,14 +38,9 @@
 # open the two codec nodes (sepolicy/media). The secure decoders also use the
 # memory-buffer driver's bitstream node (boot/ueventd.rc, sepolicy/media).
 # The Qualcomm library enables every codec if it cannot read its target
-# specification. The codec service therefore loads libc2hwjail_avservices
-# (media/seccomp) in place of libavservices_minijail: when main() sets up its
-# sandbox it installs DiamaneOS's seccomp filter (the stock one stacks on
-# top), and when main() builds the Codec2 store it checks that the property,
-# the file it names and the decoder node match this boot's state and wraps
-# the Qualcomm store so that only the allowed codecs are offered: none if
-# anything differs. The service always registers its store, so media and
-# the system services that query it at boot never wait for it.
+# specification, so the codec service loads libc2hwjail_avservices, which
+# checks this boot's state and offers only the allowed codecs, or none (see
+# media/seccomp/c2hwjail.cpp).
 # Not included: the Codec2 audio service (c2audio), the OMX core, Wi-Fi
 # display, VPP and video power optimisation.
 
@@ -113,29 +102,26 @@ FP6_MEDIA_VARIANT := _volcano_v1
 # /vendor/etc/media$(FP6_MEDIA_VARIANT)/video_system_specs.json.
 # ro.media.xml_variant.*: the framework reads
 # /vendor/etc/media_codecs$(FP6_MEDIA_VARIANT).xml and
-# media_codecs_performance$(FP6_MEDIA_VARIANT).xml (stock init.qti.media.rc
-# copies the first into the other two at post-fs-data). Without them the
-# hardware encoders are not listed at all.
-# ro.media.xml_variant.codecs is not set here: media/init.fp6.media.rc sets
-# it at early-boot from the user's choice, and for the two choices with
-# hardware decoders it also switches vendor.media.target_variant, to
-# $(FP6_MEDIA_VARIANT)_secdec or $(FP6_MEDIA_VARIANT)_hwdec. Unset, the
-# framework finds no Qualcomm codec list and lists no hardware codec at all.
-# The performance list stays the same in every state.
+# media_codecs_performance$(FP6_MEDIA_VARIANT).xml; without them it lists no
+# hardware codec at all. ro.media.xml_variant.codecs is not set here:
+# media/init.fp6.media.rc sets it at early-boot from the user's choice and,
+# for the two choices with hardware decoders, switches
+# vendor.media.target_variant to $(FP6_MEDIA_VARIANT)_secdec or _hwdec. The
+# performance list is the same in every state.
 PRODUCT_VENDOR_PROPERTIES += \
     vendor.media.target_variant=$(FP6_MEDIA_VARIANT) \
     ro.media.xml_variant.codecs_performance=$(FP6_MEDIA_VARIANT)
 
-# Stock vendor build.prop values (lines 341 and 343). Both are debug_prop
-# (platform property_contexts "debug." prefix): every domain may read it and
-# vendor_init may set it.
+# Stock vendor build.prop values. Both are debug_prop (platform
+# property_contexts "debug." prefix): every domain may read them and
+# vendor_init may set them.
 # c2inputsurface=-1: MediaCodec.createPersistentInputSurface() (used by the
 # camera app's CameraX recorder) builds the input surface in the calling
 # process instead of asking the OMX service, which this product (like stock)
 # does not have. Without it recording fails with "Failed to connect to OMX to
-# create persistent input surface" and CameraX error 7 (camera test). It also
-# keeps the framework from ever calling the store's createInputSurface (the
-# one user of the bqhelper compat library).
+# create persistent input surface" and CameraX error 7. It also keeps the
+# framework from ever calling the store's createInputSurface (the one user of
+# the bqhelper compat library).
 # use_dmabufheaps=1: Codec2 allocates linear buffers from DMA-BUF heaps (GKI
 # has no ION).
 # debug.stagefright.ccodec and omx_default_rank (OMX only) are not carried over.

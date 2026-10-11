@@ -6,32 +6,28 @@
 //
 // The tools renderer renames the service's libavservices_minijail.so
 // dependency to this library (same name length, pinned input and output
-// hashes). This library links libavservices_minijail and the service still
-// links libcodec2_hidl@1.2, but it comes before both in the service's
-// dependency order, so it defines the two functions the service's main()
-// calls through them:
-//
-// - android::SetUpMinijail (main(), before it opens binder or loads the
-//   Qualcomm store): installs DiamaneOS's filter (codec2-service.policy)
-//   for every thread, then the stock policy on top through the real
+// hashes). It comes before libavservices_minijail (which it links) and
+// libcodec2_hidl@1.2 in the service's dependency order, so it defines the
+// two functions the service's main() calls through them:
+// - android::SetUpMinijail (before main() opens binder or loads the Qualcomm
+//   store): installs DiamaneOS's filter (codec2-service.policy) for every
+//   thread, then the stock policy on top through the real
 //   libavservices_minijail.
-// - the constructor of the Codec2 HIDL ComponentStore (main(), with the
-//   Qualcomm store it created, before it registers the service): installs the
-//   filter if it is not in place yet, checks the codec configuration
-//   (c2hwjail_check.cpp) and builds the real HIDL store around a filtering
-//   store (c2hwjail_store.cpp) that offers only the codecs this boot allows:
-//   the hardware encoders, the hardware decoders the user's choice allows
-//   (the three secure ones, or those and the three clear ones), and none if
-//   the check fails or the filter could not be installed.
+// - the constructor of the Codec2 HIDL ComponentStore (with the Qualcomm
+//   store, before main() registers the service): installs the filter if it
+//   is not in place yet, checks the codec configuration (c2hwjail_check.cpp)
+//   and builds the real HIDL store around a filtering store
+//   (c2hwjail_store.cpp). That store offers the hardware encoders and the
+//   hardware decoders the user's choice allows (the three secure ones, or
+//   those and the three clear ones), and nothing if the check fails or the
+//   filter could not be installed.
 //
-// So the service always registers, and every Codec2 client (MediaCodec,
-// MediaCodecList, system_server's checks at boot) gets an answer: a store
-// with the allowed codecs or an empty one. Nothing here runs from an ELF
-// constructor, nothing aborts on a failed check, and calls outside the
-// policy fail with EPERM instead of killing the service. The Qualcomm
-// library registering every codec when it cannot read its target
-// specification no longer reaches any client: only the filtering store's
-// list does.
+// The service always registers, so every Codec2 client (MediaCodec,
+// MediaCodecList, system_server's checks at boot) gets an answer. Nothing
+// here runs from an ELF constructor, nothing aborts on a failed check, and
+// calls outside the policy fail with EPERM instead of killing the service.
+// The Qualcomm library registers every codec when it cannot read its target
+// specification; clients see only the filtering store's list.
 
 #define LOG_TAG "c2hwjail"
 

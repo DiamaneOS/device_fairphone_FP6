@@ -59,12 +59,10 @@ service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android
 # and this state has none. FORCE_LEVEL3_OEMCRYPTO=yes makes the service keep
 # its built-in library and never open liboemcrypto.so.
 # It runs in its own SELinux domain (seclabel; the executable's type leads to
-# hal_drm_widevine by default), which has no rule for the TEE node, the
-# QSEECom heap, the crypto engine node, qseecomd's socket, the secure-buffer
-# nodes or the codec service's descriptors
-# (sepolicy/media/hal_drm_widevine_sw.te). It also gets neither drmrpc nor
-# system, so the owner and mode of the TEE node, the crypto engine node,
-# qseecomd's socket and the trusted application's file keep it out as well.
+# hal_drm_widevine by default), which grants nothing of the hardware-backed
+# path (see sepolicy/media/hal_drm_widevine_sw.te). It also gets neither
+# drmrpc nor system, so the owner and mode of the TEE node, the crypto engine
+# node, qseecomd's socket and the trusted application's file keep it out too.
 service vendor.drm-widevine-hal-sw /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
     class hal
     disabled

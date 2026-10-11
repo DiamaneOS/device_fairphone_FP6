@@ -5,19 +5,12 @@ package {
     default_applicable_licenses: ["fp6_device_license"],
 }
 
-// Seccomp filter and codec gate for the stock Qualcomm Codec2 video service
-// (c2hwjail.cpp). The tools renderer renames the service's
-// libavservices_minijail.so dependency to libc2hwjail_avservices.so (same
-// length). The library defines the two functions the service's main() calls
-// through its dependencies, android::SetUpMinijail and the Codec2 HIDL
-// ComponentStore constructor, and calls the real ones (it links
-// libavservices_minijail; the service links libcodec2_hidl@1.2):
-// - SetUpMinijail installs DiamaneOS's filter (codec2-service.policy), then
-//   the stock policy on top;
-// - the store constructor checks the codec configuration and wraps the
-//   Qualcomm store so it offers only the codecs this boot allows, or none.
-// The service always registers its store; nothing runs from an ELF
-// constructor and nothing aborts on a failed check.
+// Seccomp filter and codec gate for the stock Qualcomm Codec2 video service.
+// The tools renderer renames the service's libavservices_minijail.so
+// dependency to libc2hwjail_avservices.so (same length); the library defines
+// the two functions the service's main() calls through its dependencies,
+// android::SetUpMinijail and the Codec2 HIDL ComponentStore constructor (see
+// c2hwjail.cpp). The service always registers its store.
 //
 // C2HWJAIL_LOG_ONLY: calls outside the policy are logged (kernel audit record
 // type 1326) and allowed, to collect a profile. Without it they fail with

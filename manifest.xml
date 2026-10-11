@@ -39,7 +39,8 @@
         <fqname>@1.1::IBluetoothHci/default</fqname>
     </hal>
     <!-- The stock Qualcomm Codec2 service registers the hardware video store,
-         which lists only the Iris encoders (media/media.mk). Only the default
+         which lists the Iris encoders and the decoders the user's choice
+         allows (media/media.mk). Only the default
          instance: the platform's software store is declared by the framework
          manifest (manifest_media_c2_software.xml), and the stock fragment's
          extra "software" line is not carried over. -->

@@ -81,7 +81,7 @@ PRODUCT_MANUFACTURER_FOR_ATTESTATION := Fairphone
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc
 
-# Keep one reviewed UFS fstab for early and late mounting.
+# Keep one UFS fstab for early and late mounting.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
     device/fairphone/FP6/boot/init.qcom.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.qcom.usb.rc \
@@ -314,8 +314,8 @@ PRODUCT_PACKAGES += fwrelease
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with three exceptions:
-# - no touch timer override: stock's 3500000 ms kept touch boost active for
-#   about 58 minutes and blocked idle refresh-rate drops; SurfaceFlinger's
+# - no touch timer override: stock's 3500000 ms keeps touch boost active for
+#   about 58 minutes and blocks idle refresh-rate drops; SurfaceFlinger's
 #   default (200 ms, as in Qualcomm's display config) applies instead;
 # - the idle timer is 1500 ms instead of stock's 3500 ms, so a still screen
 #   drops to the panel's idle refresh rate 2 s sooner; touch still raises the
@@ -324,10 +324,13 @@ PRODUCT_PACKAGES += fwrelease
 #   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
 #   platform, the display HAL or the stock vendor files reads them
 #   (unsignaled latching is debug.sf.auto_latch_unsignaled).
-# Encrypted microSD (adopted storage): metadata encryption with dm-default-key AES-256-XTS, and
-# file encryption v2 with AES-256-XTS contents and AES-256-HCTR2 names (wide-block, so names sharing a
-# prefix don't share ciphertext). The card has no inline crypto engine, so no wrapped keys. These are
-# the card format's constants: changing one strands adopted cards.
+# These properties are the second block below.
+
+# Encrypted microSD (adopted storage): metadata encryption with
+# dm-default-key AES-256-XTS, and file encryption v2 with AES-256-XTS contents
+# and AES-256-HCTR2 names (wide-block, so names sharing a prefix don't share
+# ciphertext). The card has no inline crypto engine, so no wrapped keys. These
+# are the card format's constants: changing one strands adopted cards.
 PRODUCT_VENDOR_PROPERTIES += \
     ro.crypto.volume.metadata.method=dm-default-key \
     ro.crypto.volume.metadata.encryption=aes-256-xts \

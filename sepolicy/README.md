@@ -170,10 +170,10 @@ of the same name (`provenance.json`).
   - The platform grants `tee_device` to its reference DRM, CAS, Keymaster,
     KeyMint, Gatekeeper, AuthGraph, Secretkeeper and hwcrypto HAL domains.
     With no node under that label, those grants reach nothing.
-- Only `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may open,
-  read, write or send commands to the node; a neverallow keeps every other
-  domain off it (`tee_node.te`).
-- The four may send two commands: invoke (`0x9801`) and create a callback
+- Only `qseecomd`, KeyMint, Gatekeeper, the fingerprint HAL and the Widevine
+  DRM HAL may open, read, write or send commands to the node; a neverallow
+  keeps every other domain off it (`tee_node.te`).
+- The five may send two commands: invoke (`0x9801`) and create a callback
   server (`0x9803`).
   - The limit covers the opened node. SELinux does not check commands on
     the object and server descriptors the driver hands out.
@@ -310,8 +310,8 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 
 - `qseecomd` on the raw UFS LUN 0 node: a platform neverallow on `device`
   forbids it. RPMB and LUN 4 have their own labels.
-- `qseecomd` on `/mnt/vendor/persist/drm`: no DRM service or provisioning
-  client is installed to use that store.
+- `qseecomd` on `/mnt/vendor/persist/drm`: no keybox or HDCP provisioning
+  tool is installed to fill that store.
 - `fsck` on `vm-bootsys`: nothing on the FP6 mounts `/product/vm-system`.
 
 ## system_ext and product rules
@@ -925,13 +925,13 @@ Other:
     the TEE node does not carry the label the platform grants DRM HALs
     (see "TEE node").
 - Widevine (`hal_drm_widevine`, `media/hal_drm_widevine.te`) is the stock
-  service from Fairphone's package, at the software level.
-  - Granted: the DRM HAL interface and its own data in `/data/vendor/mediadrm`.
-  - Not granted, unlike the stock policy: the crypto engine node, the display
-    service, the QSEECom and secure-buffer heaps, and the socket to
-    `qseecomd`. The TEE node is closed to it by `fp6/tee_node.te`.
-  - Its service runs without the `drmrpc` and `system` groups
-    (`media/init.fp6.drm.rc`).
+  service from Fairphone's package with the stock hardware-backed library.
+  - Granted: the DRM HAL interface, its own data in `/data/vendor/mediadrm`,
+    the TEE node (`fp6/tee_node.te`), the QSEECom heap, the crypto engine
+    node and the socket to `qseecomd`.
+  - Not granted, unlike the stock policy: the vendor binder, the display
+    service and wake locks.
+  - Its service runs in the package's own groups (`media/init.fp6.drm.rc`).
 
 ## Recovery
 

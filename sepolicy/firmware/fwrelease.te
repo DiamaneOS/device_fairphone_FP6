@@ -12,13 +12,13 @@ type vendor_fwrelease, domain;
 type vendor_fwrelease_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_fwrelease)
 
-# The firmware partitions. 17 of them shared vendor_custom_ab_block_device with
-# vbmeta, dtbo, pvmfw, multiimgqti and qweslicstore; they now have this type
-# (vendor-volcano/file_contexts), so fwrelease cannot open those. The others
-# have their own types already: modem and bluetooth vendor_modem_block_device,
-# uefi and uefisecapp vendor_uefi_block_device, xbl vendor_xbl_block_device.
-# vendor_xbl_block_device also labels the two XBL LUNs (sdb, sdc); ueventd
-# keeps those 0660 root:vendor_bootctl, so fwrelease cannot open them.
+# The firmware partitions. Without this type, 17 of them share
+# vendor_custom_ab_block_device with vbmeta, dtbo, pvmfw, multiimgqti and
+# qweslicstore; with it (vendor-volcano/file_contexts) fwrelease cannot open
+# those. The others have their own types: modem and bluetooth
+# vendor_modem_block_device, uefi and uefisecapp vendor_uefi_block_device, xbl
+# vendor_xbl_block_device. That type also labels the two XBL LUNs (sdb, sdc);
+# ueventd keeps those 0660 root:vendor_bootctl, so fwrelease cannot open them.
 type vendor_firmware_image_block_device, dev_type;
 
 # The grants vendor_custom_ab_block_device has, for the new type: A/B updates

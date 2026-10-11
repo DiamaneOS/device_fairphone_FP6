@@ -5,7 +5,7 @@
 
      seinfo for apps that keep the stock Fairphone signature ("FP6 platform",
      Fairphone B.V., SHA-256 B0:5F:D6:BF:48:7E:19:1E:66:4C:79:E4:37:1C:C5:03:11:E6:0B:4A:43:56:5A:90:42:46:01:ED:3D:D7:BA:50).
-     They are not signed with our platform key, so they do not get
+     They are not signed with the platform key, so they do not get
      seinfo=platform; seapp_contexts selects their domain by this seinfo and
      the package or process name.
 -->

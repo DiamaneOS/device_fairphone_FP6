@@ -278,13 +278,13 @@ subsystem mem_buf_vm
 /dev/ubwcp                0660   root       camera
 # Non-secure FastRPC node. The kernel serves the CDSP (a non-secure channel)
 # through it; the camera offloads (FastCV, BitML, HME, MCTF, ML-AWB) use it when
-# libcdsprpc falls back from the secure node. Stock made it 0664 system system
+# libcdsprpc falls back from the secure node. Stock makes it 0664 system system
 # (line 222); only the camera group needs it here, read-only (the stock
-# provider, uid cameraserver, could only open it through the read bit). The
+# provider, uid cameraserver, can only open it through the read bit). The
 # secure node keeps its 0640 system media rule; the camera provider reaches it
 # through its media group (reviewed provider rc).
 /dev/adsprpc-smd          0640   system     camera
-# VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc made
+# VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc makes
 # it 0666 system; only the camera group needs it.
 /dev/stmvl53l1_ranging    0660   system     camera
 

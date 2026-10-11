@@ -26,7 +26,7 @@ neverallow {
 
 # Off also suspends the charger input in the ADSP charger firmware:
 # /sys/class/qcom-battery/suspend_input_current, a class attribute of
-# qti_battery_charger (its line in fp6/genfs_contexts; it had the generic
+# qti_battery_charger (its line in fp6/genfs_contexts; otherwise the generic
 # sysfs label). 1 stops the phone drawing current from the port, 0 resumes.
 # vendor_init writes it from the same triggers, at early-boot (after waiting
 # for the node: init's wait stats it) and boot, in charger mode and at

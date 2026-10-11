@@ -4,7 +4,7 @@
 # telephony-system-ext-public): it finds IQcRilAudio/slot1 and /slot2,
 # registers its request callback, reports the audioserver state, and QCRIL
 # calls the callback with the in-call parameters and takes the replies on its
-# own response callback. The same reach the stock app it replaces had.
+# own response callback. The same reach as the stock app it replaces.
 allow fp6_callaudio_app fp6_hal_qcrilaudio_service:service_manager find;
 binder_call(fp6_callaudio_app, rild)
 binder_call(rild, fp6_callaudio_app)

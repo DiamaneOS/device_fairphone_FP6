@@ -3,7 +3,7 @@
 
 # Bluetooth. The selected stock vendor files
 # supply the Qualcomm HIDL HCI implementation
-# (android.hardware.bluetooth@1.1-impl-qti) and its link closure; our own
+# (android.hardware.bluetooth@1.1-impl-qti) and its link closure; DiamaneOS's
 # service (service.cpp) registers it in place of the stock service, which also
 # links the FM, ANT, SAR, config-store and TPI libraries. manifest.xml declares
 # IBluetoothHci. The AOSP HCI interfaces are built from source. The service
@@ -27,8 +27,8 @@ PRODUCT_COPY_FILES += \
 # Profiles the AOSP Bluetooth stack enables. It enables none by default.
 # Same set as stock (vendor, product and system_ext build.prop) except:
 # no SIM access (sap.server) or SIM phonebook (pbap.sim), no AVRCP controller
-# (the phone is not an audio sink), no LE audio broadcast yet, and ASHA hearing
-# aids added because stock served them through its own stack.
+# (the phone is not an audio sink), no LE audio broadcast, and ASHA hearing
+# aids added because stock serves them through its own stack.
 PRODUCT_VENDOR_PROPERTIES += \
     bluetooth.device.class_of_device=90,2,12 \
     bluetooth.profile.a2dp.source.enabled=true \

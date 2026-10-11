@@ -39,8 +39,8 @@ PRODUCT_COPY_FILES += \
 
 # SurfaceFlinger's main and RenderEngine threads join the top-app cpuset, as on
 # Pixels. AOSP's default (and stock's) is system-background, which this device
-# limits to the silver cores (boot/init.fp6.perf.rc), so SF could never use a
-# bigger core and its ADPF boosts had no effect.
+# limits to the silver cores (boot/init.fp6.perf.rc): there SF can never use a
+# bigger core and its ADPF boosts have no effect.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/task_profiles.json:$(TARGET_COPY_OUT_VENDOR)/etc/task_profiles.json
 

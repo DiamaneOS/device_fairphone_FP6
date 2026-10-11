@@ -54,7 +54,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 # key). The hostname only switches it on. The server rkpd talks to is set by
 # GrapheneOS's RemoteKeyProvisioningSettings (frameworks/base,
 # android.ext.settings; default the GrapheneOS proxy, https://<hostname>/v1
-# only if the user picks the standard server); our own backend replaces it
+# only if the user picks the standard server); DiamaneOS's backend replaces it
 # there (tools endpoint contract rkp-proxy).
 PRODUCT_VENDOR_PROPERTIES += \
     remote_provisioning.hostname=remoteprovisioning.googleapis.com \
@@ -70,7 +70,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 # Device-ID attestation sends these to KeyMint, which checks them against the
 # IDs provisioned at the factory, so they carry stock's values; the visible
 # brand stays DiamaneOS. Stock sets brand, name and model; device and
-# manufacturer pin what ro.product.vendor.* reports today.
+# manufacturer pin what ro.product.vendor.* reports.
 PRODUCT_BRAND_FOR_ATTESTATION := Fairphone
 PRODUCT_NAME_FOR_ATTESTATION := FP6
 PRODUCT_MODEL_FOR_ATTESTATION := Fairphone 6
@@ -136,12 +136,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += filterPowerSupplyEvents.o
 
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
-# its interface repositories). The stock Android 14
-# composer failed to present under Android 17 when tried without
-# libsdmextension and is untested with it; source is kept so we can patch and
-# harden the code that handles every app's buffers. Configuration values follow
-# the usual setup for Qualcomm 6.1-kernel platforms; stock declares a
-# wide-colour panel.
+# its interface repositories). The stock Android 14 composer does not present
+# under Android 17 without libsdmextension and is untested with it; the source
+# build allows patching and hardening the code that handles every app's
+# buffers. Configuration values follow the usual setup for Qualcomm 6.1-kernel
+# platforms; stock declares a wide-colour panel.
 $(call soong_config_set,qtidisplay,default,true)
 $(call soong_config_set,qtidisplay,drmpp,true)
 $(call soong_config_set,qtidisplay,gralloc4,true)
@@ -266,7 +265,7 @@ PRODUCT_PACKAGES += \
 # (display/display_port_130.xml; Android.bp).
 PRODUCT_PACKAGES += fp6_displayconfig_port130
 
-# Fingerprint: our AIDL service (fingerprint/) drives the stock FocalTech
+# Fingerprint: the AIDL service in fingerprint/ drives the stock FocalTech
 # module. The module keeps its own SONAME as file name, so it cannot collide
 # with AOSP's reference fingerprint modules; hw_get_module finds it through
 # ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
@@ -302,7 +301,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     log.tag.focaltech:version=I
 
 # Clock across reboots: the PMIC RTC is read-only from Linux, so without help
-# every boot starts at the build date. Our timekeepd (timekeep/) restores the
+# every boot starts at the build date. timekeepd (timekeep/) restores the
 # clock at post-fs-data, before zygote, from the RTC counter plus the offset it
 # saved when the time was last set (and at least hourly). Qualcomm's
 # time_daemon and TimeService app stay out.
@@ -402,7 +401,7 @@ PRODUCT_PACKAGES += \
     android.hardware.sensors-service.multihal
 
 # Tap to wake and Tap to check phone: the touch controller's double and single
-# tap as sensors, from our sub-HAL (sensors/), which the multi-HAL loads from
+# tap as sensors, from the sub-HAL in sensors/, which the multi-HAL loads from
 # the odm partition.
 PRODUCT_PACKAGES += \
     fp6_odm_sensors_hals_conf \

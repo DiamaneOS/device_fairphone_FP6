@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # Stock IWlanService and CACertService share .qtidataservices under their own
-# application UID. They retain the Fairphone signer, not our platform signer.
+# application UID. They retain the Fairphone signer, not the platform signer.
 # IWLAN calls QCRIL's IIWlan through libWlanServiceJni. CACertService exposes
 # its HIDL certificate lookup and libjnihelper forwards modem AUTH requests.
 type fp6_iwlan_app, domain;

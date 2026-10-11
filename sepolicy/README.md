@@ -937,15 +937,28 @@ Other:
     node and the socket to `qseecomd`.
   - Granted for protected video: file descriptors of the codec service, the
     memory-buffer driver and the content-protection bitstream node.
-  - Not granted, unlike the stock policy: the vendor binder, the display
-    service and wake locks.
+  - Granted for the library's wake lock: finding and calling the suspend
+    service, and nothing else of the stock wake lock rules (no wake lock
+    files, no capability).
+  - Not granted, unlike the stock policy: the vendor binder and the display
+    service.
   - Its service has two definitions (`media/init.fp6.drm.rc`), and one runs
     per boot:
     - with the package's own groups and the hardware-backed library, when
       hardware video decoding is for protected video or for all video;
     - without the `drmrpc` and `system` groups and with the service's
-      built-in software protection, when it is never. Both run in the same
-      domain; the missing groups keep the TEE node closed to that one.
+      built-in software protection, when it is never.
+- The software-protection definition runs in its own domain,
+  `hal_drm_widevine_sw` (`media/hal_drm_widevine_sw.te`).
+  - Granted here: the DRM HAL interface and its data in
+    `/data/vendor/mediadrm`. The rest is what the platform gives every DRM
+    HAL.
+  - No rule lets it use the TEE node, the QSEECom heap, the crypto engine
+    node, the socket to `qseecomd`, the memory-buffer driver, the bitstream
+    node or the codec service's file descriptors.
+  - Both domains share the executable's type, which leads to
+    `hal_drm_widevine` by default; init enters this one through the
+    definition's `seclabel` line, so its transition is not automatic.
 
 ## Recovery
 

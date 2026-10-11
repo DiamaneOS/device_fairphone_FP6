@@ -64,8 +64,9 @@ PRODUCT_COPY_FILES += \
 # installs (vendor/fairphone/FP6) together with the stock hardware-backed
 # library (liboemcrypto.so) in /vendor/lib64; the same rc file defines its
 # service twice, with that library or with the service's built-in software
-# protection when the user chose no hardware video decoding, and
-# sepolicy/media/hal_drm_widevine.te is its policy.
+# protection when the user chose no hardware video decoding. Each runs in
+# its own domain: sepolicy/media/hal_drm_widevine.te and
+# hal_drm_widevine_sw.te.
 PRODUCT_PACKAGES += \
     android.hardware.drm-service.clearkey
 

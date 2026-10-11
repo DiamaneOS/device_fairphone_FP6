@@ -44,7 +44,8 @@ service vendor.drm-clearkey-service /vendor/bin/hw/android.hardware.drm-service.
 # engine node and qseecomd's socket (boot/ueventd.rc), and system to read the
 # Widevine trusted application from the firmware partition, which is mounted
 # for that user and group only (boot/fstab.qcom). SELinux decides what it
-# reaches (sepolicy/media/hal_drm_widevine.te, sepolicy/fp6/tee_node.te).
+# reaches (sepolicy/media/hal_drm_widevine.te, sepolicy/fp6/tee_node.te): init
+# enters hal_drm_widevine through the executable's type.
 service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
     class hal
     disabled
@@ -56,14 +57,20 @@ service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android
 # No hardware decoding (state 0): the service's built-in software protection.
 # With the hardware-backed library protected video asks for a secure decoder,
 # and this state has none. FORCE_LEVEL3_OEMCRYPTO=yes makes the service keep
-# its built-in library and never open liboemcrypto.so. It gets neither drmrpc
-# nor system, so the TEE node, the crypto engine node, qseecomd's socket and
-# the trusted application's file stay closed to it.
+# its built-in library and never open liboemcrypto.so.
+# It runs in its own SELinux domain (seclabel; the executable's type leads to
+# hal_drm_widevine by default), which has no rule for the TEE node, the
+# QSEECom heap, the crypto engine node, qseecomd's socket, the secure-buffer
+# nodes or the codec service's descriptors
+# (sepolicy/media/hal_drm_widevine_sw.te). It also gets neither drmrpc nor
+# system, so the owner and mode of the TEE node, the crypto engine node,
+# qseecomd's socket and the trusted application's file keep it out as well.
 service vendor.drm-widevine-hal-sw /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
     class hal
     disabled
     user media
     group media mediadrm
+    seclabel u:r:hal_drm_widevine_sw:s0
     setenv FORCE_LEVEL3_OEMCRYPTO yes
     ioprio rt 4
     task_profiles ProcessCapacityHigh

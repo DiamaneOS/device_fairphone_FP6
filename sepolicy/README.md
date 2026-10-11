@@ -332,6 +332,11 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
     writing the switch's sysfs files.
   - system_server reads the kernel's state. Only it and init set
     `privacy_switch_prop`; Settings reads it.
+- `system-ext-private/camera_table.te`: the camera provider may read
+  `ro.vendor.qti.va_aosp.support`, which selects the stock camera table with
+  every lens (`camera/camera.mk`).
+  - The rule names the `hal_camera_server` attribute, because the property's
+    type is private to this partition; the provider is its only member here.
 - `system-ext-private/vold_adoptable.te`: vold may list `/data/misc_ce` and
   `/data/misc_de`.
   - It finds there the users whose keys it destroys when an adopted microSD
@@ -951,9 +956,13 @@ without it. Denials covered in the sections above are not repeated.
   light.
 - `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not
   set on this build; CamX uses the public SoC id file.
+- `hal_bluetooth_default` and `vendor_hal_gnss_qti`,
+  `ro.vendor.qti.va_aosp.support`: the property is set for the camera provider
+  alone (`system-ext-private/camera_table.te`). A denied read returns the
+  default these two had before it was set.
 - `hal_bluetooth_default`, `hal_camera_default` and `vendor_hal_gnss_qti`,
-  `ro.vendor.qti.va_aosp.support` and `va_odm.support`: not set on this build,
-  so a denied read returns the same default.
+  `ro.vendor.qti.va_odm.support`: not set on this build, so a denied read
+  returns the same default.
 - `hal_audio_default` and `rild`, `persist.vendor.pd_locater_debug`
   (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable. No
   domain reads it here.

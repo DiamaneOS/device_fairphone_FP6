@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The stock camera provider picks its camera table by
+# ro.vendor.qti.va_aosp.support (camera/camera.mk): set, it loads the FP6 table
+# with every lens; unreadable or unset, Qualcomm's generic table with the main
+# and front cameras only.
+#
+# The property's type is declared in this partition's private policy, so the
+# rule is here and names the camera HAL server attribute; the provider
+# (hal_camera_default) is its only member on this product. The Bluetooth and
+# GNSS HALs ask the same library question; they get no grant and keep reading
+# the default.
+get_prop(hal_camera_server, vendor_exported_system_prop)

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Widevine DRM HAL with its built-in software protection: the second
+# definition of the service in media/init.fp6.drm.rc, which runs when the
+# user chose no hardware video decoding. It is the executable of
+# hal_drm_widevine (hal_drm_widevine_exec, labelled inside the stock package),
+# started with FORCE_LEVEL3_OEMCRYPTO=yes, so it never opens liboemcrypto.so.
+#
+# It has its own domain so that nothing of the hardware-backed path is granted
+# to it: no rule here or in fp6/tee_node.te lets it use the TEE node, the
+# QSEECom heap, the crypto engine node, qseecomd's socket, the memory-buffer
+# driver and its bitstream node, or the codec service's file descriptors. The
+# grants below are what the service needs when it runs without the
+# hardware-backed library.
+type hal_drm_widevine_sw, domain;
+
+hal_server_domain(hal_drm_widevine_sw, hal_drm)
+
+# init enters the domain through the definition's seclabel line. The
+# executable's type already has its automatic transition from init, to
+# hal_drm_widevine (init_daemon_domain there), and can have only one: so these
+# are the rules of a transition without the automatic one.
+domain_trans(init, hal_drm_widevine_exec, hal_drm_widevine_sw)
+
+# Its certificates, licences and usage records (/data/vendor/mediadrm).
+allow hal_drm_widevine_sw vendor_mediadrm_vendor_data_file:dir create_dir_perms;
+allow hal_drm_widevine_sw vendor_mediadrm_vendor_data_file:file create_file_perms;

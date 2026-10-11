@@ -4,12 +4,13 @@
 # com.google.android.widevine; the files inside it carry their own labels,
 # hal_drm_widevine_exec for the service), with the stock hardware-backed
 # library (liboemcrypto.so), which talks to the Widevine trusted application.
-# The grant on the TEE node is in fp6/tee_node.te.
+# The grant on the TEE node is in fp6/tee_node.te. The same executable with
+# its built-in software protection runs in hal_drm_widevine_sw.
 #
 # Written for this product, not imported. Of the stock Qualcomm rule set
 # (generic/vendor/common/hal_drm_widevine.te) it leaves out the vendor binder
-# and display service rules, which the library does not use, and the wake
-# lock rules.
+# and display service rules, which the library does not use, and all of the
+# wake lock rules but the two for the suspend service.
 type hal_drm_widevine, domain;
 type hal_drm_widevine_exec, exec_type, vendor_file_type, file_type;
 
@@ -42,6 +43,12 @@ allow hal_drm_widevine mediacodec:fd use;
 # domain's VM node (boot/ueventd.rc). Stock's two rules.
 allow hal_drm_widevine vendor_membuf_dev:chr_file r_file_perms;
 allow hal_drm_widevine vendor_vm_cp_bitstream_device:chr_file r_file_perms;
+
+# The library's watchdog timer holds a wake lock, which it takes from the
+# suspend service: finding the service and calling it. The wake lock files in
+# sysfs and the block_suspend capability are not granted.
+allow hal_drm_widevine hal_system_suspend_service:service_manager find;
+binder_call(hal_drm_widevine, system_suspend_server)
 
 # The library asks for the display configuration service to choose a resource
 # tier and uses the same tier when it gets no answer. Not granted.

@@ -10,9 +10,10 @@ package {
 // so the dynamic linker loads it, and runs its filter installation, before the
 // provider's main(). camera-provider.policy lists the allowed system calls.
 //
-// CAMXJAIL_LOG_ONLY: calls outside the policy are logged (kernel audit record
-// type 1326) and allowed, while the provider's profile is collected. Without
-// it they are trapped (SIGSYS) and the provider dies with a tombstone.
+// Calls outside the policy are trapped (SIGSYS) and the provider dies with a
+// tombstone. Building with -DCAMXJAIL_LOG_ONLY logs them instead (kernel audit
+// record type 1326, read with seccomp_audit.py) and allows them; use that to
+// collect the profile again after a vendor update.
 cc_library_shared {
     name: "libcamxjail",
     vendor: true,
@@ -32,7 +33,6 @@ cc_library_shared {
         "-Wall",
         "-Werror",
         "-Wextra",
-        "-DCAMXJAIL_LOG_ONLY",
     ],
 }
 

@@ -22,20 +22,19 @@
 // (hgbp_createFromHandle, CLONE_HANDLE) and uses them only through inline
 // accessors (the Android 14 offsets checked below), initCheck, the
 // AHardwareBuffer pointer casts and RefBase.
-// - Hardware video decoding off (the default; ro.vendor.diamaneos.hw_video_decode
-//   is not "1"): the service exposes only encoders, which write to linear
-//   buffers and never use that pool. The constructors fail closed: the object
-//   holds no buffer and reports NO_INIT. Every caller in C2BqBuffer.cpp checks
-//   initCheck() (or the requestBuffer result built from it) and returns an
-//   error, so a client that attaches a Surface to a hardware codec gets an
-//   error.
-// - Hardware video decoding on: the decoders render into the app's Surface
-//   through that pool, so the object does what Android 14's GraphicBuffer did
-//   for the two constructors the library calls. The handle constructor accepts
-//   only CLONE_HANDLE, the one method the library passes: it imports a clone of
-//   the producer's handle with the Android 17 mapper (which validates it
-//   against the description) and the destructor frees that clone, as Android
-//   14's free_handle did. Everything stays within the 256 bytes.
+// - No hardware decoder this boot (ro.vendor.diamaneos.hw_video_decode is
+//   neither "1" nor "2"): the encoders write to linear buffers and never use
+//   that pool, so the constructors fail closed: the object holds no buffer
+//   and reports NO_INIT. Every caller in C2BqBuffer.cpp checks initCheck()
+//   (or the requestBuffer result built from it) and returns an error, so a
+//   client that attaches a Surface to a hardware codec gets an error.
+// - Hardware decoders this boot ("2", the default, or "1"): the decoders
+//   render into the app's Surface through that pool. The handle constructor
+//   accepts only CLONE_HANDLE, the one method the library passes: it imports
+//   a clone of the producer's handle with the Android 17 mapper (which
+//   validates it against the description) and the destructor frees that
+//   clone, as Android 14's free_handle did. Everything stays within the 256
+//   bytes.
 //
 // The same class serves the stock FP6 com.fp.node.distortion.so (sha256
 // 2f4766d5a88fdf8c5cf20c29982a36fe983d517208b1ca5df762bfedbca277c0, loaded by
@@ -102,7 +101,7 @@ class GraphicBufferV34 final
     // Android 14 GraphicBuffer::mOwner values.
     enum : uint8_t { kOwnNone = 0, kOwnHandle = 1, kOwnData = 2 };
 
-    // usable: false makes the object report NO_INIT (hardware decoding off).
+    // usable: false makes the object report NO_INIT (no hardware decoder).
     // withMapper: false leaves mBufferMapper unset, for objects that hold an
     // AHardwareBuffer and never use this partition's libui mapper.
     GraphicBufferV34(bool usable, bool withMapper);
@@ -280,11 +279,15 @@ GraphicBufferV34::~GraphicBufferV34() {
     }
 }
 
-// Hardware video decoding is on for this boot: media/init.fp6.media.rc sets
-// the read-only property at zygote-start, before the codec service starts.
+// A hardware decoder is offered this boot, the secure ones ("2") or all
+// ("1"): media/init.fp6.media.rc sets the read-only property at zygote-start,
+// before the codec service starts.
 bool surfaceOutputAllowed() {
-    static const bool allowed =
-            android::base::GetProperty("ro.vendor.diamaneos.hw_video_decode", "") == "1";
+    static const bool allowed = [] {
+        const std::string state =
+                android::base::GetProperty("ro.vendor.diamaneos.hw_video_decode", "");
+        return state == "1" || state == "2";
+    }();
     return allowed;
 }
 
@@ -293,7 +296,7 @@ std::atomic<bool> gRefusalLogged{false};
 void refuse(void* self) {
     new (self) GraphicBufferV34(false, true);
     if (!gRefusalLogged.exchange(true, std::memory_order_relaxed)) {
-        ALOGW("GraphicBuffer refused: Codec2 output to a Surface needs hardware video decoding "
+        ALOGW("GraphicBuffer refused: Codec2 output to a Surface needs a hardware video decoder "
               "(Android 14 ABI, fails closed)");
     }
 }

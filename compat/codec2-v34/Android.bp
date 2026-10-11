@@ -28,14 +28,8 @@ package {
 
 // - GraphicBufferV34.cpp: an Android 14 sized GraphicBuffer (256 bytes;
 //   Android 17's is 3376), so the stock libraries' own 256-byte allocations
-//   never meet the Android 17 constructor. For the codec library it fails
-//   closed unless hardware video decoding is on; then it wraps the decoders'
-//   Surface buffers as Android 14's did (CLONE_HANDLE only). For the
-//   distortion node it allocates the node's own working buffers as
-//   AHardwareBuffers (libnativewindow) and locks them for CPU access. This
-//   partition's libui allocator and mapper are not used in the camera
-//   provider, where the stock libraries' older allocator interface library
-//   takes the place of the one libui needs;
+//   never meet the Android 17 constructor. Its header says what the object
+//   does for the codec library and for the distortion node;
 // - GraphicBufferMapperV34.cpp: GraphicBufferMapper::lock with six arguments
 //   and unlock(handle), which Android 17 dropped, forwarded to the Android 17
 //   members.

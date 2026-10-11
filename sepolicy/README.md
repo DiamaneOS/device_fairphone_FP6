@@ -871,9 +871,11 @@ Other:
 `media/` holds the policy for the stock Qualcomm Codec2 video service
 (`vendor.qti.media.c2@1.0-service`, platform domain `mediacodec`).
 
-- It exposes the hardware encoders. It exposes the non-secure hardware
-  decoders only when the user turns on Hardware video decoding (off by
-  default; `media/media.mk`).
+- It exposes the hardware encoders, and the hardware decoders the user's
+  Hardware video decoding choice allows (`media/media.mk`):
+  - protected video only, the default: the three secure decoders;
+  - all video: those and the three clear decoders;
+  - never: none.
 - Every app except isolated processes is a Codec2 client and can call it.
 - The platform vendor policy makes `mediacodec` the Codec2 HIDL server and a
   gralloc and GPU client, and gives it every `video_device` node.
@@ -883,17 +885,22 @@ Other:
   their own type, `vendor_video_codec_device`.
   - Only `mediacodec` may open them (neverallow), with the V4L2 ioctls only
     (`video_ioctl2` is the driver's only handler).
-  - The decoder node is root-only unless decoding is on.
-  - `vendor_init` changes its user and mode at zygote-start, through the
-    platform's setattr grant on every device node, and may `getattr` it.
+  - The decoder node is root-only when the choice is never.
+  - Otherwise `vendor_init` changes its group and mode at early-boot, through
+    the platform's setattr grant on every device node, and may `getattr` it.
+- Protected video: the secure decoders lend input buffers through the
+  memory-buffer driver (`vendor_membuf_dev`) and the content-protection
+  bitstream node (`vendor_vm_cp_bitstream_device`), as in the stock policy.
+  - `boot/ueventd.rc` makes that one VM node readable by all; SELinux lets
+    only the codec service and the Widevine service open it.
 - `persist.diamaneos.hw_video_decode`: the user's choice; accepts only 0
-  and 1.
+  (never), 1 (all video) and 2 (protected video only). Unset counts as 2.
   - Only Settings sets it (`system-ext-private/hw_video_decode.te`).
   - It is public and system restricted, because the vendor rc triggers on it.
 - `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot;
-  accepts only 0 and 1.
+  accepts only 0, 1 and 2.
   - Only init and `vendor_init` set it; the codec service and Settings read
-    it.
+    it, and the vendor rc files trigger on it.
 - No network: the platform neverallows cover tcp, udp and rawip sockets.
   - DiamaneOS's seccomp filter (`media/seccomp`) fails every socket family but
     AF_UNIX with EPERM, and the stock one has no `socket` at all.
@@ -901,8 +908,8 @@ Other:
   `vendor.media.target_variant`.
   - Through that property the service finds the target specification that
     limits the codecs it registers.
-  - `vendor_init` sets it from the vendor build.prop and switches it when
-    decoding is on.
+  - `vendor_init` sets it from the vendor build.prop and switches it when a
+    hardware decoder is offered.
 - `dontaudit` on the lookup of the composer's `IDisplayConfig` (refresh rates
   for perf hints, which are off): the service exposes screen writeback and
   panel controls, so the lookup stays denied.
@@ -911,7 +918,6 @@ Other:
 - Not granted, unlike the stock policy:
   - the Codec2 audio service, Wi-Fi display, VPP, hexlp and the capability
     config store;
-  - secure video (content-protection and membuf nodes, QSEECom);
   - the performance HAL and `/data/vendor/media`;
   - the Qualcomm system DMA-BUF heap: the selected libraries allocate from the
     AOSP system heaps only.
@@ -929,9 +935,17 @@ Other:
   - Granted: the DRM HAL interface, its own data in `/data/vendor/mediadrm`,
     the TEE node (`fp6/tee_node.te`), the QSEECom heap, the crypto engine
     node and the socket to `qseecomd`.
+  - Granted for protected video: file descriptors of the codec service, the
+    memory-buffer driver and the content-protection bitstream node.
   - Not granted, unlike the stock policy: the vendor binder, the display
     service and wake locks.
-  - Its service runs in the package's own groups (`media/init.fp6.drm.rc`).
+  - Its service has two definitions (`media/init.fp6.drm.rc`), and one runs
+    per boot:
+    - with the package's own groups and the hardware-backed library, when
+      hardware video decoding is for protected video or for all video;
+    - without the `drmrpc` and `system` groups and with the service's
+      built-in software protection, when it is never. Both run in the same
+      domain; the missing groups keep the TEE node closed to that one.
 
 ## Recovery
 

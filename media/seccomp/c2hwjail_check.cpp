@@ -41,13 +41,16 @@
 namespace c2hwjail {
 namespace {
 
-// Set once per boot by media/init.fp6.media.rc from the Settings switch.
+// Set once per boot by media/init.fp6.media.rc from the user's choice in
+// Settings: "0" no hardware decoder, "1" hardware decoders for all video, "2"
+// for protected video only.
 constexpr char kModeProperty[] = "ro.vendor.diamaneos.hw_video_decode";
 // Read by libqcodec2_platform (qc2::TargetSpec::readTargetVariant), which
 // opens /vendor/etc/media<variant>/video_system_specs.json.
 constexpr char kVariantProperty[] = "vendor.media.target_variant";
 constexpr char kEncodersOnlyVariant[] = "_volcano_v1";
-constexpr char kDecodersVariant[] = "_volcano_v1_hwdec";
+constexpr char kSecureDecodersVariant[] = "_volcano_v1_secdec";
+constexpr char kAllDecodersVariant[] = "_volcano_v1_hwdec";
 // msm_vidc registers the Iris decoder at minor 32 (boot/ueventd.rc).
 constexpr char kDecoderNode[] = "/dev/video32";
 // The target specifications are a few kilobytes.
@@ -58,11 +61,17 @@ constexpr const char* kEncoders[] = {
         "c2.qti.avc.encoder",      "c2.qti.hevc.encoder", "c2.qti.hevc.encoder.cq",
         "c2.qti.hevc.encoder.hdr", "c2.qti.heic.encoder",
 };
-// No secure (DRM) and no low-latency variant.
+// The clear decoders; no low-latency variant.
 constexpr const char* kDecoders[] = {
         "c2.qti.avc.decoder",
         "c2.qti.hevc.decoder",
         "c2.qti.vp9.decoder",
+};
+// The secure decoders, for protected (DRM) video.
+constexpr const char* kSecureDecoders[] = {
+        "c2.qti.avc.decoder.secure",
+        "c2.qti.hevc.decoder.secure",
+        "c2.qti.vp9.decoder.secure",
 };
 
 // Adds the names of a codec list; a missing list counts as empty.
@@ -101,12 +110,17 @@ Platform DevicePlatform() {
 
 std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason) {
     const std::string mode = platform.getProperty(kModeProperty);
-    if (!mode.empty() && mode != "0" && mode != "1") {
+    if (!mode.empty() && mode != "0" && mode != "1" && mode != "2") {
         *reason = std::string(kModeProperty) + " is \"" + mode + "\"";
         return {};
     }
-    const bool decoders = mode == "1";
-    const std::string expected = decoders ? kDecodersVariant : kEncodersOnlyVariant;
+    // Unset counts as "0": the rc always sets the state, so without one no
+    // decoder is offered.
+    const bool clearDecoders = mode == "1";
+    const bool secureDecoders = mode == "1" || mode == "2";
+    const std::string expected = clearDecoders    ? kAllDecodersVariant
+                                 : secureDecoders ? kSecureDecodersVariant
+                                                  : kEncodersOnlyVariant;
     const std::string variant = platform.getProperty(kVariantProperty);
     if (variant != expected) {
         *reason = std::string(kVariantProperty) + " is \"" + variant + "\", expected \"" + expected +
@@ -153,7 +167,10 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
         return {};
     }
     std::set<std::string> allowed(std::begin(kEncoders), std::end(kEncoders));
-    if (decoders) {
+    if (secureDecoders) {
+        allowed.insert(std::begin(kSecureDecoders), std::end(kSecureDecoders));
+    }
+    if (clearDecoders) {
         allowed.insert(std::begin(kDecoders), std::end(kDecoders));
     }
     if (listed != allowed) {
@@ -162,9 +179,9 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
         return {};
     }
 
-    // The decoder node: root-only while hardware decoding is off; root and
-    // group mediacodec, read-write, while it is on. A missing node (video
-    // driver not loaded) cannot be opened at all.
+    // The decoder node: root-only when no hardware decoder is offered; root
+    // and group mediacodec, read-write, when the secure or all decoders are. A
+    // missing node (video driver not loaded) cannot be opened at all.
     struct stat node = {};
     const int error = platform.statPath(kDecoderNode, &node);
     if (error != 0 && error != ENOENT) {
@@ -172,8 +189,8 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
         return {};
     }
     if (error == 0) {
-        const gid_t group = decoders ? AID_MEDIA_CODEC : AID_ROOT;
-        const mode_t access = decoders ? 0660 : 0600;
+        const gid_t group = secureDecoders ? AID_MEDIA_CODEC : AID_ROOT;
+        const mode_t access = secureDecoders ? 0660 : 0600;
         if (!S_ISCHR(node.st_mode) || node.st_uid != AID_ROOT || node.st_gid != group ||
             (node.st_mode & 07777) != access) {
             char found[160];
@@ -185,7 +202,9 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
             return {};
         }
     }
-    *reason = decoders ? "hardware encoders and decoders" : "hardware encoders only";
+    *reason = clearDecoders    ? "hardware encoders and decoders"
+              : secureDecoders ? "hardware encoders and secure decoders"
+                               : "hardware encoders only";
     return allowed;
 }
 

@@ -1,13 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # ro.vendor.diamaneos.hw_video_decode: hardware video decoding for this boot
-# ("1" on, "0" off). media/init.fp6.media.rc sets it once, at zygote-start,
-# from the user's choice in Settings (persist.diamaneos.hw_video_decode,
-# sepolicy/system-ext-private/hw_video_decode.te). The codec service reads it
-# (its configuration check and the Android 14 GraphicBuffer compat), and
-# Settings reads it to tell whether a change still waits for a restart, so it
-# is vendor restricted (platform domains may read it). Only init and
-# vendor_init set it.
+# ("0" never, "1" all video, "2" protected video only).
+# media/init.fp6.media.rc sets it once, at zygote-start, from the user's
+# choice in Settings (persist.diamaneos.hw_video_decode,
+# sepolicy/system-ext-private/hw_video_decode.te), and its early-boot actions
+# and the Widevine start actions (media/init.fp6.drm.rc) trigger on it. The
+# codec service reads it (its configuration check and the Android 14
+# GraphicBuffer compat), and Settings reads it to tell whether a change still
+# waits for a restart, so it is vendor restricted (platform domains may read
+# it). Only init and vendor_init set it.
 vendor_restricted_prop(vendor_diamaneos_hw_video_decode_prop)
 get_prop(system_app, vendor_diamaneos_hw_video_decode_prop)
 

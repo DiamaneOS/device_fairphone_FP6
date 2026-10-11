@@ -2,7 +2,7 @@
 # Copyright 2026 The DiamaneOS Project
 
 # The stock Qualcomm Codec2 video service (vendor.qti.media.c2@1.0-service),
-# hardware encoders, and hardware decoders when the user turns them on
+# hardware encoders, and the hardware decoders the user's choice allows
 # (media/media.mk), in the platform mediacodec domain.
 # The platform vendor policy (system/sepolicy/vendor/mediacodec.te) already
 # makes it the Codec2 HIDL server (hal_codec2), a gralloc/allocator client and
@@ -14,26 +14,25 @@
 # DAC group (mediacodec; media/init.fp6.media.rc and boot/ueventd.rc) is what
 # keeps it off the camera nodes. The two codec nodes have their own type,
 # vendor_video_codec_device (below), which no other domain may use; the
-# decoder node's DAC (root-only unless hardware decoding is on) keeps the
-# service off the decoder while it is off. The platform neverallows cover
+# decoder node's DAC (root-only when the user chose no hardware decoding)
+# keeps the service off the decoder then. The platform neverallows cover
 # only tcp, udp and rawip sockets; the seccomp filters (DiamaneOS's,
 # media/seccomp, and the stock one) allow no socket family but AF_UNIX.
 # Reduced from the pinned Qualcomm generic/vendor/common/mediacodec.te,
 # qva/vendor/common/mediacodec.te and qva/vendor/volcano/mediacodec.te and the
 # stock compiled policy, bound to this domain and to what the encoder path of
-# the selected closure uses.
+# the selected closure and the secure decoders use.
 #
 # Not granted (stock grants them for components this product does not
 # install, for decoders or for optional features): the Codec2 audio service
 # (audio_device, the audio HAL, the DSP manager), Wi-Fi display, VPP, hexlp,
-# qconfig, the capability config store, secure video (VM content-protection
-# bitstream and membuf nodes), FastRPC (vendor_qdsp_device), the performance
-# HAL (the perf library property ro.vendor.extension_library is not set), the
-# composer's IDisplayConfig (see below), /data/vendor/media (dumps), and the
-# Qualcomm system DMA-BUF heap (vendor_dmabuf_system_heap_device): the
-# selected libraries allocate only from the AOSP system heaps
-# (/dev/dma_heap/system and system-uncached, platform grant) and name no
-# qcom,system heap.
+# qconfig, the capability config store, FastRPC (vendor_qdsp_device), the
+# performance HAL (the perf library property ro.vendor.extension_library is
+# not set), the composer's IDisplayConfig (see below), /data/vendor/media
+# (dumps), and the Qualcomm system DMA-BUF heap
+# (vendor_dmabuf_system_heap_device): the selected libraries allocate only
+# from the AOSP system heaps (/dev/dma_heap/system and system-uncached,
+# platform grant) and name no qcom,system heap.
 
 # init.fp6.media.rc: capabilities SYS_NICE (qva/vendor/common/mediacodec.te).
 allow mediacodec self:capability sys_nice;
@@ -78,9 +77,15 @@ neverallow mediacodec { vendor_qdsp_device vendor_xdsp_device }:chr_file open;
 allow mediacodec vendor_video_codec_device:chr_file rw_file_perms;
 allowxperm mediacodec vendor_video_codec_device:chr_file ioctl { 0x5600-0x56ff };
 
-# Hardware video decoding for this boot (property.te): libc2hwjail_avservices
-# checks the codec configuration against it, and uiv34 lets Codec2 output to a
-# Surface only when it is on.
+# Protected video: the secure decoders lend input buffers to the
+# content-protection bitstream domain, through the memory-buffer driver
+# (/dev/membuf) and that domain's VM node (boot/ueventd.rc). Stock's two rules.
+allow mediacodec vendor_membuf_dev:chr_file r_file_perms;
+allow mediacodec vendor_vm_cp_bitstream_device:chr_file r_file_perms;
+
+# The hardware video decoding state of this boot (property.te):
+# libc2hwjail_avservices checks the codec configuration against it, and uiv34
+# lets Codec2 output to a Surface only when a hardware decoder is offered.
 get_prop(mediacodec, vendor_diamaneos_hw_video_decode_prop)
 
 # Only the codec service may use the codec nodes. ueventd (create, setattr),

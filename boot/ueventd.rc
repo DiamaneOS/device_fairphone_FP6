@@ -77,9 +77,22 @@ firmware_directories /vendor/firmware_mnt/image/
 # firmware path does not reach /mnt/vendor, so only ueventd ever opens it.
 firmware_directories /mnt/vendor/wlan_mac/
 
+# The memory-buffer driver's VM nodes get their stock place, /dev/mem_buf_vm
+# (stock stanza): libvmmem opens them there and file_contexts labels them
+# there. Without it ueventd creates them directly in /dev.
+subsystem mem_buf_vm
+    devname uevent_devpath
+    dirname /dev/mem_buf_vm
+
 /dev/kgsl                 0666   system     system
 /dev/kgsl-3d0             0666   system     system
 /dev/membuf               0664   system     system
+# Protected video: the secure decoders and the Widevine library lend input
+# buffers to the content-protection bitstream domain through /dev/membuf and
+# this node. Stock makes every /dev/mem_buf_vm node readable by all; here only
+# this one is, the others keep ueventd's default (root only). SELinux decides
+# who opens it: the codec service and the Widevine service (sepolicy/media).
+/dev/mem_buf_vm/qcom,cp_bitstream 0444 system system
 /dev/dma_heap/qcom,*      0444   system     system
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
@@ -277,11 +290,10 @@ firmware_directories /mnt/vendor/wlan_mac/
 
 # Video codec (media/init.fp6.media.rc, group mediacodec): msm_vidc registers
 # the Iris decoder at the fixed minor 32 and the encoder at 33. The Codec2
-# service's group gets the encoder node. The decoder node is root-only: by
-# default no hardware decoder is used (the software decoders run in the
-# sandboxed mediaswcodec), and only when the user turns hardware video
-# decoding on does init.fp6.media.rc give it to the same group, at
-# zygote-start. Both nodes are owned by root, so no system-uid process gets
+# service's group gets the encoder node. The decoder node is root-only here;
+# init.fp6.media.rc gives it to the same group at early-boot, for the secure
+# decoders or for all hardware decoders, unless the user chose no hardware
+# decoding. Both nodes are owned by root, so no system-uid process gets
 # them through the owner bits; their SELinux type is the codec service's
 # alone (sepolicy/media). The video core's media-controller node (media2)
 # stays in the camera block rule: the codecs never open a media node. These

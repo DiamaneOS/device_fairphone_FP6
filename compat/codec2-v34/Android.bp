@@ -21,17 +21,27 @@ package {
 // Android linker binds every symbol when a library loads, and the service
 // links libcodec2_hidl@1.2 (which links @1.1 and @1.0) and libcodec2_vndk.
 
+// uiv34 also serves the camera provider: Fairphone's stock lens distortion
+// node (com.fp.node.distortion.so, built against Android 14 too) gets the same
+// libui.so -> uiv34.so rename, for its three android::GraphicBuffer imports
+// (the allocating constructor, lockYCbCr and unlock).
+
 // - GraphicBufferV34.cpp: an Android 14 sized GraphicBuffer (256 bytes;
-//   Android 17's is 3376), so the stock library's own 256-byte allocations
-//   never meet the Android 17 constructor. It fails closed unless hardware
-//   video decoding is on; then it wraps the decoders' Surface buffers as
-//   Android 14's did (CLONE_HANDLE only);
+//   Android 17's is 3376), so the stock libraries' own 256-byte allocations
+//   never meet the Android 17 constructor. For the codec library it fails
+//   closed unless hardware video decoding is on; then it wraps the decoders'
+//   Surface buffers as Android 14's did (CLONE_HANDLE only). For the
+//   distortion node it allocates the node's own working buffers as
+//   AHardwareBuffers (libnativewindow) and locks them for CPU access. This
+//   partition's libui allocator and mapper are not used in the camera
+//   provider, where the stock libraries' older allocator interface library
+//   takes the place of the one libui needs;
 // - GraphicBufferMapperV34.cpp: GraphicBufferMapper::lock with six arguments
 //   and unlock(handle), which Android 17 dropped, forwarded to the Android 17
 //   members.
 // Every other libui symbol the stock library imports (mapper, allocator,
 // Fence, Region) has the same layout in Android 17 and still comes from the
-// real libui. The version script exports exactly the eight entry points.
+// real libui. The version script exports exactly the eleven entry points.
 cc_library_shared {
     name: "uiv34",
     vendor: true,
@@ -49,6 +59,7 @@ cc_library_shared {
     shared_libs: [
         "libbase",
         "liblog",
+        "libnativewindow",
         "libsync",
         "libui",
         "libutils",

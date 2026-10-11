@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /* uiv34 exports exactly the Android 14 entry points the stock libcodec2_vndk */
-/* imports from it (see Android.bp); everything else stays local. */
+/* and com.fp.node.distortion import from it (see Android.bp); everything else */
+/* stays local. */
 {
   global:
     _ZN7android19GraphicBufferMapper4lockEPK13native_handlejRKNS_4RectEPPvPiS9_;
@@ -11,6 +12,9 @@
     _ZN7android13GraphicBufV3419fromAHardwareBufferEP15AHardwareBuffer;
     _ZN7android13GraphicBufV3419fromAHardwareBufferEPK15AHardwareBuffer;
     _ZN7android13GraphicBufV3417toAHardwareBufferEv;
+    _ZN7android13GraphicBufV34C1EjjijNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE;
+    _ZN7android13GraphicBufV349lockYCbCrEjP13android_ycbcr;
+    _ZN7android13GraphicBufV346unlockEv;
   local:
     *;
 };

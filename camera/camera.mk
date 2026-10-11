@@ -6,9 +6,13 @@
 # the ICP firmware and the CDSP skeletons come from the selected stock vendor
 # files (vendor/fairphone/FP6). The AOSP camera interfaces, the HIDL shims and
 # the Qualcomm interface libraries the stock blobs link are built from source.
+# Fairphone's lens distortion node (com.fp.node.distortion with libundistort)
+# is selected too: the combined cameras of the stock table need it. It was
+# built against Android 14 and binds its GraphicBuffer calls to the uiv34
+# compat library (compat/codec2-v34, installed by media/media.mk).
 # Not included: the TCL camera algorithm service and its models, third-party
-# (ANC/TCL) algorithms, the Fairphone com.fp.node.* feature nodes, QNN/SNPE,
-# the always-on (AON) camera and factory (MTF) tuning.
+# (ANC/TCL) algorithms, the other Fairphone com.fp.node.* feature nodes,
+# QNN/SNPE, the always-on (AON) camera and factory (MTF) tuning.
 
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/camera/init.camera.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.camera.rc

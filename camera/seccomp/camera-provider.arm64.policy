@@ -80,6 +80,15 @@ setpriority: arg0 == 0
 # Read-only resource-limit query, seen once during capture.
 getrlimit: 1
 
+# At every provider start, logged by the filter (the first trace began after
+# start). 33 getsockname calls: libqmi_cci, libbinder and libcutils import it.
+# 5 statfs calls, through libc. One setrlimit call: CamX raises its open-file
+# limit (7 RLIMIT_NOFILE; libcamxcommonutils is the only CamX library that
+# calls it, with that resource at both call sites).
+getsockname: 1
+statfs: 1
+setrlimit: arg0 == 7
+
 # debuggerd fallback handler (system/core debuggerd/seccomp_policy/
 # crash_dump.arm64.policy), less the calls already listed.
 clock_gettime: 1

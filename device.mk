@@ -135,6 +135,10 @@ PRODUCT_PACKAGES += \
 # base_vendor.mk, which this product does not inherit, normally adds it.
 PRODUCT_PACKAGES += filterPowerSupplyEvents.o
 
+# Off-mode charging animation. The health service reads the images from
+# /vendor only.
+PRODUCT_PACKAGES += charger_res_images_vendor
+
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
 # its interface repositories). The stock Android 14 composer does not present
 # under Android 17 without libsdmextension and is untested with it; the source

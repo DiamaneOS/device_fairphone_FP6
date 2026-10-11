@@ -48,6 +48,9 @@ PRODUCT_COPY_FILES += \
 
 # DRM HALs (android.hardware.drm). ClearKey is built from the platform source;
 # media/init.fp6.drm.rc runs it without the group that owns the TEE node.
+# Widevine is Fairphone's stock package, which the generated vendor tree
+# installs (vendor/fairphone/FP6); the same rc file defines its service, and
+# sepolicy/media/hal_drm_widevine.te is its policy.
 PRODUCT_PACKAGES += \
     android.hardware.drm-service.clearkey
 

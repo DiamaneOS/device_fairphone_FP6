@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Camera: the stock Qualcomm CamX/CHI provider, its
-# Qualcomm components and algorithms, the FP6 sensor module and tuning data,
+# Camera: the stock Qualcomm CamX/CHI provider, its Qualcomm components and
+# algorithms, the FP6 sensor module and tuning data,
 # the ICP firmware and the CDSP skeletons come from the selected stock vendor
 # files (vendor/fairphone/FP6). The AOSP camera interfaces, the HIDL shims and
 # the Qualcomm interface libraries the stock blobs link are built from source.

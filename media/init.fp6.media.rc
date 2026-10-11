@@ -1,19 +1,23 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# The stock Qualcomm Codec2 video service: hardware encoders, and hardware
-# decoders when the user turned them on (media/media.mk). Derived from the
+# The stock Qualcomm Codec2 video service: hardware encoders, and the hardware
+# decoders the user's choice allows (media/media.mk). Derived from the
 # stock FP6 vendor/etc/init/vendor.qti.media.c2@1.0-service.rc
 # (sha256 c29bfa76cf361423ea75bee88faee903283c3e0c85aeee5057cd436b1dd05f8a):
 # - group mediacodec only. The encoders open only /dev/video33 and the
 #   decoders only /dev/video32 (libqcodec2_v4l2codec: the encoder and decoder
 #   constructors are the one user of each path; the media-controller lookup
 #   returns early for both). boot/ueventd.rc and the actions below give that
-#   group the encoder node, and the decoder node only while hardware decoding
-#   is on. Stock's camera group would also open every camera V4L2, subdevice
-#   and media node, UBWC-P, the non-secure FastRPC node and the ToF sensor.
-#   Stock's mediadrm and drmrpc groups serve secure (DRM) playback through
-#   QSEECom, which this product does not install; stock's system group has no
+#   group the encoder node, and the decoder node unless the user chose no
+#   hardware decoding. Stock's camera group would also open every camera V4L2,
+#   subdevice and media node, UBWC-P, the non-secure FastRPC node and the ToF
+#   sensor. Stock's mediadrm and drmrpc groups are not needed either: stock's
+#   policy gives the service none of what they own (Widevine's data, the TEE
+#   node, the crypto engine node, qseecomd's socket), and the secure decoders
+#   lend their input buffers through /dev/membuf and
+#   /dev/mem_buf_vm/qcom,cp_bitstream, which every user may open and SELinux
+#   limits (boot/ueventd.rc, sepolicy/media). Stock's system group has no
 #   consumer in the selected closure.
 # - task_profiles ProcessCapacityHigh replaces stock's
 #   "writepid /dev/cpuset/foreground/tasks" (the AOSP Codec2 service rc does
@@ -37,35 +41,63 @@ service vendor-qti-media-c2-hal-1-0 /vendor/bin/hw/vendor.qti.media.c2@1.0-servi
     ioprio rt 4
     task_profiles ProcessCapacityHigh
 
-# Hardware video decoding (Settings > Security & privacy > Exploit protection;
-# off by default). Settings stores the user's choice in
-# persist.diamaneos.hw_video_decode ("1" on, "0" off; only Settings may set
-# it, sepolicy/system-ext-private). It is applied once per boot, here: the
-# persistent properties are loaded at post-fs-data, and zygote-start comes
-# before the codec service (class hal, at boot), the media framework
-# (mediaserver, class main) and every app, so every component sees one state
+# Hardware video decoding (Settings > Security & privacy > Exploit protection).
+# Settings stores the user's choice in persist.diamaneos.hw_video_decode (only
+# Settings may set it, sepolicy/system-ext-private):
+# - "2" or unset, the default: protected video only. The three secure
+#   Qualcomm decoders, which read only protected buffers that a DRM session
+#   fills; clear video stays in the software decoders.
+# - "1": all video. The secure decoders and the three clear ones.
+# - "0": never. No hardware decoder; Widevine then protects in software
+#   (media/init.fp6.drm.rc).
+# It is applied once per boot, in two steps, so every component sees one state
 # for the whole boot. A change takes effect at the next boot.
 #
+# Step 1, zygote-start (the persistent properties are loaded at
+# post-fs-data): the state of this boot, ro.vendor.diamaneos.hw_video_decode.
 # Init runs the actions of one trigger in file order, and a read-only property
-# keeps the first value it is given: with the switch on, the first action
-# sets the decoding state, and the second action's setprop lines change
-# nothing. Any other value, or none, leaves hardware decoding off.
-# libc2hwjail_avservices checks the result in the codec service when it builds
-# its store (the mode, the target variant, the target specification and the
-# decoder node); if anything differs the store offers no hardware codec, and
-# the service still registers it.
+# keeps the first value it is given: a stored "0" or "1" sets it, and the last
+# action's "2" stays only when neither did. These actions set nothing else:
+# init picks every action of a trigger before it runs the first, so the last
+# one always runs and cannot tell what an earlier one set.
+on zygote-start && property:persist.diamaneos.hw_video_decode=0
+    setprop ro.vendor.diamaneos.hw_video_decode 0
+
 on zygote-start && property:persist.diamaneos.hw_video_decode=1
     setprop ro.vendor.diamaneos.hw_video_decode 1
-    # The framework's codec list and the Qualcomm target specification with
-    # the three decoders (both pinned derivations, media/media.mk).
+
+on zygote-start
+    setprop ro.vendor.diamaneos.hw_video_decode 2
+
+# Step 2, early-boot: what each state needs. Exactly one of the three actions
+# runs, because the state has one value by now. early-boot comes before the
+# codec service and the Widevine service (class hal, at boot), the media
+# framework (mediaserver, class main) and every app.
+# - ro.media.xml_variant.codecs: the framework's codec list. Unset, the
+#   framework lists no Qualcomm codec at all.
+# - vendor.media.target_variant: the Qualcomm target specification. The
+#   build's value is the encoders-only one (media/media.mk), which state 0
+#   keeps.
+# - the decoder node for the codec service's group. ueventd made it root-only;
+#   msm_video.ko is a boot module, so the node normally exists.
+# The codec lists and target specifications are pinned derivations of the
+# stock files (media/media.mk). libc2hwjail_avservices checks the result in
+# the codec service when it builds its store (the state, the target variant,
+# the target specification and the decoder node); if anything differs the
+# store offers no hardware codec, and the service still registers it.
+on early-boot && property:ro.vendor.diamaneos.hw_video_decode=0
+    setprop ro.media.xml_variant.codecs _volcano_v1
+
+on early-boot && property:ro.vendor.diamaneos.hw_video_decode=1
     setprop ro.media.xml_variant.codecs _volcano_v1_hwdec
     setprop vendor.media.target_variant _volcano_v1_hwdec
-    # The decoder node for the codec service's group. ueventd made it
-    # root-only; msm_video.ko is a boot module, so the node normally exists.
     wait /dev/video32
     chown root mediacodec /dev/video32
     chmod 0660 /dev/video32
 
-on zygote-start
-    setprop ro.vendor.diamaneos.hw_video_decode 0
-    setprop ro.media.xml_variant.codecs _volcano_v1
+on early-boot && property:ro.vendor.diamaneos.hw_video_decode=2
+    setprop ro.media.xml_variant.codecs _volcano_v1_secdec
+    setprop vendor.media.target_variant _volcano_v1_secdec
+    wait /dev/video32
+    chown root mediacodec /dev/video32
+    chmod 0660 /dev/video32

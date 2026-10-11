@@ -33,6 +33,16 @@ allow hal_drm_widevine tee:unix_stream_socket connectto;
 # ordinary memory.
 allow hal_drm_widevine vendor_qce_device:chr_file { open read write ioctl };
 
+# Protected video: a buffer of the codec service reaches the library as a
+# file descriptor (stock rule).
+allow hal_drm_widevine mediacodec:fd use;
+
+# The library lends the buffer it decrypts into to the content-protection
+# bitstream domain, through the memory-buffer driver (/dev/membuf) and that
+# domain's VM node (boot/ueventd.rc). Stock's two rules.
+allow hal_drm_widevine vendor_membuf_dev:chr_file r_file_perms;
+allow hal_drm_widevine vendor_vm_cp_bitstream_device:chr_file r_file_perms;
+
 # The library asks for the display configuration service to choose a resource
 # tier and uses the same tier when it gets no answer. Not granted.
 dontaudit hal_drm_widevine vendor_hal_vnddisplayconfig_service:service_manager find;

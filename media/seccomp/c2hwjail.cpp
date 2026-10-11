@@ -20,9 +20,9 @@
 //   filter if it is not in place yet, checks the codec configuration
 //   (c2hwjail_check.cpp) and builds the real HIDL store around a filtering
 //   store (c2hwjail_store.cpp) that offers only the codecs this boot allows:
-//   the hardware encoders, the three non-secure hardware decoders when
-//   hardware video decoding is on, and none if the check fails or the filter
-//   could not be installed.
+//   the hardware encoders, the hardware decoders the user's choice allows
+//   (the three secure ones, or those and the three clear ones), and none if
+//   the check fails or the filter could not be installed.
 //
 // So the service always registers, and every Codec2 client (MediaCodec,
 // MediaCodecList, system_server's checks at boot) gets an answer: a store

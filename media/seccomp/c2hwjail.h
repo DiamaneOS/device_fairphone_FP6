@@ -30,10 +30,11 @@ struct Platform {
 Platform DevicePlatform();
 
 // The Qualcomm codecs the store may offer this boot: the five hardware
-// encoders, plus the three non-secure hardware decoders when hardware video
-// decoding is on. If the mode, the target variant, the target specification
-// the Qualcomm library reads or the decoder node differ from what this boot
-// expects, none, and *reason says why. Never aborts.
+// encoders, plus the three secure hardware decoders when hardware video
+// decoding is for protected video only, or those and the three clear ones
+// when it is for all video. If the mode, the target variant, the target
+// specification the Qualcomm library reads or the decoder node differ from
+// what this boot expects, none, and *reason says why. Never aborts.
 std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason);
 
 // Rewrites every "trap" result of a compiled filter to "fail with EPERM", so a

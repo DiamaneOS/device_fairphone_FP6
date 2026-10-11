@@ -118,6 +118,16 @@ dontaudit hal_camera_default default_prop:file read;
 # provider carries on. Not audited: it is retried at every provider start.
 dontaudit hal_camera_default vendor_hal_offlinecamera_service:service_manager add;
 
+# Fairphone's distortion library (libundistort) carries OpenCV, which at load
+# looks for a tracing library under /data/data/com.intel.vtune and for a temp
+# folder under /data/local/tmp. Both stay denied: the camera service must
+# never load or read anything from app or shell data. The graphics loader it
+# starts also asks for ro.zygote.disable_gl_preload, which is not set here.
+# Not audited: all three are retried at every provider start.
+dontaudit hal_camera_default shell_data_file:dir search;
+dontaudit hal_camera_default system_data_file:dir search;
+dontaudit hal_camera_default zygote_config_prop:file read;
+
 # The provider runs with no_new_privs (camxjail seccomp, camera/seccomp), so
 # debuggerd writes its crash and watchdog-abort tombstones and its ANR and
 # bug-report stack dumps through the in-process fallback handler. That handler

@@ -1,17 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony: the stock Qualcomm radio daemon (qcrilNrd),
-# its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
-# native modem services come from the
-# selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
-# radio daemon and the audio HAL is built here (callaudio/, replacing the stock
-# QtiTelephonyService). The radio interface libraries, the carrier
-# configuration service and telephony features are built from source. Carrier
-# data is extracted from the authenticated stock package without its code.
-# Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
-# eSIM management is DiamaneOS's own LPA (no stock LPA is
-# packaged), off until the user turns on eSIM support.
+# Telephony: the stock Qualcomm radio daemon (qcrilNrd), its data module and
+# nicmd, the stock IMS app (org.codeaurora.ims) and the native modem services
+# come from the selected stock files (vendor/fairphone/FP6). The call-audio
+# bridge between the radio daemon and the audio HAL is built here (callaudio/,
+# replacing the stock QtiTelephonyService). The radio interface libraries, the
+# carrier configuration service and telephony features are built from source.
+# Carrier data is extracted from the authenticated stock package without its
+# code. Native Qualcomm IWLAN is paired with the isolated source reporter and
+# broker. eSIM management is DiamaneOS's own LPA (no stock LPA is packaged),
+# off until the user turns on eSIM support.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
 # QCRIL defaults that stock sets in vendor build.prop and that are not in the
@@ -81,11 +80,10 @@ PRODUCT_VENDOR_PROPERTIES += \
     log.tag.ApduSender-0=I \
     log.tag.ApduSender-1=I
 
-# QCRIL directories and database; the stock IMS app is only parsed when
-# ro.boot.vendor.qspa.modem=enabled (its manifest carries an <overlay
-# requiredSystemPropertyName=...> gate), which stock sets from a system_ext
-# init script. Only init may set ro.boot.* properties, so the property is set
-# from system_ext as on stock.
+# QCRIL directories and database (init.fp6.telephony.rc), and the
+# ro.boot.vendor.qspa.modem gate without which the stock IMS app is not parsed
+# (init.fp6.qspa.rc). Only init may set ro.boot.* properties, so the gate is
+# set from system_ext, as on stock.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/init.fp6.telephony.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.telephony.rc \
     device/fairphone/FP6/telephony/init.fp6.qspa.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.fp6.qspa.rc \

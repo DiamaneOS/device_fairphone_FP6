@@ -2,7 +2,7 @@
 # Copyright 2026 The DiamaneOS Project
 #
 # System calls the Bluetooth HCI service may make (arm64, minijail syntax):
-# our service.cpp and the stock Qualcomm HCI implementation it loads
+# DiamaneOS's service.cpp and the stock Qualcomm HCI implementation it loads
 # (android.hardware.bluetooth@1.0/1.1-impl-qti, libbtnv, libsoc_helper,
 # libdiag, libqmi_cci and their AOSP dependencies). Installed as
 # /vendor/etc/seccomp_policy/bluetooth-hci.policy and compiled by the service

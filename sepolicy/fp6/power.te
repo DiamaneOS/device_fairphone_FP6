@@ -18,7 +18,7 @@ type vendor_sysfs_kgsl_limit, fs_type, sysfs_type;
 # The HAL only writes these nodes (powerhint.json marks them WriteOnly).
 allow hal_power_default { vendor_sysfs_cpufreq_limit vendor_sysfs_kgsl_limit }:file w_file_perms;
 
-# Keep the access the nodes had under their old labels for the processes the
+# Keep the access the nodes have under the generic labels for the processes the
 # relabelling would otherwise cut off: the thermal engine may read and write
 # all of sysfs_devices_system_cpu and vendor_sysfs_kgsl
 # (vendor-common/thermal-engine.te), and system_server's CPU monitor

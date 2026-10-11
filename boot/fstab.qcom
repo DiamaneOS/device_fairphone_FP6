@@ -34,8 +34,8 @@
 # Unlike stock, persist is not also mounted at /odm/persist in first stage.
 # Stock uses that mount only to import device-generated product properties
 # from persist into the odm build.prop; DiamaneOS sets product properties at
-# build time and keeps unverified storage out of ro.* properties. Our odm image
-# has no /odm/persist mount point, so the entry made first-stage mount fail.
+# build time and keeps unverified storage out of ro.* properties. The odm image
+# has no /odm/persist mount point: with the entry, first-stage mount fails.
 # The filesystem that contains the filesystem checker binary (typically /system) cannot
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 

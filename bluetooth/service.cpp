@@ -51,7 +51,7 @@ constexpr block_action kSeccompAction = ACTION_RET_TRAP;
 constexpr char kSeccompMode[] = "trap";
 #endif
 
-// Installs the seccomp filter for the whole process: our code, the HIDL thread
+// Installs the seccomp filter for the whole process: this code, the HIDL thread
 // pool, the HCI implementation's load and every thread it starts. Calls outside
 // bluetooth-hci.policy, and listed calls whose arguments do not match their
 // rule, are

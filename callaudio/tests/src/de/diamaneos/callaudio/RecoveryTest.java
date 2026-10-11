@@ -128,7 +128,7 @@ public final class RecoveryTest {
     @Test
     public void latePermissionPushStillApplied() {
         Flinger flinger = new Flinger();
-        flinger.permittedAt = 3_000; // Beyond the old cap of 20 retries of 100 ms.
+        flinger.permittedAt = 3_000; // After more than 20 retries of 100 ms: no count caps them.
         Recovery recovery = new Recovery();
         recovery.begin(0);
         assertEquals(Recovery.SUCCESS, flinger.retry(recovery));

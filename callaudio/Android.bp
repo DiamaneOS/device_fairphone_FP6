@@ -27,10 +27,10 @@ package {
 // runtime hidden-API enforcement for system apps.
 //
 // The AIDL is a client-side copy of the radio daemon's frozen version 1. The
-// flags make the generated stubs match it: VINTF stability (our request
+// flags make the generated stubs match it: VINTF stability (the request
 // callback crosses into the vendor daemon) and the vendor's version and hash,
 // which the daemon can query on that callback. There is no aidl_interface
-// module on purpose: the interface is the vendor's, we only mirror it.
+// module on purpose: the interface is the vendor's and is only mirrored here.
 
 filegroup { name: "FP6CallAudioJavaSources", srcs: ["src/**/*.java"] }
 filegroup { name: "FP6CallAudioAidlSources", srcs: ["aidl/**/*.aidl"] }

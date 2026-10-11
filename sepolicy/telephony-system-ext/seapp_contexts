@@ -8,7 +8,7 @@
 # (mac_permissions.xml), their package or process name and isPrivApp=true (both
 # packages are installed as privileged system apps, so a newly installed
 # app never matches; only a same-signature update of one of them would).
-# Each app gets its own domain. Our own call-audio bridge is
+# Each app gets its own domain. The DiamaneOS call-audio bridge is
 # selected by its default-application signer, package and privileged placement.
 user=_app seinfo=fp6_stock_platform isPrivApp=true name=org.codeaurora.ims domain=vendor_qtelephony type=app_data_file levelFrom=all
 user=_app seinfo=diamaneos_callaudio isPrivApp=true name=de.diamaneos.callaudio domain=fp6_callaudio_app type=app_data_file levelFrom=all

@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- The presigned stock apps use platform-only SystemProperties/HwBinder APIs.
      Scope hidden-API access to these preinstalled packages instead of signing
-     them with our platform key. Android permission checks and the dedicated
+     them with the platform key. Android permission checks and the dedicated
      SELinux domain still apply. Telephony binds them in user 0. -->
 <config>
     <hidden-api-whitelisted-app package="vendor.qti.iwlan" />

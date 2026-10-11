@@ -12,9 +12,9 @@ $(call inherit-product, device/fairphone/FP6/device.mk)
 $(call inherit-product, vendor/diamaneos/product.mk)
 
 # Fairphone's stock product identity, as GrapheneOS keeps Google's for Pixels:
-# Google blocked the DiamaneOS-branded identity as an uncertified device. DiamaneOS stays the name people see
-# (setup, About, system label, boot); the build ID, number, variant and keys
-# in the fingerprint are our own.
+# Google blocks a DiamaneOS-branded identity as an uncertified device.
+# DiamaneOS stays the name people see (setup, About, system label, boot); the
+# build ID, number, variant and keys in the fingerprint are DiamaneOS's own.
 PRODUCT_NAME := FP6
 PRODUCT_DEVICE := FP6
 PRODUCT_MODEL := The Fairphone (Gen. 6)

@@ -7,8 +7,8 @@
 # label, those grants reach nothing, whatever service is installed later.
 #
 # Its five users are qseecomd (tee), KeyMint, Gatekeeper, the fingerprint HAL
-# and the Widevine DRM HAL. Every grant on the node is in this file, so the
-# platform's rules for tee_device no longer supply any of them.
+# and the Widevine DRM HAL. Every grant on the node is in this file: the
+# platform's rules for tee_device supply none of them.
 allow tee vendor_smcinvoke_device:chr_file rw_file_perms;
 allow vendor_hal_keymint_qti vendor_smcinvoke_device:chr_file rw_file_perms;
 allow vendor_hal_gatekeeper_qti vendor_smcinvoke_device:chr_file rw_file_perms;
@@ -29,7 +29,7 @@ allowxperm hal_fingerprint_default vendor_smcinvoke_device:chr_file ioctl { 0x98
 allowxperm hal_drm_widevine vendor_smcinvoke_device:chr_file ioctl { 0x9801 0x9803 };
 
 # Nobody else, apps and platform services included. This replaces the
-# platform's neverallows on tee_device, which no longer cover the node.
+# platform's neverallows on tee_device, which do not cover the node.
 neverallow {
   domain
   -tee

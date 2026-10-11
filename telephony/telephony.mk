@@ -1,17 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony: the stock Qualcomm radio daemon (qcrilNrd),
-# its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
-# native modem services come from the
-# selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
-# radio daemon and the audio HAL is our own (callaudio/, replacing the stock
-# QtiTelephonyService). The radio interface libraries, the carrier
-# configuration service and telephony features are built from source. Carrier
-# data is extracted from the authenticated stock package without its code.
-# Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
-# eSIM management is DiamaneOS's own LPA (no stock LPA is
-# packaged), off until the user turns on eSIM support.
+# Telephony: the stock Qualcomm radio daemon (qcrilNrd), its data module and
+# nicmd, the stock IMS app (org.codeaurora.ims) and the native modem services
+# come from the selected stock files (vendor/fairphone/FP6). The call-audio
+# bridge between the radio daemon and the audio HAL is built here (callaudio/,
+# replacing the stock QtiTelephonyService). The radio interface libraries, the
+# carrier configuration service and telephony features are built from source.
+# Carrier data is extracted from the authenticated stock package without its
+# code. Native Qualcomm IWLAN is paired with the isolated source reporter and
+# broker. eSIM management is DiamaneOS's own LPA (no stock LPA is packaged),
+# off until the user turns on eSIM support.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
 # QCRIL defaults that stock sets in vendor build.prop and that are not in the
@@ -90,10 +89,10 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/init.fp6.qspa.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.fp6.qspa.rc \
     device/fairphone/FP6/telephony/privapp-permissions-fp6-telephony.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/privapp-permissions-fp6-telephony.xml
 
-# The QCRIL database we ship has power-up optimisation off (version 16.0). This
+# The shipped QCRIL database has power-up optimisation off (version 16.0). This
 # upgrade step brings a version 15.0 copy already in /data/vendor/radio to the
 # same state; with the optimisation on, QCRIL holds incoming SMS and USSD until
-# a UI-ready call from stock apps we do not ship.
+# a UI-ready call from stock apps this build does not ship.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/qcril-upgrade-0016.0_config.sql:$(TARGET_COPY_OUT_VENDOR)/etc/qcril_database/upgrade/config/0016.0_config.sql
 
@@ -106,7 +105,7 @@ PRODUCT_PACKAGES += \
 
 # Stock modem-backed IWLAN, not the alternative AP-assisted AOSP service.
 # The renderer selects IWlanService, CACertService and their exact JNI closure.
-# Neither app uses the system UID or our platform key, and neither receives
+# Neither app uses the system UID or the platform key, and neither receives
 # privileged Android permissions. Their shared process has a scoped domain.
 ifneq ($(filter-out qti,$(DIAMANEOS_IWLAN_IMPLEMENTATION)),)
 $(error FP6 selects the QTI IWLAN path; do not also inherit an AOSP IWLAN product)
@@ -135,7 +134,7 @@ $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 # by the user before TelephonyProvider reimports the changed file.
 
 # Device overlay: IMS package and RTT capabilities for TeleService. Stock
-# carrier defaults are now extracted as data, including their original filters.
+# carrier defaults are extracted as data, including their original filters.
 # The CarrierConfig overlay corrects stock values that apply to every carrier
 # (see its vendor.xml); it is read after the stock data.
 PRODUCT_PACKAGES += \

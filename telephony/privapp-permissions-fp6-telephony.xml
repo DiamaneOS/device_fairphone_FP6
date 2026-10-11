@@ -4,7 +4,7 @@
      Copyright 2026 The DiamaneOS Project
 
      Privileged permissions of the stock Qualcomm system_ext telephony apps,
-     which keep their stock signature (they are not signed with our platform
+     which keep their stock signature (they are not signed with the platform
      key). Every signature|privileged permission they request is listed, as
      granted or explicitly denied; with ro.control_privapp_permissions=enforce
      an unlisted one stops a user build at boot (AppIdPermissionPolicy).
@@ -27,9 +27,9 @@
      CREATE_USERS, INTERACT_ACROSS_USERS_FULL, INTERACT_ACROSS_PROFILES,
      SYSTEM_ALERT_WINDOW.
 
-     The stock QCRIL audio messenger (com.qualcomm.qti.telephonyservice) and
-     its MODIFY_AUDIO_ROUTING grant are gone: our call-audio bridge
-     (callaudio/) does the same job with the normal permission
+     The stock QCRIL audio messenger (com.qualcomm.qti.telephonyservice) is
+     not installed, so there is no MODIFY_AUDIO_ROUTING grant: the call-audio
+     bridge (callaudio/) does the same job with the normal permission
      MODIFY_AUDIO_SETTINGS and needs no entry here.
 -->
 <permissions>

@@ -19,18 +19,21 @@ service vendor.drm-clearkey-service /vendor/bin/hw/android.hardware.drm-service.
     override
 
 # Widevine, from Fairphone's stock package (vendor APEX
-# com.google.android.widevine, selected by the tools). The rc file inside the
-# package runs the service in groups media, mediadrm, drmrpc and system. This
-# product ships no hardware-backed Widevine path, so the service needs neither
-# the TEE node's group (drmrpc) nor system. init reads /vendor/etc/init before
-# the files inside APEXes and keeps the first definition of a service, so this
-# one is used and the package's is ignored (init logs the duplicate).
-# The package's rc still creates /data/vendor/mediadrm (0770 media mediadrm)
-# once all APEXes are ready.
+# com.google.android.widevine, selected by the tools), with the stock
+# hardware-backed library. The groups are the package's own: mediadrm for its
+# data, drmrpc for the TEE node, the crypto engine node and qseecomd's socket
+# (boot/ueventd.rc), and system to read the Widevine trusted application from
+# the firmware partition, which is mounted for that user and group only
+# (boot/fstab.qcom). SELinux decides what it reaches
+# (sepolicy/media/hal_drm_widevine.te, sepolicy/fp6/tee_node.te).
+# init reads /vendor/etc/init before the files inside APEXes and keeps the
+# first definition of a service, so this one is used and the package's is
+# ignored (init logs the duplicate). The package's rc still creates
+# /data/vendor/mediadrm (0770 media mediadrm) once all APEXes are ready.
 service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
     interface aidl android.hardware.drm.IDrmFactory/widevine
     class hal
     user media
-    group media mediadrm
+    group media mediadrm drmrpc system
     ioprio rt 4
     task_profiles ProcessCapacityHigh

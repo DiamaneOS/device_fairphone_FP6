@@ -49,13 +49,27 @@ PRODUCT_COPY_FILES += \
 # DRM HALs (android.hardware.drm). ClearKey is built from the platform source;
 # media/init.fp6.drm.rc runs it without the group that owns the TEE node.
 # Widevine is Fairphone's stock package, which the generated vendor tree
-# installs (vendor/fairphone/FP6); the same rc file defines its service, and
-# sepolicy/media/hal_drm_widevine.te is its policy.
+# installs (vendor/fairphone/FP6) together with the stock hardware-backed
+# library (liboemcrypto.so) in /vendor/lib64; the same rc file defines its
+# service, and sepolicy/media/hal_drm_widevine.te is its policy.
 PRODUCT_PACKAGES += \
     android.hardware.drm-service.clearkey
 
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/media/init.fp6.drm.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.drm.rc
+
+# The Widevine package may load a library from /vendor/lib64 only if the
+# vendor linker configuration offers it by name.
+PRODUCT_VENDOR_LINKER_CONFIG_FRAGMENTS += \
+    device/fairphone/FP6/media/linker.config.widevine.json
+
+# The hardware-backed library's two stock settings: tell the Widevine trusted
+# application that keys are provisioned with the device's certificate chain
+# (no factory keybox), and decrypt clear-output content through the crypto
+# engine.
+PRODUCT_VENDOR_PROPERTIES += \
+    vendor.wv.oemcrypto.debug.enable_prov40=true \
+    vendor.wv.oemcrypto.debug.enable_hlos_data_path=true
 
 # Android 14 ABI compat libraries for the stock Codec2 framework libraries
 # (see compat/codec2-v34). The tools renderer renames one dependency of

@@ -5,53 +5,49 @@
 // (sha256 f1d104621b5575f6603fa6779b55548034c2b11be85e6fcd47bffb2afc199e5d)
 // constructs, at the Android 14 size.
 //
-// The stock library was built against Android 14, where GraphicBuffer is 256
-// bytes. At each of its four construction sites it allocates 256 bytes itself
-// (operator new) and then calls the GraphicBuffer constructor. Android 17's
-// GraphicBuffer is 3376 bytes, so the Android 17 constructor would write far
-// past that allocation. The tools renderer therefore renames the six
-// GraphicBuffer symbols the stock library imports from android::GraphicBuffer
-// to android::GraphicBufV34 (same length; input and output hashes pinned), and
-// its libui.so dependency to uiv34.so. Only this library defines those names,
-// so the stock calls cannot bind to Android 17 libui, whatever the load order,
-// and nothing else in the process can bind to this class.
+// The stock library is built against Android 14, where GraphicBuffer is 256
+// bytes: at each of its four construction sites it allocates 256 bytes itself
+// (operator new) and then calls the constructor. Android 17's GraphicBuffer
+// is 3376 bytes, so its constructor would write far past that allocation. The
+// tools renderer therefore renames the six GraphicBuffer symbols the stock
+// library imports to android::GraphicBufV34 (same length; input and output
+// hashes pinned), and its libui.so dependency to uiv34.so. Only this library
+// defines those names, so the stock calls cannot bind to Android 17 libui,
+// whatever the load order, and nothing else in the process can bind to this
+// class.
 //
 // Only the platform bufferqueue block pool (C2BqBuffer.cpp, codec output to a
 // Surface) constructs GraphicBuffer objects in the stock library, and none
 // leaves the library: it wraps the producer's buffers itself
-// (hgbp_createFromHandle, CLONE_HANDLE) instead of going through
-// AHardwareBuffer, and uses them only through inline accessors (the Android 14
-// offsets checked below), initCheck, the AHardwareBuffer pointer casts and
-// RefBase.
+// (hgbp_createFromHandle, CLONE_HANDLE) and uses them only through inline
+// accessors (the Android 14 offsets checked below), initCheck, the
+// AHardwareBuffer pointer casts and RefBase.
 // - No hardware decoder this boot (ro.vendor.diamaneos.hw_video_decode is
-//   neither "1" nor "2"): the service exposes only encoders, which write to
-//   linear buffers and never use that pool. The constructors fail closed: the
-//   object holds no buffer and reports NO_INIT. Every caller in C2BqBuffer.cpp
-//   checks initCheck() (or the requestBuffer result built from it) and returns
-//   an error, so a client that attaches a Surface to a hardware codec gets an
-//   error.
-// - Hardware decoders this boot, for protected video only ("2", the default)
-//   or for all video ("1"): the decoders render into the app's Surface
-//   through that pool, so the object does what Android 14's GraphicBuffer did
-//   for the two constructors the library calls. The handle constructor accepts
-//   only CLONE_HANDLE, the one method the library passes: it imports a clone of
-//   the producer's handle with the Android 17 mapper (which validates it
-//   against the description) and the destructor frees that clone, as Android
-//   14's free_handle did. Everything stays within the 256 bytes.
+//   neither "1" nor "2"): the encoders write to linear buffers and never use
+//   that pool, so the constructors fail closed: the object holds no buffer
+//   and reports NO_INIT. Every caller in C2BqBuffer.cpp checks initCheck()
+//   (or the requestBuffer result built from it) and returns an error, so a
+//   client that attaches a Surface to a hardware codec gets an error.
+// - Hardware decoders this boot ("2", the default, or "1"): the decoders
+//   render into the app's Surface through that pool. The handle constructor
+//   accepts only CLONE_HANDLE, the one method the library passes: it imports
+//   a clone of the producer's handle with the Android 17 mapper (which
+//   validates it against the description) and the destructor frees that
+//   clone, as Android 14's free_handle did. Everything stays within the 256
+//   bytes.
 //
 // The same class serves the stock FP6 com.fp.node.distortion.so (sha256
 // 2f4766d5a88fdf8c5cf20c29982a36fe983d517208b1ca5df762bfedbca277c0, loaded by
 // the camera provider), Fairphone's lens distortion node, also built against
-// Android 14. It allocates
-// its two working buffers itself: 256 bytes from operator new, then the
-// Android 14 constructor that allocates a buffer of a given size, format and
-// usage. It fills and reads them through lockYCbCr and unlock and hands their
-// ANativeWindowBuffer to the GPU library. Its three GraphicBuffer imports are
-// renamed the same way.
+// Android 14; its three GraphicBuffer imports are renamed the same way. It
+// allocates its two working buffers itself (256 bytes from operator new, then
+// the Android 14 constructor for a given size, format and usage), fills and
+// reads them through lockYCbCr and unlock and hands their ANativeWindowBuffer
+// to the GPU library.
 // These buffers are AHardwareBuffers from the NDK interface (libnativewindow),
 // not from this partition's libui: the camera provider also loads the stock
 // camera libraries' version 1 of the allocator interface library, whose
-// symbols take the place of the version 2 ones this partition's libui was built
+// symbols take the place of the version 2 ones this partition's libui is built
 // against, so libui's own allocator and mapper cannot be used in that process.
 // libnativewindow is an LLNDK library and uses the platform's own libui in its
 // own linker namespace. The object carries the buffer's native handle and

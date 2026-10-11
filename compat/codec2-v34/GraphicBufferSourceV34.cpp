@@ -3,12 +3,12 @@
 
 // Android 14 GraphicBufferSource::getHGraphicBufferProducer() const for the
 // stock FP6 libcodec2_hidl@1.0.so, @1.1.so and @1.2.so (sha256 f77c0f4a...,
-// 8c637bfd..., 9d87cc30...). Android 17 libstagefright_bufferqueue_helper no
-// longer has it (it keeps getHGraphicBufferProducer_V1_0 and
+// 8c637bfd..., 9d87cc30...). Android 17 libstagefright_bufferqueue_helper does
+// not have it (it keeps getHGraphicBufferProducer_V1_0 and
 // getIGraphicBufferProducer).
 //
 // Its only caller is ComponentStore::createInputSurface in each of the three
-// libraries (disassembly), the store-side persistent input surface. The
+// libraries, the store-side persistent input surface. The
 // framework asks a store for one only when debug.stagefright.c2inputsurface is
 // above 0; this product sets -1 (media/media.mk), so the framework builds the
 // input surface in the app process instead and never calls it. For any other

@@ -15,8 +15,8 @@
 
     <!-- Both stay off until the user turns them on, to save battery. Android
          defaults both to on; stock turns only always-on display off. With
-         both off the doze service does not start and screen off behaves as
-         before. -->
+         both off the doze service does not start and the screen simply turns
+         off. -->
     <bool name="config_dozeAlwaysOnEnabled">false</bool>
     <bool name="config_dozeEnabled">false</bool>
 

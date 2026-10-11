@@ -919,6 +919,14 @@ Other:
   - Its service runs without the `drmrpc` group (`media/init.fp6.drm.rc`), and
     the TEE node does not carry the label the platform grants DRM HALs
     (see "TEE node").
+- Widevine (`hal_drm_widevine`, `media/hal_drm_widevine.te`) is the stock
+  service from Fairphone's package, at the software level.
+  - Granted: the DRM HAL interface and its own data in `/data/vendor/mediadrm`.
+  - Not granted, unlike the stock policy: the crypto engine node, the display
+    service, the QSEECom and secure-buffer heaps, and the socket to
+    `qseecomd`. The TEE node is closed to it by `fp6/tee_node.te`.
+  - Its service runs without the `drmrpc` and `system` groups
+    (`media/init.fp6.drm.rc`).
 
 ## Recovery
 

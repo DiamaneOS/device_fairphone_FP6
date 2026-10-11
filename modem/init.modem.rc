@@ -40,7 +40,7 @@ on early-boot
 # tqftpserv (modem.mk) serves the modem's TFTP requests over QRTR.
 # Read-write requests (/readwrite/...) go to /data/vendor/tmp/tqftpserv, the
 # directory tqftpserv uses on Android; the modem keeps server_check.txt and
-# mcfg.tmp there. Unlike Qualcomm's tftp_server, which used persist, a factory
+# mcfg.tmp there. Unlike Qualcomm's tftp_server, which uses persist, a factory
 # reset clears it. Only the service's own user may enter it.
 on post-fs-data
     mkdir /data/vendor/tmp 0711 root root

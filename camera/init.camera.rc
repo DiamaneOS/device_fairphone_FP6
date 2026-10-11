@@ -3,7 +3,7 @@
 
 # CamX keeps its runtime caches, configuration dumps and crash dumps here
 # (stock init.qcom.rc creates the same directory). The provider runs as
-# cameraserver in group camera (reviewed provider rc derived from the stock
+# cameraserver in group camera (its rc is derived from the stock
 # vendor.qti.camera.provider-service_64.rc).
 # The stock init.target.rc directories for the TCL algorithm service
 # (/data/vendor/camera_dump, /data/vendor/algoservice, both 0777) and its

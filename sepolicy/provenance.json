@@ -979,7 +979,7 @@
       "source": "generic/private/property_contexts",
       "source_sha256": "be8f1623c027264299137373a9567c515a720ed03b2b2a67be031c6be95109b2",
       "path": "system-ext-private/property_contexts",
-      "sha256": "7e9e85980bab6c9f4eb6fc1ccc9e35be34a6f89aee8b84ab36e87b72ed795951"
+      "sha256": "76db8f38f981f462e7cbb6704ea56ebb6a9a3dcf97e79249278f46ffdc71f37b"
     },
     {
       "project": "qualcomm-sepolicy",

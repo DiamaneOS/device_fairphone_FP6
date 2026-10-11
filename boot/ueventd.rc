@@ -203,7 +203,7 @@ subsystem mem_buf_vm
 
 # Wake gestures of the touch controller, switched by the sensors HAL (system)
 # for Display > Tap to wake (double tap) and Tap to check phone (single tap).
-# Stock wrote it as root from vendor init.
+# Stock writes it as root from vendor init.
 /sys/bus/spi/devices/spi0.0   gesture_wakeup   0660   system   system
 # Taps the controller reported, read only by the sensors HAL.
 /sys/bus/spi/devices/spi0.0   wake_gesture     0400   system   system
@@ -282,7 +282,7 @@ subsystem mem_buf_vm
 # (line 222); only the camera group needs it here, read-only (the stock
 # provider, uid cameraserver, can only open it through the read bit). The
 # secure node keeps its 0640 system media rule; the camera provider reaches it
-# through its media group (reviewed provider rc).
+# through its media group (the provider's rc).
 /dev/adsprpc-smd          0640   system     camera
 # VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc makes
 # it 0666 system; only the camera group needs it.

@@ -37,8 +37,8 @@ on early-boot
 # ro.vendor.diamaneos.bt.factory_address; this copies it to the property the
 # HCI implementation reads. The HAL reads it only when Bluetooth is turned on
 # (HCI initialisation), long after this runs. A missing or invalid address sets
-# nothing, so the HAL keeps its stored generated address as before. The address
-# is never logged.
+# nothing, so the HAL keeps its stored generated address. The address is never
+# logged.
 on property:ro.vendor.diamaneos.bt.factory_address=*
     setprop ro.vendor.bt.boot.macaddr ${ro.vendor.diamaneos.bt.factory_address}
 

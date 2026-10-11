@@ -15,8 +15,8 @@
 # of the closed implementation's kill, socket and timer_create calls, the
 # camera provider's traced baseline on the same OS (bionic, linker, allocator,
 # binder) and the calls the debuggerd fallback handler needs to write a
-# tombstone from a no_new_privs process. No trace yet: the first builds log
-# calls outside the list instead of blocking them.
+# tombstone from a no_new_privs process. No trace of this service is among
+# them.
 
 # HCI traffic, binder and locks, most frequent first.
 futex: 1

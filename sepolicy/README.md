@@ -320,6 +320,9 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   `vendor_display_notch_prop`, which SystemUI cannot read.
   - The read falls back to false, so the privacy dot cannot be switched off
     with `adb setprop`.
+- `system-ext-private/system_server.te`: the system server reads enabled
+  kernel-console metadata for the serial-console warning. It receives no
+  access to serial devices or console control.
 - `system-ext-private/system_app.te`: Settings reads
   `ro.vendor.build.security_patch` (`vendor_security_patch_level_prop`) for
   its "Vendor security update" row.

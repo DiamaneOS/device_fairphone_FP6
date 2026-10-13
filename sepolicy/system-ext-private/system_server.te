@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Read enabled kernel-console metadata for the serial-console notification.
+allow system_server proc_consoles:file { getattr open read };

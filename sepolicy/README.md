@@ -72,6 +72,10 @@ may access, and why. It describes the policy of a release (`user`) build.
     numbers follow probe order, so they labelled whichever device got the
     number, and no vendor service reads extcon. Stock instead lets
     system_server write all of `vendor_sysfs_graphics`.
+    domain off it. The UFS storage's serial number and its LUNs' SCSI serial
+    and identification pages keep the generic `sysfs` label, readable by 22
+    domains (among them the fingerprint and USB HALs, the composer and tee);
+    ueventd makes them 0400 root too, and no shipped program reads them.
   - The UFS LUN 0 block directory is `sysfs_devices_block`, which init may
     only read. The one node platform init.rc writes there, the root disk's
     `queue/discard_max_bytes`, is `vendor_sysfs_ufs_discard_max` (`storage.te`),
@@ -224,6 +228,9 @@ For each upstream refresh:
 This preserves upstream traceability without importing unused policy. A shared
 DiamaneOS policy repository becomes useful when multiple devices genuinely share
 this maintained subset; it is not required merely to reduce this folder's size.
+- `system-ext-private/system_server.te`: the system server reads enabled
+  kernel-console metadata for the serial-console warning. It receives no
+  access to serial devices or console control.
 writes, voice-UI sockets, QTR SDK access, broad HAL-attribute grants, vendor
 Binder use and DSP restart controls (`vendor.audio.crash.trigger` is unset). QRTR
 is granted narrowly: `hal_audio_default` may create and use its own

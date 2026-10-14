@@ -61,6 +61,11 @@ on fs
     start vendor.modprobe_crypto
     start vendor.modprobe_media
     exec_start vendor.modprobe_display
+    # The display driver starts the backlight at its maximum and applies it
+    # when the boot animation first draws. Android holds its default during
+    # boot (config_screenBrightnessSettingDefaultFloat, 100 nits, written as
+    # 822) and expects the boot brightness to match it.
+    write /sys/class/backlight/panel0-backlight/brightness 822
     start vendor.modprobe_touch
     wait_for_prop init.svc.vendor.modprobe_system stopped
     wait_for_prop init.svc.vendor.modprobe_wireless stopped

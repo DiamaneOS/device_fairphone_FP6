@@ -68,8 +68,9 @@
     <bool name="config_evenDimmerEnabled">true</bool>
 
     <!-- Brightness values (0 = 2.0 nits, 1 = 1151 nits, linear in nits):
-         default 100 nits; dimmed before the screen times out 16 nits, and at
-         least 5.7 nits below the current brightness. -->
+         default 100 nits, which boot/init.qcom.rc also sets at boot (as 822).
+         Dimmed before the screen times out 16 nits, and at least 5.7 nits
+         below the current brightness. -->
     <item name="config_screenBrightnessSettingDefaultFloat" format="float" type="dimen">0.0853</item>
     <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.0122</item>
     <item name="config_screenBrightnessMinimumDimAmountFloat" format="float" type="dimen">0.005</item>

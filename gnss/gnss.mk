@@ -14,8 +14,9 @@
 # gps.conf, izat.conf and sap.conf are Fairphone's stock files (the first two
 # with pinned edits by the vendor renderer).
 # Assistance comes from the framework: SUPL host (GrapheneOS GnssSettings),
-# network time and coarse position requests. PSDS stays off
-# (config_gnssPsdsType is empty).
+# network time, coarse position requests and Qualcomm XTRA data as long-term
+# PSDS, which the HAL injects into the modem over QMI (type and server in
+# rro/FP6FrameworksOverlay/res/values/gnss.xml).
 
 # libgnss and libloc_api_v02 are loaded with dlopen, so they are listed too.
 PRODUCT_PACKAGES += \

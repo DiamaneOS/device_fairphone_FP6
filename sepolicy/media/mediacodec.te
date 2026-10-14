@@ -49,6 +49,13 @@ get_prop(mediacodec, vendor_video_prop)
 get_prop(mediacodec, vendor_gralloc_prop)
 get_prop(mediacodec, vendor_public_vendor_default_prop)
 
+# When the image-transform engine starts the Vulkan loader, the loader asks for
+# ro.zygote.disable_gl_preload and ro.vulkan.layers.oem and .platform. None is
+# set here and encoding works without them, so the reads stay denied, as for
+# the camera provider. Not audited: they come at every encoder start.
+dontaudit mediacodec zygote_config_prop:file read;
+dontaudit mediacodec default_prop:file read;
+
 # libqcodec2_utils (QC2DisplayConfigClient) looks up the composer's
 # IDisplayConfig/default only for the refresh rate its perf hints use; perf
 # hints are off here and the library logs "IDisplayConfig AIDL is not present"

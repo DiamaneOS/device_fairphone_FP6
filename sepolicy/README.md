@@ -854,6 +854,9 @@ Denied on purpose:
 - `dontaudit` on adding the offline camera service: it is in no VINTF
   manifest and nothing uses it. The provider retries at every start and
   carries on.
+- `dontaudit` on looking up the ODM's camera algorithm service and Qualcomm's
+  post-processing HAL: neither is in the image, and the provider asks at every
+  session.
 - `vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module
   serial numbers CamX tries to publish. Nothing may set or read it, and the
   denials stay audited.

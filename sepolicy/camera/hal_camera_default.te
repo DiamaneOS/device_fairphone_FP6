@@ -113,6 +113,12 @@ dontaudit hal_camera_default default_prop:file read;
 # provider carries on. Not audited: it is retried at every provider start.
 dontaudit hal_camera_default vendor_hal_offlinecamera_service:service_manager add;
 
+# At every session the provider also looks up the ODM's camera algorithm
+# service (ITctCameraAlgoService) and Qualcomm's post-processing HAL. Neither is
+# in the image, so both lookups stay denied. Not audited: about 20 a session.
+dontaudit hal_camera_default vendor_tct_camera_algo_service:service_manager find;
+dontaudit hal_camera_default vendor_hal_camera_postproc_hwservice:hwservice_manager find;
+
 # Fairphone's distortion library (libundistort) carries OpenCV, which at load
 # looks for a tracing library under /data/data/com.intel.vtune and for a temp
 # folder under /data/local/tmp. Both stay denied: the camera service must

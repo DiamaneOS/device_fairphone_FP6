@@ -30,18 +30,13 @@ allow hal_camera_default vl53l1_device:chr_file rw_file_perms;
 # UBWC-P linear views of compressed camera buffers (libubwcp, /dev/ubwcp).
 allow hal_camera_default vendor_ubwcp_device:chr_file r_file_perms;
 
-# FastRPC (libcdsprpc opens /dev/adsprpc-smd-secure, /dev/cdsprpc-smd and
-# /dev/adsprpc-smd; the kernel creates only adsprpc-smd and adsprpc-smd-secure).
-# - vendor_xdsp_device (/dev/adsprpc-smd-secure): the CamX sensor direct channel
-#   attaches to the ADSP sensors PD (camera.qcom.so "createstaticpd:sensorspd
-#   &_dom=adsp"); the kernel refuses the ADSP and static-PD attach on the
-#   non-secure node (kernel_qcom_dsp android17 dsp/adsprpc.c lines 4105, 4441, 6810).
-# - vendor_qdsp_device (/dev/adsprpc-smd): the CDSP channel is non-secure with
-#   unsigned support (adsprpc.c lines 3211-3213) and serves the FastCV, BitML,
-#   HME, MCTF and ML-AWB offloads when libcdsprpc falls back to it.
-# Read-only opens, as stock (CIL 4693, 4724). Keep only the node the
-# provider actually holds open before enforcing.
-allow hal_camera_default { vendor_qdsp_device vendor_xdsp_device }:chr_file r_file_perms;
+# FastRPC: the provider opens only /dev/adsprpc-smd-secure (vendor_xdsp_device),
+# for the CamX sensor direct channel (camera.qcom.so "createstaticpd:sensorspd
+# &_dom=adsp", which the kernel refuses on the non-secure node, kernel_qcom_dsp
+# android17 dsp/adsprpc.c lines 4105, 4441, 6810) and the CDSP offloads (BitML,
+# HME). Seen on 2026-10-14 in photo, video, QR and front camera sessions. The
+# non-secure /dev/adsprpc-smd is not granted. Read-only opens, as stock.
+allow hal_camera_default vendor_xdsp_device:chr_file r_file_perms;
 r_dir_file(hal_camera_default, adsprpcd_file)
 get_prop(hal_camera_default, vendor_adsprpc_prop)
 

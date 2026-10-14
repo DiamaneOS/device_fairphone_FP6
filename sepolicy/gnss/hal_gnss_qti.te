@@ -4,7 +4,7 @@
 # Qualcomm GNSS HAL, android.hardware.gnss-aidl-service-qti (IGnss v3), built
 # from CodeLinaro source (device gnss/gnss.mk). Drafted from the stock compiled
 # policy (vendor_sepolicy.cil lines 4914-4953 and 8128-8141) and reduced to what
-# the HAL uses. Before enforcing, reduce it from Qualcomm
+# the HAL uses. Qualcomm's source policy for comparison:
 # generic/vendor/common/hal_gnss_qti.te at sepolicy_vndr 67fa928.
 # Not granted, because their peers are not installed: peripheral manager and
 # vndbinder (liblbs_core, XTRA service), the location daemons' sockets
@@ -16,8 +16,7 @@
 # servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
 # domains without such vendor rules (vendor_hal_gatekeeper_qti,
 # vendor_hal_keymint_qti) register on stock, so the platform hal server rules
-# cover it; confirm with a policy compile and on-device denials
-# before enforcing.
+# cover it. It registers under enforcing with no denial (2026-10-14).
 type vendor_hal_gnss_qti, domain;
 type vendor_hal_gnss_qti_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_hal_gnss_qti)

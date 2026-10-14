@@ -809,9 +809,8 @@ Grants:
   - Only the provider may open them.
   - They do not share `video_device`, which the composer and platform media
     services also hold.
-- FastRPC with read-only opens: the secure node (the ADSP sensors PD of the
-  CamX sensor direct channel), the non-secure node (the CDSP offloads) and
-  `/vendor/dsp`.
+- FastRPC with read-only opens: the secure node only (the ADSP sensors PD of
+  the CamX sensor direct channel and the CDSP offloads) and `/vendor/dsp`.
 - Qualcomm DMA-BUF heaps; on the display heap only the allocation ioctl.
 - SoC, camera, JPEG and DDR identification, `/proc/meminfo` and the public SoC
   id.

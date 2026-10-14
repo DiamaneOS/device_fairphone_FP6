@@ -57,3 +57,10 @@ runtime_resource_overlay {
     manifest: "FP6WifiOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6WifiOverlay/res"],
 }
+
+runtime_resource_overlay {
+    name: "FP6NfcOverlay",
+    vendor: true,
+    manifest: "FP6NfcOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6NfcOverlay/res"],
+}

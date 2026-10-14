@@ -481,3 +481,6 @@ PRODUCT_PACKAGES += FP6TetheringOverlay
 # Wi-Fi capabilities from Fairphone's Wi-Fi resource overlays: MAC address
 # randomisation, screen-off scans, bands and SAR transmit limits.
 PRODUCT_PACKAGES += FP6WifiOverlay
+
+# Secure NFC ("Require device unlock for NFC"), on by default as on Pixels.
+PRODUCT_PACKAGES += FP6NfcOverlay

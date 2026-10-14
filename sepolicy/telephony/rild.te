@@ -7,7 +7,7 @@
 # generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te.
 # Omitted: diag and debug properties, executing
 # vendor tools (voice-call logging), the time and SSG TrustZone daemons, the
-# legacy MSM IPC-router socket ioctls, the secure-element HAL, the
+# legacy MSM IPC-router socket ioctls, the
 # data-factory services, the IMS factory client, the
 # QCRIL client socket (/dev/socket/qcrild; its module is not installed) and
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
@@ -20,6 +20,10 @@
 # service.te). Upstream grants add on these to every hal_telephony server;
 # here only to rild.
 allow rild { vendor_hal_telephony_service2 fp6_hal_qcrilaudio_service fp6_hal_uimlpa_service }:service_manager { add find };
+
+# The SIM's secure element for OMAPI (SecureElementService), as on stock and on
+# Pixels. Which apps reach which applet stays under the SIM's own access rules.
+hal_server_domain(rild, hal_secure_element)
 set_prop(rild, vendor_radio_prop)
 
 # QCRIL internal IPC (/dev/socket/qmux_radio), created by the daemon.

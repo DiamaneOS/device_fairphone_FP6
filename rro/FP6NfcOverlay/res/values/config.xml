@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<!-- Secure NFC, as on Pixels: Settings offers "Require device unlock for NFC", on by default
+     (the module's secure_nfc_default), so payments and other card emulation need an unlocked
+     phone. -->
+<resources>
+    <bool name="enable_secure_nfc_support">true</bool>
+</resources>

@@ -55,7 +55,6 @@ on fs
     # when it appears.
     start vendor.modprobe_system
     exec_start vendor.modprobe_platform
-    start vendor.modprobe_debug
     start vendor.modprobe_wireless
     start vendor.modprobe_audio
     start vendor.modprobe_data
@@ -64,7 +63,6 @@ on fs
     exec_start vendor.modprobe_display
     start vendor.modprobe_touch
     wait_for_prop init.svc.vendor.modprobe_system stopped
-    wait_for_prop init.svc.vendor.modprobe_debug stopped
     wait_for_prop init.svc.vendor.modprobe_wireless stopped
     wait_for_prop init.svc.vendor.modprobe_audio stopped
     wait_for_prop init.svc.vendor.modprobe_data stopped
@@ -111,15 +109,6 @@ service vendor.modprobe_system /vendor/bin/modprobe -q -b -d /system/lib/modules
     oneshot
 
 service vendor.modprobe_platform /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.platform
-    user root
-    group root
-    capabilities SYS_MODULE
-    seclabel u:r:vendor_modprobe:s0
-    stdio_to_kmsg
-    disabled
-    oneshot
-
-service vendor.modprobe_debug /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.debug
     user root
     group root
     capabilities SYS_MODULE

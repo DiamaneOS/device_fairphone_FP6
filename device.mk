@@ -99,7 +99,7 @@ PRODUCT_COPY_FILES += \
 # parallel. Together they must list every module of the kernel's
 # modules.load once, each in its order (image verification checks this).
 PRODUCT_COPY_FILES += \
-    $(foreach s,platform debug wireless audio data crypto media display touch, \
+    $(foreach s,platform wireless audio data crypto media display touch, \
         device/fairphone/FP6/boot/modules/modules.load.$(s):$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.load.$(s))
 
 # CPU, scheduler, deep sleep and memory tuning with stock's values (the kernel

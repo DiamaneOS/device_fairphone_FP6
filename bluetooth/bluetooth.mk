@@ -46,11 +46,14 @@ PRODUCT_VENDOR_PROPERTIES += \
     bluetooth.profile.ccp.server.enabled=true \
     bluetooth.profile.hap.client.enabled=true
 
-# Stock (system_ext build.prop): up to 10 Bluetooth LE devices connected at
-# once instead of 8, on the same controller firmware. A bluetooth_prop, which
-# vendor_init may not set, so it is a product property.
+# Stock values: up to 10 Bluetooth LE devices connected at once instead of 8,
+# on the same controller firmware (system_ext build.prop), and Qualcomm as the
+# Device ID vendor (Android's default is Google), which car kits may use to
+# pick workarounds. Both are bluetooth_prop, which vendor_init may not set, so
+# they are product properties.
 PRODUCT_PRODUCT_PROPERTIES += \
-    bluetooth.core.le.max_number_of_concurrent_connections=10
+    bluetooth.core.le.max_number_of_concurrent_connections=10 \
+    bluetooth.device_id.vendor_id=0x001D
 
 # The stock HCI implementation logs the Bluetooth address at info level each
 # time Bluetooth starts, when it writes it into the controller's NVM tags

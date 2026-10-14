@@ -194,6 +194,10 @@ $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 $(call inherit-product, device/fairphone/FP6/gnss/gnss.mk)
 $(call inherit-product, device/fairphone/FP6/telephony/telephony.mk)
 
+# Factory reset offers "Erase eSIMs" as a choice, as on Pixels, instead of erasing them without
+# asking. It shows while eSIM support is on and an eSIM was downloaded on the phone.
+PRODUCT_PRODUCT_PROPERTIES += masterclear.allow_retain_esim_profiles_after_fdr=true
+
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)

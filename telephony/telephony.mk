@@ -1,19 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony: the stock Qualcomm radio daemon (qcrilNrd),
-# its data module and nicmd, the stock IMS app (org.codeaurora.ims) and the
-# stock eSIM LPA (com.qualcomm.qti.lpa, disabled by default) come from the
-# native modem services come from the
-# selected stock files (vendor/fairphone/FP6). The call-audio bridge between the
-# radio daemon and the audio HAL is our own (callaudio/, replacing the stock
-# QtiTelephonyService). The radio interface libraries, the carrier
-# configuration service and telephony features are built from source. Carrier
-# data is extracted from the authenticated stock package without its code.
-# Native Qualcomm IWLAN is paired with the isolated source reporter and broker.
-# Ordinary calling/SMS/data require carrier qualification on the selected image;
-# emergency handling is simulated, not end-to-end emergency acceptance.
-# AML and eSIM management are deferred. No inactive stock LPA is packaged.
+# Telephony: the stock Qualcomm radio daemon (qcrilNrd), its data module and
+# nicmd, the stock IMS app (org.codeaurora.ims) and the native modem services
+# come from the selected stock files (vendor/fairphone/FP6). The call-audio
+# bridge between the radio daemon and the audio HAL is built here (callaudio/,
+# replacing the stock QtiTelephonyService). The radio interface libraries, the
+# carrier configuration service and telephony features are built from source.
+# Carrier data is extracted from the authenticated stock package without its
+# code. Native Qualcomm IWLAN is paired with the isolated source reporter and
+# broker. eSIM management is DiamaneOS's own LPA (no stock LPA is packaged),
+# off until the user turns on eSIM support.
 
 # Dual SIM, dual standby (stock vendor build.prop and system_ext build.prop).
 # QCRIL defaults that stock sets in vendor build.prop and that are not in the
@@ -64,11 +61,29 @@ PRODUCT_PACKAGES += \
     android.hardware.telephony.ims.prebuilt.xml \
     android.hardware.telephony.euicc.prebuilt.xml
 
-# QCRIL directories and database; the stock IMS and LPA apps are only parsed
-# when ro.boot.vendor.qspa.modem=enabled (their manifests carry an <overlay
-# requiredSystemPropertyName=...> gate), which stock sets from a system_ext
-# init script. Only init may set ro.boot.* properties, so the property is set
-# from system_ext as on stock.
+# eSIM manager (packages/apps/DiamaneOSEuicc): manages the profiles on the
+# eUICC in slot 1 through the framework's eUICC card commands and downloads new
+# ones (SGP.22). Ships disabled. Settings > Network & internet > eSIM support
+# turns it on and restarts, as GrapheneOS does for Google's LPA. Without it,
+# installed eSIMs work as SIMs. It runs in the platform's priv_app domain, which
+# already has network sockets. Its INTERNET permission is the only new grant.
+PRODUCT_PACKAGES += \
+    DiamaneOSEuicc
+
+# The framework's eUICC transport logs every ES10 command and response in full
+# at verbose level, on every build (TransmitApduLogicalChannelInvocation
+# "Send:"/"Response:", ApduSender "Full APDU response"): profile lists with
+# ICCIDs and, during a download, the activation code's matching ID, the IMEI
+# and the eUICC certificate with the EID. Keep these tags at info.
+PRODUCT_VENDOR_PROPERTIES += \
+    log.tag.TransApdu=I \
+    log.tag.ApduSender-0=I \
+    log.tag.ApduSender-1=I
+
+# QCRIL directories and database (init.fp6.telephony.rc), and the
+# ro.boot.vendor.qspa.modem gate without which the stock IMS app is not parsed
+# (init.fp6.qspa.rc). Only init may set ro.boot.* properties, so the gate is
+# set from system_ext, as on stock.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/init.fp6.telephony.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.telephony.rc \
     device/fairphone/FP6/telephony/init.fp6.qspa.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.fp6.qspa.rc \
@@ -112,8 +127,6 @@ DIAMANEOS_IMS_SLOTS := 2
 $(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
 $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 
-# default-disabled state of its services (product apps take their allowlist
-# from the product partition).
 # APNs come from the authenticated stock XML in vendor/fairphone/FP6. Keep
 # IMS/emergency rows, MVNO filters and ordering intact instead of appending
 # overlapping entries to the sample database. Users can still add APNs in

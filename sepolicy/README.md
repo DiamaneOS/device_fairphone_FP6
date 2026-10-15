@@ -275,17 +275,21 @@ of the same name (`provenance.json`).
 vendor_init writes two nodes from the `sys.port_security_mode` and boot
 triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 
-- The USB controller's `dynamic_disable` (data off, charging kept) is
-  `vendor_sysfs_usb_data_disable` (`vendor-common/genfs_contexts`).
-  - It is split from `vendor_sysfs_usb_device`, which also covers the
-    controller role.
-  - The USB HAL may not write it: with port control on, the framework never
-    passes `enableUsbData` to the HAL.
+- The USB controller's data switch `data_path_enable` (GrapheneOS's three
+  data commands, alt modes ignored unless on, charging kept) is
+  `vendor_sysfs_usb_data_path` (`fp6/genfs_contexts`).
+  - The USB HAL may not write it: it parses data from the Type-C partner,
+    and with port control on the framework never passes `enableUsbData` to
+    it.
+- The controller's older `dynamic_disable` keeps its own type,
+  `vendor_sysfs_usb_data_disable` (`vendor-common/genfs_contexts`), split
+  from `vendor_sysfs_usb_device`, which also covers the controller role. No
+  trigger writes it.
 - The charger firmware's input suspend
   (`/sys/class/qcom-battery/suspend_input_current`, which Off sets) is
   `vendor_sysfs_usb_input_suspend` (`fp6/genfs_contexts`).
-- Neverallows keep every other domain from writing either, except ueventd,
-  which the platform lets write all of sysfs.
+- Neverallows keep every other domain from writing any of them, except
+  ueventd, which the platform lets write all of sysfs.
 
 ### Embedded USB debugger
 

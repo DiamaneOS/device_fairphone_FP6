@@ -88,6 +88,17 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.media.target_variant=$(FP6_MEDIA_VARIANT) \
     ro.media.xml_variant.codecs_performance=$(FP6_MEDIA_VARIANT)
 
+# Camcorder profiles (CamcorderProfile, CameraX's video qualities). Without the
+# property the framework reads stock media_profiles_V1_0.xml, which stops at
+# 1080p for cameras 0 and 1 and has nothing for the other four, so apps offer
+# no 4K. Stock's SoC file is not used: media_profiles_fp6.xml is our own, with
+# 4K where the camera streams it and the high-speed profiles slow motion needs
+# (the HAL's high-speed sizes, capped by the encoder at 1080p120 and 720p240).
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/media/media_profiles_fp6.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_fp6.xml
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.media.xml_variant.profiles=_fp6
+
 # Stock vendor build.prop values. Both are debug_prop (platform
 # property_contexts "debug." prefix): every domain may read them and
 # vendor_init may set them.

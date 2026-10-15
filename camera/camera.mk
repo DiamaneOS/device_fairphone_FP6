@@ -22,7 +22,8 @@ PRODUCT_COPY_FILES += \
 # installs the filter from /vendor/etc/seccomp_policy/camera-provider.policy
 # before the provider's main(). Without it the provider does not start.
 PRODUCT_PACKAGES += \
-    libcamxjail
+    libcamxjail \
+    FP6CameraOverlay
 
 # The stock camera table. Without this property the stock provider loads
 # Qualcomm's generic table, which has the main and front cameras only. With it
@@ -70,9 +71,9 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # (CamX outputFormat setting, its compiled default 0 is linear). The display
 # hardware can rotate only UBWC buffers inline, so a linear portrait preview
 # forces GPU composition for every frame. Previews up to 1088 lines before
-# rotation (16:9 1920x1080) are then composed by the display hardware. The 4:3
-# photo preview (1600x1200) still needs the GPU. Streams the CPU reads keep
-# their own format.
+# rotation (16:9 1920x1080) are then composed by the display hardware.
+# FP6CameraOverlay keeps the Camera app's 4:3 photo preview within that limit
+# too. Streams the CPU reads keep their own format.
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.camera.outputFormat=1
 

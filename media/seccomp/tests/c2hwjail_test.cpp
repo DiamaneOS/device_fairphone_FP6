@@ -95,7 +95,6 @@ struct Fake {
 };
 
 const char kOffSpec[] = "/vendor/etc/media_volcano_v1/video_system_specs.json";
-const char kSecureSpec[] = "/vendor/etc/media_volcano_v1_secdec/video_system_specs.json";
 const char kOnSpec[] = "/vendor/etc/media_volcano_v1_hwdec/video_system_specs.json";
 
 // State 0: no hardware decoder.
@@ -107,23 +106,12 @@ Fake GoodOff() {
     return f;
 }
 
-// State 2: the secure decoders only.
-Fake GoodSecure() {
-    Fake f;
-    f.props["vendor.media.target_variant"] = "_volcano_v1_secdec";
-    f.props["ro.vendor.diamaneos.hw_video_decode"] = "2";
-    f.files[kSecureSpec] = Spec(kSecureDecoders, kEncoders);
-    f.gid = 1046;  // AID_MEDIA_CODEC
-    f.mode = S_IFCHR | 0660;
-    return f;
-}
-
-// State 1: the clear and the secure decoders.
+// State 1: the clear decoders.
 Fake GoodOn() {
     Fake f;
     f.props["vendor.media.target_variant"] = "_volcano_v1_hwdec";
     f.props["ro.vendor.diamaneos.hw_video_decode"] = "1";
-    f.files[kOnSpec] = Spec(Union(kDecoders, kSecureDecoders), kEncoders);
+    f.files[kOnSpec] = Spec(kDecoders, kEncoders);
     f.gid = 1046;  // AID_MEDIA_CODEC
     f.mode = S_IFCHR | 0660;
     return f;
@@ -141,8 +129,7 @@ TEST(AllowedCodecs, ConsistentStatesOfferTheirCodecs) {
     Fake unset = GoodOff();
     unset.props.erase("ro.vendor.diamaneos.hw_video_decode");
     EXPECT_EQ(kEncoders, Allowed(unset));
-    EXPECT_EQ(Union(kEncoders, kSecureDecoders), Allowed(GoodSecure()));
-    EXPECT_EQ(Union(Union(kEncoders, kSecureDecoders), kDecoders), Allowed(GoodOn()));
+    EXPECT_EQ(Union(kEncoders, kDecoders), Allowed(GoodOn()));
     // No video driver: the node cannot be opened at all.
     Fake missing = GoodOff();
     missing.nodeError = ENOENT;
@@ -152,13 +139,8 @@ TEST(AllowedCodecs, ConsistentStatesOfferTheirCodecs) {
 TEST(AllowedCodecs, EveryInconsistencyOffersNothing) {
     std::vector<std::pair<std::string, Fake>> cases;
     Fake f;
-    f = GoodOff(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "3"; cases.emplace_back("mode 3", f);
+    f = GoodOff(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "2"; cases.emplace_back("mode 2", f);
     f = GoodOff(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "true"; cases.emplace_back("mode true", f);
-    f = GoodOff(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "2"; cases.emplace_back("mode 2, off variant", f);
-    f = GoodSecure(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "0"; cases.emplace_back("mode 0, secure variant", f);
-    f = GoodSecure(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "1"; cases.emplace_back("mode 1, secure variant", f);
-    f = GoodSecure(); f.props.erase("ro.vendor.diamaneos.hw_video_decode"); cases.emplace_back("no mode, secure variant", f);
-    f = GoodOn(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "2"; cases.emplace_back("mode 2, all variant", f);
     f = GoodOff(); f.props.erase("vendor.media.target_variant"); cases.emplace_back("no variant", f);
     f = GoodOn(); f.props["vendor.media.target_variant"] = "_volcano_v1"; cases.emplace_back("on, off variant", f);
     f = GoodOff(); f.props["vendor.media.target_variant"] = "_volcano_v1_hwdec"; cases.emplace_back("off, on variant", f);
@@ -170,13 +152,8 @@ TEST(AllowedCodecs, EveryInconsistencyOffersNothing) {
     f = GoodOff(); f.files[kOffSpec] = Spec({"c2.qti.avc.decoder"}, kEncoders); cases.emplace_back("off lists a decoder", f);
     f = GoodOff(); f.files[kOffSpec] = Spec({}, kEncoders, "\"c2.qti.dv.decoder\""); cases.emplace_back("optional codec", f);
     f = GoodOff(); f.files[kOffSpec] = Spec(kSecureDecoders, kEncoders); cases.emplace_back("off lists the secure decoders", f);
-    f = GoodSecure(); f.files[kSecureSpec] = Spec(Union(kDecoders, kSecureDecoders), kEncoders); cases.emplace_back("secure lists a clear decoder", f);
-    f = GoodSecure(); f.files[kSecureSpec] = Spec({"c2.qti.avc.decoder.secure"}, kEncoders); cases.emplace_back("secure lacks two decoders", f);
-    f = GoodSecure(); f.files[kSecureSpec] = Spec({}, kEncoders); cases.emplace_back("secure lists no decoder", f);
-    f = GoodSecure(); f.files[kSecureSpec] = Spec(Union(kSecureDecoders, {"c2.qti.avc.decoder.low_latency"}), kEncoders); cases.emplace_back("secure lists a low-latency decoder", f);
-    f = GoodOn(); f.files[kOnSpec] = Spec(kDecoders, kEncoders); cases.emplace_back("all lacks the secure decoders", f);
-    f = GoodOn(); f.files[kOnSpec] = Spec(kSecureDecoders, kEncoders); cases.emplace_back("all lacks the clear decoders", f);
-    f = GoodOn(); f.files[kOnSpec] = Spec(Union(Union(kDecoders, kSecureDecoders), {"c2.qti.avc.encoder.secure"}), kEncoders); cases.emplace_back("secure encoder", f);
+    f = GoodOn(); f.files[kOnSpec] = Spec(Union(kDecoders, kSecureDecoders), kEncoders); cases.emplace_back("on lists the secure decoders", f);
+    f = GoodOn(); f.files[kOnSpec] = Spec(kDecoders, Union(kEncoders, {"c2.qti.avc.encoder.secure"})); cases.emplace_back("secure encoder", f);
     f = GoodOff(); f.files[kOffSpec] = Spec({}, {"c2.qti.avc.encoder"}); cases.emplace_back("missing encoders", f);
     f = GoodOff(); f.files[kOffSpec] = std::string(2 << 20, ' '); cases.emplace_back("too large", f);
     f = GoodOff(); f.files[kOffSpec] = "{ \"Video\": { \"codecs-available\": { \"decoders\": 1 } } }"; cases.emplace_back("list not an array", f);
@@ -184,8 +161,6 @@ TEST(AllowedCodecs, EveryInconsistencyOffersNothing) {
     f = GoodOff(); f.mode = S_IFCHR | 0660; f.gid = 1046; cases.emplace_back("off, node open to group", f);
     f = GoodOff(); f.uid = 1000; cases.emplace_back("off, node owned by system", f);
     f = GoodOn(); f.mode = S_IFCHR | 0600; f.gid = 0; cases.emplace_back("on, node root-only", f);
-    f = GoodSecure(); f.mode = S_IFCHR | 0600; f.gid = 0; cases.emplace_back("secure, node root-only", f);
-    f = GoodSecure(); f.mode = S_IFCHR | 0666; cases.emplace_back("secure, node open to all", f);
     f = GoodOff(); f.mode = S_IFREG | 0600; cases.emplace_back("node not a device", f);
     f = GoodOff(); f.nodeError = EACCES; cases.emplace_back("node unreadable", f);
     for (auto& [name, fake] : cases) {

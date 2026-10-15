@@ -24,7 +24,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 | `power/` | power HAL config, camera hint client, power stats HAL, task profiles |
 | `audio/`, `callaudio/` | audio packages, AOSP effects, the call-audio bridge app ([callaudio/SECURITY.md](callaudio/SECURITY.md)) |
 | `bluetooth/` | HCI service with its seccomp filter |
-| `camera/`, `media/` | stock CamX camera; hardware video encoders; hardware decoders as the user chooses (protected video only by default); DRM HALs |
+| `camera/`, `media/` | stock CamX camera, hardware video encoders, hardware decoders as the user chooses (off by default), DRM HALs |
 | `modem/`, `telephony/`, `gnss/`, `nfc/`, `wifi/` | radios and their configuration ([telephony/IMS.md](telephony/IMS.md), [wifi/README.md](wifi/README.md)) |
 | `fingerprint/` | fingerprint HAL over the stock module |
 | `timekeep/` | `timekeepd`: keeps the clock across reboots |

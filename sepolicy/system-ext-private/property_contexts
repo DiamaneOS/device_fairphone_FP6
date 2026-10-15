@@ -122,6 +122,5 @@ diamaneos.privacy_switch.enforced          u:object_r:privacy_switch_prop:s0 exa
 ro.camera.disableCameraMute                u:object_r:camera_config_prop:s0 exact bool
 
 # Hardware video decoding: the user's choice, applied at the next boot
-# (hw_video_decode.te). Settings stores "0" (never), "1" (all video) or "2"
-# (protected video only).
-persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1 2
+# (hw_video_decode.te). Settings stores "0" (never) or "1" (all video).
+persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1

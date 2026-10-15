@@ -85,6 +85,14 @@ TARGET_RECOVERY_UI_MAX_BRIGHTNESS_FILE := /sys/class/backlight/panel0-backlight/
 include vendor/fairphone/FP6/BoardConfigVendor.mk
 include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 
+# USB-C port control: user builds start with USB data and alt modes off in the
+# kernel, as GrapheneOS starts Pixels with the port off, until the port setting
+# applies. Normal boot and charger mode load vendor_dlkm with this file.
+# Recovery and fastbootd load their own modules without it.
+ifeq ($(TARGET_BUILD_VARIANT),user)
+BOARD_VENDOR_KERNEL_MODULES_OPTIONS_FILE := $(DEVICE_PATH)/boot/modules/modules.options
+endif
+
 # Reviewed source policy belongs to the device tree, not generated stock files.
 BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
 # Device-owned grants for the FP6 services, reviewed per denial.

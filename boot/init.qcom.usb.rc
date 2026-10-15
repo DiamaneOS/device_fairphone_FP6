@@ -127,9 +127,9 @@ on zygote-start
 # - User builds start every normal boot with USB data and charging off, as
 #   GrapheneOS starts Pixels with the port off from first-stage init, until
 #   the framework applies the stored mode.
-#   - Data: the early-boot write stops data before any USB function is set
-#     up. New connections are refused from first-stage init anyway
-#     (deny_new_usb2).
+#   - Data: the kernel driver starts with data off (its option in the user
+#     build's modules.options, see BoardConfig.mk). The early-boot write
+#     repeats it in case the option did not apply.
 #   - Charging: the qcom-battery class appears only once the charger
 #     firmware's glink channel is up, after the ADSP boots. init waits for the
 #     node, and "on boot" writes again.

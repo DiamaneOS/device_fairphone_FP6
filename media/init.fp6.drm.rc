@@ -19,65 +19,21 @@ service vendor.drm-clearkey-service /vendor/bin/hw/android.hardware.drm-service.
     override
 
 # Widevine, from Fairphone's stock package (vendor APEX
-# com.google.android.widevine, selected by the tools), with the stock
-# hardware-backed library. The same binary has two definitions, and exactly
-# one runs per boot: the user's hardware video decoding choice decides
-# (media/init.fp6.media.rc sets ro.vendor.diamaneos.hw_video_decode at
-# zygote-start; the actions below run at boot).
-#
-# Neither names the interface it serves. servicemanager asks init to start
-# the service that declares an interface whenever a client asks for it while
-# it is not registered, and init would then start that definition next to the
-# running one, whatever the choice. Without the line the request finds no
-# service (init logs that), and each definition runs only when the actions
-# below start it; init restarts it if it exits.
-#
+# com.google.android.widevine, selected by the tools), with its built-in
+# software protection only: FORCE_LEVEL3_OEMCRYPTO=yes makes it keep its
+# built-in library, and the image has no liboemcrypto.so (media/media.mk).
 # init reads /vendor/etc/init before the files inside APEXes and keeps the
-# first definition of a service, so the first one here is used and the
-# package's is ignored (init logs the duplicate). The package's rc still
-# creates /data/vendor/mediadrm (0770 media mediadrm) once all APEXes are
-# ready.
-
-# Hardware decoding for protected video or for all video (states 2 and 1): the
-# hardware-backed library, which needs the secure decoders. The groups are the
-# package's own: mediadrm for its data, drmrpc for the TEE node, the crypto
-# engine node and qseecomd's socket (boot/ueventd.rc), and system to read the
-# Widevine trusted application from the firmware partition, which is mounted
-# for that user and group only (boot/fstab.qcom). SELinux decides what it
-# reaches (sepolicy/media/hal_drm_widevine.te, sepolicy/fp6/tee_node.te): init
-# enters hal_drm_widevine through the executable's type.
+# first definition of a service, so this one is used and the package's, which
+# adds the drmrpc and system groups, is ignored (init logs the duplicate).
+# Without those groups the TEE node, qseecomd's socket and the trusted
+# application's file stay closed to it, as they are to its SELinux domain
+# (sepolicy/media/hal_drm_widevine_sw.te). The package's rc still creates
+# /data/vendor/mediadrm (0770 media mediadrm) once all APEXes are ready.
 service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
+    interface aidl android.hardware.drm.IDrmFactory/widevine
     class hal
-    disabled
-    user media
-    group media mediadrm drmrpc system
-    ioprio rt 4
-    task_profiles ProcessCapacityHigh
-
-# No hardware decoding (state 0): the service's built-in software protection.
-# With the hardware-backed library protected video asks for a secure decoder,
-# and this state has none. FORCE_LEVEL3_OEMCRYPTO=yes makes the service keep
-# its built-in library and never open liboemcrypto.so.
-# It runs in its own SELinux domain (seclabel; the executable's type leads to
-# hal_drm_widevine by default), which grants nothing of the hardware-backed
-# path (see sepolicy/media/hal_drm_widevine_sw.te). It also gets neither
-# drmrpc nor system, so the owner and mode of the TEE node, the crypto engine
-# node, qseecomd's socket and the trusted application's file keep it out too.
-service vendor.drm-widevine-hal-sw /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
-    class hal
-    disabled
     user media
     group media mediadrm
-    seclabel u:r:hal_drm_widevine_sw:s0
     setenv FORCE_LEVEL3_OEMCRYPTO yes
     ioprio rt 4
     task_profiles ProcessCapacityHigh
-
-on boot && property:ro.vendor.diamaneos.hw_video_decode=0
-    start vendor.drm-widevine-hal-sw
-
-on boot && property:ro.vendor.diamaneos.hw_video_decode=1
-    start vendor.drm-widevine-hal
-
-on boot && property:ro.vendor.diamaneos.hw_video_decode=2
-    start vendor.drm-widevine-hal

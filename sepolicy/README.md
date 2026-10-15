@@ -170,10 +170,10 @@ of the same name (`provenance.json`).
   - The platform grants `tee_device` to its reference DRM, CAS, Keymaster,
     KeyMint, Gatekeeper, AuthGraph, Secretkeeper and hwcrypto HAL domains.
     With no node under that label, those grants reach nothing.
-- Only `qseecomd`, KeyMint, Gatekeeper, the fingerprint HAL and the Widevine
-  DRM HAL may open, read, write or send commands to the node; a neverallow
-  keeps every other domain off it (`tee_node.te`).
-- The five may send two commands: invoke (`0x9801`) and create a callback
+- Only `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may open,
+  read, write or send commands to the node. A neverallow keeps every other
+  domain off it (`tee_node.te`).
+- The four may send two commands: invoke (`0x9801`) and create a callback
   server (`0x9803`).
   - The limit covers the opened node. SELinux does not check commands on
     the object and server descriptors the driver hands out.
@@ -882,9 +882,8 @@ Other:
 
 - It exposes the hardware encoders, and the hardware decoders the user's
   Hardware video decoding choice allows (`media/media.mk`):
-  - protected video only, the default: the three secure decoders;
-  - all video: those and the three clear decoders;
-  - never: none.
+  - never, the default: none.
+  - all video: the three clear decoders. No secure decoder is offered.
 - Every app except isolated processes is a Codec2 client and can call it.
 - The platform vendor policy makes `mediacodec` the Codec2 HIDL server and a
   gralloc and GPU client, and gives it every `video_device` node.
@@ -897,19 +896,14 @@ Other:
   - The decoder node is root-only when the choice is never.
   - Otherwise `vendor_init` changes its group and mode at early-boot, through
     the platform's setattr grant on every device node, and may `getattr` it.
-- Protected video: the secure decoders lend input buffers through the
-  memory-buffer driver (`vendor_membuf_dev`) and the content-protection
-  bitstream node (`vendor_vm_cp_bitstream_device`), as in the stock policy.
-  - `boot/ueventd.rc` makes that one VM node readable by all; SELinux lets
-    only the codec service and the Widevine service open it.
 - `persist.diamaneos.hw_video_decode`: the user's choice; accepts only 0
-  (never), 1 (all video) and 2 (protected video only). Unset counts as 2.
+  (never) and 1 (all video). Unset counts as 0.
   - Only Settings sets it (`system-ext-private/hw_video_decode.te`).
   - It is public and system restricted, because the vendor rc triggers on it.
 - `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot;
-  accepts only 0, 1 and 2.
-  - Only init and `vendor_init` set it; the codec service and Settings read
-    it, and the vendor rc files trigger on it.
+  accepts only 0 and 1.
+  - Only init and `vendor_init` set it. The codec service and Settings read
+    it, and the vendor rc file triggers on it.
 - No network: the platform neverallows cover tcp, udp and rawip sockets.
   - DiamaneOS's seccomp filter (`media/seccomp`) fails every socket family but
     AF_UNIX with EPERM, and the stock one has no `socket` at all.
@@ -930,6 +924,8 @@ Other:
   - the performance HAL and `/data/vendor/media`;
   - the Qualcomm system DMA-BUF heap: the selected libraries allocate from the
     AOSP system heaps only.
+- Secure video is not granted either: the memory-buffer driver and the
+  content-protection bitstream node.
 - There is no provenance entry for these files.
 
 ### DRM
@@ -939,35 +935,16 @@ Other:
   - Its service runs without the `drmrpc` group (`media/init.fp6.drm.rc`), and
     the TEE node does not carry the label the platform grants DRM HALs
     (see "TEE node").
-- Widevine (`hal_drm_widevine`, `media/hal_drm_widevine.te`) is the stock
-  service from Fairphone's package with the stock hardware-backed library.
-  - Granted: the DRM HAL interface, its own data in `/data/vendor/mediadrm`,
-    the TEE node (`fp6/tee_node.te`), the QSEECom heap, the crypto engine
-    node and the socket to `qseecomd`.
-  - Granted for protected video: file descriptors of the codec service, the
-    memory-buffer driver and the content-protection bitstream node.
-  - Granted for the library's wake lock: finding and calling the suspend
-    service, and nothing else of the stock wake lock rules (no wake lock
-    files, no capability).
-  - Not granted, unlike the stock policy: the vendor binder and the display
-    service.
-  - Its service has two definitions (`media/init.fp6.drm.rc`), and one runs
-    per boot:
-    - with the package's own groups and the hardware-backed library, when
-      hardware video decoding is for protected video or for all video;
-    - without the `drmrpc` and `system` groups and with the service's
-      built-in software protection, when it is never.
-- The software-protection definition runs in its own domain,
-  `hal_drm_widevine_sw` (`media/hal_drm_widevine_sw.te`).
-  - Granted here: the DRM HAL interface and its data in
-    `/data/vendor/mediadrm`. The rest is what the platform gives every DRM
-    HAL.
+- Widevine (`hal_drm_widevine_sw`, `media/hal_drm_widevine_sw.te`) is the
+  stock service from Fairphone's package with its built-in software
+  protection only. The hardware-backed library is not installed.
+  - Granted: the DRM HAL interface and its data in `/data/vendor/mediadrm`.
+    The rest is what the platform gives every DRM HAL.
   - No rule lets it use the TEE node, the QSEECom heap, the crypto engine
     node, the socket to `qseecomd`, the memory-buffer driver, the bitstream
     node or the codec service's file descriptors.
-  - Both domains share the executable's type, which leads to
-    `hal_drm_widevine` by default; init enters this one through the
-    definition's `seclabel` line, so its transition is not automatic.
+  - Its service runs without the `drmrpc` and `system` groups
+    (`media/init.fp6.drm.rc`).
 
 ## Recovery
 

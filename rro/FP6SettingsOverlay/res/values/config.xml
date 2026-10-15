@@ -13,9 +13,13 @@
     <bool name="config_show_smooth_display">true</bool>
 
     <!-- Show Security & privacy > Exploit protection > Hardware video decoding:
-         the FP6 applies the choice (protected video only, all video or never)
-         at boot (device media/media.mk). -->
+         the FP6 applies the choice (all video or never) at boot (device
+         media/media.mk). -->
     <bool name="config_show_hardware_video_decoding">true</bool>
+
+    <!-- Protected video only is shown disabled and Never is the default: the
+         FP6 has no secure decoders. -->
+    <bool name="config_hardware_video_decoding_protected_video">false</bool>
 
     <!-- Labels for the colour modes in the framework's config_availableColorModes
          (0, 256, 257). Settings pairs this list, by position, with its own

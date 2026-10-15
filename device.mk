@@ -49,15 +49,13 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.frp.pst=/dev/block/bootdevice/by-name/frp \
     ro.oem_unlock_supported=1
 
-# Remote key provisioning, as stock: without a hostname keystore2 treats it as
-# off, and stock declares the TEE KeyMint RKP-only (no factory attestation
-# key). The hostname only switches it on. The server rkpd talks to is set by
-# GrapheneOS's RemoteKeyProvisioningSettings (frameworks/base,
-# android.ext.settings; default the GrapheneOS proxy, https://<hostname>/v1
-# only if the user picks the standard server); DiamaneOS's backend replaces it
-# there (tools endpoint contract rkp-proxy).
+# Remote key provisioning stays off: the TEE gives no attestation keys to a system
+# signed with our own key, so rkpd would only contact the server for nothing.
+# Without remote_provisioning.hostname, keystore2 and rkpd treat it as off. Stock
+# declares the TEE KeyMint RKP-only (no factory attestation key), so apps asking for
+# an attested key get a permanent error at once. Widevine provisioning in rkpd uses
+# its own server and is not affected.
 PRODUCT_VENDOR_PROPERTIES += \
-    remote_provisioning.hostname=remoteprovisioning.googleapis.com \
     remote_provisioning.tee.rkp_only=true
 
 # Keys, as stock: when the metadata key is created after a wipe, vold first asks

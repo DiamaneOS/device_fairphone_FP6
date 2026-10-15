@@ -125,7 +125,8 @@ BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096
 
-# Preserve the published FP6 boot/recovery chains and rollback locations.
+# Chains as on stock, at the top rollback index locations (the bootloader keeps
+# 32). Stock uses 1 to 4, so the indices we store never limit a stock relock.
 # The kernel follows the selected vendor source baseline; the generic ramdisk
 # follows the platform. Header zeros must not erase their AVB version metadata.
 BOOT_SECURITY_PATCH := $(VENDOR_SECURITY_PATCH)
@@ -133,25 +134,25 @@ INIT_BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 BOARD_AVB_RECOVERY_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_RECOVERY_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 28
 BOARD_AVB_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 3
+BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 30
 BOARD_AVB_INIT_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_INIT_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 4
+BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 31
 
-# Match the fstab's system-side AVB chain. The location is the published FP6
-# system-chain slot; generated vendor inputs must not redefine this identity.
+# Match the fstab's system-side AVB chain. Generated vendor inputs must not
+# redefine its location.
 # The FP6 bootloader requests pvmfw whenever its partition exists and rejects a
 # verified slot that does not describe it, so the chain must include pvmfw.
 BOARD_AVB_VBMETA_SYSTEM := system system_ext product pvmfw
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
+BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 29
 
 # dm-verity hash trees use SHA-256, as on stock; avbtool still defaults to
 # SHA-1 for backwards compatibility.

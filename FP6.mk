@@ -9,6 +9,11 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/handheld_system_ext.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/telephony_system_ext.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_product.mk)
 $(call inherit-product, device/fairphone/FP6/device.mk)
+
+# The TEE refuses the remote key provisioning request on a phone with a custom
+# AVB key, so the keystore never gets attestation keys: no Auditor and no
+# de.diamaneos.hardware_attestation feature.
+DIAMANEOS_HARDWARE_ATTESTATION := false
 $(call inherit-product, vendor/diamaneos/product.mk)
 
 # Fairphone's stock product identity, as GrapheneOS keeps Google's for Pixels:

@@ -9,6 +9,13 @@ package {
 // generic system image stays device independent.
 
 runtime_resource_overlay {
+    name: "FP6CameraOverlay",
+    vendor: true,
+    manifest: "FP6CameraOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6CameraOverlay/res"],
+}
+
+runtime_resource_overlay {
     name: "FP6CarrierConfigOverlay",
     vendor: true,
     manifest: "FP6CarrierConfigOverlay/AndroidManifest.xml",

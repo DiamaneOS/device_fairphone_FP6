@@ -12,6 +12,18 @@ license {
     license_text: ["LICENSE"],
 }
 
+// The QCA6750 host driver requests its configuration through the kernel
+// firmware loader, at the path the stock vendor image links. Stock also links
+// wlan_mac.bin to /mnt/vendor/persist. Here imeiprovd writes that file at boot
+// and ueventd serves it from /mnt/vendor/wlan_mac (boot/ueventd.rc), so no
+// link is installed.
+install_symlink {
+    name: "fp6_wlan_cfg_ini",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/qca6750/WCNSS_qcom_cfg.ini",
+    symlink_target: "/vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini",
+}
+
 
 // Display configuration of the built-in panel: the measured brightness table,
 // the manual range and the high-brightness limits. The display HAL reports its

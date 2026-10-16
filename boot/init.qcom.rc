@@ -157,6 +157,10 @@ on late-fs
 
 on post-fs-data
     mkdir /data/vendor/display 0770 system graphics
+    # Supplicant state and control sockets (matches stock).
+    mkdir /data/vendor/wifi 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
     mkdir /data/vendor/tzstorage 0770 system system
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
@@ -198,6 +202,15 @@ on early-boot
     write /sys/kernel/boot_adsp/boot 1
     write /sys/kernel/boot_cdsp/boot 1
 
+# Wi-Fi (matches stock init.target.rc and init.vendor.wlan.rc). Fairphone's
+# icnss2 holds the firmware handshake until the CE/FCC board data is chosen.
+# DiamaneOS targets the EU FP6, which uses the CE board data (is_fcc 0). Then
+# boot the WPSS processor that runs the QCA6750 firmware.
+on early-boot
+    write /sys/kernel/fps_reg/is_fcc 0
+    write /sys/kernel/icnss/wlan_en_delay 1000
+    write /sys/kernel/icnss/wpss_boot 1
+
 # pd-mapper (linux-msm, modem/modem.mk) answers the protection-domain lookups
 # of the remote processors and the audio HAL. Own user (modem/config.fs), no
 # capabilities. The system group only lets it read the domain lists on the
@@ -230,4 +243,5 @@ on property:init.svc.vendor.per_mgr=running
 
 on property:sys.shutdown.requested=*
     write /sys/kernel/qcom_rproc/shutdown_in_progress 1
+    write /sys/kernel/shutdown_wlan/shutdown 1
     stop vendor.per_proxy

@@ -147,7 +147,41 @@ PRODUCT_PACKAGES += \
 # compat/tinyxml2-v34).
 PRODUCT_PACKAGES += libtxml2v34
 
+# Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
+# driver. The vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
+# fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
+# (BoardConfig.mk). The stock cnss-daemon is not selected.
+PRODUCT_SOONG_NAMESPACES += \
+    hardware/qcom/wlan/cld80211-lib \
+    hardware/qcom/wlan/qcwcn
 $(call inherit-product, vendor/diamaneos/config/wifi.mk)
+PRODUCT_PACKAGES += \
+    libcld80211 \
+    wpa_supplicant.conf \
+    fp6_wlan_cfg_ini
+# Supplicant overlays, identical to stock. p2p_disabled keeps P2P off wlan0.
+# Otherwise the supplicant registers wlan0 as its P2P interface and the
+# framework cannot add it as a station.
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
+    device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
+# Hotspot, Wi-Fi Direct and Wi-Fi Aware, as GrapheneOS has them on Pixels and
+# the stock FP6 declares them. hostapd is AOSP's, with its own init file and
+# policy (BoardConfig.mk). The driver creates p2p0 and wifi-aware0. Aware uses
+# wifi-aware0, as on stock. The Wi-Fi overlay declares the hotspot and P2P
+# capabilities, MAC randomization included (wifi/README.md).
+PRODUCT_PACKAGES += hostapd
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.wifi.direct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.direct.xml \
+    frameworks/native/data/etc/android.hardware.wifi.aware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.aware.xml
+PRODUCT_VENDOR_PROPERTIES += wifi.aware.interface=wifi-aware0
+# User builds keep hostapd at info level, like the supplicant
+# (vendor/diamaneos/config/wifi.mk): with Wi-Fi verbose logging its debug lines
+# carry the hotspot's and its clients' addresses.
+ifeq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_VENDOR_PROPERTIES += log.tag.hostapd=I
+endif
+
 # Hardware subsystems. Each subsystem makefile documents its stock and
 # source-built parts.
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
@@ -318,3 +352,7 @@ PRODUCT_VENDOR_PROPERTIES += sys.usb.mtp.batchcancel=1
 # by init.qcom.usb.rc) through the "ncm" and "ncm,adb" compositions. The usb0
 # interface matches Tethering's default USB pattern.
 PRODUCT_PACKAGES += FP6TetheringOverlay
+
+# Wi-Fi capabilities from Fairphone's Wi-Fi resource overlays: MAC address
+# randomisation, screen-off scans, bands and SAR transmit limits.
+PRODUCT_PACKAGES += FP6WifiOverlay

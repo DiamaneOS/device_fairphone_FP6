@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# DRM HALs (media/media.mk).
+
+# ClearKey, built from the platform source
+# (android.hardware.drm-service.clearkey). The module's own rc file gives the
+# service the drmrpc group, which owns the TEE node (/dev/smcinvoke, boot/
+# ueventd.rc). ClearKey never uses the TEE. This file sorts after the module's
+# in /vendor/etc/init, and init uses the last definition marked override: the
+# same service without that group.
+service vendor.drm-clearkey-service /vendor/bin/hw/android.hardware.drm-service.clearkey
+    class hal
+    user media
+    group mediadrm
+    ioprio rt 4
+    task_profiles ProcessCapacityHigh
+    interface aidl android.hardware.drm.IDrmFactory/clearkey
+    override
+
+# Widevine, from Fairphone's stock package (vendor APEX
+# com.google.android.widevine, selected by the tools), with its built-in
+# software protection only: FORCE_LEVEL3_OEMCRYPTO=yes makes it keep its
+# built-in library, and the image has no liboemcrypto.so (media/media.mk).
+# init reads /vendor/etc/init before the files inside APEXes and keeps the
+# first definition of a service, so this one is used and the package's, which
+# adds the drmrpc and system groups, is ignored (init logs the duplicate).
+# Without those groups the TEE node, qseecomd's socket and the trusted
+# application's file stay closed to it, as they are to its SELinux domain
+# (sepolicy/media/hal_drm_widevine_sw.te). The package's rc still creates
+# /data/vendor/mediadrm (0770 media mediadrm) once all APEXes are ready.
+service vendor.drm-widevine-hal /apex/com.google.android.widevine/bin/hw/android.hardware.drm-service.widevine
+    interface aidl android.hardware.drm.IDrmFactory/widevine
+    class hal
+    user media
+    group media mediadrm
+    setenv FORCE_LEVEL3_OEMCRYPTO yes
+    ioprio rt 4
+    task_profiles ProcessCapacityHigh

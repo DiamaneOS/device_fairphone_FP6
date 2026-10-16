@@ -82,7 +82,6 @@ firmware_directories /mnt/vendor/wlan_mac/
 /dev/membuf               0664   system     system
 /dev/dma_heap/qcom,*      0444   system     system
 /dev/qseecom              0660   system     drmrpc
-/dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
 # The traceability partition: imeiprovd (vendor_imeiprov, no capabilities)
 # reads the two IMEIs from it. SELinux allows it nothing else. Stock reads it
@@ -193,8 +192,8 @@ firmware_directories /mnt/vendor/wlan_mac/
 
 # Camera (stock FP6 ueventd.rc lines 111, 194, 196, 197): V4L2 video,
 # media-controller and subdevice nodes and UBWC-P for the camera provider
-# (runs as cameraserver in group camera). As on stock, the video nodes include
-# the video codec nodes.
+# (runs as cameraserver in group camera). The two video codec nodes are split
+# off at the end of this file.
 /dev/video*               0660   system     camera
 /dev/media*               0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
@@ -210,3 +209,18 @@ firmware_directories /mnt/vendor/wlan_mac/
 # VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc makes
 # it 0666 system. Only the camera group needs it.
 /dev/stmvl53l1_ranging    0660   system     camera
+
+# Video codec (media/init.fp6.media.rc, group mediacodec): msm_vidc registers
+# the Iris decoder at the fixed minor 32 and the encoder at 33. The Codec2
+# service's group gets the encoder node. The decoder node is root-only here:
+# by default no hardware decoder is used (the software decoders run in the
+# sandboxed mediaswcodec), and only when the user chooses hardware decoding
+# for all video does init.fp6.media.rc give it to the same group, at
+# early-boot. Both nodes are owned by root, so no system-uid process gets
+# them through the owner bits. Their SELinux type is the codec service's
+# alone (sepolicy/media). The video core's media-controller node (media2)
+# stays in the camera block rule: the codecs never open a media node. These
+# lines must stay after the camera block: ueventd applies the last matching
+# rule.
+/dev/video32              0600   root       root
+/dev/video33              0660   root       mediacodec

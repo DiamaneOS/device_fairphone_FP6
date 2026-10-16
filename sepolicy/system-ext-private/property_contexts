@@ -111,3 +111,7 @@ ro.vendor.power.tuning.support             u:object_r:vendor_exported_system_pro
 
 # qspa
 ro.vendor.config.qspa.       u:object_r:vendor_qspa_prop:s0
+
+# Hardware video decoding: the user's choice, applied at the next boot
+# (hw_video_decode.te). Settings stores "0" (never) or "1" (all video).
+persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1

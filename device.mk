@@ -198,6 +198,8 @@ $(call inherit-product, device/fairphone/FP6/telephony/telephony.mk)
 # asking. It shows while eSIM support is on and an eSIM was downloaded on the phone.
 PRODUCT_PRODUCT_PROPERTIES += masterclear.allow_retain_esim_profiles_after_fdr=true
 $(call inherit-product, device/fairphone/FP6/camera/camera.mk)
+# Video recording and hardware video codecs (media/media.mk).
+$(call inherit-product, device/fairphone/FP6/media/media.mk)
 
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.

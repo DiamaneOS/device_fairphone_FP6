@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Iris video codec nodes, /dev/video32 (decoder) and /dev/video33
+# (encoder): file_contexts, mediacodec.te.
+type vendor_video_codec_device, dev_type;

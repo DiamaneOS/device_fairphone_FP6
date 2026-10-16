@@ -300,6 +300,10 @@ For each upstream refresh:
 This preserves upstream traceability without importing unused policy. A shared
 DiamaneOS policy repository becomes useful when multiple devices genuinely share
 this maintained subset; it is not required merely to reduce this folder's size.
+- Only `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may open,
+  read, write or send commands to the node. A neverallow keeps every other
+  domain off it (`tee_node.te`).
+- The four may send two commands: invoke (`0x9801`) and create a callback
 - The touch controller's wake-gesture switch (`gesture_wakeup`) is
   `vendor_sysfs_touch_gesture` and its tap report (`wake_gesture`) is
   `vendor_sysfs_touch_wake_gesture`. The rest of the touch device keeps the
@@ -307,6 +311,8 @@ this maintained subset; it is not required merely to reduce this folder's size.
     check phone (single tap): it writes the switch and reads the report
     (`fp6/touch.te`).
   - The power HAL has no access.
+- `qseecomd` on `/mnt/vendor/persist/drm`: no keybox or HDCP provisioning
+  tool is installed to fill that store.
 - `system-ext-private/system_server.te`: the system server reads enabled
   kernel-console metadata for the serial-console warning. It receives no
   access to serial devices or console control.
@@ -667,9 +673,170 @@ These rules are not yet runtime-qualified under enforcing mode.
 - `dontaudit` on looking up the ODM's camera algorithm service and Qualcomm's
   post-processing HAL: neither is in the image, and the provider asks at every
   session.
+
+## Media
+
+`media/` holds the policy for the stock Qualcomm Codec2 video service
+(`vendor.qti.media.c2@1.0-service`, platform domain `mediacodec`).
+
+- It exposes the hardware encoders, and the hardware decoders the user's
+  Hardware video decoding choice allows (`media/media.mk`):
+  - never, the default: none.
+  - all video: the three clear decoders. No secure decoder is offered.
+- Every app except isolated processes is a Codec2 client and can call it.
+- The platform vendor policy makes `mediacodec` the Codec2 HIDL server and a
+  gralloc and GPU client, and gives it every `video_device` node.
+  - That type also labels the camera V4L2, subdevice, media, JPEG and CVP
+    nodes, so the DAC group (`mediacodec`) is what keeps the codec off them.
+- Codec nodes: `/dev/video32` (decoder) and `/dev/video33` (encoder) have
+  their own type, `vendor_video_codec_device`.
+  - Only `mediacodec` may open them (neverallow), with the V4L2 ioctls only
+    (`video_ioctl2` is the driver's only handler).
+  - The decoder node is root-only when the choice is never.
+  - Otherwise `vendor_init` changes its group and mode at early-boot, through
+    the platform's setattr grant on every device node, and may `getattr` it.
+- `persist.diamaneos.hw_video_decode`: the user's choice. Accepts only 0
+  (never) and 1 (all video). Unset counts as 0.
+  - Only Settings sets it (`system-ext-private/hw_video_decode.te`).
+  - It is public and system restricted, because the vendor rc triggers on it.
+- `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot.
+  Accepts only 0 and 1.
+  - Only init and `vendor_init` set it. The codec service and Settings read
+    it, and the vendor rc file triggers on it.
+- No network: the platform neverallows cover tcp, udp and rawip sockets.
+  - DiamaneOS's seccomp filter (`media/seccomp`) fails every socket family but
+    AF_UNIX with EPERM, and the stock one has no `socket` at all.
+- Other grants: `SYS_NICE`, the gralloc and Adreno properties, and
+  `vendor.media.target_variant`.
+  - Through that property the service finds the target specification that
+    limits the codecs it registers.
+  - `vendor_init` sets it from the vendor build.prop and switches it when a
+    hardware decoder is offered.
+- `dontaudit` on the lookup of the composer's `IDisplayConfig` (refresh rates
+  for perf hints, which are off): the service exposes screen writeback and
+  panel controls, so the lookup stays denied.
+- `dontaudit` on the FastRPC nodes, with a neverallow on opening a DSP node,
+  as upstream: `libfastcvopt` then runs on the CPU.
+- Not granted, unlike the stock policy:
+  - the Codec2 audio service, Wi-Fi display, VPP, hexlp and the capability
+    config store
+  - the performance HAL and `/data/vendor/media`
+  - the Qualcomm system DMA-BUF heap: the selected libraries allocate from the
+    AOSP system heaps only.
+- Secure video is not granted either: the memory-buffer driver and the
+  content-protection bitstream node.
+- There is no provenance entry for these files.
+
+### DRM
+
+- ClearKey (`hal_drm_clearkey_aidl`) runs under the platform policy alone. No
+  device rule.
+  - Its service runs without the `drmrpc` group (`media/init.fp6.drm.rc`), and
+    the TEE node does not carry the label the platform grants DRM HALs
+    (see "TEE node").
+- Widevine (`hal_drm_widevine_sw`, `media/hal_drm_widevine_sw.te`) is the
+  stock service from Fairphone's package with its built-in software
+  protection only. The hardware-backed library is not installed.
+  - Granted: the DRM HAL interface and its data in `/data/vendor/mediadrm`.
+    The rest is what the platform gives every DRM HAL.
+  - No rule lets it use the TEE node, the QSEECom heap, the crypto engine
+    node, the socket to `qseecomd`, the memory-buffer driver, the bitstream
+    node or the codec service's file descriptors.
+  - Its service runs without the `drmrpc` and `system` groups
+    (`media/init.fp6.drm.rc`).
+
+## Recovery
+
+- The recovery executable uses the boot-control service over IPC. It does not
+  link the legacy Qualcomm updater.
+- So this policy gives recovery no raw SCSI/BSG access and no CAP_SYS_RAWIO.
+- Boot control keeps BSG access and CAP_SYS_RAWIO for the UFS implementation.
+- Legacy sg character-device access is not granted. The sysfs discovery used
+  by `gpt-utils` remains.
+- Read and write access to recovery UI and firmware resources belongs to the
+  init, ueventd or recovery domain that performs the operation.
+
+## Not granted on purpose
+
+These accesses stay denied. Each was checked against what the process does
+without it. Denials covered in the sections above are not repeated.
+
+- `system_server`, extcon cable names of the EUD debug port (`sysfs`): no
+  cable type the framework uses.
+- `system_server` (InputReader), `max_brightness` of the haptics LED device
+  (`sysfs_leds`): reading it would let InputReader treat the vibrator as a
+  light.
+- `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not
+  set on this build. CamX uses the public SoC id file.
 - `hal_bluetooth_default` and `vendor_hal_gnss_qti`,
   `ro.vendor.qti.va_aosp.support`: the property is set for the camera provider
   alone (`system-ext-private/camera_table.te`). A denied read returns the
   default these two had before it was set.
+- `hal_bluetooth_default`, `hal_camera_default` and `vendor_hal_gnss_qti`,
   `ro.vendor.qti.va_odm.support`: not set on this build, so a denied read
   returns the same default.
+- `hal_audio_default` and `rild`, `persist.vendor.pd_locater_debug`
+  (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable. No
+  domain reads it here.
+- `vendor_nicmd`, `property_socket` write and an `init.svc.*` read: the SHS
+  and QMI-priority helpers it would start and check are not installed.
+- `fp6_iwlan_app` and `mediacodec`, reads of `default_prop` and
+  `zygote_config_prop`: generic platform properties that a denied read
+  returns as unset. Neither needs them.
+- `hal_camera_default`, finding
+  `vendor.tcl.camera.algoservice.ITctCameraAlgoService`: the TCL algorithm
+  service is not installed, and CamX continues without it.
+- `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
+  nodes of the other UFS LUNs: it only probes them at start.
+- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service`,
+  `netstats_service` and `content_capture_service`: lookups every app
+  process makes at start.
+  - These two domains have no graphics and keep no traffic statistics, and the
+    framework continues when the lookup returns nothing.
+- `hal_audio_default`, `read append` on `/sys/power/wake_lock`
+  (`sysfs_wake_lock`): PAL opens the wake-lock nodes at start, but only sound
+  trigger, which is not shipped, takes wake locks.
+  - audioserver's own wake lock keeps playback awake with the screen off. A
+    call's audio runs between the modem and the audio DSP.
+- `platform_app` and `system_app`, the absent Google wireless-charger service.
+- `platform_app` (SystemUI), `read` of `bluetooth_lea_prop`: the property is
+  not set on this build, so the denied read returns the same default.
+  - This is platform app policy, as on other GrapheneOS devices.
+- `untrusted_app`, probes of the device (adb properties, `/proc`, `/sys`,
+  `selinuxfs`, the root and `/dev` directories, the wallet property, cgroups):
+  intended.
+
+## Updating upstream policy
+
+The source of truth is the Fairphone-published Qualcomm repositories at the
+revisions in `provenance.json`. The local files are a reviewed subset with
+the adaptations above.
+
+- Do not track a moving branch in the build.
+- Do not include the entire upstream `SEPolicy.mk`: it would activate policy
+  for services the product does not install, and could undo domain scoping.
+
+For each upstream refresh:
+
+1. Fetch the two declared repositories into review checkouts, keeping the old
+   revisions available.
+2. Verify each recorded original hash with
+   `git show OLD_REVISION:SOURCE_PATH | sha256sum`, and each local derived
+   hash, before changing the baseline.
+3. Review `git diff OLD_REVISION NEW_REVISION -- SOURCE_PATH` for every
+   selected file.
+4. Inspect the full upstream diff too, including shared macros, attributes,
+   contexts and selection makefiles: a security fix may live outside the
+   current selection. Check both repositories together.
+5. Merge relevant changes against the old upstream file and the derived file.
+   Do not overwrite the adaptations.
+6. Trace each added allow to its current provider and resource. Include new
+   files only when their consumers or shared definitions are required. Keep
+   the upstream headers.
+7. Update the upstream revisions, source hashes and local hashes in
+   `provenance.json`. Review removals and renames explicitly.
+8. Publish a new device commit and update the pinned build environment and
+   project map.
+9. Compile the release and recovery policy with neverallows enabled, inspect
+   the effective grants and negative privilege checks, and repeat the affected
+   device tests.

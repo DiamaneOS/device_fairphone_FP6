@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# media/media.mk sets vendor.media.target_variant in the vendor build.prop,
+# which init loads with vendor_init's permissions. Stock sets it from its
+# init.qti.media.sh domain (vendor_qti_init_shell), which is not installed.
+# media/init.fp6.media.rc switches it when a hardware decoder is offered.
+set_prop(vendor_init, vendor_video_prop)
+
+# media/init.fp6.media.rc: hardware video decoding for this boot. At
+# zygote-start the actions' property triggers need read access to the user's
+# choice (init refuses vendor triggers on properties vendor_init cannot read),
+# and they set the boot state (property.te). At early-boot the actions trigger
+# on that state, which set_prop also lets vendor_init read, and set the codec
+# list variant (platform media_variant_prop, which vendor_init may set) and
+# the decoder node's owner and mode (the platform lets vendor_init setattr
+# every device node). Their "wait /dev/video32" runs in vendor_init and stats
+# the node until it exists: without getattr every stat fails, so it polls for
+# its full 5 s (about 500 denials) before the chown and chmod go ahead.
+get_prop(vendor_init, diamaneos_hw_video_decode_prop)
+set_prop(vendor_init, vendor_diamaneos_hw_video_decode_prop)
+allow vendor_init vendor_video_codec_device:chr_file getattr;

@@ -232,6 +232,18 @@ on early-boot
 on boot
     chown system system /sys/class/backlight/panel0-backlight/brightness
 
+# Charge limit: the health service, which runs as system, pauses and resumes
+# charging through the charger firmware's charge_disable
+# (sepolicy/fp6/charge_limit.te). The qcom-battery class appears once the ADSP
+# charger firmware is up, so wait for it, and chown again at boot if it came
+# later.
+on early-boot
+    wait /sys/class/qcom-battery/charge_disable 5
+    chown system system /sys/class/qcom-battery/charge_disable
+
+on boot
+    chown system system /sys/class/qcom-battery/charge_disable
+
 # Remote processors (matches stock init.qti.kernel.rc and init.target.rc): the
 # ADSP provides USB role detection, charging and audio, the CDSP compute.
 # Their firmware is on /vendor/firmware_mnt, mounted by mount_all --early.

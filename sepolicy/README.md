@@ -291,6 +291,17 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 - Neverallows keep every other domain from writing any of them, except
   ueventd, which the platform lets write all of sysfs.
 
+### Charge limit
+
+- The health service (`hal_health_default`) pauses and resumes charging
+  through the charger firmware's
+  `/sys/class/qcom-battery/charge_disable` (`charge_limit.te`).
+  - The node is `vendor_sysfs_charge_disable` (`fp6/genfs_contexts`).
+  - The service may open and write it, nothing more. vendor_init hands it to
+    system at boot (`boot/init.qcom.rc`).
+- A neverallow keeps every other domain from writing it, except vendor_init
+  and ueventd, which the platform lets write all of sysfs.
+
 ### Embedded USB debugger
 
 - The switch that turns Qualcomm's embedded USB debugger (EUD) on,

@@ -10,5 +10,5 @@ type vendor_sysfs_rproc_firmware, sysfs_type, fs_type;
 
 # The kernel's firmware search path,
 # /sys/module/firmware_class/parameters/path (genfs_contexts). tqftpserv
-# probes it; nothing on the FP6 is allowed to read it (tqftpserv.te).
+# probes it. Nothing on the FP6 is allowed to read it (tqftpserv.te).
 type vendor_sysfs_firmware_path, sysfs_type, fs_type;

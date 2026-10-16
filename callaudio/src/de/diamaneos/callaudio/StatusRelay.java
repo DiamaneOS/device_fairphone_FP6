@@ -11,7 +11,7 @@ package de.diamaneos.callaudio;
  * because the daemon re-sends the call state on the second), nothing twice in a row, and the
  * current status again after every registration, the first one included. A report the daemon
  * did not receive is sent again, before the current status if that alone would not show the
- * change. Statuses are AudioError values; sequence numbers come from {@link AudioServerMonitor}
+ * change. Statuses are AudioError values. Sequence numbers come from {@link AudioServerMonitor}
  * and make a stale update harmless. Not thread-safe: each slot uses it on its own thread.
  */
 final class StatusRelay {

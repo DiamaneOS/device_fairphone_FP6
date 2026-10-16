@@ -14,7 +14,7 @@ import java.util.function.LongConsumer;
  * system_server has sent it the permission table again, which system_server starts when
  * media.audio_policy registers, at the same moment the bridge sees audioserver back and tells
  * the radio daemon, which then re-sends the call state. Inside the window a rejected
- * setParameters is retried; the window closes after {@link #WINDOW_MS} or when audioserver dies
+ * setParameters is retried. The window closes after {@link #WINDOW_MS} or when audioserver dies
  * again. Outside it nothing is retried, as stock. Times are elapsed-realtime milliseconds.
  */
 final class Recovery {
@@ -39,12 +39,12 @@ final class Recovery {
 
     /**
      * Runs {@code set}, which returns an AudioSystem status, and while {@code retryAllowed} holds
-     * runs it again every {@link #RETRY_MS} until it succeeds; returns the last status. Only the
+     * runs it again every {@link #RETRY_MS} until it succeeds. Returns the last status. Only the
      * window bounds the retries. Another slot's accepted call must not end them: its request can
      * reach AudioFlinger just after the permission table and this one just before, and the radio
      * daemon does not send an unchanged call state again. AudioFlinger accepts global parameters
      * if any HAL module does, so a HAL rejection that keeps retrying to the end of the window is
-     * rare; outside the window every request is tried once.
+     * rare. Outside the window every request is tried once.
      */
     static int retry(IntSupplier set, BooleanSupplier retryAllowed, LongConsumer sleep) {
         int status = set.getAsInt();

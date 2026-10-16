@@ -5,7 +5,7 @@
 # vendor/qcom/opensource/tqftpserv) serves the modem's TFTP requests over QRTR:
 # read-only files from the modem partition and read-write files in
 # /data/vendor/tmp/tqftpserv (modem/init.modem.rc). It replaces Qualcomm's
-# tftp_server (not installed; its imported policy is left out), which starts
+# tftp_server (not installed, its imported policy is left out), which starts
 # as root with chown, setuid, setgid, setpcap and net_bind_service, and writes
 # persist, /data/vendor/tombstones and pddump.
 # This domain has no capabilities, no network, no persist, no binder and no
@@ -19,9 +19,9 @@ neverallow vendor_tqftpserv self:global_capability2_class_set *;
 neverallow vendor_tqftpserv self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
 
 # QRTR, without ioctls: one socket publishes TFTP service 4096 (its address
-# through getsockname, getattr) and receives requests; each transfer opens
+# through getsockname, getattr) and receives requests. Each transfer opens
 # its own socket connected to the requesting port. libqrtr sets a receive
-# timeout (setopt). The kernel binds the sockets on first send; no explicit
+# timeout (setopt). The kernel binds the sockets on first send. No explicit
 # bind.
 allow vendor_tqftpserv self:qipcrtr_socket { create connect getattr read setopt write };
 
@@ -39,7 +39,7 @@ allow vendor_tqftpserv vendor_sysfs_rproc_firmware:file { open read };
 
 # It first tries the kernel's firmware search path. On the FP6 that is a
 # comma-separated list (firmware_class.path in the boot arguments), which
-# tqftpserv would treat as one directory, so the read stays denied; tqftpserv
+# tqftpserv would treat as one directory, so the read stays denied. tqftpserv
 # then uses /vendor/firmware. Not audited: it happens on every request.
 dontaudit vendor_tqftpserv vendor_sysfs_firmware_path:file { open read };
 
@@ -47,7 +47,7 @@ dontaudit vendor_tqftpserv vendor_sysfs_firmware_path:file { open read };
 # which init creates for the service's user (modem/init.modem.rc). The modem
 # writes server_check.txt and mcfg.tmp there, reads them back and deletes
 # mcfg.tmp (the TFTP "unlink" option). tqftpserv opens the directory, then
-# opens, creates, truncates, reads, writes and deletes files in it; it does not
+# opens, creates, truncates, reads, writes and deletes files in it. It does not
 # follow symbolic links there. It cannot rename or link files, change
 # attributes or create directories. /data and /data/vendor/tmp
 # (vendor_data_file) are searched through platform policy.
@@ -62,8 +62,8 @@ neverallow { domain -coredomain -vendor_init -vendor_tqftpserv } vendor_tqftpser
 
 # stdio_to_kmsg (modem/init.modem.rc): on debuggable builds init passes
 # /dev/kmsg_debug as stdout and stderr, so the request log reaches the kernel
-# log. stdio's buffer setup also probes the device (fstat, a terminal ioctl);
-# that probe stays denied and is not audited.
+# log. stdio's buffer setup also probes the device (fstat, a terminal ioctl).
+# That probe stays denied and is not audited.
 userdebug_or_eng(`
   allow vendor_tqftpserv kmsg_debug_device:chr_file write;
   dontaudit vendor_tqftpserv kmsg_debug_device:chr_file { getattr ioctl };

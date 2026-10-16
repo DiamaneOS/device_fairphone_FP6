@@ -21,7 +21,7 @@
 # HCI traffic, binder and locks, most frequent first.
 futex: 1
 # Binder, the UART (termios, flush, drain) and /dev/btpower. ioctl requests are
-# not filtered here; SELinux limits which devices the service can open.
+# not filtered here. SELinux limits which devices the service can open.
 ioctl: 1
 read: 1
 write: 1
@@ -51,7 +51,7 @@ clone: arg0 & 0x10000
 set_tid_address: 1
 gettid: 1
 getpid: 1
-# pthread_kill, raise and timer_delete signal a thread of this process; abort.
+# pthread_kill, raise, timer_delete and abort signal a thread of this process.
 tgkill: 1
 rt_tgsigqueueinfo: 1
 # 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 3 PR_GET_DUMPABLE,
@@ -67,13 +67,13 @@ getrandom: 1
 clock_gettime: 1
 gettimeofday: 1
 # After a controller failure the implementation kills itself so init restarts
-# it: all six call sites are kill(getpid(), SIGKILL). SIGKILL only; SELinux
+# it: all six call sites are kill(getpid(), SIGKILL). SIGKILL only. SELinux
 # keeps it from signalling other domains.
 kill: arg1 == 9
 
 # Files: the HIDL library search and load, properties, patch and NVM files,
 # the address file, /proc/self/task/*/comm (HIDL renames the threads), and
-# the implementation's dump files (fsync, unlink; their directory does not
+# the implementation's dump files (fsync, unlink, their directory does not
 # exist here).
 openat: 1
 close: 1
@@ -91,7 +91,7 @@ pipe2: 1
 fsync: 1
 unlinkat: 1
 mkdirat: 1
-# service.cpp and libbtnv set the file mode mask; libbtnv changes the owner of
+# service.cpp and libbtnv set the file mode mask. libbtnv changes the owner of
 # the address file after writing it (persist is read-only for the service).
 umask: 1
 fchown: 1

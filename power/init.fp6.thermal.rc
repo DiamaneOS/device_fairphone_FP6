@@ -3,7 +3,7 @@
 #
 # Thermal HAL (android.hardware.thermal-service.qti, built from
 # vendor/qcom/opensource/thermal-hal): it reports temperatures, cooling-device
-# states and throttling severity to the framework; it applies no mitigation
+# states and throttling severity to the framework. It applies no mitigation
 # itself (the kernel and the thermal engine do). Its own rc runs it as root.
 # This file sorts after it in /vendor/etc/init, and init uses the last
 # definition marked override: the HAL runs as system with no capabilities, as
@@ -12,12 +12,12 @@
 #
 # What it touches (thermalCommon.cpp, thermalConfig.cpp, thermalMonitorNetlink.cpp):
 # reads thermal_zone*/temp, type, trip_point_*_type, cooling_device*/cur_state,
-# /proc/stat, cpu*/online and soc0/soc_id, all world-readable; listens to the
-# kernel's thermal netlink events (generic netlink multicast, open to non-root);
-# writes trip_point_1_temp and trip_point_1_hyst of the zones it monitors
+# /proc/stat, cpu*/online and soc0/soc_id, all world-readable. Listens to the
+# kernel's thermal netlink events (generic netlink multicast, open to non-root).
+# Writes trip_point_1_temp and trip_point_1_hyst of the zones it monitors
 # (CPU, GPU, NSP, skin, battery and BCL sensors) to get an event at the next
 # severity threshold. ueventd gives those two nodes to group system
-# (boot/ueventd.rc); they stay root-owned, so the root thermal engine still
+# (boot/ueventd.rc). They stay root-owned, so the root thermal engine still
 # writes them.
 service vendor.thermal-hal /vendor/bin/hw/android.hardware.thermal-service.qti
     interface aidl android.hardware.thermal.IThermal/default

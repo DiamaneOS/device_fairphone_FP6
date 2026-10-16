@@ -115,7 +115,7 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
         std::lock_guard lock(mSessionMutex);
         previous = std::exchange(mSession, session);
     }
-    // The framework closes a session before opening the next; if it did not,
+    // The framework closes a session before opening the next. If it did not,
     // the old one must not receive this session's messages or cancel its work.
     if (previous != nullptr) previous->detach(false);
     *out = session;

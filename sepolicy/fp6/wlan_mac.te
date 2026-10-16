@@ -14,7 +14,7 @@ allow ueventd mnt_vendor_file:dir search;
 allow ueventd vendor_diamaneos_wlan_mac_file:dir search;
 allow ueventd vendor_diamaneos_wlan_mac_file:file { open getattr read };
 
-# Only ueventd reads the MAC file; init and vendor_init may read most vendor
+# Only ueventd reads the MAC file. init and vendor_init may read most vendor
 # files through platform policy. imeiprovd opens it to write it but may not
 # read it (hardware/diamaneos/ims imeiprov.te).
 neverallow {

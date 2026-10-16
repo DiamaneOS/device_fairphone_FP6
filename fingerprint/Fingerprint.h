@@ -17,7 +17,7 @@ class Session;
 
 class Fingerprint : public BnFingerprint {
   public:
-    // Opens the FP6 module; returns nullptr if it is unavailable.
+    // Opens the FP6 module. Returns nullptr if it is unavailable.
     static std::shared_ptr<Fingerprint> create();
     explicit Fingerprint(fingerprint_device_t* device);
 

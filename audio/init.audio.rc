@@ -2,8 +2,8 @@
 # Copyright 2026 The DiamaneOS Project
 
 # Stock init.qti.qcv.rc selects this SKU from the SoC name. The curated product
-# does not install that script. Set the same value before the audio service starts;
-# do not duplicate a bootloader-supplied key in the kernel bootconfig.
+# does not install that script. Set the same value before the audio service starts.
+# Do not duplicate a bootloader-supplied key in the kernel bootconfig.
 on init
     setprop ro.boot.product.vendor.sku volcano
 

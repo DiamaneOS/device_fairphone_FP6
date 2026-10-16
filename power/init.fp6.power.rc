@@ -20,7 +20,7 @@ service vendor.power-hal-aidl /vendor/bin/hw/android.hardware.power-service.line
 # The sysfs nodes powerhint.json writes, and no others, go to system. They are
 # 0644, so the owner can write them and everyone else keeps read access. The
 # HAL starts writing at sys.boot_completed (vendor.powerhal.init, set at the
-# end of init.fp6.perf.rc); the touch controller's gesture node gets its owner
+# end of init.fp6.perf.rc). The touch controller's gesture node gets its owner
 # from ueventd.rc.
 on boot
     chown system system /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq

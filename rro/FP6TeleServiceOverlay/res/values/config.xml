@@ -7,10 +7,10 @@
     <!-- FP6.QREL.16.100.0 factory TelephonyResCommon_Sys overlay: the device
          MMTEL ImsService is the stock Qualcomm IMS app. The stock RCS package
          (vendor.qti.imsrcs) and carrier-config package
-         (com.fp.customercarrierconfig) are not installed; the AOSP defaults
+         (com.fp.customercarrierconfig) are not installed. The AOSP defaults
          apply for those. -->
     <string name="config_ims_mmtel_package" translatable="false">org.codeaurora.ims</string>
-    <!-- Stock capabilities; framework/carrier policy chooses when RTT applies. -->
+    <!-- Stock capabilities. framework/carrier policy chooses when RTT applies. -->
     <bool name="config_support_rtt">true</bool>
     <bool name="config_support_simless_emergency_rtt">true</bool>
 </resources>

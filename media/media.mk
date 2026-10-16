@@ -3,7 +3,7 @@
 
 # Video recording, the Iris video core and the hardware video codecs.
 #
-# Hardware encoders always; hardware decoders as the user chooses in
+# Hardware encoders always. Hardware decoders as the user chooses in
 # Settings > Security & privacy > Exploit protection > Hardware video decoding
 # (persist.diamaneos.hw_video_decode, takes effect at the next boot):
 # - never, the default: every video stays in the platform software decoders
@@ -16,13 +16,13 @@
 # media framework start.
 #
 # The codec service, its plugins and the Iris firmware (vpu20_2v.mbn) are
-# stock (vendor/fairphone/FP6; manifest.xml declares the service's HIDL
+# stock (vendor/fairphone/FP6, manifest.xml declares the service's HIDL
 # IComponentStore/default). The tools renderer derives two pinned
 # configurations from the stock codec list and target specification:
 # - _volcano_v1 (never): the target specification names the five encoders and
-#   no decoder ("codecs-available"; libqcodec2_v4l2codec registers only the
+#   no decoder ("codecs-available", libqcodec2_v4l2codec registers only the
 #   codecs listed), and the codec list has no decoder section, so MediaCodec
-#   cannot pick a hardware decoder even if the service listed one;
+#   cannot pick a hardware decoder even if the service listed one.
 # - _volcano_v1_hwdec (all video): the same plus the three clear decoders, in
 #   both files.
 # The decoder node /dev/video32 is root-only when the choice is never
@@ -38,7 +38,7 @@
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/media/init.fp6.media.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.media.rc
 
-# DRM HALs (android.hardware.drm). ClearKey is built from the platform source;
+# DRM HALs (android.hardware.drm). ClearKey is built from the platform source.
 # media/init.fp6.drm.rc runs it without the group that owns the TEE node.
 # Widevine is Fairphone's stock package, which the generated vendor tree
 # installs (vendor/fairphone/FP6), with its built-in software protection
@@ -61,7 +61,7 @@ PRODUCT_PACKAGES += \
 
 # Seccomp filter and codec gate for the codec service (media/seccomp). The
 # tools renderer renames the service's libavservices_minijail.so dependency
-# to it; without it the service does not start.
+# to it. Without it the service does not start.
 PRODUCT_PACKAGES += \
     libc2hwjail_avservices
 
@@ -71,14 +71,14 @@ PRODUCT_PACKAGES += \
 # SoC ids (636, 640, 641, 712) sku_version 1 selects _volcano_v1 (the
 # IRIS_MULTIPIPE_DISABLE fuse, 4K30 encode), anything else _volcano_v0. The
 # phone reads soc_id 636 and sku_version 1, so the value
-# is fixed here instead of running a shell script at boot; only the
+# is fixed here instead of running a shell script at boot. Only the
 # _volcano_v1 files are selected.
 FP6_MEDIA_VARIANT := _volcano_v1
 # vendor.media.target_variant: libqcodec2_platform reads
 # /vendor/etc/media$(FP6_MEDIA_VARIANT)/video_system_specs.json.
 # ro.media.xml_variant.*: the framework reads
 # /vendor/etc/media_codecs$(FP6_MEDIA_VARIANT).xml and
-# media_codecs_performance$(FP6_MEDIA_VARIANT).xml; without them it lists no
+# media_codecs_performance$(FP6_MEDIA_VARIANT).xml. Without them it lists no
 # hardware codec at all. ro.media.xml_variant.codecs is not set here:
 # media/init.fp6.media.rc sets it at early-boot from the user's choice and,
 # for all video, switches vendor.media.target_variant to

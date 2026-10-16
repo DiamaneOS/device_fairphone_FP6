@@ -8,7 +8,7 @@
 # socket files it creates, its capability use and its shutdown requests.
 #
 # Not logged: reads of thermal, CPU and GPU sysfs (the engine polls them, which
-# would flood the log; their modes are checked from a node listing instead),
+# would flood the log, their modes are checked from a node listing instead),
 # and the writes every domain may make to world-writable nodes, its own
 # process files and the logging and tracing sockets (logd, pmsg, heapprofd,
 # traced_perf, prng_seeder), whose file modes do not depend on the user.
@@ -32,7 +32,7 @@ userdebug_or_eng(`
   auditallow vendor_thermal-engine { vendor_qdsp_device ion_device }:chr_file open;
 
   # Client sockets: init creates the four /dev/socket/thermal-* sockets (rc
-  # socket lines); the engine unlinks, binds and chmods its own only when
+  # socket lines). The engine unlinks, binds and chmods its own only when
   # they are missing.
   auditallow vendor_thermal-engine vendor_thermal_socket:sock_file { create setattr unlink rename };
   auditallow vendor_thermal-engine { socket_device vendor_thermal_socket }:dir { add_name remove_name };

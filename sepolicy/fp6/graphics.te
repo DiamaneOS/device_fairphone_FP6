@@ -10,7 +10,7 @@ allow { domain -isolated_app_all } vendor_sysfs_kgsl_gpu_model:file r_file_perms
 # MediaPlayer) map camera and video buffers through the same mapper, which
 # reads vendor.gralloc.* again for every buffer: denied, that is over a
 # thousand audit records per camera session. Stock lets every domain read
-# these properties; here only the processes that map buffers may.
+# these properties. Here only the processes that map buffers may.
 get_prop({ appdomain -isolated_app_all zygote system_server bootanim surfaceflinger mediaswcodec
            cameraserver mediaserver hal_camera_default
            hal_graphics_allocator_default hal_graphics_composer_default }, vendor_gralloc_prop)

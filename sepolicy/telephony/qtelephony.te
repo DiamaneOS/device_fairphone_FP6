@@ -5,7 +5,7 @@
 # @ 67fa928299a49374a55281969fee357884c86890 generic/vendor/common/qtelephony.te
 # and generic/vendor/common/hal_telephony.te. Upstream makes the app a
 # hal_telephony client, which also lets it find and call the AOSP IRadio*
-# services (platform hal_telephony_client rules); the app uses only IImsRadio
+# services (platform hal_telephony_client rules). The app uses only IImsRadio
 # and IQtiRadioConfig (dex), so it gets binder with the radio daemon and find
 # on the one service type that carries those two services. Of the other
 # services that share the type (vendor-common/service_contexts), none is

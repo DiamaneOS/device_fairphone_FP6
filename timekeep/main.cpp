@@ -46,7 +46,7 @@ constexpr char kTempPath[] = "/data/vendor/timekeepd/offset.tmp";
 // suspend wake the daemon in any case.
 constexpr time_t kRecheckSec = timekeep::kRefreshMs / 1000;
 
-// Reads a small file with open and read only; the policy grants nothing else.
+// Reads a small file with open and read only. The policy grants nothing else.
 std::optional<std::string> readSmallFile(const char* path) {
     unique_fd fd(TEMP_FAILURE_RETRY(open(path, O_RDONLY | O_CLOEXEC)));
     if (fd < 0) return std::nullopt;
@@ -99,7 +99,7 @@ std::optional<Record> loadRecord() {
     return record;
 }
 
-// Makes a completed rename survive a power loss; on f2fs it would otherwise
+// Makes a completed rename survive a power loss. On f2fs it would otherwise
 // wait for the next checkpoint.
 bool syncDir() {
     unique_fd fd(TEMP_FAILURE_RETRY(open(kDirPath, O_RDONLY | O_DIRECTORY | O_CLOEXEC)));
@@ -129,7 +129,7 @@ bool saveRecord(const Record& record) {
 }
 
 // Makes the next read of the timer fd return when CLOCK_REALTIME is set (by
-// Android; the kernel reports each resume from suspend the same way) or after
+// Android, the kernel reports each resume from suspend the same way) or after
 // kRecheckSec.
 void arm(int tfd) {
     itimerspec spec = {};

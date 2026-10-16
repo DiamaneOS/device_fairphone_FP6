@@ -2,5 +2,5 @@
 # Copyright 2026 The DiamaneOS Project
 # signature. Stock runs it in vendor_qtelephony (Qualcomm sepolicy
 # generic/private/seapp_contexts line 44, generic/product/private/seapp_contexts
-# line 47); here it gets only what it uses. Public so that the vendor policy
+# line 47). Here it gets only what it uses. Public so that the vendor policy
 # (telephony/) can bind its QCRIL service access to exactly this domain.

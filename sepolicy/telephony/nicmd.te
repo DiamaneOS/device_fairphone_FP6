@@ -9,7 +9,7 @@
 # QMI-priority and performance helpers (shsusrd, qmipriod, perf HAL and their
 # properties), the legacy MSM IPC-router socket and ioctls, the HIDL
 # netd service (the daemon links only the AIDL netd interface), diag, the
-# netdomain attribute (stock vendor_sepolicy.cil line 442; it would add TCP
+# netdomain attribute (stock vendor_sepolicy.cil line 442, it would add TCP
 # connect and name_bind on every port, which nicmd does not use: besides
 # interface ioctls it only binds ephemeral ports for the modem, node_bind
 # below) and write access to /data/vendor/nicmd beyond the init-created
@@ -25,8 +25,8 @@ allow vendor_nicmd vendor_nicmd_socket:sock_file create_file_perms;
 allow vendor_nicmd vendor_nicm_data_file:dir search;
 allow vendor_nicmd vendor_nicm_data_file:file rw_file_perms;
 
-# rmnet links, addresses, routes and xfrm; modem data-call events over QRTR;
-# interface ioctls on datagram sockets (stock vendor_sepolicy.cil 6082-6085).
+# rmnet links, addresses, routes and xfrm. Modem data-call events over QRTR.
+# Interface ioctls on datagram sockets (stock vendor_sepolicy.cil 6082-6085).
 allow vendor_nicmd self:udp_socket create_socket_perms;
 allow vendor_nicmd self:tcp_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlmsg_read nlmsg_write };
@@ -36,7 +36,7 @@ allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlms
 # the tunnel runs over the phone's Wi-Fi (libnicm_netlink XFRMHelper.cpp:
 # NEWSA, NEWPOLICY, DELSA and DELPOLICY requests, nlmsg_write). To remove them
 # at teardown and rekey it sends a GETSA dump (NLM_F_DUMP, nlmsg_read) and
-# deletes the states whose protocol and SPI match (removeXFRMStateCb); it
+# deletes the states whose protocol and SPI match (removeXFRMStateCb). It
 # sends no other read request. Without nlmsg_read the old states would stay
 # after a rekey or teardown. The dump returns every security association, not
 # only nicmd's own, with its keys zeroed (lockdown and the kernel's own XFRM
@@ -46,7 +46,7 @@ allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:qipcrtr_socket create_socket_perms_no_ioctl;
 # The data module's interface requests arrive over TIPC (libnicm
-# EventTIPCMessenger/RequestTIPCMessenger; stock vendor_sepolicy.cil line 6080).
+# EventTIPCMessenger/RequestTIPCMessenger, stock vendor_sepolicy.cil line 6080).
 allow vendor_nicmd self:tipc_socket { create_socket_perms_no_ioctl listen accept };
 allowxperm vendor_nicmd self:udp_socket ioctl priv_sock_ioctls;
 allowxperm vendor_nicmd self:udp_socket ioctl rmnet_sock_ioctls;
@@ -69,7 +69,7 @@ get_prop(vendor_nicmd, boot_status_prop)
 # Mobile data target detection (libdsutils ds_get_target, ds_get_soc_id): with
 # only the internal modem, the target comes from the public SoC id (636 ->
 # lanai). Not granted: /sys/class/remoteproc (vendor_sysfs_ssr), which
-# libmdmdetect probes for external/fusion modems only; one denial per start.
+# libmdmdetect probes for external/fusion modems only. One denial per start.
 allow vendor_nicmd vendor_sysfs_soc:dir search;
 allow vendor_nicmd vendor_sysfs_public:file { open read getattr };
 

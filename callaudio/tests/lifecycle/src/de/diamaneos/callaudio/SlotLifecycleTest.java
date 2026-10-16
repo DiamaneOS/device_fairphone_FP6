@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import vendor.qti.hardware.radio.am.*;
 
-/** Actual Android worker/production adapter, local fake radio only; no HAL or modem lookup. */
+/** Actual Android worker/production adapter, local fake radio only. No HAL or modem lookup. */
 @RunWith(AndroidJUnit4.class)
 public final class SlotLifecycleTest {
     private static final class FakeRadio extends IQcRilAudio.Stub {

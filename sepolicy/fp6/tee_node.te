@@ -3,7 +3,7 @@
 # The TEE node (/dev/smcinvoke) has its own label, vendor_smcinvoke_device
 # (qva-common/file_contexts), not the platform's tee_device. The platform
 # grants tee_device to its reference DRM, CAS, Keymaster, KeyMint, Gatekeeper,
-# AuthGraph, Secretkeeper and hwcrypto HAL domains; with no node under that
+# AuthGraph, Secretkeeper and hwcrypto HAL domains. With no node under that
 # label, those grants reach nothing, whatever service is installed later.
 #
 # Its four users are qseecomd (tee), KeyMint, Gatekeeper and the fingerprint

@@ -23,7 +23,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 # Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed
 # snapshots that the userspace snapshot daemon merges (the kernel has dm-user
 # and io_uring), so an update needs far less free space on /data. The generic
-# ramdisk already has the first-stage snapuserd; recovery, which also runs
+# ramdisk already has the first-stage snapuserd. Recovery, which also runs
 # fastbootd, needs its own to finish a pending merge before a wipe or a flash.
 # Takes effect from the first OTA whose source build carries these properties.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/vabc_features.mk)
@@ -53,23 +53,23 @@ PRODUCT_VENDOR_PROPERTIES += \
 # off, and stock declares the TEE KeyMint RKP-only (no factory attestation
 # key). The hostname only switches it on. The server rkpd talks to is set by
 # GrapheneOS's RemoteKeyProvisioningSettings (frameworks/base,
-# android.ext.settings; default the GrapheneOS proxy, https://<hostname>/v1
-# only if the user picks the standard server); DiamaneOS's backend replaces it
+# android.ext.settings, default the GrapheneOS proxy, https://<hostname>/v1
+# only if the user picks the standard server). DiamaneOS's backend replaces it
 # there (tools endpoint contract rkp-proxy).
 PRODUCT_VENDOR_PROPERTIES += \
     remote_provisioning.hostname=remoteprovisioning.googleapis.com \
     remote_provisioning.tee.rkp_only=true
 
 # Keys, as stock: when the metadata key is created after a wipe, vold first asks
-# KeyMint to delete every old key, rollback-resistant ones included; and
+# KeyMint to delete every old key, rollback-resistant ones included.
 # AndroidKeyStore offers the TEE's 3DES keys.
 PRODUCT_VENDOR_PROPERTIES += \
     ro.crypto.metadata_init_delete_all_keys.enabled=true \
     ro.hardware.keystore_desede=true
 
 # Device-ID attestation sends these to KeyMint, which checks them against the
-# IDs provisioned at the factory, so they carry stock's values; the visible
-# brand stays DiamaneOS. Stock sets brand, name and model; device and
+# IDs provisioned at the factory, so they carry stock's values. The visible
+# brand stays DiamaneOS. Stock sets brand, name and model. Device and
 # manufacturer pin what ro.product.vendor.* reports.
 PRODUCT_BRAND_FOR_ATTESTATION := Fairphone
 PRODUCT_NAME_FOR_ATTESTATION := FP6
@@ -77,7 +77,7 @@ PRODUCT_MODEL_FOR_ATTESTATION := Fairphone 6
 PRODUCT_DEVICE_FOR_ATTESTATION := FP6
 PRODUCT_MANUFACTURER_FOR_ATTESTATION := Fairphone
 
-# Recovery has no zygote or normal vendor init; platform recovery imports this.
+# Recovery has no zygote or normal vendor init. Platform recovery imports this.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc
 
@@ -91,7 +91,7 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
 # Seals the Moments switch's kernel floor once per boot (system_ext, so it runs
-# as init; the policy property is platform-only).
+# as init, the policy property is platform-only).
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/init.privacy_switch.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.privacy_switch.rc
 
@@ -141,10 +141,10 @@ PRODUCT_PACKAGES += charger_res_images_vendor
 
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
 # its interface repositories). The stock Android 14 composer does not present
-# under Android 17 without libsdmextension and is untested with it; the source
+# under Android 17 without libsdmextension and is untested with it. The source
 # build allows patching and hardening the code that handles every app's
 # buffers. Configuration values follow the usual setup for Qualcomm 6.1-kernel
-# platforms; stock declares a wide-colour panel.
+# platforms. Stock declares a wide-colour panel.
 $(call soong_config_set,qtidisplay,default,true)
 $(call soong_config_set,qtidisplay,drmpp,true)
 $(call soong_config_set,qtidisplay,gralloc4,true)
@@ -183,7 +183,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += libtxml2v34
 
 # Source-built Android 17 Wi-Fi services. The pinned kernel loads its QCA6750
-# driver; the vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
+# driver. The vendor HAL is Qualcomm's CodeLinaro Wi-Fi HAL (hardware/qcom/wlan
 # fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
 # (BoardConfig.mk). The stock cnss-daemon is not selected.
 PRODUCT_SOONG_NAMESPACES += \
@@ -194,15 +194,15 @@ PRODUCT_PACKAGES += \
     libcld80211 \
     wpa_supplicant.conf \
     fp6_wlan_cfg_ini
-# Supplicant overlays, identical to stock. p2p_disabled keeps P2P off wlan0;
-# otherwise the supplicant registers wlan0 as its P2P interface and the
+# Supplicant overlays, identical to stock. p2p_disabled keeps P2P off wlan0.
+# Otherwise the supplicant registers wlan0 as its P2P interface and the
 # framework cannot add it as a station.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     device/fairphone/FP6/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf
 # Hotspot, Wi-Fi Direct and Wi-Fi Aware, as GrapheneOS has them on Pixels and
 # the stock FP6 declares them. hostapd is AOSP's, with its own init file and
-# policy (BoardConfig.mk). The driver creates p2p0 and wifi-aware0; Aware uses
+# policy (BoardConfig.mk). The driver creates p2p0 and wifi-aware0. Aware uses
 # wifi-aware0, as on stock. The Wi-Fi overlay declares the hotspot and P2P
 # capabilities, MAC randomization included (wifi/README.md).
 PRODUCT_PACKAGES += hostapd
@@ -242,7 +242,7 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 PRODUCT_VENDOR_PROPERTIES += ro.opengles.version=196610
 
 # The SoC maker and model apps read through Build.SOC_MANUFACTURER and
-# Build.SOC_MODEL, as stock (which sets the model at boot from the SoC id;
+# Build.SOC_MODEL, as stock (which sets the model at boot from the SoC id,
 # both FP6 SoC ids are SM7635).
 PRODUCT_VENDOR_PROPERTIES += \
     ro.soc.manufacturer=QTI \
@@ -270,17 +270,17 @@ PRODUCT_PACKAGES += \
     FP6SystemUIOverlay
 
 # Measured brightness table, manual range and high-brightness limits
-# (display/display_port_130.xml; Android.bp).
+# (display/display_port_130.xml, Android.bp).
 PRODUCT_PACKAGES += fp6_displayconfig_port130
 
 # Fingerprint: the AIDL service in fingerprint/ drives the stock FocalTech
 # module. The module keeps its own SONAME as file name, so it cannot collide
-# with AOSP's reference fingerprint modules; hw_get_module finds it through
+# with AOSP's reference fingerprint modules. hw_get_module finds it through
 # ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
 PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
 PRODUCT_PACKAGES += android.hardware.biometrics.fingerprint-service.fp6
 # The stock FocalTech module and trusted app are debug builds that log
-# auth-token fields, the token HMAC and trusted-app traces at debug level; keep
+# auth-token fields, the token HMAC and trusted-app traces at debug level. Keep
 # every FocalTech tag at info. (The module's own switch is only read from a
 # /data file, which is deliberately not created.)
 PRODUCT_VENDOR_PROPERTIES += \
@@ -323,11 +323,11 @@ PRODUCT_PACKAGES += fwrelease
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with three exceptions:
 # - no touch timer override: stock's 3500000 ms keeps touch boost active for
-#   about 58 minutes and blocks idle refresh-rate drops; SurfaceFlinger's
-#   default (200 ms, as in Qualcomm's display config) applies instead;
+#   about 58 minutes and blocks idle refresh-rate drops. SurfaceFlinger's
+#   default (200 ms, as in Qualcomm's display config) applies instead.
 # - the idle timer is 1500 ms instead of stock's 3500 ms, so a still screen
-#   drops to the panel's idle refresh rate 2 s sooner; touch still raises the
-#   rate at once through the touch timer;
+#   drops to the panel's idle refresh rate 2 s sooner. Touch still raises the
+#   rate at once through the touch timer.
 # - debug.sf.hw, debug.sf.latch_unsignaled and
 #   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
 #   platform, the display HAL or the stock vendor files reads them
@@ -478,7 +478,7 @@ PRODUCT_VENDOR_PROPERTIES += sys.usb.mtp.batchcancel=1
 
 # USB tethering over NCM, as Pixels: Tethering defaults to RNDIS, which this
 # kernel does not build. With the overlay the gadget HAL links ncm.gs6 (created
-# by init.qcom.usb.rc) through the "ncm" and "ncm,adb" compositions; the usb0
+# by init.qcom.usb.rc) through the "ncm" and "ncm,adb" compositions. The usb0
 # interface matches Tethering's default USB pattern.
 PRODUCT_PACKAGES += FP6TetheringOverlay
 

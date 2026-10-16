@@ -23,7 +23,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += android.hardware.power.stats-service.fp6
 
 # powerhint.json has no camera streaming modes (Mode::CAMERA_STREAMING_*).
-# Pixels cap the CPUs in them and move the camera daemon to bigger cores;
+# Pixels cap the CPUs in them and move the camera daemon to bigger cores.
 # Qualcomm's own streaming tunings cap the little cores and lower the migration
 # thresholds. This HAL can make neither placement change, and CamX runs on the
 # little cores, so a cap alone would slow it. Nothing sends the modes, and
@@ -33,7 +33,7 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/init.fp6.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.power.rc
 
 # The thermal HAL (device.mk) runs as system instead of root
-# (init.fp6.thermal.rc); ueventd gives it the two trip nodes it writes.
+# (init.fp6.thermal.rc). ueventd gives it the two trip nodes it writes.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/power/init.fp6.thermal.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.thermal.rc
 

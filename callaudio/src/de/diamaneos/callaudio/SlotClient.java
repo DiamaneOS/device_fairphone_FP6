@@ -31,10 +31,10 @@ import java.util.NoSuchElementException;
  * The daemon's oneway calls reach the request binder one at a time and are
  * queued here in that order, so a slot's call-state changes reach AudioFlinger in the order the
  * daemon sent them. The parameter strings (vsid, call_state, call_type, crs_call,
- * isCRSsupported) are validated against AudioParameters and never logged; the daemon chooses
+ * isCRSsupported) are validated against AudioParameters and never logged. The daemon chooses
  * the vsid. Unknown keys and malformed values never reach AudioFlinger.
  * Pending/running payloads are bounded per registration. Overflow replies use that
- * registration's oneway endpoint without adding Handler work; an overfull registration
+ * registration's oneway endpoint without adding Handler work. An overfull registration
  * that has not yet published its endpoint is revoked and retried.
  */
 final class SlotClient implements AudioServerMonitor.Listener {
@@ -107,7 +107,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
         });
     }
 
-    /** Final application teardown; ordinary SIM-mode changes only suspend. */
+    /** Final application teardown. Ordinary SIM-mode changes only suspend. */
     void dispose() {
         setEnabled(false);
         disposed = true;
@@ -183,7 +183,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
         }
         Log.i(TAG, "slot " + slot + ": registered with the radio daemon");
         // Status changes that arrived while this thread was blocked above are still queued behind
-        // it. Take the current status first (nothing is sent while unregistered); the queued
+        // it. Take the current status first (nothing is sent while unregistered). The queued
         // updates are then older by sequence and dropped.
         long[] now = audioServer.snapshot();
         relay.onAudioStatus((int) now[0], now[1]);
@@ -288,7 +288,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
         }
     }
 
-    /** Called by the radio daemon on binder threads; queued in arrival order. */
+    /** Called by the radio daemon on binder threads. Queued in arrival order. */
     private final class Request extends IQcRilAudioRequest.Stub {
         private final Object incarnation;
         Request(Object incarnation) { this.incarnation = incarnation; }
@@ -343,7 +343,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
                 if (query) r.queryParametersResponse(token, "");
                 else r.setParametersResponse(token, AudioError.GENERIC_FAILURE);
             } catch (RemoteException ignored) {
-                // Registration death handles reconnection; no payload is logged.
+                // Registration death handles reconnection. No payload is logged.
             }
         }
 
@@ -361,7 +361,7 @@ final class SlotClient implements AudioServerMonitor.Listener {
             if (!enqueue(token, params, true)) rejected(token, true);
         }
 
-        // The daemon can ask; the answers are the vendor's frozen version 1 (Android.bp).
+        // The daemon can ask. The answers are the vendor's frozen version 1 (Android.bp).
         @Override
         public int getInterfaceVersion() {
             return IQcRilAudioRequest.VERSION;

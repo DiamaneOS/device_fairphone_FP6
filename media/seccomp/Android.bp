@@ -7,7 +7,7 @@ package {
 
 // Seccomp filter and codec gate for the stock Qualcomm Codec2 video service.
 // The tools renderer renames the service's libavservices_minijail.so
-// dependency to libc2hwjail_avservices.so (same length); the library defines
+// dependency to libc2hwjail_avservices.so (same length). The library defines
 // the two functions the service's main() calls through its dependencies,
 // android::SetUpMinijail and the Codec2 HIDL ComponentStore constructor (see
 // c2hwjail.cpp). The service always registers its store.
@@ -70,7 +70,7 @@ cc_test_host {
     name: "c2hwjail_host_test",
     defaults: ["libc2hwjail_defaults"],
     srcs: ["tests/c2hwjail_test.cpp"],
-    // libcodec2_headers has no host variant; the headers themselves build.
+    // libcodec2_headers has no host variant. The headers themselves build.
     include_dirs: ["frameworks/av/media/codec2/core/include"],
     header_libs: [
         "libcutils_headers",

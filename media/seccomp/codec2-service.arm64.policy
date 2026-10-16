@@ -6,19 +6,19 @@
 # and installed by libc2hwjail_avservices when the service's main() calls
 # SetUpMinijail. A call outside this list, or a listed call whose arguments do
 # not match, fails with EPERM (kernel audit record type 1326), or with
-# C2HWJAIL_LOG_ONLY (Android.bp) is logged and allowed; it never kills the
+# C2HWJAIL_LOG_ONLY (Android.bp) is logged and allowed. It never kills the
 # service. Duplicate entries are an error.
 #
 # The stock Qualcomm policy (codec2.vendor.base-arm64.policy and
 # codec2.vendor.ext-arm64.policy) is then stacked on top, so a call must pass
 # both. This list is the stock one with these changes:
 # - argument limits: no fork (threads only), no in-place mremap, prctl only for
-#   the options listed, setpriority for threads and processes only;
+#   the options listed, setpriority for threads and processes only.
 # - AF_UNIX sockets only, for logd and tombstoned (the stock list has no
-#   socket call at all). No other socket family, so no network;
+#   socket call at all). No other socket family, so no network.
 # - the prctl options and fcntl the stock SetUpMinijail needs to install its
 #   filter, and the calls of the debuggerd fallback handler
-#   (system/core debuggerd/seccomp_policy/crash_dump.arm64.policy);
+#   (system/core debuggerd/seccomp_policy/crash_dump.arm64.policy).
 # - _llseek (no such call on arm64) is dropped.
 
 futex: 1
@@ -46,7 +46,7 @@ fstatfs: 1
 ftruncate: 1
 memfd_create: 1
 # libqcodec2_utils removes its own dump files (dumps are off in the target
-# specification); SELinux leaves the service no writable directory to use it on.
+# specification). SELinux leaves the service no writable directory to use it on.
 unlinkat: 1
 # No mapping may be writable and executable at once.
 mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE

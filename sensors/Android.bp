@@ -9,7 +9,7 @@ package {
 // doze service: Tap to check phone and Display > Tap to wake (TapSubHal.cpp). The AOSP sensors multi-HAL loads it from
 // /odm/etc/sensors/hals.conf, next to the Qualcomm sub-HAL it loads from
 // /vendor/etc/sensors/hals.conf, so the stock-derived vendor list stays as it
-// is. It runs in the multi-HAL process (hal_sensors_default; sepolicy/fp6/
+// is. It runs in the multi-HAL process (hal_sensors_default, sepolicy/fp6/
 // touch.te).
 cc_library_shared {
     name: "sensors.fp6.tap",

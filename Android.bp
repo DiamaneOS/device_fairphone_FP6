@@ -14,7 +14,7 @@ license {
 
 // The QCA6750 host driver requests its configuration through the kernel
 // firmware loader, at the path the stock vendor image links. Stock also links
-// wlan_mac.bin to /mnt/vendor/persist; here imeiprovd writes that file at boot
+// wlan_mac.bin to /mnt/vendor/persist. Here imeiprovd writes that file at boot
 // and ueventd serves it from /mnt/vendor/wlan_mac (boot/ueventd.rc), so no
 // link is installed.
 install_symlink {

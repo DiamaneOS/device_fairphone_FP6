@@ -3,7 +3,7 @@
 
 # Bluetooth. The selected stock vendor files supply the Qualcomm HIDL HCI
 # implementation (android.hardware.bluetooth@1.1-impl-qti) and its link
-# closure; DiamaneOS's service registers it in place of the stock service and
+# closure. DiamaneOS's service registers it in place of the stock service and
 # installs a seccomp filter first (see bluetooth/Android.bp). manifest.xml
 # declares IBluetoothHci. The AOSP HCI interfaces are built from source.
 # Bluetooth audio is software only (no DSP offload): the AOSP Bluetooth audio
@@ -59,7 +59,7 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # time Bluetooth starts, when it writes it into the controller's NVM tags
 # ("BD Address: ..." in PatchDLManager::ReadTlvInfo and
 # NvmTagsManager::DownloadNvmTags), and HCI command dumps at debug level under
-# the first tag. Keep both tags at warning; their other info lines (firmware
+# the first tag. Keep both tags at warning. Their other info lines (firmware
 # versions) go too. The address is the factory one (init.fp6.bluetooth.rc).
 PRODUCT_VENDOR_PROPERTIES += \
     log.tag.vendor.qti.bluetooth@1.1-patch_dl_manager=W \
@@ -70,7 +70,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 #   (default false): stock offload needs the Qualcomm Bluetooth audio stack.
 # - ro.vendor.qti.va_odm.support and persist.vendor.qcom.bluetooth.tpi_supported:
 #   only the stock service reads them, to register FM, ANT, config-store and TPI
-#   services; neither it nor those libraries are installed.
+#   services. Neither it nor those libraries are installed.
 # - persist.vendor.bluetooth.modem_nv_support: would ask the modem for the
 #   Bluetooth address over QMI.
 # - persist.vendor.service.bdroid.{snooplog,soclog,fwsnoop,dump_uartlogs}:
@@ -80,5 +80,5 @@ PRODUCT_VENDOR_PROPERTIES += \
 #   ssrlvl is 3, recovery without panic).
 # - persist.vendor.bluetooth.alt_path_for_fw: firmware from /data.
 #
-# HFP audio gateway stays enabled so headsets connect with their call profile;
+# HFP audio gateway stays enabled so headsets connect with their call profile.
 # SCO audio is not validated.

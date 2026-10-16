@@ -11,12 +11,12 @@
 # except isolated processes is a Codec2 client and can call this service.
 # video_device is not narrow: it also labels the camera V4L2, subdevice,
 # media, JPEG and CVP nodes (vendor-common/file_contexts), so the service's
-# DAC group (mediacodec; media/init.fp6.media.rc and boot/ueventd.rc) is what
+# DAC group (mediacodec, media/init.fp6.media.rc and boot/ueventd.rc) is what
 # keeps it off the camera nodes. The two codec nodes have their own type,
-# vendor_video_codec_device (below), which no other domain may use; the
+# vendor_video_codec_device (below), which no other domain may use. The
 # decoder node's DAC (root-only when the user chose no hardware decoding)
 # keeps the service off the decoder then. The platform neverallows cover
-# only tcp, udp and rawip sockets; the seccomp filters (DiamaneOS's,
+# only tcp, udp and rawip sockets. The seccomp filters (DiamaneOS's,
 # media/seccomp, and the stock one) allow no socket family but AF_UNIX.
 # Reduced from the pinned Qualcomm generic/vendor/common/mediacodec.te,
 # qva/vendor/common/mediacodec.te and qva/vendor/volcano/mediacodec.te and the
@@ -45,8 +45,8 @@ allow mediacodec self:capability sys_nice;
 get_prop(mediacodec, vendor_video_prop)
 
 # The in-process gralloc (libgralloc.qti) and the Adreno Vulkan driver used by
-# the image-transform engine (libvideotxr) read their read-only properties;
-# same grant as for mediaswcodec in fp6/graphics.te.
+# the image-transform engine (libvideotxr) read their read-only properties.
+# Same grant as for mediaswcodec in fp6/graphics.te.
 get_prop(mediacodec, vendor_gralloc_prop)
 get_prop(mediacodec, vendor_public_vendor_default_prop)
 
@@ -58,14 +58,14 @@ dontaudit mediacodec zygote_config_prop:file read;
 dontaudit mediacodec default_prop:file read;
 
 # libqcodec2_utils (QC2DisplayConfigClient) looks up the composer's
-# IDisplayConfig/default only for the refresh rate its perf hints use; perf
+# IDisplayConfig/default only for the refresh rate its perf hints use. perf
 # hints are off here and the library logs "IDisplayConfig AIDL is not present"
 # and carries on. The service would expose screen writeback, display freeze and
 # panel controls to a process every app can call, so the lookup is denied,
 # silently. (A grant would also break the build: hal_attribute_service
 # neverallows find by any domain outside the composer client/server
 # attributes.) /dev/binder and the servicemanager call come from the platform
-# (every domain; hal_graphics_allocator_client), so no binder_use here.
+# (every domain, hal_graphics_allocator_client), so no binder_use here.
 dontaudit mediacodec vendor_hal_vnddisplayconfig_service:service_manager find;
 
 # libqcodec2_utils loads libfastcvopt.so (installed by the camera stack),

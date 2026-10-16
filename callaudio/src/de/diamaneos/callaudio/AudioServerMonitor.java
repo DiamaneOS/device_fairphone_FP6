@@ -63,7 +63,7 @@ final class AudioServerMonitor {
         thread.start();
     }
 
-    /** Returns the {status, sequence} the listener starts from; later changes come in order. */
+    /** Returns the {status, sequence} the listener starts from. Later changes come in order. */
     long[] addListener(Listener listener) {
         synchronized (lock) {
             listeners.add(listener);
@@ -71,7 +71,7 @@ final class AudioServerMonitor {
         }
     }
 
-    /** The current {status, sequence}; changes after it reach the listeners after this returns. */
+    /** The current {status, sequence}. Changes after it reach the listeners after this returns. */
     long[] snapshot() {
         synchronized (lock) {
             return new long[] {status, sequence};

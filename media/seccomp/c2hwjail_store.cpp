@@ -18,7 +18,7 @@ class FilteringStore final : public C2ComponentStore {
             return;
         }
         // A listed alias creates the same component, so it is allowed with its
-        // component; nothing else is added.
+        // component. Nothing else is added.
         for (const auto& traits : mStore->listComponents()) {
             if (traits != nullptr && mAllowed.count(traits->name) != 0) {
                 mListed.push_back(traits);

@@ -26,7 +26,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.radio.sib16_support=1
 
 # Preferred network type for each SIM on first use and after a network reset:
-# 26 = NR/LTE/GSM/WCDMA (RILConstants; stock system build.prop). Without
+# 26 = NR/LTE/GSM/WCDMA (RILConstants, stock system build.prop). Without
 # it the framework falls back to GSM/WCDMA, Settings hides "5G (recommended)"
 # and the Allow-2G switch stores a mask with no LTE or NR.
 PRODUCT_VENDOR_PROPERTIES += \
@@ -34,12 +34,12 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # Without a SIM the lock screen is not forced on (also not over the setup
 # wizard): the AOSP phone default from full_base_telephony.mk, which this
-# product does not inherit; stock sets it too.
+# product does not inherit. Stock sets it too.
 PRODUCT_VENDOR_PROPERTIES += \
     keyguard.no_require_sim=true
 
 # QCRIL copies the APNs Android uses (custom, MVNO, MMS and attach APNs) into
-# the modem's data profiles, as stock; its database default (false) keeps the
+# the modem's data profiles, as stock. Its database default (false) keeps the
 # modem's built-in carrier profiles. vendor_init may set vendor_dataqdp_prop
 # (sepolicy/fp6/platform.te).
 PRODUCT_VENDOR_PROPERTIES += \
@@ -53,7 +53,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.telephony.network_state_poll_window_ms=5000
 
 # Telephony, calling, messaging, data, IMS and eUICC features (AOSP
-# definitions; stock declares the same set in vendor/etc/permissions and
+# definitions, stock declares the same set in vendor/etc/permissions and
 # system/etc/permissions/android.hardware.telephony.euicc.xml). No MBMS:
 # eMBMS is not installed.
 PRODUCT_PACKAGES += \
@@ -63,10 +63,10 @@ PRODUCT_PACKAGES += \
 
 # eSIM manager (packages/apps/DiamaneOSEuicc): manages the profiles on the
 # eUICC in slot 1 through the framework's eUICC card commands and downloads new
-# ones (SGP.22). Ships disabled; Settings > Network & internet > eSIM support
+# ones (SGP.22). Ships disabled. Settings > Network & internet > eSIM support
 # turns it on and restarts, as GrapheneOS does for Google's LPA. Without it,
 # installed eSIMs work as SIMs. It runs in the platform's priv_app domain, which
-# already has network sockets; its INTERNET permission is the only new grant.
+# already has network sockets. Its INTERNET permission is the only new grant.
 PRODUCT_PACKAGES += \
     DiamaneOSEuicc
 
@@ -91,7 +91,7 @@ PRODUCT_COPY_FILES += \
 
 # The shipped QCRIL database has power-up optimisation off (version 16.0). This
 # upgrade step brings a version 15.0 copy already in /data/vendor/radio to the
-# same state; with the optimisation on, QCRIL holds incoming SMS and USSD until
+# same state. With the optimisation on, QCRIL holds incoming SMS and USSD until
 # a UI-ready call from stock apps this build does not ship.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/qcril-upgrade-0016.0_config.sql:$(TARGET_COPY_OUT_VENDOR)/etc/qcril_database/upgrade/config/0016.0_config.sql
@@ -99,7 +99,7 @@ PRODUCT_COPY_FILES += \
 # Call-audio bridge (system_ext privileged app, one normal permission): passes
 # each call's vsid/call_state parameters from the radio daemon's IQcRilAudio
 # service to the audio HAL. Every call's audio needs it, emergency calls
-# included; see callaudio/Android.bp.
+# included. See callaudio/Android.bp.
 PRODUCT_PACKAGES += \
     FP6CallAudio
 
@@ -116,11 +116,11 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/telephony/fp6-iwlan-sysconfig.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/sysconfig/fp6-iwlan-sysconfig.xml
 
 # CarrierConfig remains the maintained Android service. The generated
-# filegroup contains XML only; CustomerCarrierConfig.apk is never installed.
+# filegroup contains XML only. CustomerCarrierConfig.apk is never installed.
 $(call soong_config_set,diamaneos_carrierconfig,asset_module,fp6_stock_carrier_assets)
 
 # Verified FP6 QRTR topology: AP node 1, modem node 0 (DMS/NAS/WDS/WMS/VOICE
-# name-service records). Pin it; never trust the first incoming DCM packet.
+# name-service records). Pin it. Never trust the first incoming DCM packet.
 # The transport asks the kernel for its local AP node before binding.
 DIAMANEOS_IMS_MODEM_NODE := 0
 DIAMANEOS_IMS_SLOTS := 2
@@ -136,7 +136,7 @@ $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 # Device overlay: IMS package and RTT capabilities for TeleService. Stock
 # carrier defaults are extracted as data, including their original filters.
 # The CarrierConfig overlay corrects stock values that apply to every carrier
-# (see its vendor.xml); it is read after the stock data.
+# (see its vendor.xml). It is read after the stock data.
 PRODUCT_PACKAGES += \
     FP6TeleServiceOverlay \
     FP6CarrierConfigOverlay

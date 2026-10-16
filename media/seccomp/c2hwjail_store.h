@@ -10,7 +10,7 @@
 #include <string>
 
 // The Codec2 headers use bionic's __unused, which glibc lacks (the host
-// test); glibc's own headers name struct fields __unused, so it is defined
+// test). glibc's own headers name struct fields __unused, so it is defined
 // only around the Codec2 headers, after the system headers.
 #if !defined(__BIONIC__) && !defined(__unused)
 #define __unused __attribute__((__unused__))

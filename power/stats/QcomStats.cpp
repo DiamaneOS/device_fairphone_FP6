@@ -16,7 +16,7 @@ constexpr unsigned int kStatsIoctlMagic = 0x9d;
 
 unsigned int IoctlCommand(StatsIoctl nr) {
     // The driver declares its commands with a pointer as the size argument,
-    // so the encoded size is 8 on arm64; this HAL is built 64-bit only.
+    // so the encoded size is 8 on arm64. This HAL is built 64-bit only.
     return _IOR(kStatsIoctlMagic, nr, SleepStats*);
 }
 
@@ -31,8 +31,8 @@ std::string RecordName(uint32_t statType) {
 }
 
 const std::vector<EntitySource>& Entities() {
-    // SoC: the AOSS sleep records (AOSD: whole-SoC deep sleep; CXSD: CX rail
-    // collapse; DDR: DDR low-power mode). Subsystems: sleep time the remote
+    // SoC: the AOSS sleep records (AOSD: whole-SoC deep sleep, CXSD: CX rail
+    // collapse, DDR: DDR low-power mode). Subsystems: sleep time the remote
     // processors publish in shared memory (devicetree ss-name). WPSS runs the
     // Wi-Fi firmware.
     static const std::vector<EntitySource> kEntities = {

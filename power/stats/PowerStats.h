@@ -29,7 +29,7 @@ class PowerStats : public BnPowerStats {
     binder_status_t dump(int fd, const char** args, uint32_t numArgs) override;
 
   private:
-    // Reads every state of one entity; false if any read fails, so an entity
+    // Reads every state of one entity. False if any read fails, so an entity
     // is reported whole or not at all.
     bool readEntity(int fd, size_t index, std::vector<StateResidency>* residencies);
 

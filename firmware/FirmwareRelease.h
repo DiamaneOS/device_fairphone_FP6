@@ -18,7 +18,7 @@ namespace fwrelease {
 using Digest = std::array<uint8_t, 32>;
 
 // What a partition holds at one release: the image's length and SHA-256.
-// Partitions are larger than their images; only the image length is hashed.
+// Partitions are larger than their images. Only the image length is hashed.
 struct Image {
     std::string release;  // "16.111.0"
     uint64_t bytes;

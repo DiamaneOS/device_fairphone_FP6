@@ -66,7 +66,7 @@ constexpr const char* kDecoders[] = {
         "c2.qti.vp9.decoder",
 };
 
-// Adds the names of a codec list; a missing list counts as empty.
+// Adds the names of a codec list. A missing list counts as empty.
 bool AddCodecNames(const Json::Value& list, const char* what, std::set<std::string>* names,
                    std::string* reason) {
     if (list.isNull()) {
@@ -148,7 +148,7 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
         return {};
     }
     // libqcodec2_platform merges these three lists into the one set the codec
-    // plugin registers; an empty set would register every codec.
+    // plugin registers. An empty set would register every codec.
     std::set<std::string> listed;
     if (!AddCodecNames(available["decoders"], "codecs-available.decoders", &listed, reason) ||
         !AddCodecNames(available["encoders"], "codecs-available.encoders", &listed, reason) ||
@@ -165,7 +165,7 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
         return {};
     }
 
-    // The decoder node: root-only when no hardware decoder is offered; root
+    // The decoder node: root-only when no hardware decoder is offered. Root
     // and group mediacodec, read-write, when the decoders are. A missing node
     // (video driver not loaded) cannot be opened at all.
     struct stat node = {};
@@ -240,7 +240,7 @@ bool InstallFilter(const char* path, bool logOnly, std::string* error) {
         *error = std::string("cannot set no_new_privs: ") + strerror(errno);
     } else {
         // TSYNC applies the filter and no_new_privs to every thread of the
-        // process; a positive result names a thread that could not be
+        // process. A positive result names a thread that could not be
         // synchronised.
         const int result = sys_seccomp(SECCOMP_SET_MODE_FILTER, SECCOMP_FILTER_FLAG_TSYNC, &prog);
         if (result != 0) {

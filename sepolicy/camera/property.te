@@ -3,7 +3,7 @@
 
 # Camera module serial numbers. The stock camera.qcom.so calls property_set for
 # vendor.fp.camera_main.sn, vendor.fp.camera_aux.sn and vendor.fp.camera_front.sn
-# (the values stock trace_util.rc lines 7-14 copy into traceability storage;
+# (the values stock trace_util.rc lines 7-14 copy into traceability storage,
 # trace_util is not installed). Stock labels them vendor_fp_prop
 # (system_ext_property_contexts line 32) and grants hal_camera no set, so the
 # write is denied on stock. This dedicated vendor-internal type has no set or

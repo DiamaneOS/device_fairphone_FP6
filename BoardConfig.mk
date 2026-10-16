@@ -10,13 +10,13 @@ TARGET_CPU_VARIANT := generic
 # Code ART compiles on the phone (apps at install and update, odrefresh after
 # an ART update) targets the cores: Cortex-A520 and A720 have LSE atomics,
 # FP16 and dot product and need no Cortex-A53 erratum workarounds. ART gives
-# cortex-a55 and cortex-a76 the same features; Pixel 9, whose cores include
+# cortex-a55 and cortex-a76 the same features. Pixel 9, whose cores include
 # A720 and A520, uses cortex-a55. Native code and the images built here stay
 # generic.
 TARGET_CPU_VARIANT_RUNTIME := cortex-a55
 TARGET_BOARD_PLATFORM := volcano
 TARGET_BOOTLOADER_BOARD_NAME := fps
-# Keep the authenticated device bootloader; this product builds Android images.
+# Keep the authenticated device bootloader. This product builds Android images.
 TARGET_NO_BOOTLOADER := true
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/framework_compatibility_matrix.xml
@@ -58,7 +58,7 @@ BOARD_INIT_BOOT_HEADER_VERSION := 4
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_RAMDISK_USE_LZ4 := true
-# Stock boot v4 carries the kernel; init_boot and recovery carry ramdisks only.
+# Stock boot v4 carries the kernel. init_boot and recovery carry ramdisks only.
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 # Recovery is a complete A/B partition image, not an imgdiff patch from boot.
 BOARD_USES_FULL_RECOVERY_IMAGE := true
@@ -67,7 +67,7 @@ BOARD_MKBOOTIMG_ARGS += --header_version 4 --kernel_offset 0x00008000
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 BOARD_MKBOOTIMG_ARGS += --dtb_offset 0x01f00000
 BOARD_MKBOOTIMG_INIT_ARGS += --header_version 4
-# GKI v4 loaders obtain versions from AVB; stock uses zero in these headers.
+# GKI v4 loaders obtain versions from AVB. Stock uses zero in these headers.
 # These trailing arguments override the platform's legacy header defaults.
 BOARD_MKBOOTIMG_ARGS += --os_version 0 --os_patch_level 0
 BOARD_MKBOOTIMG_INIT_ARGS += --os_version 0 --os_patch_level 0
@@ -110,9 +110,9 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 # Vendor user of the power stats HAL.
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
-# Vendor user of fwrelease; boot/ueventd.rc gives it the firmware partitions.
+# Vendor user of fwrelease. boot/ueventd.rc gives it the firmware partitions.
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/firmware/config.fs
-# Vendor user of the boot control HAL; boot/ueventd.rc gives it its nodes.
+# Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
@@ -120,14 +120,14 @@ include hardware/diamaneos/ims/ims-board.mk
 include hardware/diamaneos/ims/wlan-board.mk
 include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 
-# AVB is enabled; release signing replaces the test identities.
+# AVB is enabled. Release signing replaces the test identities.
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096
 
 # Chains as on stock, at the top rollback index locations (the bootloader keeps
 # 32). Stock uses 1 to 4, so the indices we store never limit a stock relock.
-# The kernel follows the selected vendor source baseline; the generic ramdisk
+# The kernel follows the selected vendor source baseline. The generic ramdisk
 # follows the platform. Header zeros must not erase their AVB version metadata.
 BOOT_SECURITY_PATCH := $(VENDOR_SECURITY_PATCH)
 INIT_BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
@@ -154,7 +154,7 @@ BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 29
 
-# dm-verity hash trees use SHA-256, as on stock; avbtool still defaults to
+# dm-verity hash trees use SHA-256, as on stock. avbtool still defaults to
 # SHA-1 for backwards compatibility.
 BOARD_AVB_SYSTEM_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
 BOARD_AVB_SYSTEM_EXT_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
@@ -166,7 +166,7 @@ BOARD_AVB_SYSTEM_DLKM_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
 
 # The FP6 bootloader appends androidboot.fstab_suffix itself, and the kernel
 # rejects the whole bootconfig when a key is defined twice. Provide only the
-# hardware name; fstab lookup falls back from the bootloader's suffix to
+# hardware name. fstab lookup falls back from the bootloader's suffix to
 # fstab.qcom.
 BOARD_BOOTCONFIG += androidboot.hardware=qcom
 
@@ -178,12 +178,12 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
 # And the source-built GNSS HAL, which parses the framework's and the modem's
-# location messages; Qualcomm's own builds of these have CFI too.
+# location messages. Qualcomm's own builds of these have CFI too.
 CFI_INCLUDE_PATHS += hardware/qcom/gps vendor/qcom/opensource/location \
     vendor/qcom/opensource/qmi-framework vendor/qcom/opensource/core-utils/fwk-detect
 
 # Audio: the AudioReach primary HAL, PAL and AGM are built from Fairphone's
-# published FP6 sources (audio/audio.mk); their Android.mk files read these
+# published FP6 sources (audio/audio.mk). Their Android.mk files read these
 # flags. The HAL links PAL directly and registers only the AGM HIDL service,
 # which libagmclient (PAL and the ALSA plugins) uses inside the HAL process.
 # Off: the PAL HIDL service (no client), dynamic logging (closed library) and
@@ -193,7 +193,7 @@ AUDIO_FEATURE_ENABLED_PAL_HIDL := false
 AUDIO_FEATURE_ENABLED_AGM_HIDL := true
 AUDIO_FEATURE_ENABLED_DYNAMIC_LOG := false
 AUDIO_FEATURE_ENABLED_GEF_SUPPORT := false
-# The Android.mk modules set CFI themselves; audioadsprpcd and the AGM HIDL
+# The Android.mk modules set CFI themselves. audioadsprpcd and the AGM HIDL
 # interface library are Soong-built (stock has CFI in both).
 CFI_INCLUDE_PATHS += \
     vendor/qcom/opensource/audio-hal/primary-hal/adsprpcd \
@@ -206,7 +206,7 @@ WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
 WIFI_DRIVER_STATE_ON := "ON"
 WIFI_DRIVER_STATE_OFF := "OFF"
 # The QCA6750 driver reports its interface combinations and the Wi-Fi service
-# reloads them into a single combination mode after first configuration; start
+# reloads them into a single combination mode after first configuration. Start
 # in that same mode (the legacy STA/AP default modes cannot be re-selected).
 WIFI_HAL_INTERFACE_COMBINATIONS := {{{STA}, 1}, {{AP}, 1}, {{P2P, NAN}, 1}}
 # Hotspot: AOSP's hostapd (external/wpa_supplicant_8) for nl80211, with

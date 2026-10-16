@@ -245,7 +245,7 @@ TEST_F(SessionTest, ScreenOffMatchWaitsForScreenOn) {
     deliver(authenticated(kUser, 3));
     EXPECT_TRUE(mCb->events.empty());
     EXPECT_TRUE(waitFor(mModule.authenticates, 2));  // the sensor listens again
-    // The power press turns the screen on; the match from just before counts.
+    // The power press turns the screen on. The match from just before counts.
     mSession->onContextChanged(context(common::DisplayState::LOCKSCREEN, true));
     EXPECT_EQ(mCb->events, (Events{"success 3"}));
 }
@@ -291,7 +291,7 @@ TEST_F(SessionTest, RemovalReportsRemovedIdsOnce) {
 }
 
 TEST_F(SessionTest, RemovalNeverAsksTheModuleToRemoveAll) {
-    // Id 0 is the legacy module's "all templates"; ids keep their full 32 bits.
+    // Id 0 is the legacy module's "all templates". Ids keep their full 32 bits.
     mSession->removeEnrollments({0});
     mSession->removeEnrollments({3, 0, -2});
     EXPECT_EQ(mCb->events, (Events{"removed 0", "removed 2"}));

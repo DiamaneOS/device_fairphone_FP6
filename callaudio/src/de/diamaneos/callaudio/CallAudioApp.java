@@ -38,7 +38,7 @@ public final class CallAudioApp extends Application {
         TelephonyManager telephony = getSystemService(TelephonyManager.class);
         supportedSlots = telephony.getSupportedModemCount();
         setSlotCount(telephony.getActiveModemCount());
-        // A protected broadcast that the phone process sends; it only reaches exported receivers.
+        // A protected broadcast that the phone process sends. It only reaches exported receivers.
         registerReceiver(
                 new BroadcastReceiver() {
                     @Override

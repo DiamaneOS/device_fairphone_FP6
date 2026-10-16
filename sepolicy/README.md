@@ -27,7 +27,7 @@ may access, and why. It describes the policy of a release (`user`) build.
 
 ## Rules for changes
 
-- The policy is enforcing; compatibility tests and neverallow checks stay on.
+- The policy is enforcing. Compatibility tests and neverallow checks stay on.
 - Never fix a failure by importing stock policy wholesale or by adding a
   permissive domain.
 - Bind hardware grants to the service domain, not to a HAL attribute. Keep the
@@ -36,7 +36,7 @@ may access, and why. It describes the policy of a release (`user`) build.
 - Explain every `dontaudit` and every broad rule, here or next to the rule.
 - Use platform init and ueventd permissions where they already cover an
   operation.
-- Firmware-handler transitions are not imported; review them if the product
+- Firmware-handler transitions are not imported. Review them if the product
   ever activates those handlers.
 
 ## Imported policy: adaptations
@@ -56,15 +56,15 @@ may access, and why. It describes the policy of a release (`user`) build.
 - No HBTP access for the power HAL: the selected power service does not use
   it.
 - No Qualcomm perf HAL domain or client grants (see [Power](#power)).
-- The peripheral manager has no binder call into the WLAN service domain; that
+- The peripheral manager has no binder call into the WLAN service domain. That
   service is not installed.
 - `vendor_per_mgr` may use QRTR sockets (`qipcrtr_socket`, no ioctls): its QMI
   libraries open AF_QIPCRTR sockets.
 - No label or ueventd rule for `/dev/qseecom`: the legacy QSEECom driver is
   not shipped. `/dev/smcinvoke` is the only TEE node, and no node carries the
   platform's `tee_device` label (see "TEE node").
-- The imported `tee_device` grants of `qseecomd` and KeyMint are removed;
-  their grants on the node are in `fp6/tee_node.te`.
+- The imported `tee_device` grants of `qseecomd` and KeyMint are removed.
+  Their grants on the node are in `fp6/tee_node.te`.
 - No label for the HDCP level node (`/sys/devices/virtual/hdcp/msm_hdcp`): the
   display driver is built without HDCP, so the node does not exist.
 - No QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
@@ -105,7 +105,7 @@ of the same name (`provenance.json`).
   label, `vendor_persist_sensors_list_file`.
   - init copies it from vendor at every boot: the stock list without the hall
     sensor (`boot/init.qcom.rc`).
-  - The HAL may read it; its attempts to append to it stay denied.
+  - The HAL may read it. Its attempts to append to it stay denied.
 - `dontaudit hal_sensors_default property_socket:sock_file write`: the sub-HAL
   publishes every proximity sample as a factory-test property that nothing
   reads.
@@ -160,7 +160,7 @@ of the same name (`provenance.json`).
 - Neverallow: the HAL may not open or read `vendor_data_file` files, where the
   module's configuration and dumps would live.
 - Neverallow: only init, vendor_init and vold_prepare_subdirs may create
-  directories with the HAL's data label or relabel directories to it; only
+  directories with the HAL's data label or relabel directories to it. Only
   init and vendor_init may relabel files to it.
 
 ### TEE node
@@ -218,8 +218,8 @@ of the same name (`provenance.json`).
   are `sysfs_wakeup`, which the suspend service reads.
 - `init.fp6.perf.rc` writes WALT and VM sysctls that the platform does not
   label. Each has its own type, and only vendor_init writes them (`perf.te`):
-  - `/proc/sys/walt`: `vendor_proc_walt`;
-  - `swappiness` and `min_free_kbytes`: `vendor_proc_vm_tuning`;
+  - `/proc/sys/walt`: `vendor_proc_walt`
+  - `swappiness` and `min_free_kbytes`: `vendor_proc_vm_tuning`
   - `compaction_proactiveness`: `vendor_proc_compaction`.
 - vendor_init also writes the platform `proc_sched` and
   `proc_watermark_scale_factor` sysctls. It has no write on generic `proc`.
@@ -257,7 +257,7 @@ of the same name (`provenance.json`).
     (`fp6/touch.te`).
   - The HAL may search the device directory but not use its factory-test
     files.
-  - The power HAL no longer has access.
+  - The power HAL has no access.
 - The Awinic haptics nodes the vibrator HAL writes (`activate`, `brightness`,
   `duration`, `gain`, `loop`, `seq`) are `vendor_sysfs_aw_vibrator`
   (`vibrator.te`).
@@ -292,7 +292,7 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 - The switch that turns Qualcomm's embedded USB debugger (EUD) on,
   `/sys/module/eud/parameters/enable`, is `vendor_sysfs_eud_enable`
   (`eud.te`).
-- A neverallow leaves only ueventd and vendor_init able to write it; the
+- A neverallow leaves only ueventd and vendor_init able to write it. The
   platform lets those two write all of sysfs.
 - Reads stay as the platform grants them: the value only tells whether EUD is
   on.
@@ -329,17 +329,17 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   - The platform grants that property to shell, keystore and vendor_init only.
 - `system-ext-private/privacy_switch.te`: the kernel block of the Moments
   privacy switch.
-  - init writes `/sys/kernel/privacy_switch/policy` once per boot; the kernel
+  - init writes `/sys/kernel/privacy_switch/policy` once per boot. The kernel
     refuses later writes.
   - Neverallows keep every domain but init, vendor_init and ueventd from
     writing the switch's sysfs files.
   - system_server reads the kernel's state. Only it and init set
-    `privacy_switch_prop`; Settings reads it.
+    `privacy_switch_prop`. Settings reads it.
 - `system-ext-private/camera_table.te`: the camera provider may read
   `ro.vendor.qti.va_aosp.support`, which selects the stock camera table with
   every lens (`camera/camera.mk`).
   - The rule names the `hal_camera_server` attribute, because the property's
-    type is private to this partition; the provider is its only member here.
+    type is private to this partition. The provider is its only member here.
 - `system-ext-private/vold_adoptable.te`: vold may list `/data/misc_ce` and
   `/data/misc_de`.
   - It finds there the users whose keys it destroys when an adopted microSD
@@ -360,7 +360,7 @@ installed Fairphone firmware release to Settings.
 - It may only open and read the firmware partitions and set
   `ro.vendor.diamaneos.firmware_release`.
 - The property is vendor restricted. Settings (`system_app`) reads it, as do
-  init, vendor_init and dumpstate through platform grants; shell does not.
+  init, vendor_init and dumpstate through platform grants. Shell does not.
 - The firmware partitions that would share `vendor_custom_ab_block_device`
   with vbmeta, dtbo, pvmfw, multiimgqti and qweslicstore have their own type,
   `vendor_firmware_image_block_device`, so fwrelease cannot open those.
@@ -374,8 +374,8 @@ installed Fairphone firmware release to Settings.
     root:vendor_bootctl, so fwrelease cannot open them.
 - Neverallows for fwrelease: no capabilities, block writes or ioctls, network
   sockets or other properties.
-- Neverallows for the property: only fwrelease, init and vendor_init set it;
-  only the readers above read it.
+- Neverallows for the property: only fwrelease, init and vendor_init set it.
+  Only the readers above read it.
 - Who reads the firmware partitions is an image check, not a neverallow: init
   and the recovery domains read all block devices through platform grants.
 
@@ -392,8 +392,8 @@ installed Fairphone firmware release to Settings.
 
 - AGM device, ION and system DMA-BUF heap, the runtime audio directory
   (`/data/vendor/audio`) and the audio properties.
-- Sound-card state node: read and write. AGM and PAL open it read-write;
-  without write no audio comes up.
+- Sound-card state node: read and write. AGM and PAL open it read-write.
+  Without write no audio comes up.
 - ADSP sleep monitor: only the activity-reporting ioctl (`0x5201`).
 - QRTR: its own `qipcrtr_socket` with create, read, write, getattr and setopt
   (no ioctl, bind or connect).
@@ -471,7 +471,7 @@ Qualcomm's `ssr_setup.te` (`provenance.json`).
 
 `vendor_tqftpserv` (`modem/tqftpserv.te`):
 
-- QRTR sockets: create, connect, getattr, read, setopt and write; no ioctl or
+- QRTR sockets: create, connect, getattr, read, setopt and write. No ioctl or
   bind.
 - It lists `/sys/class/remoteproc` and reads each processor's `firmware`
   attribute (`vendor_sysfs_rproc_firmware`, `modem/file_contexts`).
@@ -479,7 +479,7 @@ Qualcomm's `ssr_setup.te` (`provenance.json`).
   `/vendor/firmware/modem_pr` link to the modem partition.
 - Its read-write directory is `/data/vendor/tmp/tqftpserv`
   (`vendor_tqftpserv_data_file`).
-  - It may open, create, read, write and delete files there; no rename, link,
+  - It may open, create, read, write and delete files there. No rename, link,
     attribute change or subdirectory.
   - The modem writes `server_check.txt` and `mcfg.tmp` there, and deletes
     `mcfg.tmp` (the TFTP "unlink" option).
@@ -533,7 +533,7 @@ Factory address:
 - Only vendor_init sets it (`bluetooth/vendor_init.te`):
   `init.fp6.bluetooth.rc` copies the value imeiprovd read from the
   traceability partition, as stock does.
-- Neverallows: only init and vendor_init set it; only they, dumpstate and the
+- Neverallows: only init and vendor_init set it. Only they, dumpstate and the
   HAL read it.
 
 Not granted:
@@ -553,7 +553,7 @@ Shared device labels (`vendor-common/file_contexts`):
 - `/dev/btfmcodec_dev` and `/dev/bt_cp_ctrl` share `hci_attach_dev` with
   `/dev/ttyHS0`.
 - `/dev/btfmslim` shares `vendor_bt_device` with `/dev/btpower`.
-- SELinux alone would let the HAL use them; ueventd keeps the three root-only.
+- SELinux alone would let the HAL use them. ueventd keeps the three root-only.
 
 ## NFC
 
@@ -599,9 +599,9 @@ Shared device labels (`vendor-common/file_contexts`):
   registration, as for the gatekeeper and keymint HALs.
 - The HAL opens no socket in `/dev/socket/location`.
 - Not granted, because none of these peers is installed:
-  - the peripheral manager and vndbinder;
+  - the peripheral manager and vndbinder
   - the location daemons' sockets (loc_launcher, XTRA, LOWI, Wi-Fi
-    crowdsourcing, sensor, correction, engine and Skyhook services);
+    crowdsourcing, sensor, correction, engine and Skyhook services)
   - RIL and SSG sockets, MHI sysfs and QMS/AON properties.
 
 ## Time keeping
@@ -636,9 +636,9 @@ not imported.
   - No readproc group: the HAL reads no `/proc/<pid>` entries.
 - Nodes the HAL may write, not read:
   - `scaling_min_freq` and `scaling_max_freq` of the CPU policies
-    (`vendor_sysfs_cpufreq_limit`, `fp6/genfs_contexts`);
+    (`vendor_sysfs_cpufreq_limit`, `fp6/genfs_contexts`)
   - the GPU devfreq `min_freq` and `max_freq` and the GPU wake trigger
-    `touch_wake` (`vendor_sysfs_kgsl_limit`, `fp6/file_contexts`);
+    `touch_wake` (`vendor_sysfs_kgsl_limit`, `fp6/file_contexts`)
   - the touch gesture switch (`fp6/touch.te`).
 - init hands exactly these nodes to system. The rest of the CPU and GPU sysfs
   stays root's, with its platform or Qualcomm label.
@@ -650,7 +650,7 @@ not imported.
 - `sched_boost`: `/proc/sys/walt/sched_boost` is root-only, and a sysctl
   cannot be chowned.
   - The HAL may set only `vendor.powerhal.sched_boost`
-    (`vendor_power_sched_boost_prop`, values 0, 1 and 2); vendor init writes
+    (`vendor_power_sched_boost_prop`, values 0, 1 and 2). Vendor init writes
     the matching fixed value.
   - The other `vendor.powerhal.*` properties (`vendor_power_prop`) are
     switches the HAL reads and vendor init sets.
@@ -678,12 +678,12 @@ not imported.
   - Their effects stay within the grants above: frequency floors and caps, the
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.
 - Not granted:
-  - reads of the nodes (dumpsys shows request indexes, not values);
+  - reads of the nodes (dumpsys shows request indexes, not values)
   - the debug configuration in `/data/vendor/etc`
-    (`vendor.powerhal.config.debug`);
-  - the Pixel-only `/proc/vendor_sched`;
+    (`vendor.powerhal.config.debug`)
+  - the Pixel-only `/proc/vendor_sched`
   - the display `idle_state` nodes: the Qualcomm display driver has none
-    (`vendor.powerhal.disp.idle_support=false`);
+    (`vendor.powerhal.disp.idle_support=false`)
   - setsched on the composer, which is needed only if SurfaceFlinger puts
     composer threads in its hint session.
 
@@ -712,7 +712,7 @@ not imported.
 Sources:
 
 - `telephony/rild.te`, `nicmd.te` and `qtelephony.te` are reduced from
-  Qualcomm's vendor policy; `telephony-system-ext/vendor_qtelephony.te` and
+  Qualcomm's vendor policy. `telephony-system-ext/vendor_qtelephony.te` and
   `seapp_contexts` from Qualcomm's system policy.
   - Each file's header names its upstream files and revision.
 - The file contexts are the stock labels.
@@ -725,7 +725,7 @@ Radio daemon (`telephony/rild.te`):
 - It may add only the Qualcomm radio services the device declares: IMS and
   radio config under `vendor_hal_telephony_service2`, call audio and LPA
   under their own types.
-- It is not a `binderservicedomain`; each selected app client has an explicit
+- It is not a `binderservicedomain`. Each selected app client has an explicit
   binder grant.
 - Not granted: the secure-element HAL, unrelated data-factory services, diag,
   the legacy IPC-router ioctls, the QCRIL client socket and executing vendor
@@ -811,14 +811,14 @@ Grants:
     services also hold.
 - FastRPC with read-only opens: the secure node only (the ADSP sensors PD of
   the CamX sensor direct channel and the CDSP offloads) and `/vendor/dsp`.
-- Qualcomm DMA-BUF heaps; on the display heap only the allocation ioctl.
+- Qualcomm DMA-BUF heaps. On the display heap only the allocation ioctl.
 - SoC, camera, JPEG and DDR identification, `/proc/meminfo` and the public SoC
   id.
   - It may search `/sys/devices/soc0` for the per-part files
     (`num_subset_parts` is labelled in `camera/genfs_contexts`).
 - QRTR sockets without ioctls, for the gyro QMI client.
 - The thermal-engine client socket.
-- The provider's own vndbinder open; no vndservice lookup.
+- The provider's own vndbinder open. No vndservice lookup.
 - `/data/vendor/camera`, read-only factory calibration in
   `/mnt/vendor/persist/camera`, and the vendor camera properties.
 - The composer's release fences.
@@ -892,12 +892,12 @@ Other:
   - The decoder node is root-only when the choice is never.
   - Otherwise `vendor_init` changes its group and mode at early-boot, through
     the platform's setattr grant on every device node, and may `getattr` it.
-- `persist.diamaneos.hw_video_decode`: the user's choice; accepts only 0
+- `persist.diamaneos.hw_video_decode`: the user's choice. Accepts only 0
   (never) and 1 (all video). Unset counts as 0.
   - Only Settings sets it (`system-ext-private/hw_video_decode.te`).
   - It is public and system restricted, because the vendor rc triggers on it.
-- `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot;
-  accepts only 0 and 1.
+- `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot.
+  Accepts only 0 and 1.
   - Only init and `vendor_init` set it. The codec service and Settings read
     it, and the vendor rc file triggers on it.
 - No network: the platform neverallows cover tcp, udp and rawip sockets.
@@ -916,8 +916,8 @@ Other:
   as upstream: `libfastcvopt` then runs on the CPU.
 - Not granted, unlike the stock policy:
   - the Codec2 audio service, Wi-Fi display, VPP, hexlp and the capability
-    config store;
-  - the performance HAL and `/data/vendor/media`;
+    config store
+  - the performance HAL and `/data/vendor/media`
   - the Qualcomm system DMA-BUF heap: the selected libraries allocate from the
     AOSP system heaps only.
 - Secure video is not granted either: the memory-buffer driver and the
@@ -926,7 +926,7 @@ Other:
 
 ### DRM
 
-- ClearKey (`hal_drm_clearkey_aidl`) runs under the platform policy alone; no
+- ClearKey (`hal_drm_clearkey_aidl`) runs under the platform policy alone. No
   device rule.
   - Its service runs without the `drmrpc` group (`media/init.fp6.drm.rc`), and
     the TEE node does not carry the label the platform grants DRM HALs
@@ -944,11 +944,11 @@ Other:
 
 ## Recovery
 
-- The recovery executable uses the boot-control service over IPC; it does not
+- The recovery executable uses the boot-control service over IPC. It does not
   link the legacy Qualcomm updater.
 - So this policy gives recovery no raw SCSI/BSG access and no CAP_SYS_RAWIO.
 - Boot control keeps BSG access and CAP_SYS_RAWIO for the UFS implementation.
-- Legacy sg character-device access is not granted; the sysfs discovery used
+- Legacy sg character-device access is not granted. The sysfs discovery used
   by `gpt-utils` remains.
 - Read and write access to recovery UI and firmware resources belongs to the
   init, ueventd or recovery domain that performs the operation.
@@ -964,7 +964,7 @@ without it. Denials covered in the sections above are not repeated.
   (`sysfs_leds`): reading it would let InputReader treat the vibrator as a
   light.
 - `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not
-  set on this build; CamX uses the public SoC id file.
+  set on this build. CamX uses the public SoC id file.
 - `hal_bluetooth_default` and `vendor_hal_gnss_qti`,
   `ro.vendor.qti.va_aosp.support`: the property is set for the camera provider
   alone (`system-ext-private/camera_table.te`). A denied read returns the
@@ -1029,8 +1029,8 @@ For each upstream refresh:
 4. Inspect the full upstream diff too, including shared macros, attributes,
    contexts and selection makefiles: a security fix may live outside the
    current selection. Check both repositories together.
-5. Merge relevant changes against the old upstream file and the derived file;
-   do not overwrite the adaptations.
+5. Merge relevant changes against the old upstream file and the derived file.
+   Do not overwrite the adaptations.
 6. Trace each added allow to its current provider and resource. Include new
    files only when their consumers or shared definitions are required. Keep
    the upstream headers.

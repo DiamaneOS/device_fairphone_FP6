@@ -11,8 +11,8 @@
        MODIFY_AUDIO_ROUTING, no phone-state permission, no INTERNET.
      - No components: nothing can bind to it, start it or send it intents.
      - persistent and directBootAware: running at boot, before the first
-       unlock, so the first call after boot (an emergency call from the lock
-       screen included) has audio.
+       unlock, because the first call after boot can be an emergency call
+       from the lock screen.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.diamaneos.callaudio">
@@ -30,7 +30,7 @@
         android:directBootAware="true"
         android:defaultToDeviceProtectedStorage="true"
         android:allowBackup="false">
-        <!-- Audio parameters do not use physical sensors; proximity remains in Telecom. -->
+        <!-- Audio parameters do not use physical sensors. Proximity remains in Telecom. -->
         <meta-data android:name="de.diamaneos.permission.NO_IMPLICIT_OTHER_SENSORS"
             android:value="true" />
     </application>

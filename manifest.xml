@@ -7,4 +7,22 @@
         <version>1</version>
         <fqname>IGatekeeper/default</fqname>
     </hal>
+    <!-- The AOSP audio service hosts the primary HAL, which registers the AGM
+         HIDL service in the same process for libagmclient (PAL and the AGM
+         ALSA plugins). It registers no PAL HIDL service. -->
+    <hal format="hidl">
+        <name>android.hardware.audio</name>
+        <transport>hwbinder</transport>
+        <fqname>@7.1::IDevicesFactory/default</fqname>
+    </hal>
+    <hal format="hidl">
+        <name>android.hardware.audio.effect</name>
+        <transport>hwbinder</transport>
+        <fqname>@7.0::IEffectsFactory/default</fqname>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.qti.hardware.AGMIPC</name>
+        <transport>hwbinder</transport>
+        <fqname>@1.0::IAGM/default</fqname>
+    </hal>
 </manifest>

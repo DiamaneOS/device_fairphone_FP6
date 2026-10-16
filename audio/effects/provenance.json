@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "source": "https://git.codelinaro.org/clo/la/platform/hardware/qcom/audio-ar",
+  "revision": "89d32774e85832bd2368032a7eaebc154f77b6d1",
+  "branch": "audio-android-hal.lnx.3.0.r10-rel",
+  "release": "AUDIO.LA.9.0.r1-09000-lanai.0",
+  "note": "Both sources are byte-identical in Fairphone's published FP6 audio-ar (gerrit-public.fairphone.software platform/hardware/qcom/audio-ar 4d39b3c97e163578e55c74b9e3c2d7262dc5c07c), which the stock FP6 audio HAL and effect libraries were built from. The stock audio HAL exports the three functions volume_listener.c resolves (audio_hw_send_gain_dep_calibration, audio_hw_send_linear_gain, audio_hw_get_gain_level_mapping; hal/audio_extn/Gain.cpp, identical at both revisions).",
+  "files": [
+    {
+      "path": "voice_processing.c",
+      "upstream_path": "audio-effects/voice_processing/voice_processing.c",
+      "sha256": "9c82ff35f6b239b80208329bc4973be0d65b7397852f035c8f7090a03b10b110",
+      "licence": "Apache-2.0"
+    },
+    {
+      "path": "volume_listener.c",
+      "upstream_path": "audio-effects/post_proc/volume_listener.c",
+      "sha256": "590b07848855bf579aa6b99d28c613bafce86c1f17d3a583b79a069ea533f161",
+      "licence": "BSD-3-Clause"
+    }
+  ],
+  "own_files": [
+    {
+      "path": "include/PalDefs.h",
+      "note": "Declares only struct pal_amp_db_and_gain_table, with the layout of inc/PalDefs.h in Fairphone's published PAL (platform/vendor/qcom/opensource/arpal-lx 6d6f50dba430a80b7eaf2c59cc9d63ced5125e99, file SHA-256 e469d652cb1e60028fb9042b608e05be94114210f4ef1cec7b81c0a9ece4d588). The stock listener's 180-byte default table has this 12-byte layout."
+    }
+  ],
+  "abi_reference": [
+    {
+      "file": "vendor/lib64/soundfx/libqcomvoiceprocessing.so in stock FP6.QREL.16.111.0 EU",
+      "sha256": "ce81a88dde08ff485980756e61d9b67bba54d4447bb4f65afd5544401921075b",
+      "match": "AEC and NS descriptors byte-identical; exports AELI; needs only liblog and libcutils"
+    },
+    {
+      "file": "vendor/lib64/soundfx/libvolumelistener.so in stock FP6.QREL.16.111.0 EU",
+      "sha256": "1a4b34183e66dc03b565bbcc695b57f1950d42e4789be70ddf212ef376a44e62",
+      "match": "five listener descriptors and the default gain table byte-identical; exports AELI; the stock build links libar-pal and libaudioutils but imports no symbol from either"
+    },
+    {
+      "file": "vendor/lib64/hw/audio.primary.volcano.so in stock FP6.QREL.16.111.0 EU",
+      "sha256": "83e31c6b0362761e0f318d21212ac422aeaadae8832bdd35296fcb2f46a7bdcb",
+      "match": "exports audio_hw_send_gain_dep_calibration, audio_hw_send_linear_gain and audio_hw_get_gain_level_mapping"
+    }
+  ]
+}

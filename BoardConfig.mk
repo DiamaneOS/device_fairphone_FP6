@@ -82,6 +82,7 @@ include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
 # Device-owned grants for the FP6 services, reviewed per denial.
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fp6
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/audio
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/modem
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
@@ -154,6 +155,23 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
+
+# Audio: the AudioReach primary HAL, PAL and AGM are built from Fairphone's
+# published FP6 sources (audio/audio.mk). Their Android.mk files read these
+# flags. The HAL links PAL directly and registers only the AGM HIDL service,
+# which libagmclient (PAL and the ALSA plugins) uses inside the HAL process.
+# Off: the PAL HIDL service (no client), dynamic logging (closed library) and
+# the generic effect framework (its closed library is not shipped).
+TARGET_USES_QCOM_MM_AUDIO := true
+AUDIO_FEATURE_ENABLED_PAL_HIDL := false
+AUDIO_FEATURE_ENABLED_AGM_HIDL := true
+AUDIO_FEATURE_ENABLED_DYNAMIC_LOG := false
+AUDIO_FEATURE_ENABLED_GEF_SUPPORT := false
+# The Android.mk modules set CFI themselves. audioadsprpcd and the AGM HIDL
+# interface library are Soong-built (stock has CFI in both).
+CFI_INCLUDE_PATHS += \
+    vendor/qcom/opensource/audio-hal/primary-hal/adsprpcd \
+    vendor/qcom/opensource/agm/ipc/HwBinders/interfaces
 
 # Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
 # node and waits for the driver to finish probing before bringing up wlan0.

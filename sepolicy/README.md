@@ -301,6 +301,16 @@ this maintained subset; it is not required merely to reduce this folder's size.
 - `system-ext-private/system_server.te`: the system server reads enabled
   kernel-console metadata for the serial-console warning. It receives no
   access to serial devices or console control.
+
+## Audio
+
+`audio/adsprpcd.te` and `audio/hal_audio_default.te` are downstream-authored
+adaptations of the matching Qualcomm `sepolicy_vndr` files published by Fairphone
+at `67fa928299a49374a55281969fee357884c86890`. Their original licence headers,
+source hashes and derived hashes are retained in `provenance.json`. The audio
+file contexts and init-directory rules are authored by DiamaneOS.
+
+The policy deliberately omits upstream diagnostic-device access, sensor persist
 writes, voice-UI sockets, QTR SDK access, broad HAL-attribute grants, vendor
 Binder use and DSP restart controls (`vendor.audio.crash.trigger` is unset). QRTR
 is granted narrowly: `hal_audio_default` may create and use its own
@@ -315,6 +325,20 @@ grant to activity reporting (`0x5201`). AudioReach receives its AGM device,
 runtime audio directory, selected allocator and sound-card state access. The
 FastRPC listener receives only its DSP transport, firmware/RFSA, audio-DSP state
 and DSP-service lookup.
+
+The primary HAL, PAL and AGM are built from source (`audio/provenance.json`)
+and keep the stock domains and labels. The HAL registers the AGM HIDL service
+(`IAGM`) in its own process and no PAL HIDL service (`IPAL` keeps its label).
+`qva-common/hwservice_contexts` labels both `vendor_hal_audio_internal_hwservice`
+(`audio/hwservice.te`) instead of `hal_audio_hwservice`, so only
+`hal_audio_default` may register and look them up; audioserver, system_server
+and the Bluetooth stack, which are hal_audio clients, cannot reach them.
+The kernel may not search `/mnt/vendor` (a platform neverallow) and does not
+need to: the amplifier driver leaves calibration to userspace. At each speaker
+start the audio HAL's PAL reads the per-unit calibration from persist and writes
+it to the DSP (logged as "Awinic set cali re success"; checked on the phone, as
+on stock). These rules are not yet runtime-qualified under enforcing mode;
+collect denials on the device before adding any grant.
 
 ## Modem
 

@@ -43,6 +43,19 @@ build/make/target/product/base_vendor.mk at GrapheneOS platform_build commit
 Open Source Project, Apache License 2.0 (see LICENSE). The selection omits the
 unrelated vendor group and adds fastbootd for dynamic-partition recovery.
 
+audio/effects/voice_processing.c (Apache-2.0) and volume_listener.c
+(BSD-3-Clause, The Linux Foundation and Qualcomm Innovation Center) are
+unmodified copies from CodeLinaro platform/hardware/qcom/audio-ar
+89d32774e85832bd2368032a7eaebc154f77b6d1. Their notices are retained in the
+files and in audio/effects/NOTICE; provenance.json records the hashes.
+
+The AudioReach primary HAL, PAL and AGM are not in this repository: they are
+built from DiamaneOS forks of Fairphone's published FP6 audio sources, listed
+with their licences in audio/provenance.json. Each fork's NOTICE reproduces
+its licences. Fairphone publishes PAL's Awinic calibration code (awinic_ar/)
+and two small interface headers without a licence header; they are used as
+published.
+
 display/display_port_130.xml: the brightness table is DiamaneOS's own
 measurement of the panel. The HDR ratio map, the ramp rates, the lux threshold
 and the HDR screen share are the values of the stock display configuration,

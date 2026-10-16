@@ -183,6 +183,9 @@ ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_VENDOR_PROPERTIES += log.tag.hostapd=I
 endif
 
+# Audio: the AudioReach HAL, PAL and AGM from source with AOSP adapters (audio/audio.mk).
+$(call inherit-product, device/fairphone/FP6/audio/audio.mk)
+
 # Hardware subsystems. Each subsystem makefile documents its stock and
 # source-built parts.
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)

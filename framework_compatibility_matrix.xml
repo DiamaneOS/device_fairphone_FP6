@@ -2,6 +2,14 @@
 <!-- Copyright 2026 The DiamaneOS Project -->
 <!-- Device-specific interfaces supplied by the selected FP6 vendor services. -->
 <compatibility-matrix version="1.0" type="framework">
+    <hal format="hidl">
+        <name>vendor.qti.hardware.AGMIPC</name>
+        <version>1.0</version>
+        <interface>
+            <name>IAGM</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <hal format="aidl">
         <name>vendor.qti.hardware.display.config</name>
         <version>11</version>

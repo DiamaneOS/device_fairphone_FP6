@@ -78,6 +78,13 @@ TARGET_RECOVERY_UI_MAX_BRIGHTNESS_FILE := /sys/class/backlight/panel0-backlight/
 include vendor/fairphone/FP6/BoardConfigVendor.mk
 include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 
+# Reviewed source policy belongs to the device tree, not generated stock files.
+BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
+PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
+PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
+
 # AVB is enabled. Release signing replaces the test identities.
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem

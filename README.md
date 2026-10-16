@@ -3,13 +3,20 @@
 Android product `FP6` (`lunch FP6-cur-user`), at `device/fairphone/FP6` in the
 GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 
-This is initial integration source, not a qualified bootable product. The
-Android graph has not yet been resolved. Required generated inputs are:
+- Keeps Fairphone's product identity (brand, device, model) in the fingerprint,
+  as GrapheneOS keeps Google's. Build ID, number and keys are DiamaneOS's.
+- Needs two generated inputs, and the build fails without either:
+  - `vendor/fairphone/FP6`: selected stock vendor files, HAL, init and VINTF
+    integration
+  - `device/fairphone/FP6-kernel`: kernel, modules, device tree, board
+    definitions and module load lists
+- Hardware facts come from Fairphone's published `vendor/fairphone/fps` and
+  `platform/vendor/qcom/volcano` sources. `NOTICE` lists what each file
+  derives from.
+- No manufacturing product, userdata or keys are imported.
+- Release signing is done by diamaneos-tools (`docs/SIGNING.md`).
 
-- `vendor/fairphone/FP6`: selected stock-derived inputs and reviewed source HAL,
-  init, VINTF and policy integration.
-- `device/fairphone/FP6-kernel`: matched kernel, module and device-tree artifacts,
-  generated product/board definitions and load lists.
+## Layout
 
 | Path | Contents |
 |---|---|

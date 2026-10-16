@@ -5,3 +5,5 @@
 # the three values init acts on.
 vendor.powerhal.                u:object_r:vendor_power_prop:s0
 vendor.powerhal.sched_boost     u:object_r:vendor_power_sched_boost_prop:s0 exact enum 0 1 2
+# Charge limit state the health service keeps (charge_limit.te).
+persist.vendor.charge_limit     u:object_r:vendor_charge_limit_prop:s0 exact enum off on paused

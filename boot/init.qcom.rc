@@ -236,10 +236,14 @@ on boot
 # charging through the charger firmware's charge_disable
 # (sepolicy/fp6/charge_limit.te). The qcom-battery class appears once the ADSP
 # charger firmware is up, so wait for it, and chown again at boot if it came
-# later.
+# later. A pause the service kept in persist.vendor.charge_limit is set again
+# here, before the framework is up, as stock does. Charger mode never runs it.
 on early-boot
     wait /sys/class/qcom-battery/charge_disable 5
     chown system system /sys/class/qcom-battery/charge_disable
+
+on early-boot && property:persist.vendor.charge_limit=paused
+    write /sys/class/qcom-battery/charge_disable 1
 
 on boot
     chown system system /sys/class/qcom-battery/charge_disable

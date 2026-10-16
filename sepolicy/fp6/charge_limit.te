@@ -8,15 +8,25 @@
 type vendor_sysfs_charge_disable, sysfs_type, fs_type;
 
 allow hal_health_default vendor_sysfs_charge_disable:file { open write };
-# vendor_init hands the node to system and stats it for init's wait
-# (boot/init.qcom.rc).
-allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr };
+# vendor_init hands the node to system, stats it for init's wait and writes
+# the pause early in boot (boot/init.qcom.rc).
+allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr open write };
 
-# Nothing else may write it: a later rule that adds a writer fails the build.
-# The platform lets vendor_init and ueventd write every sysfs_type file.
+# Nothing else may write the node: a later rule that adds a writer fails the
+# build. The platform lets vendor_init and ueventd write every sysfs_type file.
 neverallow {
   domain
   -hal_health_default
   -vendor_init
   -ueventd
 } vendor_sysfs_charge_disable:file { write append };
+
+# persist.vendor.charge_limit: off, on or paused (fp6/property_contexts). The
+# health service keeps its state there, and init pauses charging from it at
+# early-boot, as stock does with persist.odm.charge_disable.
+vendor_internal_prop(vendor_charge_limit_prop)
+set_prop(hal_health_default, vendor_charge_limit_prop)
+
+# Only the health service sets it. The platform lets init and vendor_init set
+# every vendor property.
+neverallow { domain -init -vendor_init -hal_health_default } vendor_charge_limit_prop:property_service set;

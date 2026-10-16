@@ -9,7 +9,7 @@
   only is shown disabled and Never is the default (no secure decoders).
 - `config_color_mode_options_values`: pairs Settings' colour-mode names with
   the panel's modes (0 natural, 256 boosted, 257 adaptive).
-  - Keep its length and order equal to Settings' own names list; a length
+  - Keep its length and order equal to Settings' own names list. A length
     mismatch crashes Settings > Display.
 
 ## Side fingerprint sensor education

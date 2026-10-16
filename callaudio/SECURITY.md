@@ -12,13 +12,13 @@ that reaches the audio HAL's parsers.
 - Rejected before queuing or calling AudioFlinger: unknown or duplicate keys,
   malformed numeric values, trailing separators, non-ASCII numeric input and
   oversized messages.
-- `vsid` accepts the vendor's 32-bit bit pattern; the HAL keeps authority over
+- `vsid` accepts the vendor's 32-bit bit pattern, and the HAL keeps authority over
   valid session IDs and call states.
 - `call_type` keeps the producer's text (including `UNKNOWN`) within a
-  32-character ASCII token grammar; it is not mapped to a numeric enum.
+  32-character ASCII token grammar. It is not mapped to a numeric enum.
 - `crs_call` uses the HAL's literal `true` / `false`.
 - Accepted messages are passed on verbatim and never logged.
-- Limits: 256 characters per message; per-registration count and payload
+- Limits: 256 characters per message, and per-registration count and payload
   budgets, which include running work.
 - Registration identity, PHONE_UID callbacks, ordering and audioserver
   recovery fences are required.
@@ -28,8 +28,8 @@ that reaches the audio HAL's parsers.
 - AudioFlinger (paired source change) reserves the vendor call-control keys
   and `all_call_states` queries for root, system, radio, audioserver and
   holders of `android.permission.DIAMANEOS_CONTROL_CALL_AUDIO`.
-- The platform defines this signature/privileged permission; the bridge is its
-  sole privileged allowlist entry.
+- The platform defines this signature/privileged permission, and the bridge is
+  its sole privileged allowlist entry.
 - AudioFlinger also requires the primary user's unique bridge package and
   checks grants without a persistent permission cache.
 - The bridge gains no routing, phone-state or network authority.
@@ -59,5 +59,5 @@ Run after any bridge, AudioFlinger or HAL change.
 - `FP6CallAudioAuthorizationTests`: on the phone with no active call, an
   ordinary app is refused the call keys and the call-state query.
 - `FP6CallAudioLifecycleTests`: the actual Android worker with a local fake
-  radio; no HAL, network or modem lookup.
+  radio, with no HAL, network or modem lookup.
 - Ordinary calls and audio routing on the phone.

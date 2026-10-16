@@ -17,7 +17,7 @@
   (`res/values/config.xml`).
 - `config_volumeDialogOnLeft`: puts the volume dialog on the left edge, next
   to the FP6 volume buttons, as stock FP6 SystemUI does.
-  - The resource comes from a DiamaneOS SystemUI change; upstream Android 17
+  - The resource comes from a DiamaneOS SystemUI change. Upstream Android 17
     always shows the dialog on the right.
 - `tally_lens_center_x`, `tally_lens_center_y`, `tally_lens_radius`: the front
   camera's lens position and radius, for SystemUI's `tally_lens.xml`.

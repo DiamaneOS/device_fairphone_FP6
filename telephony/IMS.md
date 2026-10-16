@@ -8,7 +8,7 @@ call-audio bridge (`callaudio/`).
 - `hardware/diamaneos/ims` provides the data-connection broker (DCM) that the
   stock stack lacks here.
 - It serves IMS and EIMS requests through Android networking.
-- It authenticates modem traffic by the pinned FP6 QRTR node (modem 0, AP 1;
+- It authenticates modem traffic by the pinned FP6 QRTR node (modem 0, AP 1,
   `telephony.mk`).
 - It has its own vendor UID and a frozen AIDL API, both defined in
   `hardware/diamaneos/ims`.
@@ -26,7 +26,7 @@ call-audio bridge (`callaudio/`).
   (`sepolicy/telephony/fp6_iwlan_app.te`).
 - Package-specific hidden-API access supports the stock Java IPC classes
   without platform-signing the apps (`fp6-iwlan-sysconfig.xml`).
-- The AOSP IWLAN alternative must not be selected at the same time;
+- The AOSP IWLAN alternative must not be selected at the same time, and
   `telephony.mk` stops the build if it is.
 
 ## Wi-Fi reporter
@@ -71,7 +71,7 @@ call-audio bridge (`callaudio/`).
 1. Build and check AIDL, VINTF, JNI linking, UID uniqueness, neverallows,
    seapp matching and installed permissions.
 2. Run the IMS repository's read-only checker with `--iwlan qti`.
-3. On the phone, test ordinary calls, SMS and Wi-Fi calling on both SIMs; keep
+3. On the phone, test ordinary calls, SMS and Wi-Fi calling on both SIMs. Keep
    emergency simulations separate from carrier-authorized observations.
 
 Presence checks and host simulations do not establish registration, handover,

@@ -4,14 +4,14 @@ Android product `FP6` (`lunch FP6-cur-user`), at `device/fairphone/FP6` in the
 GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 
 - Keeps Fairphone's product identity (brand, device, model) in the fingerprint,
-  as GrapheneOS keeps Google's; build ID, number and keys are DiamaneOS's.
-- Needs two generated inputs; the build fails without either:
+  as GrapheneOS keeps Google's. Build ID, number and keys are DiamaneOS's.
+- Needs two generated inputs, and the build fails without either:
   - `vendor/fairphone/FP6`: selected stock vendor files, HAL, init and VINTF
-    integration;
+    integration
   - `device/fairphone/FP6-kernel`: kernel, modules, device tree, board
-    definitions and module load lists.
+    definitions and module load lists
 - Hardware facts come from Fairphone's published `vendor/fairphone/fps` and
-  `platform/vendor/qcom/volcano` sources; `NOTICE` lists what each file
+  `platform/vendor/qcom/volcano` sources. `NOTICE` lists what each file
   derives from.
 - No manufacturing product, userdata or keys are imported.
 - Release signing is done by diamaneos-tools (`docs/SIGNING.md`).
@@ -22,9 +22,9 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 |---|---|
 | `boot/` | fstab, init and ueventd files, module load lists, recovery init |
 | `power/` | power HAL config, camera hint client, power stats HAL, task profiles |
-| `audio/`, `callaudio/` | audio packages, AOSP effects; the call-audio bridge app ([callaudio/SECURITY.md](callaudio/SECURITY.md)) |
+| `audio/`, `callaudio/` | audio packages, AOSP effects, the call-audio bridge app ([callaudio/SECURITY.md](callaudio/SECURITY.md)) |
 | `bluetooth/` | HCI service with its seccomp filter |
-| `camera/`, `media/` | stock CamX camera; hardware video encoders; hardware decoders as the user chooses (off by default); DRM HALs |
+| `camera/`, `media/` | stock CamX camera, hardware video encoders, hardware decoders as the user chooses (off by default), DRM HALs |
 | `modem/`, `telephony/`, `gnss/`, `nfc/`, `wifi/` | radios and their configuration ([telephony/IMS.md](telephony/IMS.md), [wifi/README.md](wifi/README.md)) |
 | `fingerprint/` | fingerprint HAL over the stock module |
 | `timekeep/` | `timekeepd`: keeps the clock across reboots |
@@ -37,7 +37,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 ## Boot and images
 
 - Pages are 4 KiB.
-- Boot, init_boot and recovery use header v4; recovery has no kernel (stock
+- Boot, init_boot and recovery use header v4. Recovery has no kernel (stock
   layout). OS version and patch level are in AVB properties.
 - Android and recovery share one fstab (`boot/fstab.qcom`, stock settings).
 - Vendor modules load after the firmware mounts.
@@ -76,7 +76,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 - Levels 3481 to 4094 (up to 1364 nits) are not used.
 - Range, default and dim values are in
   `rro/FP6FrameworksOverlay/res/values/brightness.xml`. Its minimum must equal
-  the table's first backlight point; the image checks compare the table with
+  the table's first backlight point, and the image checks compare the table with
   the measured panel curve.
 
 ## Services

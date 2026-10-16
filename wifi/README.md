@@ -24,7 +24,7 @@
 - The station's hardware address is the factory MAC from the traceability
   partition, as on stock.
 - imeiprovd (`hardware/diamaneos/ims`) writes the driver's `wlan_mac.bin` at
-  boot; ueventd serves it from `/mnt/vendor/wlan_mac/` (`boot/ueventd.rc`).
+  boot, and ueventd serves it from `/mnt/vendor/wlan_mac/` (`boot/ueventd.rc`).
 - The driver reads it only with `read_mac_addr_from_mac_file=1` in
   `WCNSS_qcom_cfg.ini` (stock value).
 - Android randomises the address per network on top of it.
@@ -46,7 +46,7 @@
 - No magic-packet wake-up: a LAN peer must not be able to wake the phone.
   - The station overlay sets no `wowlan_triggers`.
   - The generated vendor tree sets `gEnableWoW=2` in the driver's
-    `WCNSS_qcom_cfg.ini`; the qcacld driver uses that value and ignores
+    `WCNSS_qcom_cfg.ini`. The qcacld driver uses that value and ignores
     cfg80211 WoWLAN triggers.
   - Pattern wake-ups stay on.
 
@@ -56,9 +56,9 @@ All three are on, as GrapheneOS has them on Pixels and the stock FP6 declares
 them (`android.hardware.wifi.direct` and `android.hardware.wifi.aware`).
 
 - **Hotspot:** AOSP's hostapd from `external/wpa_supplicant_8` (802.11ax, no
-  driver command library; `BoardConfig.mk`).
+  driver command library, see `BoardConfig.mk`).
   - It has its own init file, VINTF fragment and SELinux domain
-    (`hal_wifi_hostapd_default`); no device rules.
+    (`hal_wifi_hostapd_default`), with no device rules.
   - Stock's hostapd, Qualcomm's older build of the same code, is not used.
   - The Wi-Fi HAL has the driver create the hotspot interface (wlan1).
   - As on GrapheneOS, Android's defaults apply: a new random address at each
@@ -80,9 +80,9 @@ them (`android.hardware.wifi.direct` and `android.hardware.wifi.aware`).
   built without be.
 - Left out so that behaviour matches GrapheneOS on Pixels (Android's
   defaults):
-  - DFS channels in automatic channel selection;
-  - an Enhanced Open (OWE) hotspot;
-  - changing the hotspot's country without a restart;
-  - several Aware networks on one data interface;
-  - stock's hotspot name ("Fairphone 6 AP"); Android names it AndroidAP with
+  - DFS channels in automatic channel selection
+  - an Enhanced Open (OWE) hotspot
+  - changing the hotspot's country without a restart
+  - several Aware networks on one data interface
+  - stock's hotspot name ("Fairphone 6 AP"). Android names it AndroidAP with
     four random digits.

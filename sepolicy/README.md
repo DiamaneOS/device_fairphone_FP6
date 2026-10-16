@@ -99,8 +99,8 @@ may access, and why. It describes the policy of a release (`user`) build.
     so the platform neverallow on `default_android_service` forbids granting
     it. A neverallow keeps the HAL from opening files in `vendor_data_file`,
     where the module's configuration and dumps would live.
-  - Read-only SoC, thermal-zone and remote-processor names for the thermal,
-    performance and peripheral-manager services; `/dev/wlan` and the driver
+  - Read-only SoC, thermal-zone and remote-processor names for the thermal
+    and peripheral-manager services; `/dev/wlan` and the driver
     version property for the Wi-Fi HAL; the vendor patch level for KeyMint;
     vendor properties set from vendor init scripts.
   - SoC serial number: `/sys/devices/soc0/serial_number` is
@@ -128,12 +128,11 @@ may access, and why. It describes the policy of a release (`user`) build.
   - Tuning: `init.fp6.perf.rc` writes WALT and VM sysctls that the platform
     does not label. `/proc/sys/walt` is `vendor_proc_walt`, `swappiness` and
     `min_free_kbytes` are `vendor_proc_vm_tuning`, `compaction_proactiveness`
-    is `vendor_proc_compaction` (`perf.te`). vendor_init writes all three; the
-    perf HAL reads and writes only WALT and compaction (its SysNode 0xA).
-    vendor_init also writes the platform `proc_sched` and
+    is `vendor_proc_compaction` (`perf.te`). Only vendor_init writes them; the
+    power HAL reaches `sched_boost` through fixed property triggers (see
+    [Power](#power)). vendor_init also writes the platform `proc_sched` and
     `proc_watermark_scale_factor` sysctls; it still has no write on generic
-    `proc`. The perf HAL keeps the imported `proc:file rw_file_perms`
-    (`qva-common/hal_perf_default.te`), which should be narrowed.
+    `proc`.
   - camera.ko's CCI probe asks to raise the CCI IRQ thread from the kernel
     default SCHED_FIFO 50 to 99 from `vendor_modprobe`; this stays denied
     (non-fatal); `vendor_modprobe` has no `sys_nice` and no kernel task
@@ -538,9 +537,92 @@ Shared device labels (`vendor-common/file_contexts`):
     crowdsourcing, sensor, correction, engine and Skyhook services)
   - RIL and SSG sockets, MHI sysfs and QMS/AON properties.
 
+## Power
+
+- The power HAL is LineageOS's libperfmgr
+  (`android.hardware.power-service.lineage-libperfmgr`, device `power/`) in
+  the platform `hal_power_default` domain (`fp6/power.te`).
+- Qualcomm's perf daemon is not installed. Not imported: its domain
+  (`hal_perf_default.te`), its file and service contexts, and the perf client
+  grants of the composer, SurfaceFlinger, the camera and the power HAL.
+  - Kept as declarations only: Qualcomm's HIDL perf hwservice types and
+    contexts and the `vendor_hal_perf` attributes.
+- Process: user and group system, CAP_SYS_NICE only (`power/init.fp6.power.rc`
+  overrides the module's root service).
+  - No readproc group: the HAL reads no `/proc/<pid>` entries.
+- Nodes the HAL may write, not read:
+  - `scaling_min_freq` and `scaling_max_freq` of the CPU policies
+    (`vendor_sysfs_cpufreq_limit`, `fp6/genfs_contexts`)
+  - the GPU devfreq `min_freq` and `max_freq` and the GPU wake trigger
+    `touch_wake` (`vendor_sysfs_kgsl_limit`, `fp6/file_contexts`)
+  - the touch gesture switch (`fp6/touch.te`).
+- init hands exactly these nodes to system. The rest of the CPU and GPU sysfs
+  stays root's, with its platform or Qualcomm label.
+- Thermal engine: SELinux keeps its read and write on the relabelled nodes.
+  - The CPU and GPU frequency nodes belong to system (0644) and the root
+    engine has no `dac_override`, so it cannot write them.
+- system_server keeps read on the CPU limit nodes, as under the platform
+  label.
+- `sched_boost`: `/proc/sys/walt/sched_boost` is root-only, and a sysctl
+  cannot be chowned.
+  - The HAL may set only `vendor.powerhal.sched_boost`
+    (`vendor_power_sched_boost_prop`, values 0, 1 and 2). Vendor init writes
+    the matching fixed value.
+  - The other `vendor.powerhal.*` properties (`vendor_power_prop`) are
+    switches the HAL reads and vendor init sets.
+  - `vendor.powerhal.sched_boost.enable=false` turns the `sched_boost` part of
+    the hints off.
+- ADPF: `setsched` on apps, SurfaceFlinger and system_server, with
+  CAP_SYS_NICE, to set uclamp on hint-session threads.
+  - The domain is an `mlstrustedsubject`: the platform MLS constraint on
+    setsched requires equal levels, and apps run with categories.
+  - setsched is its only access to app processes.
+  - It is a thermal HAL client, for the throttling state.
+- `libqti-perfd-client` (`power/libqti-perfd-client`) is a source stand-in for
+  the closed client library that the stock camera and SDM extension load by
+  name.
+  - It forwards only the camera's open, close and snapshot hints, as
+    time-limited CAMERA_LAUNCH and CAMERA_SHOT boosts. Every other call does
+    nothing.
+  - It is `vendor_file`: no app process loads it.
+- Clients: the platform's (system_server, SurfaceFlinger, apps' hint sessions
+  through system_server) and one vendor client, the camera provider
+  (`camera/hal_camera_default.te`).
+  - A client reaches every IPower method: boosts, modes such as
     SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
     DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
+  - Their effects stay within the grants above: frequency floors and caps, the
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.
+- Not granted:
+  - reads of the nodes (dumpsys shows request indexes, not values)
+  - the debug configuration in `/data/vendor/etc`
+    (`vendor.powerhal.config.debug`)
+  - the Pixel-only `/proc/vendor_sched`
+  - the display `idle_state` nodes: the Qualcomm display driver has none
+    (`vendor.powerhal.disp.idle_support=false`)
+  - setsched on the composer, which is needed only if SurfaceFlinger puts
+    composer threads in its hint session.
+
+## Power stats
+
+- The power stats HAL (`android.hardware.power.stats-service.fp6`, device
+  `power/stats`) runs in the platform `hal_power_stats_default` domain
+  (`fp6/power_stats.te`).
+- Its clients are the platform's IPowerStats clients.
+- Process: its own vendor user and group `vendor_powerstats`
+  (`power/config.fs`), no supplementary groups, no capabilities.
+- Device: `/dev/stats`, the qcom_stats driver's sleep counter node, is
+  `vendor_qcom_stats_device` (`fp6/file_contexts`) and 0400 for the HAL's user
+  (`boot/ueventd.rc`).
+  - The HAL may open, read and ioctl it, nothing else.
+  - A neverallow keeps other vendor domains off it, and the HAL from writing
+    it.
+- ioctls: an `allowxperm` limits the HAL to the commands it uses: modem,
+  WPSS, ADSP and CDSP sleep, and the AOSD, CXSD and DDR records.
+  - The driver's other commands are not allowed.
+- Not used: debugfs, sysfs, properties and energy meters. The FP6 has no
+  on-device power monitor.
+
 ## Telephony
 
 Sources:
@@ -631,48 +713,83 @@ QRTR inventory (`telephony/qrtr.te`):
 ## Camera
 
 `camera/` holds the policy for the stock CamX/CHI provider
-(`vendor.qti.camera.provider-service_64`, platform domain `hal_camera_default`). The
-grants are drafted from the stock FP6 compiled vendor policy and bound to
-`hal_camera_default`, not to the `hal_camera` attributes. They cover the ToF node, UBWC-P,
-FastRPC with read-only opens (the secure node for the ADSP sensors PD of the CamX sensor
-direct channel, the non-secure node for the CDSP offloads, `/vendor/dsp`), Qualcomm
-DMA-BUF heaps (display heap allocation ioctl only), SoC/camera/JPEG/DDR identification,
-QRTR sockets without ioctls for the gyro QMI client, the thermal-engine client socket, the
-provider's own vndbinder open, `/data/vendor/camera`, read-only factory calibration in
-`/mnt/vendor/persist/camera` and vendor camera properties. For streaming the provider is a client of the graphics allocator (buffer
-allocation and IMapper) through `hal_client_domain`, the only form the platform
-neverallows allow for the allocator service lookups. The membership also lets it find the
-mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
-servicemanager and share memfds with the allocator, and, as a `halclientdomain`, call
-hwservicemanager, read `hwservicemanager_prop` and find `hidl_manager_hwservice`. For CamX
-perf locks it may only make binder calls into the perf HAL (`vendor_hal_perf_default`):
-a permissive boot logged no IPerf service lookup, so it is not a perf HAL client; if a find
-denial on `vendor_hal_perf2_service` or `vendor_hal_perf_hwservice` shows up, make it one
-with `hal_client_domain`. It may use the composer's release fences, read the public SoC id and
-search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelled in
-`camera/genfs_contexts`). Denied: the display QService and display-config lookups
-(IDisplayConfig would expose brightness, power mode and writeback capture),
-IPostProcService registration and the property-area listing CamX does at start (silent
-under enforcing), and the offline camera service registration (in no VINTF manifest, not
-audited). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
-the kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
-expected in use; drop the other after the first permissive run.
+(`vendor.qti.camera.provider-service_64`, platform domain
+`hal_camera_default`).
 
-`vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module serial numbers
-the stock CamX tries to publish; nothing may set or read it. `vendor_init` may chmod the
-stock 0777 `/mnt/vendor/persist/camera` and `cam_cali` directories.
+- The grants are written from the stock compiled vendor policy and bound to
+  `hal_camera_default`, not to the `hal_camera` attributes. There is no
+  provenance entry.
 
-Omitted: the TCL algorithm service and its data and dump directories, secure camera
-(QSEECom/TEE, protected heaps, VM memory-buffer nodes, ssgtzd), the AON service, factory
-OTP/OIS sysfs (`fp_mmitest_sysfs`), persist writes and QRTR ioctls. The file contexts restore
-three upstream `generic/vendor/common/file_contexts` entries (lines 317, 348, 440). The
-upstream files to reduce from are not imported, so there is no provenance entry.
-These rules are not yet runtime-qualified under enforcing mode.
+Grants:
+
+- `sys_nice` and wake locks.
+- The ToF node and UBWC-P.
+- The camera sub-device nodes (`/dev/v4l-subdev*`: sensors, actuators, OIS,
+  flash), under their own type `vendor_camera_subdev_device`.
+  - Only the provider may open them.
+  - They do not share `video_device`, which the composer and platform media
+    services also hold.
 - FastRPC with read-only opens: the secure node only (the ADSP sensors PD of
   the CamX sensor direct channel and the CDSP offloads) and `/vendor/dsp`.
+- Qualcomm DMA-BUF heaps. On the display heap only the allocation ioctl.
+- SoC, camera, JPEG and DDR identification, `/proc/meminfo` and the public SoC
+  id.
+  - It may search `/sys/devices/soc0` for the per-part files
+    (`num_subset_parts` is labelled in `camera/genfs_contexts`).
+- QRTR sockets without ioctls, for the gyro QMI client.
+- The thermal-engine client socket.
+- The provider's own vndbinder open. No vndservice lookup.
+- `/data/vendor/camera`, read-only factory calibration in
+  `/mnt/vendor/persist/camera`, and the vendor camera properties.
+- The composer's release fences.
+- Graphics allocator client, for buffer allocation and IMapper.
+  `hal_client_domain` is the only form the platform neverallows allow for the
+  allocator service lookups.
+  - The membership also lets it find the mapper services, execute
+    `same_process_hal_file` (the passthrough IMapper), call servicemanager and
+    share memfds with the allocator.
+  - As a `halclientdomain` it may call hwservicemanager, read
+    `hwservicemanager_prop` and find `hidl_manager_hwservice`.
+- Power HAL client, as on Pixels: CamX's perf hints go to
+  `libqti-perfd-client` (device `power/`), which forwards the open, close and
+  snapshot hints as time-limited boosts.
+  - `hal_client_domain(hal_camera_default, hal_power)` is the only form the
+    platform neverallow on `hal_power_service` lookups allows.
+  - It lets the provider find the power service, make binder calls with the
+    power HAL both ways (the HAL never calls back) and share memfds with it.
+  - It also lets it find the HIDL power service, which nothing registers.
+  - SELinux cannot limit the grant to the camera boosts: it covers the whole
+    IPower interface (see [Power](#power)).
+- `crash_dump_fallback`: the provider runs with no_new_privs under its seccomp
+  filter (`camera/seccomp`), so debuggerd writes its tombstones and stack
+  dumps through the in-process fallback handler.
+
+Denied on purpose:
+
+- The display QService and display-config lookups: IDisplayConfig would expose
+  brightness, power mode and writeback capture.
+- IPostProcService registration.
+- `dontaudit hal_camera_default default_prop:file read`: the property-area
+  listing CamX does at start.
+- `dontaudit` on adding the offline camera service: it is in no VINTF
+  manifest and nothing uses it. The provider retries at every start and
+  carries on.
 - `dontaudit` on looking up the ODM's camera algorithm service and Qualcomm's
   post-processing HAL: neither is in the image, and the provider asks at every
   session.
+- `vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module
+  serial numbers CamX tries to publish. Nothing may set or read it, and the
+  denials stay audited.
+
+Other:
+
+- `vendor_init` may create the camera data directory, set the camera
+  properties and change the mode of the persist `camera` and `cam_cali`
+  directories.
+- Not granted, unlike the stock policy: the TCL algorithm service and its data
+  and dump directories, secure camera (QSEECom/TEE, protected heaps, VM
+  memory-buffer nodes, ssgtzd), the AON service, factory OTP/OIS sysfs
+  (`fp_mmitest_sysfs`), persist writes and QRTR ioctls.
 
 ## Media
 

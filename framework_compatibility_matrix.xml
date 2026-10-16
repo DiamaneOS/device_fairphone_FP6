@@ -44,14 +44,6 @@
         </interface>
     </hal>
     <hal format="aidl">
-        <name>vendor.qti.hardware.perf2</name>
-        <version>1</version>
-        <interface>
-            <name>IPerf</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="aidl">
         <name>vendor.qti.hardware.qseecom</name>
         <version>1</version>
         <interface>

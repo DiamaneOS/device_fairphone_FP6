@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+// Stand-in for Qualcomm's closed libqti-perfd-client.so, which sends perf locks
+// and hints to the perf2 daemon. The stock camera (camera.qcom.so) and SDM
+// composition extension (libsdmextension.so) load it by name. The camera's
+// open, close and snapshot hints become time-limited power HAL boosts
+// (camera_hints.cpp). Every other call gets a valid handle and does nothing,
+// and nothing looks up the perf2 service. power/power.mk installs it.
+// client.c lists the exported calls.
+cc_library_shared {
+    name: "libqti-perfd-client",
+    vendor: true,
+    // The IPower version the power HAL itself is built with.
+    defaults: ["android.hardware.power-ndk_shared"],
+    srcs: [
+        "camera_hints.cpp",
+        "client.c",
+    ],
+    shared_libs: [
+        "libbinder_ndk",
+        "liblog",
+    ],
+    // The forwarding thread runs this library's code for the life of the
+    // camera provider, so a dlclose must never unmap it.
+    ldflags: ["-Wl,-z,nodelete"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wno-unused-parameter",
+    ],
+}

@@ -81,6 +81,11 @@ PRODUCT_COPY_FILES += \
     $(foreach s,platform wireless audio data crypto media display touch, \
         device/fairphone/FP6/boot/modules/modules.load.$(s):$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.load.$(s))
 
+# CPU, scheduler, deep sleep and memory tuning with stock's values (the kernel
+# defaults pin every core at its maximum clock and keep deep sleep off).
+PRODUCT_COPY_FILES += \
+    device/fairphone/FP6/boot/init.fp6.perf.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.perf.rc
+
 # Firmware, DSP and Bluetooth mount points from fstab.qcom (see Android.mk).
 # Without them the modem partition is never mounted and the ADSP, CDSP and
 # modem cannot load their firmware.
@@ -95,7 +100,6 @@ PRODUCT_PACKAGES += \
     toolbox_vendor \
     android.hardware.boot-service.qti \
     android.hardware.boot-service.qti.recovery \
-    android.hardware.power-service \
     android.hardware.thermal-service.qti \
     vendor.qti.hardware.lights.service \
     vendor.qti.hardware.vibrator.service \
@@ -188,6 +192,7 @@ $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 
 # Hardware subsystems. Each subsystem makefile documents its stock and
 # source-built parts.
+$(call inherit-product, device/fairphone/FP6/power/power.mk)
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
 $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)

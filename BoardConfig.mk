@@ -7,6 +7,13 @@ TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a-branchprot
 TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_VARIANT := generic
+# Code ART compiles on the phone (apps at install and update, odrefresh after
+# an ART update) targets the cores: Cortex-A520 and A720 have LSE atomics,
+# FP16 and dot product and need no Cortex-A53 erratum workarounds. ART gives
+# cortex-a55 and cortex-a76 the same features. Pixel 9, whose cores include
+# A720 and A520, uses cortex-a55. Native code and the images built here stay
+# generic.
+TARGET_CPU_VARIANT_RUNTIME := cortex-a55
 TARGET_BOARD_PLATFORM := volcano
 TARGET_BOOTLOADER_BOARD_NAME := fps
 # Keep the authenticated device bootloader. This product builds Android images.
@@ -99,6 +106,8 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
 # Vendor users of the remote-processor services (tqftpserv, pd-mapper).
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
+# Vendor user of the power stats HAL.
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
 # Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 

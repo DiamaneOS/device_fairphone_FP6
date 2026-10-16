@@ -27,4 +27,5 @@
 
 # HBTP is used only by the unselected legacy power-8953 implementation.
 
-hal_client_domain(hal_power_default, vendor_hal_perf)
+# The libperfmgr power HAL is not a client of Qualcomm's perf HAL, which is not
+# installed; its grants are in fp6/power.te.

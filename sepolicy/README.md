@@ -299,6 +299,10 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   - The node is `vendor_sysfs_charge_disable` (`fp6/genfs_contexts`).
   - The service may open and write it, nothing more. vendor_init hands it to
     system at boot (`boot/init.qcom.rc`).
+- The service keeps its state in `persist.vendor.charge_limit`
+  (`vendor_charge_limit_prop`, off, on or paused).
+  - At early-boot, vendor_init writes the pause again from it, as stock does.
+  - A neverallow leaves setting it to the service, init and vendor_init.
 - A neverallow keeps every other domain from writing it, except vendor_init
   and ueventd, which the platform lets write all of sysfs.
 

@@ -57,7 +57,9 @@ make_fingerprint_edu.py packages/apps/Settings/res/raw/fingerprint_edu_lottie_po
 - Settings > Battery > Charging optimization is GrapheneOS's charge limit
   screen. Its strings are empty in GrapheneOS Settings, and Pixel builds fill
   them from the stock Pixel apps.
-- `charge_limit_strings.xml` gives them English text. Only "Off" is
-  translated, copied from Settings' `switch_off_text` in every locale.
+- `charge_limit_strings.xml` gives them English text.
+  - "Off" is Settings' own `switch_off_text`, in every locale.
+  - German, French, Spanish and Italian for the rest are our own. Other
+    languages show English.
 - While the limit holds, Settings and the lock screen show Android's own
   translated "Charging on hold to protect battery".

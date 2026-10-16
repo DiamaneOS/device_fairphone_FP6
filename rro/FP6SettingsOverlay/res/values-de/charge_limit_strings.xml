@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 The DiamaneOS Project
+  SPDX-License-Identifier: Apache-2.0
+
+  German for values/charge_limit_strings.xml, translated by the DiamaneOS project.
+  "Off" is Settings' own switch_off_text.
+-->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="charging_optimization_title">"Ladeoptimierung"</string>
+    <string name="charging_optimization_entry_summary_charge_limit">"Auf <xliff:g id="percentage" example="80%">%1$s</xliff:g> begrenzen"</string>
     <string name="charging_optimization_summary_off">"Aus"</string>
+    <string name="charging_optimization_footer_message_charging_limit">"Damit dein Akku länger hält, wird das Laden bei <xliff:g id="limit" example="80%">%1$s</xliff:g> pausiert und knapp darunter fortgesetzt. Deaktiviere diese Option, um auf <xliff:g id="full" example="100%">%2$s</xliff:g> zu laden."</string>
+    <string name="charge_limit_indexing_keywords">"Ladelimit, Akkuschutz, Akkuzustand"</string>
 </resources>

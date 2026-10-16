@@ -416,6 +416,58 @@ Qualcomm's `ssr_setup.te` (`provenance.json`).
 - Not granted, unlike upstream: `vendor_sysfs_data`,
   `persist.vendor.pd_locater_debug`, and the legacy IPC router socket with its
   ioctl.
+
+## Bluetooth
+
+- DiamaneOS's HCI service (`bluetooth/service.cpp`) hosts the stock Qualcomm
+  HCI implementation. `bluetooth/file_contexts` gives it the label of the
+  stock service it replaces.
+- It reads the chip's compatible string from btpower, sets the SoC name and
+  registers the stock HCI implementation.
+- `bluetooth/hal_bluetooth_default.te` is written by DiamaneOS from the rules
+  the stock compiled policy has for that service. It has no provenance entry.
+
+`hal_bluetooth_default`:
+
+- Uses the btpower node.
+- Reads the Bluetooth firmware partition and the Bluetooth persist directory.
+- Reads the Bluetooth vendor properties and the SoC identification.
+- Sets only the properties it writes at run time: the SoC name,
+  `scram.enabled`, a generated address and two crash counters.
+  - `bluetooth/property_contexts` gives them the vendor-internal type
+    `vendor_bluetooth_hal_state_prop`, so no platform domain or app can read
+    the address.
+- Gets the HCI UART (`hci_attach_dev`) from platform policy, as in stock.
+
+Factory address:
+
+- `ro.vendor.bt.boot.macaddr` has its own vendor-internal type,
+  `vendor_bluetooth_address_prop`. The HAL reads it before the generated
+  address, and may only read it.
+- Only vendor_init sets it (`bluetooth/vendor_init.te`):
+  `init.fp6.bluetooth.rc` copies the value imeiprovd read from the
+  traceability partition, as stock does.
+- Neverallows: only init and vendor_init set it. Only they, dumpstate and the
+  HAL read it.
+
+Not granted:
+
+- Unlike the stock policy: persist writes, QRTR sockets (used only for the
+  modem-NV address query, which is off), `/data/vendor/bluetooth`, diag, the
+  FM radio device, the ssgtzd socket, TPI and Xpan service registration and
+  HSUART tracing.
+- The FM, ANT, SAR, config-store and TPI libraries are not installed.
+- `hwservice_contexts` has no lines for the ANT, ANT HCI and Bluetooth SAR
+  interfaces, so the HAL cannot register them.
+  - Unmapped names fall to `default_android_hwservice`, which no domain may
+    add.
+
+Shared device labels (`vendor-common/file_contexts`):
+
+- `/dev/btfmcodec_dev` and `/dev/bt_cp_ctrl` share `hci_attach_dev` with
+  `/dev/ttyHS0`.
+- `/dev/btfmslim` shares `vendor_bt_device` with `/dev/btpower`.
+- SELinux alone would let the HAL use them. ueventd keeps the three root-only.
 The HAL's `property_set` of `vendor.nfc.fw.version` (`vendor_nfc_prop`) stays
 denied: `nfc_nci_sec.so` ignores the result and never reads it back, and the
 only stock reader is the factory MMI app. If the firmware version is wanted in

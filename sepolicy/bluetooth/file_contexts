@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The Bluetooth HCI service (bluetooth/service.cpp) gets the label of the stock
+# Qualcomm service it replaces (stock vendor_file_contexts line 1125).
+/vendor/bin/hw/android\.hardware\.bluetooth@1\.1-service\.fp6    u:object_r:hal_bluetooth_default_exec:s0

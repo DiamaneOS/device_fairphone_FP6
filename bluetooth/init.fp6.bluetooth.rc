@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Bluetooth HCI service (bluetooth/service.cpp), hosting the stock Qualcomm HCI
+# implementation. Same as the stock android.hardware.bluetooth@1.1-service-qti.rc,
+# with fewer groups:
+# - no diag (oem_2901) or ssgtzd (oem_2912): neither service is installed.
+# - no system: every node the HAL uses is owned by the bluetooth user, and the
+#   group would let it write controller dumps (with HCI traffic) into
+#   /data/vendor/ssrdump (root:system 0770 in stock) if that directory exists.
+# - no net_raw: the HAL opens no inet raw socket.
+# The service installs its own seccomp filter at start (bluetooth/seccomp).
+service vendor.bluetooth-1-1-fp6 /vendor/bin/hw/android.hardware.bluetooth@1.1-service.fp6
+    class hal
+    user bluetooth
+    group bluetooth wakelock
+    capabilities BLOCK_SUSPEND NET_ADMIN
+
+# The HCI implementation powers the chip through rfkill and switches the UART
+# clock through hs_uart_operation (stock init.qcom.rc and the stock service rc,
+# on boot). rfkill0 is the btpower "bt_power" switch: btpower registers it when
+# vendor modules load in "on fs", before the WLAN driver registers phy0
+# (rfkill1). /dev/btpower and /dev/ttyHS0 get their owners from ueventd.rc.
+# Done before class hal starts.
+on early-boot
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/type
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/state
+    chmod 0660 /sys/class/rfkill/rfkill0/state
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/device/extldo
+    chmod 0660 /sys/class/rfkill/rfkill0/device/extldo
+    chown bluetooth bluetooth /sys/class/tty/ttyHS0/device/hs_uart_operation
+    chmod 0660 /sys/class/tty/ttyHS0/device/hs_uart_operation
+
+# Factory Bluetooth address, as stock tctd.rc does it.
+# imeiprovd --bt-address (hardware/diamaneos/ims, vendor.imeiprovd-bt) reads it
+# from the traceability partition at post-fs and sets
+# ro.vendor.diamaneos.bt.factory_address. This copies it to the property the
+# HCI implementation reads. The HAL reads it only when Bluetooth is turned on
+# (HCI initialisation), long after this runs. A missing or invalid address sets
+# nothing, so the HAL keeps its stored generated address. The address is never
+# logged.
+on property:ro.vendor.diamaneos.bt.factory_address=*
+    setprop ro.vendor.bt.boot.macaddr ${ro.vendor.diamaneos.bt.factory_address}
+
+# Not created on purpose:
+# - /mnt/vendor/persist/bluetooth: the HAL only reads .bt_nv.bin there. If the
+#   directory or file is absent it uses ro.vendor.bt.boot.macaddr (above), and
+#   only without that its stored or a newly generated random address.
+# - /data/vendor/bluetooth (optional alternate firmware path and HCI logs) and
+#   /data/vendor/ssrdump (controller crash dumps, the HAL logs "No log dir" and
+#   continues).

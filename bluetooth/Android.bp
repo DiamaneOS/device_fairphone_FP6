@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+// Bluetooth HCI service: registers the stock Qualcomm HCI implementation
+// (selected stock vendor file) through HIDL passthrough, without the FM, ANT,
+// SAR, config-store and TPI libraries the stock service links (service.cpp).
+// init.fp6.bluetooth.rc starts it. manifest.xml declares IBluetoothHci 1.1.
+//
+// The service installs a seccomp filter from bluetooth-hci.policy
+// (seccomp/) at the start of main(), before it loads the HCI implementation.
+// Calls outside the policy are trapped (SIGSYS): the service dies with a
+// tombstone and init restarts it. Building with -DBT_SECCOMP_LOG_ONLY logs
+// and allows them instead (kernel audit record type 1326), to collect a new
+// profile.
+cc_binary {
+    name: "android.hardware.bluetooth@1.1-service.fp6",
+    vendor: true,
+    relative_install_path: "hw",
+    srcs: ["service.cpp"],
+    shared_libs: [
+        "android.hardware.bluetooth@1.0",
+        "android.hardware.bluetooth@1.1",
+        "libcutils",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+    ],
+    static_libs: ["libminijail"],
+    required: ["bluetooth-hci.policy"],
+    // The stock service was built with CFI.
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Charge limit. The health service (vendor.health-default, hal_health_default)
+# pauses and resumes charging through /sys/class/qcom-battery/charge_disable,
+# a class attribute of qti_battery_charger (its line in fp6/genfs_contexts).
+# It only writes "0" or "1" and never reads the node. Off-mode charging
+# (charger_vendor) and recovery do not use it.
+type vendor_sysfs_charge_disable, sysfs_type, fs_type;
+
+allow hal_health_default vendor_sysfs_charge_disable:file { open write };
+# vendor_init hands the node to system and stats it for init's wait
+# (boot/init.qcom.rc).
+allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr };
+
+# Nothing else may write it: a later rule that adds a writer fails the build.
+# The platform lets vendor_init and ueventd write every sysfs_type file.
+neverallow {
+  domain
+  -hal_health_default
+  -vendor_init
+  -ueventd
+} vendor_sysfs_charge_disable:file { write append };

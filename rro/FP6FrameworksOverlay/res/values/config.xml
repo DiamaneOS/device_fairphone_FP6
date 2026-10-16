@@ -133,6 +133,12 @@
          config_usb_port_security_applies_to_pogo_pins stays false. -->
     <bool name="config_usbPortSecuritySupported">true</bool>
 
+    <!-- GrapheneOS's charge limit (Settings > Battery > Charging optimization).
+         The health service holds the battery at 80 %: charging pauses there
+         and resumes at 78 %, through the charger firmware's charge_disable
+         (vendor/qcom/opensource/healthd-ext). -->
+    <bool name="config_healthHalChargeLimit">true</bool>
+
     <!-- No copy of the lock credential's check data on the frp partition. That
          partition is not encrypted, and the copy (salt, stretch parameters and
          Gatekeeper handle) is only read to ask for the old lock after a

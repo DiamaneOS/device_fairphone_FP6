@@ -23,6 +23,13 @@ runtime_resource_overlay {
 }
 
 runtime_resource_overlay {
+    name: "FP6SystemUIOverlay",
+    vendor: true,
+    manifest: "FP6SystemUIOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6SystemUIOverlay/res"],
+}
+
+runtime_resource_overlay {
     name: "FP6TetheringOverlay",
     vendor: true,
     manifest: "FP6TetheringOverlay/AndroidManifest.xml",

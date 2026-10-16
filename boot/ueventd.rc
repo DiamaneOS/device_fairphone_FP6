@@ -94,6 +94,8 @@ firmware_directories /mnt/vendor/wlan_mac/
 /dev/block/sde            0660   root       vendor_bootctl
 /dev/block/platform/soc/1d84000.ufshc/by-name/misc   0660   root   vendor_bootctl
 /dev/ufs-bsg*             0660   root       vendor_bootctl
+# The stock FP6 FocalTech node is owned by the system fingerprint service.
+/dev/focaltech_fp          0660   system     system
 /sys/class/typec/port0		data_role	0660	system	usb
 /sys/class/typec/port0		power_role	0660	system	usb
 /sys/class/typec/port0		port_type	0660	system	usb

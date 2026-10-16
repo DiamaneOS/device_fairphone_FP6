@@ -58,6 +58,9 @@ may access, and why. It describes the policy of a release (`user`) build.
 - No Qualcomm perf HAL domain or client grants (see [Power](#power)).
 - The peripheral manager has no binder call into the WLAN service domain. That
   service is not installed.
+- Label the FP6 fingerprint service (`android.hardware.biometrics.
+  fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
+  stock wrapper it replaces.
 - Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_per_mgr`: its
   QMI libraries open AF_QIPCRTR sockets, which the upstream rules only grant
   as generic `socket`.
@@ -72,6 +75,12 @@ may access, and why. It describes the policy of a release (`user`) build.
     numbers follow probe order, so they labelled whichever device got the
     number, and no vendor service reads extcon. Stock instead lets
     system_server write all of `vendor_sysfs_graphics`.
+    and its heaps for the fingerprint HAL, each limited to the permissions the
+    module used. The module's debug binder service stays unlabelled, so the
+    platform neverallow on `default_android_service` forbids granting it; its
+    only switch is a /data configuration file, which is deliberately not
+    created, and a neverallow keeps the HAL from opening files in
+    `vendor_data_file`.
   - SoC serial number: `/sys/devices/soc0/serial_number` is
     `vendor_sysfs_soc_serial` (`soc_serial.te`), not the soc0 directory's
     `vendor_sysfs_soc`. No shipped program reads it (only kernel code uses

@@ -209,23 +209,54 @@ PRODUCT_VENDOR_PROPERTIES += \
 # A panel property, so it belongs to the vendor partition.
 PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
 
-# Framework and Settings hardware configuration (rro/): display cutout, corners,
-# status bar, 120 Hz refresh rate and the Smooth display switch.
+# Framework, Settings and SystemUI hardware configuration (rro/): display
 # cutout, corners, status bar, navigation bar, colour modes and their names,
 # 120 Hz refresh rate, the Smooth display switch, always-on display and
 # double-tap to wake (both off by default) and the side fingerprint sensor
 # description.
 PRODUCT_PACKAGES += \
     FP6FrameworksOverlay \
-    FP6SettingsOverlay
+    FP6SettingsOverlay \
+    FP6SystemUIOverlay
 
 # Measured brightness table, manual range and high-brightness limits
 # (display/display_port_130.xml, Android.bp).
 PRODUCT_PACKAGES += fp6_displayconfig_port130
 
-# The stock fingerprint HAL is installed as fingerprint.fp6 so it cannot collide
-# with AOSP's reference fingerprint modules; hw_get_module finds it through this.
+# Fingerprint: the AIDL service in fingerprint/ drives the stock FocalTech
+# module. The module keeps its own SONAME as file name, so it cannot collide
+# with AOSP's reference fingerprint modules. hw_get_module finds it through
+# ro.hardware.fingerprint=fp6 and the hw/fingerprint.fp6.so link.
 PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
+PRODUCT_PACKAGES += android.hardware.biometrics.fingerprint-service.fp6
+# The stock FocalTech module and trusted app are debug builds that log
+# auth-token fields, the token HMAC and trusted-app traces at debug level. Keep
+# every FocalTech tag at info. (The module's own switch is only read from a
+# /data file, which is deliberately not created.)
+PRODUCT_VENDOR_PROPERTIES += \
+    log.tag.focaltech=I \
+    log.tag.focaltech:ca:client=I \
+    log.tag.focaltech:config=I \
+    log.tag.focaltech:efc=I \
+    log.tag.focaltech:file=I \
+    log.tag.focaltech:hal:base=I \
+    log.tag.focaltech:hal:core=I \
+    log.tag.focaltech:hal:device=I \
+    log.tag.focaltech:hal:interface=I \
+    log.tag.focaltech:hal:logger=I \
+    log.tag.focaltech:libfpdata=I \
+    log.tag.focaltech:libfpsensor=I \
+    log.tag.focaltech:service:stub=I \
+    log.tag.focaltech:ta:base=I \
+    log.tag.focaltech:ta:core=I \
+    log.tag.focaltech:ta:ctx=I \
+    log.tag.focaltech:ta:device=I \
+    log.tag.focaltech:ta:file=I \
+    log.tag.focaltech:ta:interface=I \
+    log.tag.focaltech:ta:payment=I \
+    log.tag.focaltech:ta:spi=I \
+    log.tag.focaltech:util=I \
+    log.tag.focaltech:version=I
 
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
 # expect, from the stock vendor build.prop, with three exceptions:

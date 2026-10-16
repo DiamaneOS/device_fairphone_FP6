@@ -496,3 +496,7 @@
 
 #MMITest download_mode
 /sys/module/qcom_dload_mode/parameters/download_mode		u:object_r:fp_mmitest_sysfs:s0
+
+# FP6 fingerprint service (FocalTech module via QSEECom), in the same domain
+# as the stock wrapper it replaces.
+/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint-service\.fp6 u:object_r:hal_fingerprint_default_exec:s0

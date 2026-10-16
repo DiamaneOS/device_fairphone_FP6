@@ -2,9 +2,9 @@
 # Copyright 2026 The DiamaneOS Project
 # ro.vendor.diamaneos.firmware_release: the Fairphone firmware release fwrelease
 # reports (fwrelease.te). Vendor restricted, so Settings (system_app, a platform
-# domain) may read it; only fwrelease sets it, once per boot (ro.). Settings
+# domain) may read it. Only fwrelease sets it, once per boot (ro.). Settings
 # is its only reader besides init, vendor_init and dumpstate, which read
-# properties through platform grants; shell cannot read it.
+# properties through platform grants. Shell cannot read it.
 vendor_restricted_prop(vendor_diamaneos_firmware_release_prop)
 get_prop(system_app, vendor_diamaneos_firmware_release_prop)
 

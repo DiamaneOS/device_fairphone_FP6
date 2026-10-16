@@ -159,8 +159,8 @@ bool Session::runningLocked(OpKind kind) const {
 void Session::updateContextLocked(const OperationContext& context) {
     mDisplayState = context.displayState;
     if (context.authenticateReason) {
-        // Only SystemUI's keyguard requests carry the press-to-auth parcelable;
-        // any other reason (BiometricPrompt, Settings) never waits for a press.
+        // Only SystemUI's keyguard requests carry the press-to-auth parcelable.
+        // Any other reason (BiometricPrompt, Settings) never waits for a press.
         mPressToAuth = false;
         if (context.authenticateReason->getTag() ==
             common::AuthenticateReason::Tag::vendorAuthenticateReason) {
@@ -185,7 +185,7 @@ bool Session::screenGatedLocked() const {
 
 void Session::rearm(uint64_t op) {
     // Called from the module's callback thread, which must not call back into
-    // the module; restart authentication from a short-lived thread instead.
+    // the module. Restart authentication from a short-lived thread instead.
     std::weak_ptr<Session> weak = ref<Session>();
     std::thread([weak, op] {
         auto self = weak.lock();
@@ -212,7 +212,7 @@ void Session::stopSensorAfter(uint64_t op) {
     std::lock_guard moduleLock(moduleMutex());
     {
         std::lock_guard lock(mMutex);
-        // A new operation replaced this one; its sensor state is its own.
+        // A new operation replaced this one. Its sensor state is its own.
         if (mDetached || mOp != op) return;
     }
     // The module answers with CANCELED, which is dropped: the operation ended.
@@ -252,7 +252,7 @@ void Session::detach(bool clientDied) {
             mDetached = true;
             running = !mOpEnded;
         }
-        // A dead client can no longer cancel; stop the sensor on its behalf.
+        // A dead client can no longer cancel. Stop the sensor on its behalf.
         if (clientDied && running) mDevice->cancel(mDevice);
     }
     if (mOnDetach) mOnDetach(this);
@@ -320,7 +320,7 @@ void Session::onMessage(const fingerprint_msg_t* msg) {
         case FINGERPRINT_AUTHENTICATED: {
             const auto& finger = msg->data.authenticated.finger;
             if (runningLocked(OpKind::kDetectInteraction)) {
-                // A detection never releases a token; a touch is all it reports.
+                // A detection never releases a token. A touch is all it reports.
                 mCb->onInteractionDetected();
                 endOperationLocked();
                 break;
@@ -367,7 +367,7 @@ void Session::onMessage(const fingerprint_msg_t* msg) {
             }
             break;
         case fp6::kMsgLockout: {
-            // Lockout state is relayed whenever the trusted app reports it; it
+            // Lockout state is relayed whenever the trusted app reports it. It
             // only ends the operations it is a terminal result of.
             fp6::LockoutMsg lockout;
             std::memcpy(&lockout, &msg->data, sizeof(lockout));
@@ -546,7 +546,7 @@ ndk::ScopedAStatus Session::invalidateAuthenticatorId() {
 }
 
 ndk::ScopedAStatus Session::resetLockout(const HardwareAuthToken& hat) {
-    // The trusted app checks the HAT and reports onLockoutCleared itself; on
+    // The trusted app checks the HAT and reports onLockoutCleared itself. On
     // rejection it reports an error and also returns a failure code.
     std::lock_guard moduleLock(moduleMutex());
     uint64_t op = beginOperation(OpKind::kResetLockout);
@@ -630,7 +630,7 @@ ndk::ScopedAStatus Session::onContextChanged(const OperationContext& context) {
             released = mOp;
         }
     }
-    // The sensor was re-armed after the held match; stop it so later touches
+    // The sensor was re-armed after the held match. Stop it so later touches
     // are not scanned (and counted toward lockout) without an operation.
     if (released != 0) stopSensorAfter(released);
     return ndk::ScopedAStatus::ok();

@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 # Base drawing (before the root rotation): the device lies horizontally with
-# the sensor on its top edge; +90 degrees turns that edge into the right edge.
+# the sensor on its top edge. +90 degrees turns that edge into the right edge.
 TABLET_W, TABLET_H = 326.0, 201.699
 PHONE_W, PHONE_H = 326.0, 152.0          # FP6 body is about 2.14:1
 CORNER = 16.0
@@ -35,7 +35,7 @@ SENSOR_SHIFT = (SENSOR_X - STOCK_SENSOR_X, EDGE_SHIFT)
 ZOOM_SCALE = 0.59                        # AOSP shrinks the device to 59% at the zoom
 ANCHOR = (-PHONE_W / 2, PHONE_H / 2)
 START = (ANCHOR[0] + 0.75, ANCHOR[1])    # AOSP centres the device at x=+0.75
-# Final device position: AOSP moves it by (30, 20); the phone moves 40 further
+# Final device position: AOSP moves it by (30, 20). The phone moves 40 further
 # along its length so the zoomed composition stays centred.
 END = (START[0] + 30 + 40, START[1] + 20)
 SENSOR_LOCAL = (SENSOR_X, -PHONE_H / 2 + 0.683)
@@ -139,7 +139,7 @@ def rotate(data, degrees):
               and layer.get('parent') == 3 and layer['ks']['r'].get('a')]
     assert len(checks) == 1
     keys = checks[0]['ks']['r']['k']
-    # AOSP starts the spin at -180; with a 180-degree root that would not spin.
+    # AOSP starts the spin at -180. With a 180-degree root that would not spin.
     keys[0]['s'] = [-360 if degrees == 180 else -180]
     keys[1]['s'] = [-degrees]
     out['nm'] = 'FP6 side sensor, root rotation %d' % degrees

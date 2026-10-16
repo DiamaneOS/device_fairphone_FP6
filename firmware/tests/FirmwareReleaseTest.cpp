@@ -33,7 +33,7 @@ std::string hex(const Digest& digest) {
 }
 
 // Deterministic test data that does not repeat within a chunk (a
-// Lehmer generator; no wrap-around, which the overflow sanitizer would trap).
+// Lehmer generator, no wrap-around, which the overflow sanitizer would trap).
 std::string pattern(size_t bytes, uint64_t seed) {
     std::string data(bytes, '\0');
     for (auto& c : data) {
@@ -210,7 +210,7 @@ TEST(FirmwareReleaseTest, ReportsUnknownWhenAPartitionMatchesNothing) {
 }
 
 TEST(FirmwareReleaseTest, ByteIdenticalReleasesReportTheNewest) {
-    // 16.100.0 and 16.111.0 ship the same tz; abl tells them apart.
+    // 16.100.0 and 16.111.0 ship the same tz. abl tells them apart.
     const std::string text = line("abl", "16.111.0", kAblNew) + line("tz", "16.111.0", kTzOld) +
                              line("abl", "16.100.0", kAblOld) + line("tz", "16.100.0", kTzOld);
     auto table = parseTable(text);

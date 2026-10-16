@@ -7,7 +7,7 @@
     <!-- Show Display > Smooth display (AOSP): a switch between a 60 Hz and a
          120 Hz cap. Both stay adaptive: the panel idles at 10 Hz. This also
          shows Developer options > Force peak refresh rate. Stock Settings hides
-         this switch and shows a 60/90/120 Hz "Refresh Rate" list; picking an
+         this switch and shows a 60/90/120 Hz "Refresh Rate" list. Picking an
          entry also sets match_content_frame_rate to 0, which on this framework
          locks the panel to one rate, so the AOSP switch is kept. -->
     <bool name="config_show_smooth_display">true</bool>

@@ -7,13 +7,13 @@
      port (130), because the display HAL reports its own display ID.
 
      The brightness table is measured on the panel (white, 20 % window). The
-     display HAL writes panel level int(1 + backlight * 4093); the kernel maps
+     display HAL writes panel level int(1 + backlight * 4093). The kernel maps
      levels above 2048 onto the panel's high-brightness band, where only white
      gets brighter (mid greys stay put, colours oversaturate).
 
      - Brightness is linear in nits, so the slider and the brightness ramps
        (both HLG over brightness) are perceptually even. Only evenDimmer can
-       give brightness -> backlight a shape; it is used for that alone.
+       give brightness -> backlight a shape. It is used for that alone.
      - Floor: level 10, 2.0 nits. Top: level 3480, 1151 nits.
      - The manual range ends at level 2048 (757 nits), the high-brightness
        transition. The band above is for sunlight. -->

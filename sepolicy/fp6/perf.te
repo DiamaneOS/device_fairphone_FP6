@@ -2,7 +2,7 @@
 # Copyright 2026 The DiamaneOS Project
 # Scheduler and memory tuning from boot/init.fp6.perf.rc (vendor_init). The
 # platform labels none of these sysctls, so they would share the generic proc
-# label; each gets its own type (genfs lines in fp6/genfs_contexts) and only
+# label. Each gets its own type (genfs lines in fp6/genfs_contexts) and only
 # vendor_init writes them.
 #
 # WALT scheduler tunables (/proc/sys/walt: sched_boost, migration thresholds,

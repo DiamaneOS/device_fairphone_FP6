@@ -166,7 +166,7 @@ def read_records(paths, executable, domain):
             exe, subj = decode(fields.get('exe', '""')), fields.get('subj', '')
             if exe != executable and subj != domain:
                 continue
-            # logcat and dmesg carry the same record; its serial is unique per boot.
+            # logcat and dmesg carry the same record. Its serial is unique per boot.
             key = (match.group(1).rpartition(':')[2], fields.get('syscall'))
             if key in seen:
                 continue

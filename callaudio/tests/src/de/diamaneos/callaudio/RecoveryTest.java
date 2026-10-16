@@ -97,7 +97,7 @@ public final class RecoveryTest {
     /**
      * Two slots re-send their call state within a few milliseconds of audioserver coming back:
      * slot 1's request lands just before system_server's permission push and is denied, slot 2's
-     * just after and is accepted. Slot 1 must still be retried; the radio daemon will not send its
+     * just after and is accepted. Slot 1 must still be retried. The radio daemon will not send its
      * unchanged call state again.
      */
     @Test
@@ -111,7 +111,7 @@ public final class RecoveryTest {
             int status = flinger.set().getAsInt();
             if (++slot1Calls[0] == 1) {
                 // The permission push lands, then slot 2's request (on its own thread in the
-                // app; here in between slot 1's first attempt and its first retry check).
+                // app, here in between slot 1's first attempt and its first retry check).
                 flinger.permittedAt = flinger.clock[0];
                 slot2[0] = flinger.retry(recovery);
             }
@@ -124,7 +124,7 @@ public final class RecoveryTest {
         assertEquals(Recovery.RETRY_MS, flinger.clock[0]);
     }
 
-    /** The permission push can take longer than a few retries; the window bounds them. */
+    /** The permission push can take longer than a few retries. The window bounds them. */
     @Test
     public void latePermissionPushStillApplied() {
         Flinger flinger = new Flinger();
@@ -142,7 +142,7 @@ public final class RecoveryTest {
         Recovery recovery = new Recovery();
         recovery.begin(0);
         assertEquals(DENIED, flinger.retry(recovery));
-        // Attempts at 0, 100, ..., WINDOW_MS - 100; none after the window closed.
+        // Attempts at 0, 100, ..., WINDOW_MS - 100. None after the window closed.
         assertEquals(Recovery.WINDOW_MS / Recovery.RETRY_MS, flinger.calls);
         assertEquals(Recovery.WINDOW_MS, flinger.clock[0]);
     }

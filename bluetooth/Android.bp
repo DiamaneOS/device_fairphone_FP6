@@ -8,7 +8,7 @@ package {
 // Bluetooth HCI service: registers the stock Qualcomm HCI implementation
 // (selected stock vendor file) through HIDL passthrough, without the FM, ANT,
 // SAR, config-store and TPI libraries the stock service links (service.cpp).
-// init.fp6.bluetooth.rc starts it; manifest.xml declares IBluetoothHci 1.1.
+// init.fp6.bluetooth.rc starts it. manifest.xml declares IBluetoothHci 1.1.
 //
 // The service installs a seccomp filter from bluetooth-hci.policy
 // (seccomp/) at the start of main(), before it loads the HCI implementation.

@@ -15,7 +15,7 @@
 # HAL attributes, tee and wpa_supplicant_macsec. Those rules cannot be narrowed
 # without changing the platform policy, so ueventd also makes the node 0400
 # root (boot/ueventd.rc): of the processes that run in those domains, only the
-# root ones (init, ueventd, vendor_init, vold, apexd) pass the file mode; the
+# root ones (init, ueventd, vendor_init, vold, apexd) pass the file mode. The
 # Bluetooth HAL, rild, the Wi-Fi HAL, wpa_supplicant and qseecomd run as their
 # own users without CAP_DAC_OVERRIDE or CAP_DAC_READ_SEARCH.
 type vendor_sysfs_soc_serial, sysfs_type, fs_type;

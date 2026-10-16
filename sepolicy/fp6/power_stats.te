@@ -3,7 +3,7 @@
 # Power stats HAL (android.hardware.power.stats-service.fp6, device
 # power/stats) in the platform hal_power_stats_default domain. It reads the SoC
 # and remote-processor sleep counters through the qcom_stats driver's
-# /dev/stats ioctls (file_contexts; ueventd gives the node to the HAL's own
+# /dev/stats ioctls (file_contexts, ueventd gives the node to the HAL's own
 # user, read-only) and serves them to the platform clients of IPowerStats
 # (system_server, statsd, dumpstate, audioserver, traced_probes). It opens no
 # other file and uses no sysfs, debugfs or property.

@@ -9,8 +9,8 @@ package {
 // and hints to the perf2 daemon. The stock camera (camera.qcom.so) and SDM
 // composition extension (libsdmextension.so) load it by name. The camera's
 // open, close and snapshot hints become time-limited power HAL boosts
-// (camera_hints.cpp); every other call gets a valid handle and does nothing,
-// and nothing looks up the perf2 service. power/power.mk installs it;
+// (camera_hints.cpp). Every other call gets a valid handle and does nothing,
+// and nothing looks up the perf2 service. power/power.mk installs it.
 // client.c lists the exported calls.
 cc_library_shared {
     name: "libqti-perfd-client",

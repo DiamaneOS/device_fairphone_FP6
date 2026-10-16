@@ -33,7 +33,7 @@ constexpr int64_t kRefreshMs = 60 * 60 * 1000;
 // from the Unix epoch.
 constexpr int64_t kUnsetClockMarginMs = 60 * 1000;
 
-// Parses the record file; nullopt if it is not exactly one valid record.
+// Parses the record file. nullopt if it is not exactly one valid record.
 std::optional<Record> parseRecord(std::string_view text);
 
 std::string formatRecord(const Record& record);

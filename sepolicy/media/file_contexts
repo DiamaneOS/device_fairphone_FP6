@@ -9,5 +9,5 @@
 # (mediacodec.te).
 /dev/video32                                            u:object_r:vendor_video_codec_device:s0
 /dev/video33                                            u:object_r:vendor_video_codec_device:s0
-# The Widevine DRM HAL's data (stock label; the package's rc creates it).
+# The Widevine DRM HAL's data (stock label, the package's rc creates it).
 /data/vendor/mediadrm(/.*)?                             u:object_r:vendor_mediadrm_vendor_data_file:s0

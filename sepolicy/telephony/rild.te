@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # The stock QCRIL daemon qcrilNrd runs in the platform rild domain (a
-# hal_telephony server; the platform policy covers the AOSP radio HAL services).
+# hal_telephony server, the platform policy covers the AOSP radio HAL services).
 # Reduced from Qualcomm sepolicy_vndr @ 67fa928299a49374a55281969fee357884c86890
 # generic/vendor/common/rild.te, qva/vendor/common/rild.te,
 # generic/vendor/volcano/rild.te and generic/vendor/common/hal_telephony.te.
@@ -9,16 +9,16 @@
 # vendor tools (voice-call logging), the time and SSG TrustZone daemons, the
 # legacy MSM IPC-router socket ioctls, the
 # data-factory services, the IMS factory client, the
-# QCRIL client socket (/dev/socket/qcrild; its module is not installed) and
+# QCRIL client socket (/dev/socket/qcrild, its module is not installed) and
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
 # binderservicedomain, so apps cannot call it through the platform appdomain
-# rule; its app clients get scoped binder_call grants in qtelephony.te,
+# rule. Its app clients get scoped binder_call grants in qtelephony.te,
 # fp6_callaudio_app.te and fp6_iwlan_app.te.
 
 # Qualcomm services the device declares: IImsRadio and IQtiRadioConfig
 # (vendor_hal_telephony_service2), IQcRilAudio and IUimLpa (own types,
-# service.te). Upstream grants add on these to every hal_telephony server;
-# here only to rild.
+# service.te). Upstream grants add on these to every hal_telephony server.
+# Here only to rild.
 allow rild { vendor_hal_telephony_service2 fp6_hal_qcrilaudio_service fp6_hal_uimlpa_service }:service_manager { add find };
 
 # The SIM's secure element for OMAPI (SecureElementService), as on stock and on
@@ -39,10 +39,10 @@ r_dir_file(rild, vendor_mbn_data_file)
 allow rild self:qipcrtr_socket create_socket_perms_no_ioctl;
 
 # The data module's DSI layer waits for nicmd's answer over TIPC (libnicm
-# RequestTIPCMessenger/EventTIPCMessenger) before it allows any data call;
-# without it every call fails at once with cause 0x1004. Same as stock
+# RequestTIPCMessenger/EventTIPCMessenger) before it allows any data call.
+# Without it every call fails at once with cause 0x1004. Same as stock
 # (vendor_sepolicy.cil line 6576). No TIPC bearer is configured and the kernel
-# builds TIPC without the UDP bearer and crypto; only rild and nicmd may
+# builds TIPC without the UDP bearer and crypto. Only rild and nicmd may
 # create TIPC sockets.
 allow rild self:tipc_socket create_socket_perms_no_ioctl;
 neverallow { domain -rild -vendor_nicmd } self:tipc_socket create;

@@ -10,7 +10,7 @@
     <bool name="config_automatic_brightness_available">true</bool>
 
     <!-- Ambient light (lux) thresholds and the display brightness (nits)
-         wanted between them; one more nits value than lux levels. The last
+         wanted between them. One more nits value than lux levels. The last
          value is the top of the range: from 20000 lux the panel runs at
          level 3480. Values above 757 nits need the high-brightness mode of
          display/display_port_130.xml (10000 lux or more). -->

@@ -26,7 +26,7 @@
 #
 
 # FP6 recovery adaptation. The platform init.rc owns ADB/sideload/fastboot
-# compositions; this file supplies only the matched controller and firmware.
+# compositions. This file supplies only the matched controller and firmware.
 on init
     setprop sys.usb.configfs 1
     setprop sys.usb.controller a600000.dwc3

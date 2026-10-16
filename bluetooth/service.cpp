@@ -56,7 +56,7 @@ constexpr char kSeccompMode[] = "trap";
 // bluetooth-hci.policy, and listed calls whose arguments do not match their
 // rule, are
 // - logged and allowed (SECCOMP_RET_LOG, kernel audit record type 1326) when
-//   built with BT_SECCOMP_LOG_ONLY, to collect the service's profile;
+//   built with BT_SECCOMP_LOG_ONLY, to collect the service's profile.
 // - otherwise trapped: SIGSYS, a tombstone naming the call, and the service
 //   dies (init restarts it).
 // The filter also asks the kernel to log trapped calls and calls the policy
@@ -89,8 +89,8 @@ void InstallSeccompFilter() {
     if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0) {
         LOG_ALWAYS_FATAL("Cannot set no_new_privs: %s", strerror(errno));
     }
-    // TSYNC applies the filter and no_new_privs to every thread of the process;
-    // a positive result names a thread that could not be synchronised.
+    // TSYNC applies the filter and no_new_privs to every thread of the process.
+    // A positive result names a thread that could not be synchronised.
     const int installed = sys_seccomp(SECCOMP_SET_MODE_FILTER,
                                       SECCOMP_FILTER_FLAG_TSYNC | kSeccompFilterFlagLog, &prog);
     if (installed != 0) {
@@ -116,7 +116,7 @@ struct SocName {
 };
 
 // The stock service's chipset-to-SoC-name table, in its order. For wcn786x
-// the stock service also sets persist.vendor.qcom.bluetooth.sec_soc; the FP6
+// the stock service also sets persist.vendor.qcom.bluetooth.sec_soc. The FP6
 // has no such chip and the HAL may not set that property, so it is left out.
 constexpr SocName kSocNames[] = {
         {"qca6490", "hastings"}, {"qca6390", "hastings"}, {"kiwi", "hamilton"},

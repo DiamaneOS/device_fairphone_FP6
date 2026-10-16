@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # Modem subsystem support (installed as /vendor/etc/init/init.fp6.modem.rc).
-# pd-mapper, pm-service and pm-proxy are defined in boot/init.qcom.rc;
-# rmt_storage by its selected stock rc file; tqftpserv below.
+# pd-mapper, pm-service and pm-proxy are defined in boot/init.qcom.rc,
+# rmt_storage in its selected stock rc file and tqftpserv below.
 
 # Subsystem restart (matches stock init.qcom.rc). The kernel probes every
 # remote processor with recovery disabled, so a crash would panic the phone.
@@ -17,7 +17,7 @@
 # (this file's early-boot actions run after that file's). timeout_period bounds
 # the wait: if it has not exited by then, init kills it and goes on, and the
 # property trigger below runs it again after boot. That trigger also covers
-# later changes of the property; a second run only writes "enabled" again.
+# later changes of the property. A second run only writes "enabled" again.
 # Always start it without arguments (it has a --dump option).
 service vendor.ssr_setup /vendor/bin/ssr_setup
     user root
@@ -39,7 +39,7 @@ on early-boot
 
 # tqftpserv (modem.mk) serves the modem's TFTP requests over QRTR.
 # Read-write requests (/readwrite/...) go to /data/vendor/tmp/tqftpserv, the
-# directory tqftpserv uses on Android; the modem keeps server_check.txt and
+# directory tqftpserv uses on Android. The modem keeps server_check.txt and
 # mcfg.tmp there. Unlike Qualcomm's tftp_server, which uses persist, a factory
 # reset clears it. Only the service's own user may enter it.
 on post-fs-data
@@ -47,7 +47,7 @@ on post-fs-data
     mkdir /data/vendor/tmp/tqftpserv 0700 vendor_tqftpserv vendor_tqftpserv
 
 # Own user (config.fs), no capabilities. The system group only lets it read the
-# modem partition, which is mounted for system (boot/fstab.qcom); SELinux limits
+# modem partition, which is mounted for system (boot/fstab.qcom). SELinux limits
 # it to those files. class core starts after post-fs-data, with the peripheral
 # manager that boots the modem. On debuggable builds its request log goes to
 # the kernel log.

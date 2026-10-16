@@ -21,7 +21,7 @@
     <bool name="config_telephony5gStandalone">true</bool>
     <bool name="config_telephony5gNonStandalone">true</bool>
 
-    <!-- The built-in eUICC is physical slot 1. Stock sets no slots; without this Android
+    <!-- The built-in eUICC is physical slot 1. Stock sets no slots. Without this Android
          treats the eSIM as removable. -->
     <integer-array name="non_removable_euicc_slots">
         <item>1</item>

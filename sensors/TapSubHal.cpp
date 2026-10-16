@@ -15,7 +15,7 @@
 // readers. Both sensors are one-shot: after its gesture a sensor disarms itself
 // and turns the gesture off in the controller until SystemUI asks again.
 //
-// One thread does all node I/O; activate() only records what is wanted.
+// One thread does all node I/O. activate() only records what is wanted.
 
 #include <fcntl.h>
 #include <poll.h>

@@ -9,7 +9,7 @@ on property:sys.boot_completed=1
 # The slot suffix is an argument, so the service reads no property. Own user
 # and group (config.fs), no capabilities: the group is what lets it read the
 # firmware partitions (boot/ueventd.rc). Idle I/O class and the lowest CPU
-# priority; init stops it after 60 s if a read hangs.
+# priority. init stops it after 60 s if a read hangs.
 service vendor.fwrelease /vendor/bin/fwrelease ${ro.boot.slot_suffix}
     user vendor_fwrelease
     group vendor_fwrelease

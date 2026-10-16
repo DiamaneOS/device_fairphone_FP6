@@ -105,7 +105,7 @@ TEST(RecordTest, RefreshesTheSavedTimeHourly) {
 }
 
 TEST(RecordTest, NeverSavesAnUnsetClock) {
-    // At boot the kernel copies the counter into the clock; before Android
+    // At boot the kernel copies the counter into the clock. Before Android
     // sets the time the offset is about zero and means nothing.
     EXPECT_FALSE(needsSave(std::nullopt, Record{350, kRtcSec}));
     EXPECT_FALSE(needsSave(kSaved, Record{-59 * 1000, kRtcSec}));

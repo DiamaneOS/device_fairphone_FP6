@@ -97,7 +97,7 @@ on property:sys.boot_completed=1
     write /sys/devices/system/cpu/cpufreq/policy4/walt/hispeed_load 85
     write /sys/devices/system/cpu/cpufreq/policy7/walt/hispeed_load 85
     # The minimum frequencies (stock 595200, 633600, 633600) are the power
-    # HAL's defaults in power/powerhint.json; it owns scaling_min_freq.
+    # HAL's defaults in power/powerhint.json. It owns scaling_min_freq.
     write /proc/sys/kernel/sched_util_clamp_min_rt_default 0
 
     # Background work stays on the silver cores.

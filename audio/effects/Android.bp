@@ -4,7 +4,7 @@
 // Qualcomm's VoIP pre-processing descriptors and volume listener, built from
 // the unmodified CodeLinaro audio-ar sources listed in provenance.json instead
 // of the closed stock builds. Library names, effect UUIDs, descriptors and the
-// exported AELI symbol match stock; audio_effects.xml loads both into the audio
+// exported AELI symbol match stock. audio_effects.xml loads both into the audio
 // HAL process. include/PalDefs.h is this tree's own file: the one PAL type the
 // listener uses.
 
@@ -45,7 +45,7 @@ cc_defaults {
 
 // AEC and NS descriptors for VoIP capture. They carry the hardware-tunnel
 // flag, so the audio HAL runs the DSP's tuned echo canceller and noise
-// suppressor; the library itself processes no audio.
+// suppressor. The library itself processes no audio.
 cc_library_shared {
     name: "libqcomvoiceprocessing",
     defaults: ["fp6_audio_effects_defaults"],

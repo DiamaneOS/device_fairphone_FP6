@@ -6,7 +6,7 @@ package de.diamaneos.callaudio;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Narrow QCRIL call-control contract; never forward unrelated HAL parameters. */
+/** Narrow QCRIL call-control contract. Never forward unrelated HAL parameters. */
 final class AudioParameters {
     // Containment limit, comfortably above four stock keys and 32-bit values.
     static final int MAX_LENGTH = 256;

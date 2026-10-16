@@ -2,7 +2,7 @@
 # boot which sensors the switch blocks (a mask: 1 microphone, 2 camera) and
 # refuses every later write. Until this write it blocks everything while the
 # switch is down. system_server keeps the property equal to the user's
-# Moments action; a change takes effect at the next boot.
+# Moments action. A change takes effect at the next boot.
 #
 # After init.rc's post-fs-data, which loads the persistent properties and
 # waits for them, and before the audio and camera services start.

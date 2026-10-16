@@ -4,10 +4,10 @@
 # timekeepd (timekeep/) keeps the system clock across reboots on top of the
 # read-only PMIC RTC. Two services run the same binary (timekeepd.rc):
 # - vendor.timekeepd-restore (vendor_timekeepd_restore) sets the clock once at
-#   post-fs-data from the RTC counter plus the saved offset, then exits;
+#   post-fs-data from the RTC counter plus the saved offset, then exits.
 # - vendor.timekeepd (vendor_timekeepd) keeps running and saves the offset
 #   whenever the clock changes. It cannot set the clock.
-# They replace Qualcomm's time_daemon (not installed; its imported policy is
+# They replace Qualcomm's time_daemon (not installed, its imported policy is
 # left out), which also holds CAP_SYS_TIME but speaks QMI to the modem, writes
 # persist and the SMEM log and serves libtime_genoff clients. None of that is
 # granted here: no sockets, binder, properties, /dev/rtc0 or persist.
@@ -26,9 +26,9 @@ neverallow vendor_timekeepd self:capability *;
 neverallow { vendor_timekeepd vendor_timekeepd_restore } self:capability2 *;
 
 # The RTC counter, /sys/class/rtc/rtc0/since_epoch. The class directory is the
-# platform's sysfs_rtc; the rtc0 link and the device directories are sysfs,
+# platform's sysfs_rtc. The rtc0 link and the device directories are sysfs,
 # which every domain may follow and search. Only the counter file gets this
-# type (genfs_contexts); the RTC's alarm and other attributes keep their
+# type (genfs_contexts). The RTC's alarm and other attributes keep their
 # generic label and stay out of reach.
 type vendor_sysfs_rtc_counter, sysfs_type, fs_type;
 allow { vendor_timekeepd vendor_timekeepd_restore } sysfs_rtc:dir search;

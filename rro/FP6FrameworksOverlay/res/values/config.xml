@@ -34,9 +34,9 @@
 
     <!-- Pin the panel to 60 Hz while the camera app is in front:
          - photo mode's 4:3 preview (1600x1200) is over the display's
-           1088-line rotation limit, so the GPU composes it (~10 ms a frame);
-         - at 90/120 Hz that misses every deadline, at 60 Hz it fits;
-         - frameworks_base 89ac1c80 caps only the render rate; this list is
+           1088-line rotation limit, so the GPU composes it (~10 ms a frame).
+         - at 90/120 Hz that misses every deadline, at 60 Hz it fits.
+         - frameworks_base 89ac1c80 caps only the render rate. This list is
            the knob that caps the physical mode, for listed apps only. -->
     <string-array name="config_highRefreshRateBlacklist" translatable="false">
         <item>app.grapheneos.camera</item>
@@ -47,7 +47,7 @@
     <string name="config_mainDisplayShape" translatable="false">M20 0h1040s20 0 20 20v2360s0 20 -20 20h-1040s-20 0 -20 -20v-2360s0 -20 20 -20</string>
 
     <!-- Stock uses 0dp, which puts the status bar clock and battery inside the
-         physical screen corners; keep them clear of the corners. -->
+         physical screen corners. Keep them clear of the corners. -->
     <dimen name="rounded_corner_content_padding">24dp</dimen>
 
     <!-- FP6.QREL.16.100.0 factory FrameworksResCommon_Sys overlay: the
@@ -82,7 +82,7 @@
          until turned on). With the double-tap sensor in doze.xml, the
          DiamaneOS Settings switch drives Android's doze double tap
          (doze_pulse_on_double_tap) instead of the power HAL mode, so SystemUI
-         checks the proximity sensor first; the power HAL ignores
+         checks the proximity sensor first. The power HAL ignores
          Mode::DOUBLE_TAP_TO_WAKE. -->
     <bool name="config_supportDoubleTapWake">true</bool>
 
@@ -90,7 +90,7 @@
          (DisplayCapability::SKIP_CLIENT_COLOR_TRANSFORM, SDM colour manager), so
          Night Light and the Modes grayscale effect are offered and run on the
          display pipeline instead of the GPU. AOSP ties the next two values to
-         this one; they are set explicitly so an overlay change cannot silently
+         this one. They are set explicitly so an overlay change cannot silently
          drop them. Extra dim has no switch while config_evenDimmerEnabled
          (brightness.xml) is on. -->
     <bool name="config_setColorTransformAccelerated">true</bool>
@@ -99,7 +99,7 @@
 
     <!-- Keyboard key presses compose the CLICK primitive at this amplitude,
          which the FP6 vibrator HAL plays as the medium tick
-         (Awinic RAM wave 3 at gain 0x40); other clicks keep their own effect. -->
+         (Awinic RAM wave 3 at gain 0x40). Other clicks keep their own effect. -->
     <item name="config_keyboardHapticFeedbackFixedAmplitude" format="float" type="dimen">0.5</item>
 
     <!-- Camera and microphone access toggles, as on GrapheneOS's Pixels:
@@ -114,7 +114,7 @@
 
     <!-- The Moments switch: the slider on the side (privacy switch driver,
          EV_SW SW_PEN_INSERTED, as gpio-keys reported it). The kernel reports 1
-         with the slider up and 0 with it down; down means Moments on, so on
+         with the slider up and 0 with it down. Down means Moments on, so on
          is value 0. -->
     <integer name="config_momentsSwitchCode">15</integer>
     <integer name="config_momentsSwitchActiveValue">0</integer>

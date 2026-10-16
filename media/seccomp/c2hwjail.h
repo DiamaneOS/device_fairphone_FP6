@@ -20,7 +20,7 @@ namespace c2hwjail {
 struct Platform {
     // A system property, "" if unset or unreadable.
     std::function<std::string(const char* name)> getProperty;
-    // A whole file; false if it cannot be read.
+    // A whole file. False if it cannot be read.
     std::function<bool(const std::string& path, std::string* content)> readFile;
     // stat(2): 0, or the errno.
     std::function<int(const char* path, struct stat* st)> statPath;
@@ -43,7 +43,7 @@ size_t TrapsToErrno(struct sock_fprog* prog);
 
 // Compiles the minijail policy at path and installs it for every thread of
 // the process, with no_new_privs. Calls outside it fail with EPERM (logged by
-// the kernel audit as type 1326 records); with logOnly they are logged and
+// the kernel audit as type 1326 records). With logOnly they are logged and
 // allowed. False, and *error, if it cannot.
 bool InstallFilter(const char* path, bool logOnly, std::string* error);
 

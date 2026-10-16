@@ -3,7 +3,7 @@
 # Power HAL: LineageOS libperfmgr (android.hardware.power-service.
 # lineage-libperfmgr), driven by power/powerhint.json. It runs as system with
 # CAP_SYS_NICE only (power/init.fp6.power.rc). Every node it writes gets its own
-# type here and init hands exactly those nodes to system; the WALT sysctl it
+# type here and init hands exactly those nodes to system. The WALT sysctl it
 # cannot write goes through fixed init property triggers.
 
 # CPU frequency floors and caps: scaling_min_freq and scaling_max_freq of
@@ -40,14 +40,14 @@ typeattribute hal_power_default mlstrustedsubject;
 hal_client_domain(hal_power_default, hal_thermal)
 
 # vendor.powerhal.*: the HAL reads its switches (init, display idle support,
-# interaction timing, the sched_boost switch); vendor init sets
+# interaction timing, the sched_boost switch). Vendor init sets
 # vendor.powerhal.init at boot and clears the state properties when the
 # framework restarts (the module's own rc file).
 vendor_internal_prop(vendor_power_prop)
 get_prop(hal_power_default, vendor_power_prop)
 set_prop(vendor_init, vendor_power_prop)
 
-# vendor.powerhal.sched_boost: the HAL's only setting it may change; init
+# vendor.powerhal.sched_boost: the HAL's only setting it may change. init
 # turns the values 0, 1 and 2 into fixed writes of /proc/sys/walt/sched_boost
 # (power/init.fp6.power.rc). The sysctl is root-only and cannot be chowned.
 vendor_internal_prop(vendor_power_sched_boost_prop)

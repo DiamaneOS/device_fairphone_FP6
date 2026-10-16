@@ -6,7 +6,7 @@ package {
 }
 
 // The amplifier driver requests the factory calibration through firmware_class.
-// Keep the device's own calibration in persist; never package another unit's data.
+// Keep the device's own calibration in persist. Never package another unit's data.
 install_symlink {
     name: "fp6_audio_amplifier_calibration_link",
     vendor: true,

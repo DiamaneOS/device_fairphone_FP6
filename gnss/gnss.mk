@@ -2,7 +2,7 @@
 # Copyright 2026 The DiamaneOS Project
 
 # GNSS. The GNSS engine runs in the modem, so GNSS works only while the modem
-# runs (modem packet; pm-proxy keeps the modem vote). The HAL (android.hardware.gnss
+# runs (modem packet, pm-proxy keeps the modem vote). The HAL (android.hardware.gnss
 # IGnss v3) and its location libraries are built from CodeLinaro source:
 # hardware/qcom/gps and vendor/qcom/opensource/location (DiamaneOS forks),
 # libqti_vndfwk_detect_vendor from vendor/qcom/opensource/core-utils. The QMI
@@ -29,7 +29,7 @@ PRODUCT_PACKAGES += \
     libloc_api_v02 \
     libqti_vndfwk_detect_vendor
 
-# The HAL's state directory; stock creates it from loc-launcher.rc.
+# The HAL's state directory. Stock creates it from loc-launcher.rc.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/gnss/init.gnss.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.gnss.rc
 

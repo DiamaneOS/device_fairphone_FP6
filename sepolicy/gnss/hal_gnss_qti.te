@@ -25,11 +25,11 @@ hal_server_domain(vendor_hal_gnss_qti, hal_gnss)
 hal_client_domain(vendor_hal_gnss_qti, hal_health)
 
 # QMI LOC to the modem over QRTR. Stock grants this to the hal_gnss attribute
-# (CIL line 8140); here it is bound to the service domain and has no ioctls.
+# (CIL line 8140). Here it is bound to the service domain and has no ioctls.
 allow vendor_hal_gnss_qti self:qipcrtr_socket create_socket_perms_no_ioctl;
 
-# Engine state in /data/vendor/location (gps.prop, energy.conf; CIL lines
-# 4932-4933; no FIFOs).
+# Engine state in /data/vendor/location (gps.prop, energy.conf, CIL lines
+# 4932-4933, no FIFOs).
 allow vendor_hal_gnss_qti vendor_location_data_file:dir create_dir_perms;
 allow vendor_hal_gnss_qti vendor_location_data_file:file create_file_perms;
 

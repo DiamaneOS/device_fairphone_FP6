@@ -8,7 +8,7 @@
 // method order (transaction codes), oneway flags, version and hash were read
 // from the stock QtiTelephonyService stubs and checked against the stock
 // vendor.qti.hardware.radio.am-V1-ndk.so. The build passes version 1 and the
-// hash to the compiler (Android.bp); do not reorder or change anything here.
+// hash to the compiler (Android.bp). Do not reorder or change anything here.
 
 package vendor.qti.hardware.radio.am;
 
@@ -18,7 +18,7 @@ import vendor.qti.hardware.radio.am.IQcRilAudioResponse;
 
 @VintfStability
 interface IQcRilAudio {
-    // Transaction 1. Registers the client's request callback; returns the
+    // Transaction 1. Registers the client's request callback. Returns the
     // radio daemon's response callback.
     IQcRilAudioResponse setRequestInterface(in IQcRilAudioRequest request);
 

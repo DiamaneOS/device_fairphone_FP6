@@ -12,22 +12,22 @@
 //          configure_streams (5 s)
 //   0x1338 camera close tunings: before a flush or close (duration 0)
 //   0x1339 camera snapshot tunings: at each capture (10 s)
-//   0x1330 camera ZSL preview and 0x1331 camera 30 fps: while streaming;
+//   0x1330 camera ZSL preview and 0x1331 camera 30 fps: while streaming.
 //          Qualcomm's tunings for them cap the little cores to save power.
 //          Not forwarded.
 // Open and close both become Boost::CAMERA_LAUNCH and the snapshot
 // Boost::CAMERA_SHOT, as in Qualcomm's open camera HAL (QCameraPerf.cpp in
-// hardware/qcom/camera); powerhint.json defines both boosts.
+// hardware/qcom/camera). powerhint.json defines both boosts.
 //
 // Bounds: a request lasts its duration, at most kMaxTimedMs, or, with
 // duration 0, until perf_lock_rel and at most kMaxHoldMs. Each setBoost
 // carries the remaining time (never 0, which libperfmgr would treat as its
 // default), so the power HAL ends every boost on its own timer even if this
-// process dies. perf_lock_rel and renewals end what the handle started; when
+// process dies. perf_lock_rel and renewals end what the handle started. When
 // the last request for a boost ends, the boost is cancelled (setBoost -1).
 //
 // CamX threads only update a small request table under a mutex and wake a
-// worker thread; the worker alone looks up the power HAL (checkService, no
+// worker thread. The worker alone looks up the power HAL (checkService, no
 // waiting), caches the binder and makes the one-way setBoost calls. A slow or
 // missing power HAL never stalls the camera, and without it the hints stay
 // no-ops.
@@ -78,7 +78,7 @@ struct Request {
     int64_t deadline_ns;
 };
 
-// A setBoost call for the worker; duration_ms -1 cancels the boost.
+// A setBoost call for the worker. duration_ms -1 cancels the boost.
 struct Action {
     int boost;
     int32_t duration_ms;
@@ -89,7 +89,7 @@ struct Action {
 pthread_mutex_t gLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t gWake = PTHREAD_COND_INITIALIZER;
 Request gRequests[kMaxRequests];     // guarded by gLock
-int64_t gSentDeadline[kBoostCount];  // guarded by gLock; 0: no boost running
+int64_t gSentDeadline[kBoostCount];  // guarded by gLock. 0: no boost running
 bool gDirty;                         // guarded by gLock
 int gNextHandle = kFirstHandle;      // guarded by gLock
 pthread_once_t gWorkerOnce = PTHREAD_ONCE_INIT;

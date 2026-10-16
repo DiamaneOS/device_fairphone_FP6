@@ -11,7 +11,7 @@ hwbinder_use(fp6_iwlan_app)
 
 # Framework-managed DataService/NetworkService lifecycle and normal wake locks.
 # Android 17 constructs PowerManager with both IPowerManager and IThermalService.
-# The normal WAKE_LOCK permission still governs wake locks; this is discovery,
+# The normal WAKE_LOCK permission still governs wake locks. This is discovery,
 # not a grant to change thermal or power policy.
 allow fp6_iwlan_app { activity_service power_service thermal_service user_service }:service_manager find;
 allow fp6_iwlan_app vendor_hal_iwlan_service:service_manager find;
@@ -19,7 +19,7 @@ binder_call(fp6_iwlan_app, rild)
 binder_call(rild, fp6_iwlan_app)
 allow rild vendor_hal_iwlan_service:service_manager { add find };
 
-# Certificate lookup is local to this shared process; no ordinary app or
+# Certificate lookup is local to this shared process. No ordinary app or
 # other modem-facing daemon is made a client. The modem receives CA material
 # via the helper's QMI AUTH client, not through a network socket in this app.
 add_hwservice(fp6_iwlan_app, vendor_hal_cacert_hwservice)

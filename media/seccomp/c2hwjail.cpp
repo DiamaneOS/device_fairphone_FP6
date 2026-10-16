@@ -26,7 +26,7 @@
 // here runs from an ELF constructor, nothing aborts on a failed check, and
 // calls outside the policy fail with EPERM instead of killing the service.
 // The Qualcomm library registers every codec when it cannot read its target
-// specification; clients see only the filtering store's list.
+// specification. Clients see only the filtering store's list.
 
 #define LOG_TAG "c2hwjail"
 
@@ -100,7 +100,7 @@ namespace android {
 // The stock service calls this before it opens binder or loads the store.
 void SetUpMinijail(const std::string& base_policy_path, const std::string& additional_policy_path) {
     EnsureFilter();
-    // The real one aborts when it cannot read the base policy; that would
+    // The real one aborts when it cannot read the base policy. That would
     // stop the service from registering, so DiamaneOS's filter stays alone.
     if (access(base_policy_path.c_str(), R_OK) != 0) {
         ALOGE("stock seccomp policy %s unreadable, not stacked", base_policy_path.c_str());
@@ -145,7 +145,7 @@ void c2hwjailStoreCtor(void* self, const std::shared_ptr<C2ComponentStore>& stor
     using Ctor = void (*)(void*, const std::shared_ptr<C2ComponentStore>&);
     auto real = reinterpret_cast<Ctor>(RealSymbol(kHidlLibrary, C2HWJAIL_STORE_CTOR));
     // The service links libcodec2_hidl@1.2 for this very constructor, so the
-    // lookup cannot fail on a booting system; without it there is no store
+    // lookup cannot fail on a booting system. Without it there is no store
     // to build at all.
     LOG_ALWAYS_FATAL_IF(real == nullptr, "cannot build the Codec2 store");
     real(self, filtered);

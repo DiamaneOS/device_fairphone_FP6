@@ -6,7 +6,7 @@ package {
 }
 
 // AIDL fingerprint service for the FP6 FocalTech module. It replaces the stock
-// wrapper so the sensor is reported as a power-button sensor; the stock module
+// wrapper so the sensor is reported as a power-button sensor. The stock module
 // and its trusted app still do all matching, storage and lockout handling.
 
 cc_defaults {
@@ -21,7 +21,7 @@ cc_defaults {
         "libbinder_ndk",
         "liblog",
     ],
-    // The stock wrapper was built with CFI; keep that for the process that
+    // The stock wrapper was built with CFI. Keep that for the process that
     // handles biometric operations. Calls into the module's (non-CFI) entry
     // points go through the cross-DSO slow path.
     sanitize: {
@@ -80,7 +80,7 @@ cc_test {
     test_suites: ["device-tests"],
 }
 
-// The factory service is kept back, by exact name only; everything else passes.
+// The factory service is kept back, by exact name only. Everything else passes.
 cc_test {
     name: "fp6_fingerprint_module_factory_service_test",
     defaults: ["fp6_fingerprint_defaults"],

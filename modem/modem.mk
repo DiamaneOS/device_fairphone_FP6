@@ -27,7 +27,7 @@
 # Both use the linux-msm libqrtr (vendor/qcom/opensource/qrtr): tqftpserv links
 # it statically, pd-mapper loads it as libqrtr_linux_msm.so. Qualcomm's
 # libqrtr.so stays for the stock display, VM and QTEE libraries that link it.
-# Each runs as its own user without capabilities (config.fs); init and bionic
+# Each runs as its own user without capabilities (config.fs). init and bionic
 # look those users up in the generated vendor passwd and group files.
 PRODUCT_PACKAGES += \
     passwd_vendor \
@@ -46,7 +46,7 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/modem/init.modem.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.modem.rc
 
 # Subsystem restart for the modem and DSPs, as in the stock vendor build.prop.
-# ssr_setup turns it into "enabled" in /sys/class/remoteproc/*/recovery; without
+# ssr_setup turns it into "enabled" in /sys/class/remoteproc/*/recovery. Without
 # it the kernel panics the phone when a remote processor crashes.
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.ssr.restart_level=ALL_ENABLE

@@ -76,7 +76,7 @@ public final class StatusRelayTest {
     }
 
     /**
-     * The radio daemon restarts and the slot thread blocks until it registers again; meanwhile
+     * The radio daemon restarts and the slot thread blocks until it registers again. Meanwhile
      * audioserver dies and the update waits in the slot's queue. Before reporting on the new
      * registration the slot takes the monitor's current status, so the daemon is not told that
      * audio is up while it is down, and the queued update then changes nothing.
@@ -99,7 +99,7 @@ public final class StatusRelayTest {
         StatusRelay relay = new StatusRelay(OK, 0);
         sendIfAny(relay, relay.onRegistered());
         relay.onUnregistered();
-        // audioserver died and came back while the thread was blocked; the snapshot is OK 2.
+        // audioserver died and came back while the thread was blocked. The snapshot is OK 2.
         assertEquals(NONE, relay.onAudioStatus(OK, 2));
         assertEquals(OK, sendIfAny(relay, relay.onRegistered()));
         assertEquals(NONE, relay.onAudioStatus(SERVER_DIED, 1));

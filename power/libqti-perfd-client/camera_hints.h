@@ -14,7 +14,7 @@ extern "C" {
 
 // Starts or renews a camera hint. Returns the request's handle when the hint
 // becomes a power HAL boost, or 0 when it does not (not a forwarded hint, the
-// request table is full or the forwarding thread could not start); the
+// request table is full or the forwarding thread could not start). The
 // caller then answers as the no-op stub. Renewing one of these handles with a
 // hint that is not forwarded ends its boost. Never blocks on binder.
 CAMERA_HINTS_INTERNAL int camera_hint_acquire(int handle, int hint, int duration_ms);

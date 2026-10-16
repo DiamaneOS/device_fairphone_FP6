@@ -32,7 +32,7 @@ on post-fs-data
     # init.qcom.sh copies ver_info.txt (and the MBN tree, unused because
     # qcrilNr.db sets sw_mbn_update and hw_mbn_update to false) and then sets
     # ro.vendor.ril.mbn_copy_completed, which writes copy_complete=1. Only the
-    # version file is copied here; the MBN tree stays in the modem partition.
+    # version file is copied here. The MBN tree stays in the modem partition.
     copy /vendor/firmware_mnt/verinfo/ver_info.txt /data/vendor/modem_config/ver_info.txt
     chown radio root /data/vendor/modem_config/ver_info.txt
     chmod 0440 /data/vendor/modem_config/ver_info.txt

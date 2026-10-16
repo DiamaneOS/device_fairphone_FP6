@@ -9,6 +9,6 @@ vendor_internal_prop(vendor_bluetooth_hal_state_prop)
 # ro.vendor.bt.boot.macaddr: the factory Bluetooth address the HCI
 # implementation reads before its generated-address fallback. Without an entry
 # it would be vendor_default_prop, which every vendor domain may read. Vendor
-# internal: only the HAL reads it; only vendor_init sets it, from the copy
+# internal: only the HAL reads it. Only vendor_init sets it, from the copy
 # trigger in init.fp6.bluetooth.rc.
 vendor_internal_prop(vendor_bluetooth_address_prop)

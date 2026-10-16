@@ -1,0 +1,4 @@
+# User builds only (BoardConfig.mk). The USB controller starts with USB data
+# and alt modes off until the USB-C port setting applies
+# (boot/init.qcom.usb.rc).
+options dwc3_msm disable_usb_data_by_default=1

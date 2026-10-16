@@ -45,3 +45,10 @@ genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_min_freq u:object_r:v
 genfscon sysfs /devices/system/cpu/cpufreq/policy4/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
 genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_min_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
 genfscon sysfs /devices/system/cpu/cpufreq/policy7/scaling_max_freq u:object_r:vendor_sysfs_cpufreq_limit:s0
+# USB-C port control: the USB controller's data switch and the charger
+# firmware's input suspend, which Off sets (usb_port_security.te).
+genfscon sysfs /devices/platform/soc/a600000.ssusb/data_path_enable u:object_r:vendor_sysfs_usb_data_path:s0
+genfscon sysfs /class/qcom-battery/suspend_input_current u:object_r:vendor_sysfs_usb_input_suspend:s0
+# Charge limit: the charger firmware's charging pause, which the health
+# service writes (charge_limit.te).
+genfscon sysfs /class/qcom-battery/charge_disable u:object_r:vendor_sysfs_charge_disable:s0

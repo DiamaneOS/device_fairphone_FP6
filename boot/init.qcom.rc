@@ -23,6 +23,21 @@ on init
 on init && property:ro.debuggable=0
     chmod 0000 /dev/pmsg0
 
+# Off-mode charging skips "on fs" and later, so nothing loads the vendor
+# modules or starts the ADSP, whose firmware does the charging. Without it the
+# charger finds no power supply and powers off. As stock does, bring up only
+# what the charger needs: ADSP firmware, platform and display modules, the
+# ADSP's link and loader, then the ADSP.
+on init && property:ro.boot.mode=charger
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337,context=u:object_r:firmware_file:s0
+    exec_start vendor.modprobe_platform
+    exec_start vendor.modprobe_display
+    exec_start vendor.modprobe_adsp
+    start vendor.pd_mapper
+    exec_start vendor.ssr_setup
+    wait /sys/kernel/boot_adsp/boot 5
+    write /sys/kernel/boot_adsp/boot 1
+
 on early-fs
     start vold
 
@@ -170,6 +185,17 @@ service vendor.modprobe_touch /vendor/bin/modprobe -q -b -d /vendor/lib/modules 
     disabled
     oneshot
 
+# Charger mode only. A normal boot loads these two with the wireless and audio
+# modules.
+service vendor.modprobe_adsp /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules qrtr-smd.ko adsp_loader_dlkm.ko
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
 on late-fs
     mount_all --late
 
@@ -205,6 +231,22 @@ on early-boot
 # brightness. Match the stock FP6 boot-time ownership.
 on boot
     chown system system /sys/class/backlight/panel0-backlight/brightness
+
+# Charge limit: the health service, which runs as system, pauses and resumes
+# charging through the charger firmware's charge_disable
+# (sepolicy/fp6/charge_limit.te). The qcom-battery class appears once the ADSP
+# charger firmware is up, so wait for it, and chown again at boot if it came
+# later. A pause the service kept in persist.vendor.charge_limit is set again
+# here, before the framework is up, as stock does. Charger mode never runs it.
+on early-boot
+    wait /sys/class/qcom-battery/charge_disable 5
+    chown system system /sys/class/qcom-battery/charge_disable
+
+on early-boot && property:persist.vendor.charge_limit=paused
+    write /sys/class/qcom-battery/charge_disable 1
+
+on boot
+    chown system system /sys/class/qcom-battery/charge_disable
 
 # Remote processors (matches stock init.qti.kernel.rc and init.target.rc): the
 # ADSP provides USB role detection, charging and audio, the CDSP compute.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 The DiamaneOS Project
+  SPDX-License-Identifier: Apache-2.0
+
+  French for values/charge_limit_strings.xml, translated by the DiamaneOS project.
+  "Off" is Settings' own switch_off_text.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="charging_optimization_title">"Optimisation de la recharge"</string>
+    <string name="charging_optimization_entry_summary_charge_limit">"Limiter à <xliff:g id="percentage" example="80%">%1$s</xliff:g>"</string>
+    <string name="charging_optimization_summary_off">"Désactivé"</string>
+    <string name="charging_optimization_footer_message_charging_limit">"Pour prolonger la durée de vie de la batterie, la recharge s’interrompt à <xliff:g id="limit" example="80%">%1$s</xliff:g> et reprend juste en dessous. Désactivez cette option pour recharger jusqu’à <xliff:g id="full" example="100%">%2$s</xliff:g>."</string>
+    <string name="charge_limit_indexing_keywords">"limite de charge, protection de la batterie, état de la batterie"</string>
+</resources>

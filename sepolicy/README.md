@@ -172,6 +172,21 @@ may access, and why. It describes the policy of a release (`user`) build.
     events nor drive the chip's force-feedback input node. The grants for the
     absent `qcom-haptics` sysfs node and persist haptics calibration are
     removed too.
+  - USB-C port control (`usb_port_security.te`), two nodes with their own
+    types, written by vendor_init from the `sys.port_security_mode` and boot
+    triggers in `boot/init.qcom.usb.rc`:
+    - the USB controller's `dynamic_disable` (data off, charging kept):
+      `vendor_sysfs_usb_data_disable`, relabelled in
+      `vendor-common/genfs_contexts` from `vendor_sysfs_usb_device`, which
+      also covers the controller role. The USB HAL may not write it: with
+      port control on, the framework never passes `enableUsbData` to the
+      HAL, its only writer;
+    - the charger firmware's input suspend
+      (`/sys/class/qcom-battery/suspend_input_current`, which Off sets):
+      `vendor_sysfs_usb_input_suspend` (`fp6/genfs_contexts`), until now the
+      generic `sysfs` label.
+    Neverallows keep every other domain from writing either, except ueventd,
+    which the platform lets write all of sysfs.
   Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
   `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
   (its fstab line is gone: nothing on the FP6 mounts `/product/vm-system`). The modem's `study` partition has
@@ -319,6 +334,33 @@ this maintained subset; it is not required merely to reduce this folder's size.
     check phone (single tap): it writes the switch and reads the report
     (`fp6/touch.te`).
   - The power HAL has no access.
+- The USB controller's data switch `data_path_enable` (GrapheneOS's three
+  data commands, alt modes ignored unless on, charging kept) is
+  `vendor_sysfs_usb_data_path` (`fp6/genfs_contexts`).
+  - The USB HAL may not write it: it parses data from the Type-C partner,
+    and with port control on the framework never passes `enableUsbData` to
+    it.
+- The controller's older `dynamic_disable` keeps its own type,
+  `vendor_sysfs_usb_data_disable` (`vendor-common/genfs_contexts`), split
+  from `vendor_sysfs_usb_device`, which also covers the controller role. No
+  trigger writes it.
+- Neverallows keep every other domain from writing any of them, except
+  ueventd, which the platform lets write all of sysfs.
+### Charge limit
+
+- The health service (`hal_health_default`) pauses and resumes charging
+  through the charger firmware's
+  `/sys/class/qcom-battery/charge_disable` (`charge_limit.te`).
+  - The node is `vendor_sysfs_charge_disable` (`fp6/genfs_contexts`).
+  - The service may open and write it, nothing more. vendor_init hands it to
+    system at boot (`boot/init.qcom.rc`).
+- The service keeps its state in `persist.vendor.charge_limit`
+  (`vendor_charge_limit_prop`, off, on or paused).
+  - At early-boot, vendor_init writes the pause again from it, as stock does.
+  - A neverallow leaves setting it to the service, init and vendor_init.
+- A neverallow keeps every other domain from writing it, except vendor_init
+  and ueventd, which the platform lets write all of sysfs.
+
 - `qseecomd` on `/mnt/vendor/persist/drm`: no keybox or HDCP provisioning
   tool is installed to fill that store.
 - `system-ext-private/system_server.te`: the system server reads enabled

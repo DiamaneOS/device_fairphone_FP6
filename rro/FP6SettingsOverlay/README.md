@@ -34,3 +34,32 @@
 - The side-sensor description uses Settings' translated
   `security_settings_enroll_find_sensor_right_side_message` text in every
   locale instead of the Pixel hardware description.
+
+Regenerate the animations after an AOSP update:
+
+```
+make_fingerprint_edu.py packages/apps/Settings/res/raw/fingerprint_edu_lottie_portrait_bottom_right.json res/raw
+```
+
+## USB-C port summary
+
+- Security & privacy > Exploit protection > USB-C port > Off: GrapheneOS's
+  summary says Off turns off the port.
+- On the FP6, Off turns off USB data and charging, while the ADSP firmware
+  keeps running Type-C and USB PD.
+- The overlay's summary names those two and keeps GrapheneOS's note on the
+  separate charging mode.
+- GrapheneOS ships these strings in English only, so the overlay has no
+  translations either.
+
+## Charge limit
+
+- Settings > Battery > Charging optimization is GrapheneOS's charge limit
+  screen. Its strings are empty in GrapheneOS Settings, and Pixel builds fill
+  them from the stock Pixel apps.
+- `charge_limit_strings.xml` gives them English text.
+  - "Off" is Settings' own `switch_off_text`, in every locale.
+  - German, French, Spanish and Italian for the rest are our own. Other
+    languages show English.
+- While the limit holds, Settings and the lock screen show Android's own
+  translated "Charging on hold to protect battery".

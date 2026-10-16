@@ -69,6 +69,7 @@ PRODUCT_COPY_FILES += \
 # Keep one UFS fstab for early and late mounting.
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
+    device/fairphone/FP6/boot/init.qcom.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.qcom.usb.rc \
     device/fairphone/FP6/boot/init.qcom.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.rc \
     device/fairphone/FP6/boot/sensors_list.txt:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/sensors_list.txt \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
@@ -108,6 +109,15 @@ PRODUCT_PACKAGES += \
     usb_compositions.conf \
     android.hardware.health-service.qti \
     android.hardware.health-service.qti_recovery
+
+# The health service's uevent filter (libhealthloop). Without it the service
+# wakes for every kernel uevent instead of power-supply events only.
+# base_vendor.mk, which this product does not inherit, normally adds it.
+PRODUCT_PACKAGES += filterPowerSupplyEvents.o
+
+# Off-mode charging animation. The health service reads the images from
+# /vendor only.
+PRODUCT_PACKAGES += charger_res_images_vendor
 
 # Qualcomm display stack built from source (hardware/qcom-caf/sm8650/display and
 # its interface repositories). The stock Android 14 composer does not present
@@ -418,6 +428,14 @@ AB_OTA_PARTITIONS += \
     vendor \
     vendor_boot \
     vendor_dlkm
+
+# FP6 controller and the native gadget service, with FunctionFS MTP/PTP.
+PRODUCT_VENDOR_PROPERTIES += \
+    vendor.usb.controller=a600000.dwc3 \
+    vendor.usb.use_ffs_mtp=1 \
+    vendor.usb.use_gadget_hal=1 \
+    vendor.usb.rndis.func.name=rndis \
+    vendor.usb.ncm.func.name=ncm
 
 # MTP cancels pending transfers in one batch, as stock. On the DWC3 controller,
 # cancelling them one by one fails after the first, which by the code aborts

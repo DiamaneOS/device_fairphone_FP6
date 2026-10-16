@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# USB-C port control. The dwc3-msm controller's data_path_enable node takes
+# GrapheneOS's three data commands (boot/init.qcom.usb.rc) and also makes the
+# kernel ignore alt modes. Charging is not affected. It gets its own type (its
+# line in fp6/genfs_contexts) instead of the generic sysfs label.
+#
+# vendor_init writes it from the sys.port_security_mode triggers in
+# boot/init.qcom.usb.rc and stats it for init's wait in charger mode. The
+# platform already lets vendor_init and ueventd write every sysfs_type file.
+# The rule below states the one vendor_init needs here. The Qualcomm USB HAL
+# gets no write: it parses data from the Type-C partner, so a HAL compromised
+# that way must not be able to turn data back on while the phone is locked.
+type vendor_sysfs_usb_data_path, sysfs_type, fs_type;
+
+allow vendor_init vendor_sysfs_usb_data_path:file { getattr open write };
+
+# Nothing else may write it: a later rule that adds a writer fails the build.
+neverallow {
+  domain
+  -vendor_init
+  -ueventd
+} vendor_sysfs_usb_data_path:file { write append };
+
+# The controller's older dynamic_disable switch (vendor-common/genfs_contexts)
+# keeps its own type so that no other domain can write it. With port control
+# on, the framework never passes enableUsbData to the USB HAL, its only other
+# user, and no trigger writes it.
+type vendor_sysfs_usb_data_disable, sysfs_type, fs_type;
+
+neverallow {
+  domain
+  -vendor_init
+  -ueventd
+} vendor_sysfs_usb_data_disable:file { write append };
+
+# Off also suspends the charger input in the ADSP charger firmware:
+# /sys/class/qcom-battery/suspend_input_current, a class attribute of
+# qti_battery_charger (its line in fp6/genfs_contexts, otherwise the generic
+# sysfs label). vendor_init writes it from the triggers in
+# boot/init.qcom.usb.rc and stats it for init's wait. No service uses it.
+type vendor_sysfs_usb_input_suspend, sysfs_type, fs_type;
+
+allow vendor_init vendor_sysfs_usb_input_suspend:file { getattr open write };
+
+# Nothing else may write it: a later rule that adds a writer fails the build.
+neverallow {
+  domain
+  -vendor_init
+  -ueventd
+} vendor_sysfs_usb_input_suspend:file { write append };

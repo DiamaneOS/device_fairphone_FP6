@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Sensors multi-HAL with the Qualcomm sub-HAL. Reduced from the
+# pinned Qualcomm generic/vendor/common/hal_sensors_default.te: no diag,
+# sysrq, SLPI/SSR sysfs, persist writes or HID devices; QRTR without ioctls.
+
+# The list of sensor types the HAL waits for at start, written by init
+# (boot/init.qcom.rc) with its own label; the HAL reads it, and its attempts
+# to append to it stay denied. The rest of persist/sensors (registry and
+# calibration) stays readable, as before.
+type vendor_persist_sensors_list_file, file_type, vendor_persist_type;
+allow hal_sensors_default mnt_vendor_file:dir search;
+r_dir_file(hal_sensors_default, vendor_persist_sensors_file)
+allow hal_sensors_default vendor_persist_sensors_list_file:file r_file_perms;
+
+get_prop(hal_sensors_default, vendor_sensors_prop)
+get_prop(hal_sensors_default, vendor_adsprpc_prop)
+
+# QMI to the ADSP sensor core over QRTR; the direct channel uses FastRPC on
+# the secure node and gralloc buffers.
+allow hal_sensors_default self:qipcrtr_socket create_socket_perms_no_ioctl;
+allow hal_sensors_default vendor_xdsp_device:chr_file r_file_perms;
+allow hal_sensors_default dmabuf_system_heap_device:chr_file r_file_perms;
+hal_client_domain(hal_sensors_default, hal_graphics_allocator)
+
+# The Qualcomm sub-HAL reads the AON presence property.
+get_prop(hal_sensors_default, vendor_qc_aon_prop)
+
+# The Qualcomm sub-HAL publishes every proximity sample as
+# vendor.fp.psensor.rawdata, a factory-test value nothing in this build reads.
+# Its only other set clears a debug switch (vendor.slpi.ssrsimulate) that
+# nothing sets. The set stays denied; not auditing it avoids up to 18 audit
+# records a second while the proximity sensor is on.
+dontaudit hal_sensors_default property_socket:sock_file write;

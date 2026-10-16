@@ -1,10 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
-# The touch controller's wake-gesture switch (ESWIN gesture_wakeup). The power
-# HAL writes it for Mode::DOUBLE_TAP_TO_WAKE (Display > Tap to wake). It may
-# search the touch device directory (fp_mmitest_sysfs) to reach it, but not
-# read or write the factory-test files there.
+# Tap to wake (double tap) and Tap to check phone (single tap). The tap sub-HAL
+# (sensors/) in the sensors multi-HAL turns the touch controller's gestures on
+# and off through its wake-gesture switch (ESWIN gesture_wakeup) and waits for
+# taps on wake_gesture, which only says which gesture happened. It may search
+# the touch device directory (fp_mmitest_sysfs) to reach them, but not read or
+# write the factory-test files there.
 type vendor_sysfs_touch_gesture, fs_type, sysfs_type;
+type vendor_sysfs_touch_wake_gesture, fs_type, sysfs_type;
 
-allow hal_power_default fp_mmitest_sysfs:dir search;
-allow hal_power_default vendor_sysfs_touch_gesture:file w_file_perms;
+allow hal_sensors_default fp_mmitest_sysfs:dir search;
+allow hal_sensors_default vendor_sysfs_touch_gesture:file { open write };
+allow hal_sensors_default vendor_sysfs_touch_wake_gesture:file { open read };

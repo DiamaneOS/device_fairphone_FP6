@@ -63,6 +63,24 @@ on fs
     restorecon_recursive /mnt/vendor/persist
     mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
+    # Sensor registry and calibration written by the ADSP sensors domain
+    # through sscrpcd (stock init.vendor.sensors.rc keeps them system-owned).
+    mkdir /mnt/vendor/persist/sensors 0775 system system
+    mkdir /mnt/vendor/persist/sensors/registry 0775 system system
+    mkdir /mnt/vendor/persist/sensors/registry/registry 0775 system system
+    # The sensors HAL waits up to 8 s at start for every sensor type listed in
+    # sensors_list.txt and never removes an entry. A list left by an earlier
+    # system can name a sensor this one never reports (a hall sensor), which
+    # delays the HAL, and system_server with it, by 8 s on every boot. Copy
+    # the stock list without the hall sensor, in the stock order, from vendor
+    # (init's write takes a quoted \n literally). The HAL may read the list,
+    # not change it.
+    copy /vendor/etc/sensors/sensors_list.txt /mnt/vendor/persist/sensors/sensors_list.txt
+    restorecon /mnt/vendor/persist/sensors/sensors_list.txt
+    chown system system /mnt/vendor/persist/sensors/sns.reg
+    chown system system /mnt/vendor/persist/sensors/sensors_list.txt
+    chown system system /mnt/vendor/persist/sensors/registry/registry/sensors_registry
+    chown system system /mnt/vendor/persist/sensors/sensors_settings
 
 # The module streams started at "on fs": one modprobe for system_dlkm and one
 # per list in /vendor/lib/modules (boot/modules/, which together hold the
@@ -165,6 +183,8 @@ on post-fs-data
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
     mkdir /data/vendor/perfd 2770 root system
+    # Sensor stack state (matches stock).
+    mkdir /data/vendor/sensors 0770 system system
     mkdir /data/vendor/tombstones 0771 system system
     # Unlike stock, no /data/vendor/tombstones/rfs: remote-processor error logs
     # are not written to /data (tqftpserv serves no ramdump paths).

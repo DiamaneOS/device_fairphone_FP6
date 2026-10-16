@@ -119,9 +119,12 @@ firmware_directories /mnt/vendor/wlan_mac/
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
 /sys/devices/virtual/hdcp/msm_hdcp  min_level_change 0664    system  graphics
 
-# Double-tap wake gesture of the touch controller, switched by the power HAL
-# (system) for Display > Tap to wake. Stock wrote it as root from vendor init.
+# Wake gestures of the touch controller, switched by the sensors HAL (system)
+# for Display > Tap to wake (double tap) and Tap to check phone (single tap).
+# Stock writes it as root from vendor init.
 /sys/bus/spi/devices/spi0.0   gesture_wakeup   0660   system   system
+# Taps the controller reported, read only by the sensors HAL.
+/sys/bus/spi/devices/spi0.0   wake_gesture     0400   system   system
 
 # USB controller role and speed for the USB HAL (matches stock).
 /sys/bus/platform/devices/a600000.ssusb	dynamic_disable	0220	root	usb
@@ -149,6 +152,8 @@ firmware_directories /mnt/vendor/wlan_mac/
 /sys/class/leds/blue   trigger      0640    system    system
 # The Wi-Fi HAL (wifi) switches the QCA6750 host driver on and off (stock).
 /dev/wlan                 0660   wifi       wifi
+# Secure FastRPC to the ADSP for the sensors multi-HAL and sscrpcd (system).
+/dev/adsprpc-smd-secure   0660   system     system
 # Remote processors. The peripheral manager (pm-service, user system) boots the
 # modem through its remoteproc character device. Owner-only: closing the node
 # after pm-service set shutdown-on-release stops the processor, so no group

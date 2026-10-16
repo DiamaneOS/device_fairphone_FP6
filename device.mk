@@ -70,6 +70,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
     device/fairphone/FP6/boot/init.qcom.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.rc \
+    device/fairphone/FP6/boot/sensors_list.txt:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/sensors_list.txt \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
@@ -211,9 +212,9 @@ PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
 
 # Framework, Settings and SystemUI hardware configuration (rro/): display
 # cutout, corners, status bar, navigation bar, colour modes and their names,
-# 120 Hz refresh rate, the Smooth display switch, always-on display and
-# double-tap to wake (both off by default) and the side fingerprint sensor
-# description.
+# 120 Hz refresh rate, the Smooth display switch, always-on display, double-tap
+# to wake and Tap to check phone (all off by default) and the side fingerprint
+# sensor description.
 PRODUCT_PACKAGES += \
     FP6FrameworksOverlay \
     FP6SettingsOverlay \
@@ -319,8 +320,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.display.disable_hw_recovery_dump=1 \
     vendor.display.enable_early_wakeup=1
 
-# Declare the phone baseline and only the hardware that currently works; add
-# radio, camera, sensor and other features as their stacks are brought up.
+# Declare the phone baseline and the hardware features the device supports.
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
@@ -330,6 +330,26 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.vulkan.version-1_3.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.version-1_3.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml
+
+# Sensors: the AOSP multi-HAL loads the sub-HALs in /vendor/etc/sensors/hals.conf,
+# which the generated vendor tree derives from stock with only the Qualcomm
+# sub-HAL. The AOSP dynamic-sensor sub-HAL (HID sensors such as head trackers)
+# is not installed: the HAL has no hidraw access, so it could not serve one.
+PRODUCT_PACKAGES += \
+    android.hardware.sensors-service.multihal
+
+# Tap to wake and Tap to check phone: the touch controller's double and single
+# tap as sensors, from the sub-HAL in sensors/, which the multi-HAL loads from
+# the odm partition.
+PRODUCT_PACKAGES += \
+    fp6_odm_sensors_hals_conf \
+    sensors.fp6.tap
+
+# Sensors served by the ADSP through the sensors multi-HAL (the stock set
+# without the dynamic head tracker).
+PRODUCT_COPY_FILES += \
+    $(foreach f,accelerometer barometer compass gyroscope light proximity stepcounter stepdetector, \
+        frameworks/native/data/etc/android.hardware.sensor.$(f).xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.$(f).xml)
 
 # As stock: filter magnetometer samples (the sub-HAL's default is off), and do
 # not offer sensor direct channels, which stock never enabled (the sub-HAL's

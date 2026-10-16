@@ -64,6 +64,22 @@ may access, and why. It describes the policy of a release (`user`) build.
 - Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_per_mgr`: its
   QMI libraries open AF_QIPCRTR sockets, which the upstream rules only grant
   as generic `socket`.
+- `fp6/` holds device-owned grants, each bound to the service that showed the
+  denial on a permissive boot:
+  - Sensors: `sensors.te` (sscrpcd) and `hal_sensors_default.te` are reduced
+    from the pinned Qualcomm files. They use FastRPC only through the secure
+    node (`vendor_xdsp_device`), QRTR without ioctls, and have no capabilities,
+    diag, sysrq, SLPI/SSR sysfs, HID or persist writes from the HAL; it reads
+    persist/sensors. `sensors_list.txt`, the sensor types the HAL waits for at
+    start, has its own label (`vendor_persist_sensors_list_file`), and init
+    copies it from vendor at every boot with the stock list minus the hall
+    sensor: the HAL never removes an entry, and the stock list names a hall
+    sensor this build's sensor core never reports, which held the HAL, and
+    system_server with it, for 8 s at every boot. Stock lets the HAL write all
+    of persist/sensors instead.
+  - Graphics: the in-process Adreno driver reads the GPU model (the Qualcomm
+    domain grant) and its read-only graphics properties; `libllvm-qgl.so` is a
+    same-process HAL library; the composer keeps state in
     `/data/vendor/display`. The gralloc properties (`vendor.gralloc.*`) are
     readable by the processes that map buffers, including the camera
     provider, cameraserver and mediaserver; stock lets every domain read
@@ -75,6 +91,7 @@ may access, and why. It describes the policy of a release (`user`) build.
     numbers follow probe order, so they labelled whichever device got the
     number, and no vendor service reads extcon. Stock instead lets
     system_server write all of `vendor_sysfs_graphics`.
+  - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
     and its heaps for the fingerprint HAL, each limited to the permissions the
     module used. The module registers a debug binder service with no caller
     check at every start and fails without it; our HAL keeps it inside its own
@@ -82,6 +99,10 @@ may access, and why. It describes the policy of a release (`user`) build.
     so the platform neverallow on `default_android_service` forbids granting
     it. A neverallow keeps the HAL from opening files in `vendor_data_file`,
     where the module's configuration and dumps would live.
+  - Read-only SoC, thermal-zone and remote-processor names for the thermal,
+    performance and peripheral-manager services; `/dev/wlan` and the driver
+    version property for the Wi-Fi HAL; the vendor patch level for KeyMint;
+    vendor properties set from vendor init scripts.
   - SoC serial number: `/sys/devices/soc0/serial_number` is
     `vendor_sysfs_soc_serial` (`soc_serial.te`), not the soc0 directory's
     `vendor_sysfs_soc`. No shipped program reads it (only kernel code uses
@@ -96,6 +117,9 @@ may access, and why. It describes the policy of a release (`user`) build.
     and identification pages keep the generic `sysfs` label, readable by 22
     domains (among them the fingerprint and USB HALs, the composer and tee);
     ueventd makes them 0400 root too, and no shipped program reads them.
+  - The USB speed node is `sysfs_udc` (in the imported file_contexts and
+    genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
+    covers camera calibration and download mode.
   - The UFS LUN 0 block directory is `sysfs_devices_block`, which init may
     only read. The one node platform init.rc writes there, the root disk's
     `queue/discard_max_bytes`, is `vendor_sysfs_ufs_discard_max` (`storage.te`),
@@ -267,6 +291,13 @@ For each upstream refresh:
 This preserves upstream traceability without importing unused policy. A shared
 DiamaneOS policy repository becomes useful when multiple devices genuinely share
 this maintained subset; it is not required merely to reduce this folder's size.
+- The touch controller's wake-gesture switch (`gesture_wakeup`) is
+  `vendor_sysfs_touch_gesture` and its tap report (`wake_gesture`) is
+  `vendor_sysfs_touch_wake_gesture`. The rest of the touch device keeps the
+  - Only the sensors HAL uses them, for Tap to wake (double tap) and Tap to
+    check phone (single tap): it writes the switch and reads the report
+    (`fp6/touch.te`).
+  - The power HAL has no access.
 - `system-ext-private/system_server.te`: the system server reads enabled
   kernel-console metadata for the serial-console warning. It receives no
   access to serial devices or console control.
@@ -369,6 +400,9 @@ bug reports, the minimal rule is
 (`system_prop`) also stays denied, which keeps it on the normal firmware path.
 `/data/nfc`, which platform init.rc creates for the NFC stack's state, is
 `nfc_data_file` (`system-ext-private/file_contexts`, as in stock).
+    SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
+    DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
+    `sched_boost` values, the GPU wake trigger and uclamp on session threads.
 for interface ioctls and its init-created recovery file. Its XFRM netlink access is
 needed for Wi-Fi calling, where the modem negotiates the ePDG tunnel and nicmd installs
 the ESP states and policies it receives (write requests); to remove them at teardown or

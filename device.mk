@@ -190,6 +190,7 @@ $(call inherit-product, device/fairphone/FP6/audio/audio.mk)
 # source-built parts.
 $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
+$(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.
@@ -411,3 +412,6 @@ PRODUCT_PACKAGES += FP6TetheringOverlay
 # Wi-Fi capabilities from Fairphone's Wi-Fi resource overlays: MAC address
 # randomisation, screen-off scans, bands and SAR transmit limits.
 PRODUCT_PACKAGES += FP6WifiOverlay
+
+# Secure NFC ("Require device unlock for NFC"), on by default as on Pixels.
+PRODUCT_PACKAGES += FP6NfcOverlay

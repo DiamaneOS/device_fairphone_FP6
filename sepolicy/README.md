@@ -468,14 +468,30 @@ Shared device labels (`vendor-common/file_contexts`):
   `/dev/ttyHS0`.
 - `/dev/btfmslim` shares `vendor_bt_device` with `/dev/btpower`.
 - SELinux alone would let the HAL use them. ueventd keeps the three root-only.
-The HAL's `property_set` of `vendor.nfc.fw.version` (`vendor_nfc_prop`) stays
-denied: `nfc_nci_sec.so` ignores the result and never reads it back, and the
-only stock reader is the factory MMI app. If the firmware version is wanted in
-bug reports, the minimal rule is
-`nfc/hal_nfc_default.te`. The HAL's read of `persist.sys.factory.mode`
-(`system_prop`) also stays denied, which keeps it on the normal firmware path.
-`/data/nfc`, which platform init.rc creates for the NFC stack's state, is
-`nfc_data_file` (`system-ext-private/file_contexts`, as in stock).
+
+## NFC
+
+- `nfc/file_contexts` labels the stock Samsung NFC HAL
+  (`android.hardware.nfc-service.sec`) `hal_nfc_default_exec` and the
+  controller node `/dev/sec-nfc` `nfc_device`: the stock labels.
+- The domain `hal_nfc_default` and its controller access come from AOSP
+  policy. No device rule is added.
+- The Qualcomm `hal_nfc_default.te`, `nfc.te`, `nqnfcinfo.te`,
+  `hal_secure_element_default.te` and `secure_element.te` are not imported.
+  - Most of their grants are for NXP/QTI parts that are not installed or not
+    used by the Samsung HAL.
+  - Examples: HIDL registration (the HAL registers only AIDL `INfc/default`),
+    the NXP NFC service, `vendor.qti.nfc.*` properties, the `ssgtzd` socket,
+    `/firmware` and `/data/vendor/nfc`.
+- The controller firmware in `/vendor/firmware` needs no grant: vendor domains
+  may read `vendor_file_type` through platform policy.
+- Denied on purpose: the HAL's set of `vendor.nfc.fw.version`
+  (`vendor_nfc_prop`). Its library ignores the result and never reads the
+  property back.
+- Denied on purpose: the HAL's read of `persist.sys.factory.mode`
+  (`system_prop`). That keeps it on the normal firmware path.
+- `/data/nfc`, which platform init.rc creates for the NFC stack's state, is
+  `nfc_data_file` (`system-ext-private/file_contexts`, as in stock).
     SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
     DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.

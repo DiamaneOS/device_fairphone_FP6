@@ -2,6 +2,13 @@
 <!-- Copyright 2026 The DiamaneOS Project -->
 <!-- Remaining selected HAL declarations are installed with their providers. -->
 <manifest version="7.0" type="device" target-level="8">
+    <!-- The radio daemon offers the SIM's secure element to OMAPI, SIM1 as on
+         stock. -->
+    <hal format="aidl">
+        <name>android.hardware.secure_element</name>
+        <version>1</version>
+        <fqname>ISecureElement/SIM1</fqname>
+    </hal>
     <hal format="aidl">
         <name>android.hardware.gatekeeper</name>
         <version>1</version>

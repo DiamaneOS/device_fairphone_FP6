@@ -12,7 +12,6 @@
 # QCRIL client socket (/dev/socket/qcrild, its module is not installed) and
 # binder_service (upstream rild.te "#CTS failure"): the rild domain is not a
 # binderservicedomain, so apps cannot call it through the platform appdomain
-# qcril_audio.te and qti_lpa.te.
 # rule. Its app clients get scoped binder_call grants in qtelephony.te,
 # fp6_callaudio_app.te and fp6_iwlan_app.te.
 

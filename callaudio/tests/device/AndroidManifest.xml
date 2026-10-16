@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0; Copyright 2026 The DiamaneOS Project -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.diamaneos.callaudioboundarytests">
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- An unrelated, nonprivileged requester must not obtain the bridge's authority. -->
+    <uses-permission android:name="android.permission.DIAMANEOS_CONTROL_CALL_AUDIO" />
+    <application android:testOnly="true">
+        <meta-data android:name="de.diamaneos.permission.NO_IMPLICIT_OTHER_SENSORS"
+            android:value="true" />
+    </application>
+    <instrumentation android:name="androidx.test.runner.AndroidJUnitRunner"
+        android:targetPackage="de.diamaneos.callaudioboundarytests" />
+</manifest>

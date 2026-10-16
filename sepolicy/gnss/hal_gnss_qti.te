@@ -16,7 +16,7 @@
 # servicemanager (CIL 8134-8138, binder_use): not added. Stock AIDL HAL
 # domains without such vendor rules (vendor_hal_gatekeeper_qti,
 # vendor_hal_keymint_qti) register on stock, so the platform hal server rules
-# cover it. It registers under enforcing with no denial (2026-10-14).
+# cover it. It registers under enforcing with no denial.
 type vendor_hal_gnss_qti, domain;
 type vendor_hal_gnss_qti_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_hal_gnss_qti)

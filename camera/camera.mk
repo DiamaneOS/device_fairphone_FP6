@@ -67,10 +67,10 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.media.recorder-max-base-layer-fps=60
 
 # CamX allocates the preview stream as UBWC NV12 instead of linear NV12
-# (CamX outputFormat setting; its compiled default 0 is linear). The display
+# (CamX outputFormat setting, its compiled default 0 is linear). The display
 # hardware can rotate only UBWC buffers inline, so a linear portrait preview
 # forces GPU composition for every frame. Previews up to 1088 lines before
-# rotation (16:9 1920x1080) are then composed by the display hardware; the 4:3
+# rotation (16:9 1920x1080) are then composed by the display hardware. The 4:3
 # photo preview (1600x1200) still needs the GPU. Streams the CPU reads keep
 # their own format.
 PRODUCT_VENDOR_PROPERTIES += \

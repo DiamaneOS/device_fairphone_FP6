@@ -117,6 +117,10 @@ may access, and why. It describes the policy of a release (`user`) build.
     and identification pages keep the generic `sysfs` label, readable by 22
     domains (among them the fingerprint and USB HALs, the composer and tee);
     ueventd makes them 0400 root too, and no shipped program reads them.
+  - Thermal HAL: runs as system with no capabilities
+    (`power/init.fp6.thermal.rc`); ueventd gives group system the two trip
+    nodes it writes (`trip_point_1_temp` and `trip_point_1_hyst` of each
+    thermal zone). Its domain is unchanged.
   - The USB speed node is `sysfs_udc` (in the imported file_contexts and
     genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
     covers camera calibration and download mode.

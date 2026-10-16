@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The GNSS HAL (gnss_service, user gps) keeps small AP-side state files in
+# /data/vendor/location (gps.prop, energy.conf, libgps.utils and libgnss path
+# strings). Stock creates the directory in loc-launcher.rc, which is not
+# installed. The engine's own state lives in the modem and its remote file
+# system on persist, not here. /dev/socket/location is not created: the HAL
+# serves no socket there, and the daemons that would use it are not installed.
+on post-fs-data
+    mkdir /data/vendor/location 0770 gps gps

@@ -492,6 +492,31 @@ Shared device labels (`vendor-common/file_contexts`):
   (`system_prop`). That keeps it on the normal firmware path.
 - `/data/nfc`, which platform init.rc creates for the NFC stack's state, is
   `nfc_data_file` (`system-ext-private/file_contexts`, as in stock).
+
+## GNSS
+
+- `gnss/hal_gnss_qti.te` confines the Qualcomm GNSS HAL
+  (`android.hardware.gnss-aidl-service-qti`), built from CodeLinaro source, in
+  `vendor_hal_gnss_qti`.
+- It is written by DiamaneOS from the stock compiled policy, reduced to what
+  the HAL uses. It has no provenance entry.
+- The service is a HAL server for `hal_gnss` and a client of `hal_health`.
+- It reaches the modem over QRTR (`qipcrtr_socket`, no ioctls). The grant is
+  bound to the domain, not to the `hal_gnss` attribute.
+- It keeps small state files in `/data/vendor/location`.
+- It reads the modem version file from `/vendor/firmware_mnt`, the boot status
+  property, and the public SoC id and board type.
+  - `gnss/genfs_contexts` labels `/sys/devices/soc0/hw_platform`
+    `vendor_sysfs_public`, so the HAL needs no read of the rest of
+    `vendor_sysfs_soc`, which includes the SoC serial number.
+- No servicemanager rule is added: platform policy covers AIDL HAL
+  registration, as for the gatekeeper and keymint HALs.
+- The HAL opens no socket in `/dev/socket/location`.
+- Not granted, because none of these peers is installed:
+  - the peripheral manager and vndbinder
+  - the location daemons' sockets (loc_launcher, XTRA, LOWI, Wi-Fi
+    crowdsourcing, sensor, correction, engine and Skyhook services)
+  - RIL and SSG sockets, MHI sysfs and QMS/AON properties.
     SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
     DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.

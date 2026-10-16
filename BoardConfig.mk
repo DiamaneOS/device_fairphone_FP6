@@ -83,6 +83,7 @@ BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common
 # Device-owned grants for the FP6 services, reviewed per denial.
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fp6
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/audio
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/gnss
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/nfc
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/bluetooth
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/modem
@@ -157,6 +158,10 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Protect the source-built Qualcomm boot-control service and GPT/UFS helpers.
 CFI_INCLUDE_PATHS += hardware/qcom/bootctrl vendor/qcom/opensource/recovery-ext
+# And the source-built GNSS HAL, which parses the framework's and the modem's
+# location messages. Qualcomm's own builds of these have CFI too.
+CFI_INCLUDE_PATHS += hardware/qcom/gps vendor/qcom/opensource/location \
+    vendor/qcom/opensource/qmi-framework vendor/qcom/opensource/core-utils/fwk-detect
 
 # Audio: the AudioReach primary HAL, PAL and AGM are built from Fairphone's
 # published FP6 sources (audio/audio.mk). Their Android.mk files read these

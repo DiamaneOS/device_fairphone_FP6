@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- Qualcomm XTRA data as long-term PSDS for faster first fixes. The
+         framework downloads it and the GNSS HAL injects it into the modem
+         (IGnssPsds), and the modem's requests for new data reach the
+         framework. With the type set, the framework rewrites the URL's host
+         to psds.diamaneos.de (the default PSDS setting) and keeps the path. -->
+    <string name="config_gnssPsdsType" translatable="false">qualcomm</string>
+
+    <!-- GnssConfiguration reads this at every reload. One server: the rewrite
+         gives all of them the same host. Values are not trimmed, so no spaces
+         around "=". -->
+    <string-array name="config_gnssParameters" translatable="false">
+        <item>LONGTERM_PSDS_SERVER_1=https://path1.xtracloud.net/xtra3Mgrbeji.bin</item>
+    </string-array>
+</resources>

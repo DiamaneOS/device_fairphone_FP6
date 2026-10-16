@@ -72,6 +72,16 @@ may access, and why. It describes the policy of a release (`user`) build.
     numbers follow probe order, so they labelled whichever device got the
     number, and no vendor service reads extcon. Stock instead lets
     system_server write all of `vendor_sysfs_graphics`.
+  - SoC serial number: `/sys/devices/soc0/serial_number` is
+    `vendor_sysfs_soc_serial` (`soc_serial.te`), not the soc0 directory's
+    `vendor_sysfs_soc`. No shipped program reads it (only kernel code uses
+    the serial), so no vendor rule grants it: the composer's imported read of
+    all sysfs excludes it and the thermal engine no longer reads
+    `vendor_sysfs_soc` files (it reads only the public `soc_id` and
+    `hw_platform`). The type must keep `sysfs_type`, which the platform lets
+    apexd, init, ueventd, vendor_init, vold, the Bluetooth, Wi-Fi, supplicant
+    and radio HALs and tee read; ueventd makes the node 0400 root, so of those
+    only the root platform daemons can open it. A neverallow keeps every other
     domain off it. The UFS storage's serial number and its LUNs' SCSI serial
     and identification pages keep the generic `sysfs` label, readable by 22
     domains (among them the fingerprint and USB HALs, the composer and tee);

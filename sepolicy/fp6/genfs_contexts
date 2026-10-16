@@ -3,6 +3,9 @@
 # Wakeup sources of the fingerprint and hall sensors, read by system_suspend.
 genfscon sysfs /devices/platform/soc/soc:focalfp_ft9362/wakeup u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/platform/soc/soc:hall_1/wakeup u:object_r:sysfs_wakeup:s0
+# The SoC serial number, readable by no vendor service (soc_serial.te). The
+# rest of /sys/devices/soc0 keeps its vendor-common labels.
+genfscon sysfs /devices/soc0/serial_number u:object_r:vendor_sysfs_soc_serial:s0
 # The switch that turns Qualcomm's embedded USB debugger on, writable by no
 # service (eud.te).
 genfscon sysfs /module/eud/parameters/enable u:object_r:vendor_sysfs_eud_enable:s0

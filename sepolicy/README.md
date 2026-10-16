@@ -58,276 +58,8 @@ may access, and why. It describes the policy of a release (`user`) build.
 - No Qualcomm perf HAL domain or client grants (see [Power](#power)).
 - The peripheral manager has no binder call into the WLAN service domain. That
   service is not installed.
-- Drop the QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
-  `hal_qseecom.te` and its file and service contexts are removed, and the
-  service is not selected. No installed file looks it up; KeyMint, Gatekeeper,
-  the fingerprint module and `qseecomd` use `libQSEEComAPI` directly. The
-  kernel `qseecom_proxy.ko` is a different component and stays.
-- Label the FP6 fingerprint service (`android.hardware.biometrics.
-  fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
-  stock wrapper it replaces.
-- Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_per_mgr`: its
-  QMI libraries open AF_QIPCRTR sockets, which the upstream rules only grant
-  as generic `socket`.
-- `fp6/` holds device-owned grants, each bound to the service that showed the
-  denial on a permissive boot:
-  - Sensors: `sensors.te` (sscrpcd) and `hal_sensors_default.te` are reduced
-    from the pinned Qualcomm files. They use FastRPC only through the secure
-    node (`vendor_xdsp_device`), QRTR without ioctls, and have no capabilities,
-    diag, sysrq, SLPI/SSR sysfs, HID or persist writes from the HAL; it reads
-    persist/sensors. `sensors_list.txt`, the sensor types the HAL waits for at
-    start, has its own label (`vendor_persist_sensors_list_file`), and init
-    copies it from vendor at every boot with the stock list minus the hall
-    sensor: the HAL never removes an entry, and the stock list names a hall
-    sensor this build's sensor core never reports, which held the HAL, and
-    system_server with it, for 8 s at every boot. Stock lets the HAL write all
-    of persist/sensors instead.
-  - Graphics: the in-process Adreno driver reads the GPU model (the Qualcomm
-    domain grant) and its read-only graphics properties; `libllvm-qgl.so` is a
-    same-process HAL library; the composer keeps state in
-    `/data/vendor/display`. The gralloc properties (`vendor.gralloc.*`) are
-    readable by the processes that map buffers, including the camera
-    provider, cameraserver and mediaserver; stock lets every domain read
-    them.
-  - Extcon: the DisplayPort and audio-codec extcon devices are
-    `sysfs_extcon`, which system_server reads to detect DisplayPort (HDMI)
-    and wired headsets. The imported per-index `vendor_sysfs_graphics` lines
-    for `msm-ext-disp` are removed from `qva-common/genfs_contexts`: extcon
-    numbers follow probe order, so they labelled whichever device got the
-    number, and no vendor service reads extcon. Stock instead lets
-    system_server write all of `vendor_sysfs_graphics`.
-  - Fingerprint: the FocalTech node is `ff_device` (stock label), with QSEECom
-    and its heaps for the fingerprint HAL, each limited to the permissions the
-    module used. The module registers a debug binder service with no caller
-    check at every start and fails without it; our HAL keeps it inside its own
-    process (`fingerprint/ModuleFactoryService.h`), and it stays unlabelled,
-    so the platform neverallow on `default_android_service` forbids granting
-    it. A neverallow keeps the HAL from opening files in `vendor_data_file`,
-    where the module's configuration and dumps would live.
-  - Read-only SoC, thermal-zone and remote-processor names for the thermal
-    and peripheral-manager services; `/dev/wlan` and the driver
-    version property for the Wi-Fi HAL; the vendor patch level for KeyMint;
-    vendor properties set from vendor init scripts.
-  - SoC serial number: `/sys/devices/soc0/serial_number` is
-    `vendor_sysfs_soc_serial` (`soc_serial.te`), not the soc0 directory's
-    `vendor_sysfs_soc`. No shipped program reads it (only kernel code uses
-    the serial), so no vendor rule grants it: the composer's imported read of
-    all sysfs excludes it and the thermal engine no longer reads
-    `vendor_sysfs_soc` files (it reads only the public `soc_id` and
-    `hw_platform`). The type must keep `sysfs_type`, which the platform lets
-    apexd, init, ueventd, vendor_init, vold, the Bluetooth, Wi-Fi, supplicant
-    and radio HALs and tee read; ueventd makes the node 0400 root, so of those
-    only the root platform daemons can open it. A neverallow keeps every other
-    domain off it. The UFS storage's serial number and its LUNs' SCSI serial
-    and identification pages keep the generic `sysfs` label, readable by 22
-    domains (among them the fingerprint and USB HALs, the composer and tee);
-    ueventd makes them 0400 root too, and no shipped program reads them.
-  - Thermal HAL: runs as system with no capabilities
-    (`power/init.fp6.thermal.rc`); ueventd gives group system the two trip
-    nodes it writes (`trip_point_1_temp` and `trip_point_1_hyst` of each
-    thermal zone). Its domain is unchanged.
-  - Thermal engine (closed, root): on userdebug and eng builds,
-    `fp6/thermal_engine_audit.te` logs each node it opens for writing, the
-    device nodes it opens, the sockets it creates, its capability use and its
-    shutdown requests ("avc: granted" records). These rules grant nothing;
-    user builds do not have them.
-  - The USB speed node is `sysfs_udc` (in the imported file_contexts and
-    genfs_contexts), not the factory-test type `fp_mmitest_sysfs`, which also
-    covers camera calibration and download mode.
-  - The UFS LUN 0 block directory is `sysfs_devices_block`, which init may
-    only read. The one node platform init.rc writes there, the root disk's
-    `queue/discard_max_bytes`, is `vendor_sysfs_ufs_discard_max` (`storage.te`),
-    writable by init only. The NFC controller's wakeup source is
-    `sysfs_wakeup`.
-  - Tuning: `init.fp6.perf.rc` writes WALT and VM sysctls that the platform
-    does not label. `/proc/sys/walt` is `vendor_proc_walt`, `swappiness` and
-    `min_free_kbytes` are `vendor_proc_vm_tuning`, `compaction_proactiveness`
-    is `vendor_proc_compaction` (`perf.te`). Only vendor_init writes them; the
-    power HAL reaches `sched_boost` through fixed property triggers (see
-    [Power](#power)). vendor_init also writes the platform `proc_sched` and
-    `proc_watermark_scale_factor` sysctls; it still has no write on generic
-    `proc`.
-  - camera.ko's CCI probe asks to raise the CCI IRQ thread from the kernel
-    default SCHED_FIFO 50 to 99 from `vendor_modprobe`; this stays denied
-    (non-fatal); `vendor_modprobe` has no `sys_nice` and no kernel task
-    control.
-  - Wi-Fi: `/proc/sys/net/ipv4/tcp_limit_output_bytes` is
-    `vendor_proc_tcp_limit_output_bytes`, read and written only by the Wi-Fi
-    HAL for high-throughput TCP tuning; the rest of `/proc/sys/net` stays
-    read-only to it. `/data/vendor/tombstones` is no longer labelled as a
-    whole (only `rfs/`), so the platform `tombstones/wifi` label for the HAL's
-    ring-buffer logs applies. The factory MAC file the driver loads
-    (`vendor_diamaneos_wlan_mac_file`, written by imeiprovd) is read only by
-    ueventd, which serves it as firmware (`wlan_mac.te`; a neverallow keeps
-    every other domain but init and vendor_init off it). Stock lets ueventd
-    read all of `/mnt/vendor` and persist instead.
-  - The genfs lines for these tuning nodes are in `fp6/genfs_contexts`.
-  - Touch: the controller's double-tap wake switch (`gesture_wakeup`) is
-    `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the
-    touch device. Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE); it
-    may search the device directory but not use its factory-test files.
-  - Vibrator: the Awinic haptics nodes the vibrator HAL writes (`activate`,
-    `brightness`, `duration`, `gain`, `loop`, `seq`) are
-    `vendor_sysfs_aw_vibrator`. The imported `hal_vibrator_default.te` no
-    longer lets the HAL write every `sysfs_leds` file, so raw waveform
-    streaming (`rtp`), calibration and the other LEDs stay read-only to it.
-    The imported files also lose the HAL's `input_device` access (it no
-    longer probes `/dev/input` when the Awinic chip is present, and its
-    service drops the `input` group), so it can neither read touch and key
-    events nor drive the chip's force-feedback input node. The grants for the
-    absent `qcom-haptics` sysfs node and persist haptics calibration are
-    removed too.
-  - USB-C port control (`usb_port_security.te`), two nodes with their own
-    types, written by vendor_init from the `sys.port_security_mode` and boot
-    triggers in `boot/init.qcom.usb.rc`:
-    - the USB controller's `dynamic_disable` (data off, charging kept):
-      `vendor_sysfs_usb_data_disable`, relabelled in
-      `vendor-common/genfs_contexts` from `vendor_sysfs_usb_device`, which
-      also covers the controller role. The USB HAL may not write it: with
-      port control on, the framework never passes `enableUsbData` to the
-      HAL, its only writer;
-    - the charger firmware's input suspend
-      (`/sys/class/qcom-battery/suspend_input_current`, which Off sets):
-      `vendor_sysfs_usb_input_suspend` (`fp6/genfs_contexts`), until now the
-      generic `sysfs` label.
-    Neverallows keep every other domain from writing either, except ueventd,
-    which the platform lets write all of sysfs.
-  Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
-  `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
-  (its fstab line is gone: nothing on the FP6 mounts `/product/vm-system`). The modem's `study` partition has
-  the stock `vendor_modem_efs_partition_device` label
-  (`vendor-volcano/file_contexts`), so `rmt_storage` can serve it with its
-  existing grant.
-- `product-private/property_contexts` keeps `debug.disable_screen_decorations`
-  on `vendor_display_notch_prop`, which SystemUI cannot read: the read falls
-  back to false, so the privacy dot cannot be switched off with `adb setprop`.
-- `system-ext-private/system_app.te` lets Settings read only
-  `ro.vendor.build.security_patch` (`vendor_security_patch_level_prop`) for the
-  "Vendor security update" row; the platform grants it to shell, keystore and
-  vendor_init only.
-- Use platform init/ueventd permissions where they already implement selected
-  operations. Omitted firmware-handler transitions must be revisited if the
-  product activates those handlers.
-- Retain enforcing mode, compatibility tests and neverallow checks. USER
-  compilation and checks for absent module-loading, kernel scheduling, IPA
-  writes, unused WIGIG setters, HBTP access and display executable memory pass.
-
-This is a development integration baseline. Native compilation does not prove
-hardware functionality or complete least privilege. Remaining performance
-backend, firmware-handler and auxiliary-service decisions must be checked
-against the final selected product and first-boot evidence. Do not resolve a
-failure by importing stock policy wholesale or adding a permissive domain.
-
-## Denied on purpose
-
-Denials seen on enforcing boots that stay denied, each checked against what
-the process does without the access. Denials covered in the sections above
-are not repeated.
-
-- `hal_sensors_default`, `property_socket` write: the proximity raw-data
-  factory property; not audited (`fp6/hal_sensors_default.te`).
-- `hal_sensors_default`, append to `sensors_list.txt`: init owns the list.
-- `system_server`, extcon cable names of the EUD debug port (`sysfs`): no
-  cable type the framework uses.
-- `system_server` (InputReader), `max_brightness` of the haptics LED device
-  (`sysfs_leds`): it sits next to the chip's input device; reading it would
-  let InputReader treat the vibrator as a light.
-- `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not set
-  on this build; CamX uses the public SoC id file. As stock.
-- `hal_bluetooth_default`, `hal_camera_default`, `vendor_hal_gnss_qti`,
-  `ro.vendor.qti.va_aosp.support` and `va_odm.support`
-  (`vendor_exported_system_prop`, `vendor_exported_odm_prop`): not set on this
-  build, so a denied read returns the same default.
-- `hal_audio_default`, `rild`, `persist.vendor.pd_locater_debug`
-  (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable; stock
-  grants it only to its PD mapper, and no domain reads it here.
-- `vendor_nicmd`, `property_socket` write and an `init.svc.*` read
-  (`init_service_status_private_prop`): the SHS and QMI-priority helpers it
-  starts and checks are not installed.
-- `vendor_nicmd`, `netlink_route_socket` `nlmsg_readpriv`: seen after a Wi-Fi
-  change; stock does not grant it either.
-- `vendor_nicmd`, `rawip_socket` `create`: seen after a Wi-Fi change; stock does
-  not grant it either, and Wi-Fi calling works without it.
-- `fp6_iwlan_app` (qtidataservices) and `mediacodec` (the Codec2 image-texture
-  filter), reads of `default_prop` and `zygote_config_prop`: generic platform
-  properties (verified-boot partition info, build UUIDs, runtime flags) a
-  denied read returns as unset; neither needs them.
-- `hal_camera_default`, finding `vendor.tcl.camera.algoservice.ITctCameraAlgoService`
-  (`vendor_tct_camera_algo_service`): once per camera open; the TCL algorithm
-  service is not installed (see Camera), and CamX continues without it.
-- `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
-  nodes of the other UFS LUNs: it probes them at start; stock grants read on
-  the block devices but never open, and labels none of those BSG nodes.
-- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service` and
-  `netstats_service` (and `content_capture` for the bridge): lookups every app
-  process makes at start (ActivityThread's GraphicsEnvironment setup, for GPU
-  driver statistics, and TrafficStats.init). Platform apps get them through
-  `app_api_service`; these two domains have no graphics and keep no traffic
-  statistics, and the framework continues when the lookup returns nothing
-  (calls and Wi-Fi calling work with both denied).
-- `hal_audio_default`, `read append` on `/sys/power/wake_lock`
-  (`sysfs_wake_lock`), once per boot: PAL's `ResourceManager::initWakeLocks`
-  opens the wake-lock nodes at start. Every PAL call of `acquireWakeLock` and
-  `releaseWakeLock` is in sound trigger (`StreamSoundTrigger`,
-  `SoundTriggerEngineGsl`; disassembly of the shipped `libar-pal.so`), which is
-  not shipped. Playback with the screen off is kept awake by audioserver's own
-  wake lock through the framework, and a call's audio runs between the modem
-  and the audio DSP, so neither needs it. Stock grants it to the whole
-  `hal_audio` attribute (`wakelock_use`).
-- `platform_app` and `system_app`, the absent Google wireless-charger service.
-- `platform_app` (SystemUI), `read` of `bluetooth_lea_prop`: SettingsLib's
-  `BluetoothUtils.isAudioSharingSupported` reads
-  `persist.bluetooth.leaudio_dynamic_switcher.mode`, which the platform lets
-  only `bluetooth`, `system_app` and `gmscore_app` read. The property
-  is not set on this build, so the denied read returns the same default.
-  Platform app policy, as on other GrapheneOS devices; nothing added for apps.
-- `untrusted_app`: sandboxed Google Play and other apps probing the device
-  (adb properties, `/proc`, `/sys`, `selinuxfs`, the root and `/dev`
-  directories, the wallet property, cgroups). Intended.
-- `shell` and `su`: only the commands used to capture logs.
-
-## Recovery ownership
-
-The recovery executable uses the boot-control service over IPC; it does not
-link the legacy Qualcomm updater. Raw SCSI/BSG access and CAP_SYS_RAWIO are
-therefore not granted to recovery by this device supplement. Boot control keeps
-BSG access and CAP_SYS_RAWIO for the selected UFS implementation. Legacy sg
-character-device access is omitted, while the sysfs discovery used by
-`gpt-utils` remains. Read/write access to recovery UI and firmware resources is
-owned by the operation's actual init, ueventd or recovery domain.
-
-## Updating upstream policy
-
-The source of truth is the exact Fairphone-published Qualcomm repositories and
-revisions in `provenance.json`; local files are a reviewed subset with downstream
-adaptations. Do not track a moving branch in the build or include the entire
-upstream SEPolicy.mk as a shortcut. That would activate policy for services the
-product does not install and could undo platform ownership and domain scoping.
-
-For each upstream refresh:
-
-1. Fetch the two declared repositories into review checkouts, keeping the old
-   revisions available. Verify each recorded original file hash with
-   `git show OLD_REVISION:SOURCE_PATH | sha256sum` and each local derived hash
-   before changing the baseline.
-2. Review `git diff OLD_REVISION NEW_REVISION -- SOURCE_PATH` for every selected
-   file. Also inspect the full upstream diff/name-status, including shared
-   macros, attributes, contexts and selection makefiles: a new security fix may
-   live outside the current file selection. Check both repositories together.
-3. Merge relevant changes against the old upstream file and our derived file;
-   do not overwrite downstream adaptations. Trace each added allow to the
-   current provider/resource. Include new files only when their consumers or
-   shared definitions are required. Preserve licences and original hashes.
-4. Update upstream revisions/source hashes and resulting local hashes in
-   provenance.json. Review removals/renames explicitly. Publish a new device
-   commit and update the pinned build environment/project map.
-5. Compile USER and recovery policy with neverallows enabled, inspect effective
-   grants and negative privilege checks, and repeat affected device tests.
-   Build success alone does not establish runtime or least-privilege acceptance.
-
-This preserves upstream traceability without importing unused policy. A shared
-DiamaneOS policy repository becomes useful when multiple devices genuinely share
-this maintained subset; it is not required merely to reduce this folder's size.
+- `vendor_per_mgr` may use QRTR sockets (`qipcrtr_socket`, no ioctls): its QMI
+  libraries open AF_QIPCRTR sockets.
 - No label or ueventd rule for `/dev/qseecom`: the legacy QSEECom driver is
   not shipped. `/dev/smcinvoke` is the only TEE node, and no node carries the
   platform's `tee_device` label (see "TEE node").
@@ -335,23 +67,102 @@ this maintained subset; it is not required merely to reduce this folder's size.
   Their grants on the node are in `fp6/tee_node.te`.
 - No label for the HDCP level node (`/sys/devices/virtual/hdcp/msm_hdcp`): the
   display driver is built without HDCP, so the node does not exist.
+- No QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
+  `hal_qseecom.te` and its file and service contexts are not imported.
+  - No installed file looks it up. KeyMint, Gatekeeper, the fingerprint module
+    and `qseecomd` use `libQSEEComAPI` directly.
+  - The kernel `qseecom_proxy.ko` is a different component and stays.
+- No secure-processor (SPU) grants for the gatekeeper HAL and `qseecomd`: the
+  FP6 has no SPU, so those device nodes never exist.
 - Not imported for `qseecomd` (`tee`), because nothing on the FP6 matches:
   - The SOTER and `qdutils` display client lines: the policy has no server
     for either interface, and no rule uses those client attributes.
   - The user-contig heap: the device tree defines no such heap.
   - `vendor_qfp-daemon_data_file` and `vendor_sysfs_sectouch`: no file
     context or genfs entry assigns these labels.
+- The FP6 fingerprint service
+  (`android.hardware.biometrics.fingerprint-service.fp6`) is
+  `hal_fingerprint_default_exec` (`vendor-common/file_contexts`).
+
+## Device grants (`fp6/`)
+
+### Sensors
+
+`sensors.te` and `hal_sensors_default.te` are reduced from the Qualcomm files
+of the same name (`provenance.json`).
+
+- `vendor_sensors` (sscrpcd): FastRPC through the secure node only
+  (`vendor_xdsp_device`), the system DMA-BUF heap and wake locks.
+  - It keeps the sensor registry and calibration on persist, and state in
+    `/data/vendor/sensors`.
+  - No capabilities, QRTR or sensor-device grants.
+- `hal_sensors_default`: QRTR without ioctls, FastRPC through the secure node,
+  the system DMA-BUF heap and the graphics allocator (direct channel).
+  - It reads `persist/sensors` and the sensor, FastRPC and AON properties.
+  - Not granted: capabilities, diag, sysrq, SLPI/SSR sysfs, HID devices and
+    persist writes.
+- `sensors_list.txt`, the sensor types the HAL waits for at start, has its own
+  label, `vendor_persist_sensors_list_file`.
+  - init copies it from vendor at every boot: the stock list without the hall
+    sensor (`boot/init.qcom.rc`).
+  - The HAL may read it. Its attempts to append to it stay denied.
+- `dontaudit hal_sensors_default property_socket:sock_file write`: the sub-HAL
+  publishes every proximity sample as a factory-test property that nothing
+  reads.
+  - The set stays denied. Not auditing it avoids a flood of records while the
+    proximity sensor is on.
+
+### Graphics
+
+- Every domain except isolated apps may search the GPU sysfs directory and
+  read the GPU model: the Adreno driver runs inside every process that
+  renders (`graphics.te`).
+- `vendor.gralloc.*` (`vendor_gralloc_prop`) is readable by the processes that
+  map buffers, not by every domain.
+  - These are non-isolated apps, zygote, system_server, bootanim,
+    SurfaceFlinger, mediaswcodec, cameraserver, mediaserver, the camera
+    provider, the codec service, the allocator and the composer.
+- The Adreno read-only properties (`vendor_public_vendor_default_prop`) are
+  readable by the same set without cameraserver, mediaserver and the camera
+  provider.
+- `libllvm-qgl.so` is a same-process HAL library (`file_contexts`).
+- The composer keeps state in `/data/vendor/display`.
 - `qseecomd` has no secure-display grants: no framebuffer nodes, no graphics
   allocator client rules and no vndbinder access. No secure-display listener
   is installed.
   - It stays a composer client: its output-protection listener links the
     composer's display config interface.
+- init may `setattr` `vendor_sysfs_graphics` files: `init.qcom.rc` hands the
+  panel brightness node to system.
+- The DisplayPort and audio-codec extcon devices are `sysfs_extcon`, which
+  system_server reads to detect DisplayPort (HDMI) and wired headsets.
+  - They are labelled by device path, not by extcon index: extcon numbers
+    follow probe order.
+  - No vendor service reads extcon.
+
+### Fingerprint
+
+- `/dev/focaltech_fp` is `ff_device` (stock label).
 - The fingerprint HAL may open, read, write and ioctl that node
   (`fingerprint.te`) and the TEE node (`tee_node.te`), and open, read and
   ioctl the two QSEECom heaps (`fingerprint.te`).
+- Templates live in `/data/vendor_de/<user>/fpdata`
+  (`fingerprint_vendor_data_file`), which the platform `hal_fingerprint` rules
+  cover.
 - `qseecomd` has no grant on Qualcomm fingerprint data
   (`/mnt/vendor/persist/qti_fp`): the sensor and its trusted app are
   FocalTech's.
+- The stock module registers a factory binder service at start. The HAL
+  answers that registration inside its own process
+  (`fingerprint/ModuleFactoryService.h`), so it never reaches servicemanager.
+  - The service has no label. It would fall to `default_android_service`,
+    which the platform forbids granting.
+- Neverallow: the HAL may not open or read `vendor_data_file` files, where the
+  module's configuration and dumps would live.
+- Neverallow: only init, vendor_init and vold_prepare_subdirs may create
+  directories with the HAL's data label or relabel directories to it. Only
+  init and vendor_init may relabel files to it.
+
 ### TEE node
 
 - `/dev/smcinvoke` is `vendor_smcinvoke_device`, the type Qualcomm's public
@@ -367,13 +178,103 @@ this maintained subset; it is not required merely to reduce this folder's size.
   - The limit covers the opened node. SELinux does not check commands on
     the object and server descriptors the driver hands out.
 
+### Hardware identifiers
+
+- `/sys/devices/soc0/serial_number` is `vendor_sysfs_soc_serial`
+  (`soc_serial.te`), not the soc0 directory's `vendor_sysfs_soc`.
+- No vendor rule grants it: no shipped program reads it. The composer's
+  imported read of all sysfs excludes it.
+- The type must keep `sysfs_type`, which the platform lets some root daemons,
+  the Bluetooth, Wi-Fi, supplicant and radio HALs and tee read.
+  - ueventd makes the node 0400 root, so of those only the root platform
+    daemons can open it.
+- A neverallow keeps every other domain off it.
+- In soc0 the thermal HAL and the thermal engine read only the public `soc_id`
+  and `hw_platform` (`platform.te`).
+- The UFS serial number and its LUNs' SCSI serial and identification pages
+  keep the generic `sysfs` label, which many domains may read.
+  - ueventd makes them 0400 root too, and no shipped program reads them.
+
+### Thermal
+
+- Thermal HAL: runs as system with no capabilities
+  (`power/init.fp6.thermal.rc`).
+  - ueventd gives group system the two trip nodes it writes
+    (`trip_point_1_temp` and `trip_point_1_hyst` of each thermal zone).
+  - From `fp6/` it gets the public SoC id and the thermal zones, read-only.
+- Thermal engine (stock, runs as root): keeps its imported domain
+  (`vendor-common/thermal-engine.te`).
+  - From `fp6/` it gets the public SoC files and the relabelled CPU and GPU
+    limit nodes (see [Power](#power)).
+
+### Storage, wakeup sources and tuning
+
+- The UFS LUN 0 block directory is `sysfs_devices_block`, which init may only
+  read.
+- The one node platform init.rc writes there, the root disk's
+  `queue/discard_max_bytes`, is `vendor_sysfs_ufs_discard_max`, writable by
+  init only (`storage.te`).
+- The wakeup sources of the fingerprint, hall, privacy-switch and NFC devices
+  are `sysfs_wakeup`, which the suspend service reads.
+- `init.fp6.perf.rc` writes WALT and VM sysctls that the platform does not
+  label. Each has its own type, and only vendor_init writes them (`perf.te`):
+  - `/proc/sys/walt`: `vendor_proc_walt`
+  - `swappiness` and `min_free_kbytes`: `vendor_proc_vm_tuning`
+  - `compaction_proactiveness`: `vendor_proc_compaction`.
+- vendor_init also writes the platform `proc_sched` and
+  `proc_watermark_scale_factor` sysctls. It has no write on generic `proc`.
+
+### Wi-Fi
+
+- The Wi-Fi HAL may write `/dev/wlan` to switch the driver on, and set the
+  driver version property (`platform.te`).
+- `/proc/sys/net/ipv4/tcp_limit_output_bytes` is
+  `vendor_proc_tcp_limit_output_bytes`. Only the Wi-Fi HAL reads and writes
+  it, for high-throughput TCP tuning.
+  - The rest of `/proc/sys/net` stays read-only to it.
+- `dontaudit hal_wifi_default self:capability sys_module`: creating the
+  hotspot interface makes the kernel try to load a module named after it.
+  - The driver is already loaded, and module loading is never granted. AOSP's
+    netd has the same rule.
+- `/data/vendor/tombstones` is not labelled as a whole (only `rfs/`), so the
+  platform `tombstones/wifi` label for the HAL's ring-buffer logs applies.
+- The factory MAC file the driver loads (`vendor_diamaneos_wlan_mac_file`,
+  written by imeiprovd) is read only by ueventd, which serves it as firmware
+  (`wlan_mac.te`).
+  - For that, ueventd may search `/mnt/vendor` and the MAC directory. This
+    policy gives it nothing else under `/mnt/vendor`.
+  - A neverallow keeps every domain but init, vendor_init and ueventd from
+    reading the file.
+
+### Touch and vibrator
+
 - The touch controller's wake-gesture switch (`gesture_wakeup`) is
   `vendor_sysfs_touch_gesture` and its tap report (`wake_gesture`) is
   `vendor_sysfs_touch_wake_gesture`. The rest of the touch device keeps the
+  factory-test type `fp_mmitest_sysfs`.
   - Only the sensors HAL uses them, for Tap to wake (double tap) and Tap to
     check phone (single tap): it writes the switch and reads the report
     (`fp6/touch.te`).
+  - The HAL may search the device directory but not use its factory-test
+    files.
   - The power HAL has no access.
+- The Awinic haptics nodes the vibrator HAL writes (`activate`, `brightness`,
+  `duration`, `gain`, `loop`, `seq`) are `vendor_sysfs_aw_vibrator`
+  (`vibrator.te`).
+  - The rest of the driver stays `sysfs_leds`, read-only to the HAL: raw
+    waveform streaming (`rtp`), calibration and the other LEDs.
+  - genfs matches prefixes, so `activate_mode` gets the type too. init does
+    not hand that node to system, so the HAL still cannot write it.
+  - The HAL has no `input_device` access: it can neither read touch and key
+    events nor drive the chip's force-feedback input node.
+  - No grants for the absent `qcom-haptics` node or persist haptics
+    calibration.
+
+### USB-C port control
+
+vendor_init writes two nodes from the `sys.port_security_mode` and boot
+triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
+
 - The USB controller's data switch `data_path_enable` (GrapheneOS's three
   data commands, alt modes ignored unless on, charging kept) is
   `vendor_sysfs_usb_data_path` (`fp6/genfs_contexts`).
@@ -384,8 +285,12 @@ this maintained subset; it is not required merely to reduce this folder's size.
   `vendor_sysfs_usb_data_disable` (`vendor-common/genfs_contexts`), split
   from `vendor_sysfs_usb_device`, which also covers the controller role. No
   trigger writes it.
+- The charger firmware's input suspend
+  (`/sys/class/qcom-battery/suspend_input_current`, which Off sets) is
+  `vendor_sysfs_usb_input_suspend` (`fp6/genfs_contexts`).
 - Neverallows keep every other domain from writing any of them, except
   ueventd, which the platform lets write all of sysfs.
+
 ### Charge limit
 
 - The health service (`hal_health_default`) pauses and resumes charging
@@ -401,16 +306,97 @@ this maintained subset; it is not required merely to reduce this folder's size.
 - A neverallow keeps every other domain from writing it, except vendor_init
   and ueventd, which the platform lets write all of sysfs.
 
+### Embedded USB debugger
+
+- The switch that turns Qualcomm's embedded USB debugger (EUD) on,
+  `/sys/module/eud/parameters/enable`, is `vendor_sysfs_eud_enable`
+  (`eud.te`).
+- A neverallow leaves only ueventd and vendor_init able to write it. The
+  platform lets those two write all of sysfs.
+- Reads stay as the platform grants them: the value only tells whether EUD is
+  on.
+
+### Other grants
+
+- The peripheral manager and its proxy read the remote-processor names
+  (`vendor_sysfs_ssr`).
+- KeyMint reads the vendor patch level, for key attestation.
+- vendor_init sets the vendor properties that the vendor init scripts and
+  build properties set: gralloc, display, USB, SPU, audio, radio, subsystem
+  restart, data profile and sensors (`platform.te`).
+
+### Not granted
+
+- `qseecomd` on the raw UFS LUN 0 node: a platform neverallow on `device`
+  forbids it. RPMB and LUN 4 have their own labels.
 - `qseecomd` on `/mnt/vendor/persist/drm`: no keybox or HDCP provisioning
   tool is installed to fill that store.
+- `fsck` on `vm-bootsys`: nothing on the FP6 mounts `/product/vm-system`.
+
+## system_ext and product rules
+
+- `product-private/property_contexts`: `debug.disable_screen_decorations` is
+  `vendor_display_notch_prop`, which SystemUI cannot read.
+  - The read falls back to false, so the privacy dot cannot be switched off
+    with `adb setprop`.
 - `system-ext-private/system_server.te`: the system server reads enabled
   kernel-console metadata for the serial-console warning. It receives no
   access to serial devices or console control.
+- `system-ext-private/system_app.te`: Settings reads
+  `ro.vendor.build.security_patch` (`vendor_security_patch_level_prop`) for
+  its "Vendor security update" row.
+  - The platform grants that property to shell, keystore and vendor_init only.
+- `system-ext-private/privacy_switch.te`: the kernel block of the Moments
+  privacy switch.
+  - init writes `/sys/kernel/privacy_switch/policy` once per boot. The kernel
+    refuses later writes.
+  - Neverallows keep every domain but init, vendor_init and ueventd from
+    writing the switch's sysfs files.
+  - system_server reads the kernel's state. Only it and init set
+    `privacy_switch_prop`. Settings reads it.
 - `system-ext-private/camera_table.te`: the camera provider may read
   `ro.vendor.qti.va_aosp.support`, which selects the stock camera table with
   every lens (`camera/camera.mk`).
   - The rule names the `hal_camera_server` attribute, because the property's
     type is private to this partition. The provider is its only member here.
+- `system-ext-private/vold_adoptable.te`: vold may list `/data/misc_ce` and
+  `/data/misc_de`.
+  - It finds there the users whose keys it destroys when an adopted microSD
+    card is forgotten.
+- `system-ext-private/fsck_untrusted.te`: `fsck_untrusted` may use the
+  bootstrap libraries and two read-only block ioctls, for the e2fsck run on an
+  adopted card before it is mounted.
+- `telephony-system-ext/property_contexts`: gives a telephony polling
+  property and public `Build.VERSION` properties existing platform types, so
+  apps are never granted `default_prop`.
+
+## Firmware release
+
+`firmware/` is the policy of fwrelease (device `firmware/`), which reports the
+installed Fairphone firmware release to Settings.
+
+- `vendor_fwrelease` runs as its own user without capabilities.
+- It may only open and read the firmware partitions and set
+  `ro.vendor.diamaneos.firmware_release`.
+- The property is vendor restricted. Settings (`system_app`) reads it, as do
+  init, vendor_init and dumpstate through platform grants. Shell does not.
+- The firmware partitions that would share `vendor_custom_ab_block_device`
+  with vbmeta, dtbo, pvmfw, multiimgqti and qweslicstore have their own type,
+  `vendor_firmware_image_block_device`, so fwrelease cannot open those.
+  - The type is set in the UFS lines of `vendor-volcano/file_contexts`.
+  - It has the same grants: update_engine read-write, fastbootd read-write in
+    recovery, init relabel, boot control getattr.
+  - modem, bluetooth, uefi, uefisecapp and xbl keep their own types.
+- ueventd makes the partition nodes of both slots 0640
+  root:vendor_fwrelease (`boot/ueventd.rc`).
+  - The XBL LUNs share `vendor_xbl_block_device` but stay 0660
+    root:vendor_bootctl, so fwrelease cannot open them.
+- Neverallows for fwrelease: no capabilities, block writes or ioctls, network
+  sockets or other properties.
+- Neverallows for the property: only fwrelease, init and vendor_init set it.
+  Only the readers above read it.
+- Who reads the firmware partitions is an image check, not a neverallow: init
+  and the recovery domains read all block devices through platform grants.
 
 ## Audio
 

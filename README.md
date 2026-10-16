@@ -28,6 +28,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 | `modem/`, `telephony/`, `gnss/`, `nfc/`, `wifi/` | radios and their configuration ([telephony/IMS.md](telephony/IMS.md), [wifi/README.md](wifi/README.md)) |
 | `fingerprint/` | fingerprint HAL over the stock module |
 | `timekeep/` | `timekeepd`: keeps the clock across reboots |
+| `firmware/` | `fwrelease`: finds the installed Fairphone firmware release for Settings |
 | `compat/` | compatibility libraries for stock vendor files |
 | `display/` | display configuration: brightness table and high-brightness limits |
 | `rro/` | resource overlays |

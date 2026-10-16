@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# timekeepd (timekeep/) and its saved offset.
+/(vendor|system/vendor)/bin/timekeepd    u:object_r:vendor_timekeepd_exec:s0
+/data/vendor/timekeepd(/.*)?             u:object_r:vendor_timekeepd_data_file:s0

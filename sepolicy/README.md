@@ -546,6 +546,23 @@ Shared device labels (`vendor-common/file_contexts`):
     crowdsourcing, sensor, correction, engine and Skyhook services)
   - RIL and SSG sockets, MHI sysfs and QMS/AON properties.
 
+## Time keeping
+
+`timekeep/` holds the policy of DiamaneOS's time daemon. It replaces
+Qualcomm's `time_daemon`, whose policy, file label and `tee` socket rule are
+not imported.
+
+- `vendor_timekeepd_restore`: a one-shot step at post-fs-data. It sets the
+  clock from the RTC counter plus the saved offset.
+  - It is the only one of the two domains with `sys_time`, and it cannot write
+    the offset file.
+- `vendor_timekeepd`: long-running, with no capability.
+  - It searches `/sys/class/rtc` and reads the RTC counter file `since_epoch`
+    (its own genfs type).
+  - It replaces files in `/data/vendor/timekeepd`.
+- Neither has sockets, binder, properties, `/dev/rtc0` or persist.
+- A neverallow keeps other vendor domains from writing the offset file.
+
 ## Power
 
 - The power HAL is LineageOS's libperfmgr

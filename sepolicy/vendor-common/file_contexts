@@ -228,7 +228,6 @@
 /vendor/bin/rmt_storage         u:object_r:vendor_rmt_storage_exec:s0
 ## Context for location features - start
 ## Context for location features - end
-/vendor/bin/time_daemon         u:object_r:vendor_time_daemon_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.power-service        u:object_r:hal_power_default_exec:s0
 
 /vendor/bin/hw/android\.hardware\.security\.keymint-service-qti		     u:object_r:vendor_hal_keymint_qti_exec:s0

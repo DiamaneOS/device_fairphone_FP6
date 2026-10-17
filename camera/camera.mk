@@ -22,8 +22,7 @@ PRODUCT_COPY_FILES += \
 # installs the filter from /vendor/etc/seccomp_policy/camera-provider.policy
 # before the provider's main(). Without it the provider does not start.
 PRODUCT_PACKAGES += \
-    libcamxjail \
-    FP6CameraOverlay
+    libcamxjail
 
 # The stock camera table. Without this property the stock provider loads
 # Qualcomm's generic table, which has the main and front cameras only. With it
@@ -66,16 +65,6 @@ PRODUCT_VENDOR_PROPERTIES += \
 # 60 fps base layer instead of about 33 fps.
 PRODUCT_PRODUCT_PROPERTIES += \
     ro.media.recorder-max-base-layer-fps=60
-
-# CamX allocates the preview stream as UBWC NV12 instead of linear NV12
-# (CamX outputFormat setting, its compiled default 0 is linear). The display
-# hardware can rotate only UBWC buffers inline, so a linear portrait preview
-# forces GPU composition for every frame. Previews up to 1088 lines before
-# rotation (16:9 1920x1080) are then composed by the display hardware.
-# FP6CameraOverlay keeps the Camera app's 4:3 photo preview within that limit
-# too. Streams the CPU reads keep their own format.
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.camera.outputFormat=1
 
 # User builds: no CamX log output. The closed provider logs the three camera
 # modules' serial numbers at error level at every start (its EEPROM/OTP

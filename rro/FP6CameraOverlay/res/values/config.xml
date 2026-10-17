@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- SPDX-License-Identifier: Apache-2.0
-     Copyright 2026 The DiamaneOS Project -->
-<resources>
-    <!-- The display rotates compressed previews inline only up to 1088 lines.
-         Photo and QR preview only. Saved photos and video keep their sizes. -->
-    <integer name="config_camera_preview_max_short_edge">1088</integer>
-</resources>

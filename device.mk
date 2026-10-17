@@ -66,6 +66,13 @@ PRODUCT_COPY_FILES += \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
     device/fairphone/FP6/boot/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/system/etc/fstab.qcom
 
+# The vendor_dlkm load list split into streams that init.qcom.rc loads in
+# parallel. Together they must list every module of the kernel's
+# modules.load once, each in its order (image verification checks this).
+PRODUCT_COPY_FILES += \
+    $(foreach s,platform wireless audio data crypto media display touch, \
+        device/fairphone/FP6/boot/modules/modules.load.$(s):$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.load.$(s))
+
 # Firmware, DSP and Bluetooth mount points from fstab.qcom (see Android.mk).
 # Without them the modem partition is never mounted and the ADSP, CDSP and
 # modem cannot load their firmware.
@@ -73,6 +80,7 @@ PRODUCT_PACKAGES += \
     fp6_vendor_mount_point_firmware_mnt \
     fp6_vendor_mount_point_dsp \
     fp6_vendor_mount_point_bt_firmware
+
 # Source-built hardware services. Boot control owns GPT slot attributes and
 # UFS selection in both normal Android and recovery.
 PRODUCT_PACKAGES += \
@@ -93,6 +101,10 @@ PRODUCT_PACKAGES += \
 # libsdmextension and is untested with it; source is kept so we can patch and
 # harden the code that handles every app's buffers. Configuration values follow
 $(call inherit-product, vendor/diamaneos/config/wifi.mk)
+# Hardware subsystems. Each subsystem makefile documents its stock and
+# source-built parts.
+$(call inherit-product, device/fairphone/FP6/modem/modem.mk)
+
 # Phone memory profile and graphics version, matching stock. Without the heap
 # properties ART falls back to a 16 MB heap and the framework runs out of memory.
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)

@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "c9a619f20dac0c51fb0a177a3d12a067e4eaa7b0f08d7d4e06bf497db2615f89"
+      "sha256": "d989d1b942586f4f1e4570ab5cdde3d747704ef5c20a3a8f8045f98551cb0961"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -1092,6 +1092,38 @@
       "source_sha256": "c30b77419a9a0a3794b0bf6f40969d056f75acd8d3f369ca79e18651a1a606cd",
       "path": "product-private/property_contexts",
       "sha256": "8e17ca65c01d8962ea2228dee01c2e0d1d917eaf92855893f8f3de42a673f508"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/per_proxy.te",
+      "source_sha256": "afd3aa135498473190e6ff37f11b2f46a602c3faaabda87147d89e35b4948119",
+      "path": "vendor-common/per_proxy.te",
+      "sha256": "afd3aa135498473190e6ff37f11b2f46a602c3faaabda87147d89e35b4948119"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/peripheral_manager.te",
+      "source_sha256": "d0bb4c01c31e286888d07345530428b02018ecf0bd608e7be801708d3b545183",
+      "path": "vendor-common/peripheral_manager.te",
+      "sha256": "b960d5110c63e1723c82f01bc19414f566cb5301e8d3f37624a256dc5cf3f644"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/rmt_storage.te",
+      "source_sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a",
+      "path": "vendor-common/rmt_storage.te",
+      "sha256": "27dc1030e9af99396e1552cc202ab022d5af3d9df8191a37043efb937e015c7a"
+    },
+    {
+      "project": "qualcomm-sepolicy-vendor",
+      "revision": "67fa928299a49374a55281969fee357884c86890",
+      "source": "generic/vendor/common/ssr_setup.te",
+      "source_sha256": "e640747756a5515fce30d954f4b3c98690c69130ec35ab436794c9efd15e1486",
+      "path": "modem/ssr_setup.te",
+      "sha256": "a3b67607939392277623c05d86ad5bcbc0eb28a75363196d6c9b55ac6e9c2f8b"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

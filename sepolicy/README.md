@@ -1,26 +1,66 @@
-# FP6 service policy
+# FP6 SELinux policy
 
-Policy is selected from the pinned Fairphone Qualcomm sources recorded in
-`provenance.json`. Each imported file retains its original licence. It is
-maintained source, separate from generated stock files and kernel artifacts.
+Reference for the device policy in this directory: what each domain or file
+may access, and why. It describes the policy of a release (`user`) build.
 
-The selection covers the declared boot, display, credential, power, thermal,
-USB and basic hardware services. Manufacturing applications, diagnostics,
-unselected radio/camera services and their test exceptions are excluded.
-Shared type declarations do not imply that the corresponding service is
-installed. Adding a service requires reviewing both its activation and grants.
+## Sources and layout
 
-Downstream adaptations:
+- Imported files are a selected subset of Fairphone's published Qualcomm
+  policy (`device/qcom/sepolicy_vndr` and `device/qcom/sepolicy`).
+  - `provenance.json` records each file's source path, revision and hashes.
+  - Imported files keep their upstream headers.
+- The selection covers the declared boot, display, credential, power, thermal,
+  USB and basic hardware services.
+- Not imported: manufacturing applications, diagnostics, unselected radio and
+  camera services, and their test exceptions.
+- A shared type declaration does not mean that the service is installed.
+- This file explains the DiamaneOS-written rules. `dontaudit` rules inside
+  imported files are not listed here.
 
-- Bind hardware grants to the service domain; preserve required HAL IPC
-  attributes. Do not grant hardware access through a HAL attribute by default.
-- Keep module insertion in `vendor_modprobe`, matching the explicit init
-  execution domain. Vendor init retains the additional traversal needed to
-  restore mounted persist labels, rather than module-loading capabilities.
-- Use Android 17's genfs ownership for the Type-C class and sleep control.
-  The USB service receives class-directory enumeration and link traversal.
-- Remove legacy HBTP power access, whose implementation is absent from the
-  selected common AIDL power service.
+| Directory | Policy |
+|---|---|
+| `vendor-common/`, `vendor-attributes/`, `qva-common/`, `vendor-volcano/`, `qva-volcano/` | imported Qualcomm vendor policy, with the adaptations below |
+| `system-ext-public/`, `system-ext-private/`, `product-public/`, `product-private/` | imported Qualcomm system_ext and product policy, plus DiamaneOS rules |
+| `fp6/` | device grants, each bound to one service |
+| `audio/`, `bluetooth/`, `camera/`, `firmware/`, `gnss/`, `media/`, `modem/`, `nfc/`, `telephony/`, `timekeep/` | vendor policy of one subsystem each |
+| `telephony-system-ext/`, `telephony-system-ext-public/` | system_ext side of the telephony apps |
+
+## Rules for changes
+
+- The policy is enforcing. Compatibility tests and neverallow checks stay on.
+- Never fix a failure by importing stock policy wholesale or by adding a
+  permissive domain.
+- Bind hardware grants to the service domain, not to a HAL attribute. Keep the
+  HAL IPC attributes a service needs.
+- Adding a service means reviewing both its activation and its grants.
+- Explain every `dontaudit` and every broad rule, here or next to the rule.
+- Use platform init and ueventd permissions where they already cover an
+  operation.
+- Firmware-handler transitions are not imported. Review them if the product
+  ever activates those handlers.
+
+## Imported policy: adaptations
+
+- Module loading stays in `vendor_modprobe`, the explicit init execution
+  domain.
+  - `vendor_init` has no module-loading capability. It only gets the directory
+    traversal needed to restore the labels of the mounted persist partition.
+  - `vendor_modprobe` has no `sys_nice` and no kernel task control. The camera
+    module's request to raise its CCI IRQ thread priority stays denied
+    (non-fatal).
+- The Type-C class and sleep control use Android's genfs labels. The USB HAL
+  gets class-directory enumeration and link traversal (`qva-common/hal_usb.te`).
+- The USB speed node, which the USB HAL reads, is `sysfs_udc`. It is not the
+  factory-test type `fp_mmitest_sysfs`, which also covers camera calibration
+  and download mode.
+- No HBTP access for the power HAL: the selected power service does not use
+  it.
+- No Qualcomm perf HAL domain or client grants (see [Power](#power)).
+- The peripheral manager has no binder call into the WLAN service domain. That
+  service is not installed.
+- Allow QRTR sockets (`qipcrtr_socket`, no ioctls) for `vendor_per_mgr`: its
+  QMI libraries open AF_QIPCRTR sockets, which the upstream rules only grant
+  as generic `socket`.
     `/data/vendor/display`. The gralloc properties (`vendor.gralloc.*`) are
     readable by the processes that map buffers, including the camera
     provider, cameraserver and mediaserver; stock lets every domain read
@@ -105,7 +145,7 @@ are not repeated.
   build, so a denied read returns the same default.
 - `hal_audio_default`, `rild`, `persist.vendor.pd_locater_debug`
   (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable; stock
-  grants it only to the PD mapper.
+  grants it only to its PD mapper, and no domain reads it here.
 - `vendor_nicmd`, `property_socket` write and an `init.svc.*` read
   (`init_service_status_private_prop`): the SHS and QMI-priority helpers it
   starts and checks are not installed.
@@ -198,6 +238,83 @@ grant to activity reporting (`0x5201`). AudioReach receives its AGM device,
 runtime audio directory, selected allocator and sound-card state access. The
 FastRPC listener receives only its DSP transport, firmware/RFSA, audio-DSP state
 and DSP-service lookup.
+
+## Modem
+
+- The stock peripheral manager boots the modem (MSS) through its remoteproc
+  character device, which ueventd makes 0600 for `system`.
+- The modem's `study` partition has the stock
+  `vendor_modem_efs_partition_device` label (`vendor-volcano/file_contexts`),
+  so `rmt_storage` serves it with its existing grant.
+- The full RAM dump collector (`vendor_subsystem_ramdump`) is not installed
+  and has no policy.
+- Remote-processor error logs are not written to `/data`: there is no
+  `/data/vendor/tombstones/rfs`, and tqftpserv serves no ramdump paths.
+
+### `vendor_ssr_setup`
+
+The stock subsystem-restart helper (`modem/ssr_setup.te`), reduced from
+Qualcomm's `ssr_setup.te` (`provenance.json`).
+
+- It lists `/sys/class/remoteproc` and reads the processor names.
+- It writes only the `recovery` switches (`vendor_sysfs_ssr_toggle`).
+- It reads `persist.vendor.ssr.*`.
+- Not granted, unlike upstream: writes to `vendor_sysfs_ssr` files and links
+  (the legacy restart-level interface, absent on this kernel) and reads of
+  `vendor_sysfs_data`.
+- `modem/file_contexts` labels `/vendor/bin/ssr_setup`. The MSS, ADSP, CDSP
+  and WPSS recovery switches are in `vendor-volcano/file_contexts`.
+
+### tqftpserv and pd-mapper
+
+- The modem's TFTP file server and the protection-domain mapper are the
+  open-source linux-msm `tqftpserv` (DiamaneOS fork) and `pd-mapper`, built
+  from `vendor/qcom/opensource`.
+- They replace Qualcomm's `tftp_server` and `pd-mapper`.
+  - `rfs_access.te`, `pd_services.te` and their file contexts are not
+    imported.
+  - There are no `/vendor/rfs` links into persist.
+- Each runs as its own vendor user (`modem/config.fs`) with no capabilities,
+  no network, no binder and no properties.
+- Both read the modem partition, which is mounted for `system`
+  (`fstab.qcom`), through the `system` supplementary group. SELinux limits
+  what they can read.
+- QRTR has no per-service access control, so either service can reach any QMI
+  service. `telephony/qrtr.te` lists both in its inventory.
+
+`vendor_tqftpserv` (`modem/tqftpserv.te`):
+
+- QRTR sockets: create, connect, getattr, read, setopt and write. No ioctl or
+  bind.
+- It lists `/sys/class/remoteproc` and reads each processor's `firmware`
+  attribute (`vendor_sysfs_rproc_firmware`, `modem/file_contexts`).
+- Read-only requests (`modem_pr/...`) are served through the
+  `/vendor/firmware/modem_pr` link to the modem partition.
+- Its read-write directory is `/data/vendor/tmp/tqftpserv`
+  (`vendor_tqftpserv_data_file`).
+  - It may open, create, read, write and delete files there. No rename, link,
+    attribute change or subdirectory.
+  - The modem writes `server_check.txt` and `mcfg.tmp` there, and deletes
+    `mcfg.tmp` (the TFTP "unlink" option).
+  - tqftpserv deletes only files in that directory and follows no symbolic
+    links there.
+  - Nothing goes to persist, so a factory reset clears these files.
+- `dontaudit` on reading the kernel's firmware search path
+  (`vendor_sysfs_firmware_path`, `modem/genfs_contexts`): tqftpserv probes it
+  on every request.
+  - On the FP6 that path is a comma-separated list it cannot use, so the read
+    stays denied and it uses `/vendor/firmware`.
+- A neverallow keeps other vendor services from changing its files.
+
+`vendor_pd_mapper` (`modem/pd_mapper.te`):
+
+- QRTR sockets: create, getattr, read, setopt and write.
+- The same remoteproc listing and `firmware` attribute.
+- Its domain lists (`/vendor/firmware/*.jsn`, links to the modem partition)
+  are readable through the platform's vendor-file rules.
+- Not granted, unlike upstream: `vendor_sysfs_data`,
+  `persist.vendor.pd_locater_debug`, and the legacy IPC router socket with its
+  ioctl.
 The HAL's `property_set` of `vendor.nfc.fw.version` (`vendor_nfc_prop`) stays
 denied: `nfc_nci_sec.so` ignores the result and never reads it back, and the
 only stock reader is the factory MMI app. If the firmware version is wanted in

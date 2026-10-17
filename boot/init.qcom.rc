@@ -6,6 +6,9 @@ on early-init
     symlink /vendor/firmware_mnt /firmware
     symlink /vendor/bt_firmware /bt_firmware
     symlink /vendor/dsp /dsp
+    # As stock (init.qti.kernel.rc): when the kernel cannot read a firmware
+    # file, ueventd loads it (firmware_directories in ueventd.rc).
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on init
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
@@ -17,13 +20,123 @@ on early-fs
 on fs
     mount_all --early
     # Firmware mounts precede vendor drivers which may request firmware at probe.
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /system/lib/modules --all=/system/lib/modules/modules.load
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load
+    # The kernel modules load in parallel streams (the vendor.modprobe_*
+    # services below), each in the order of the kernel's modules.load. The
+    # platform stream (clocks, regulators, buses, USB, thermal, remote
+    # processors) loads alone first. Then every subsystem loads its own stream
+    # at the same time. Touch starts once display is done, since its driver
+    # needs the panel and its backlight. init goes on only when all streams
+    # are done, except touch: its driver takes about a second to probe, and
+    # nothing uses the touchscreen before system_server, which picks it up
+    # when it appears.
+    start vendor.modprobe_system
+    exec_start vendor.modprobe_platform
+    start vendor.modprobe_wireless
+    start vendor.modprobe_audio
+    start vendor.modprobe_data
+    start vendor.modprobe_crypto
+    start vendor.modprobe_media
+    exec_start vendor.modprobe_display
+    start vendor.modprobe_touch
+    wait_for_prop init.svc.vendor.modprobe_system stopped
+    wait_for_prop init.svc.vendor.modprobe_wireless stopped
+    wait_for_prop init.svc.vendor.modprobe_audio stopped
+    wait_for_prop init.svc.vendor.modprobe_data stopped
+    wait_for_prop init.svc.vendor.modprobe_crypto stopped
+    wait_for_prop init.svc.vendor.modprobe_media stopped
     chown root system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
     mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
+
+# The module streams started at "on fs": one modprobe for system_dlkm and one
+# per list in /vendor/lib/modules (boot/modules/, which together hold the
+# kernel's vendor_dlkm modules.load), with the options and domain of the
+# single modprobe each list was part of. libmodprobe loads the dependencies of
+# every module first. When two streams need the same module, the kernel loads
+# it once and the other waits for it. Each keeps only CAP_SYS_MODULE, and its
+# errors go to the kernel log.
+service vendor.modprobe_system /vendor/bin/modprobe -q -b -d /system/lib/modules --all=/system/lib/modules/modules.load
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_platform /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.platform
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_wireless /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.wireless
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_audio /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.audio
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_data /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.data
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_crypto /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.crypto
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_media /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.media
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_display /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.display
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
+
+service vendor.modprobe_touch /vendor/bin/modprobe -q -b -d /vendor/lib/modules -d /system/lib/modules --all=/vendor/lib/modules/modules.load.touch
+    user root
+    group root
+    capabilities SYS_MODULE
+    seclabel u:r:vendor_modprobe:s0
+    stdio_to_kmsg
+    disabled
+    oneshot
 
 on late-fs
     mount_all --late
@@ -34,6 +147,9 @@ on post-fs-data
     mkdir /data/vendor/qtee 0770 system system
     mkdir /data/vendor/pwr 0700 root root
     mkdir /data/vendor/perfd 2770 root system
+    mkdir /data/vendor/tombstones 0771 system system
+    # Unlike stock, no /data/vendor/tombstones/rfs: remote-processor error logs
+    # are not written to /data (tqftpserv serves no ramdump paths).
     # Vibrator control for the vibrator HAL (matches stock).
     chown system system /sys/class/leds/aw_vibrator/trigger
     chown system system /sys/class/leds/aw_vibrator/activate
@@ -50,3 +166,52 @@ on post-fs-data
 
 on early-boot
     verity_update_state
+
+# Remote processors (matches stock init.qti.kernel.rc and init.target.rc): the
+# ADSP provides USB role detection, charging and audio, the CDSP compute.
+# Their firmware is on /vendor/firmware_mnt, mounted by mount_all --early.
+on early-boot
+    start vendor.pd_mapper
+    # Subsystem restart must be enabled before the first remote processor
+    # boots (vendor.ssr_setup, modem/init.modem.rc). init waits for it.
+    exec_start vendor.ssr_setup
+    # Unlike stock, which writes these from a background script, init waits
+    # here: the DSP loaders boot the remote processor synchronously, so a slow
+    # or failing DSP start delays the rest of early-boot and class core.
+    # Measure this on the device before relying on it.
+    write /sys/kernel/boot_adsp/boot 1
+    write /sys/kernel/boot_cdsp/boot 1
+
+# pd-mapper (linux-msm, modem/modem.mk) answers the protection-domain lookups
+# of the remote processors and the audio HAL. Own user (modem/config.fs), no
+# capabilities. The system group only lets it read the domain lists on the
+# modem partition, which is mounted for system (fstab.qcom). On debuggable
+# builds its error messages go to the kernel log.
+service vendor.pd_mapper /vendor/bin/pd-mapper
+    class core
+    user vendor_pd_mapper
+    group vendor_pd_mapper system
+    capabilities
+    stdio_to_kmsg
+
+# Stock grants CAP_NET_BIND_SERVICE through file capabilities. The prebuilts
+# are installed without them, so init grants it to these services instead.
+service vendor.per_mgr /vendor/bin/pm-service
+    class core
+    user system
+    group system
+    capabilities NET_BIND_SERVICE
+    ioprio rt 4
+
+service vendor.per_proxy /vendor/bin/pm-proxy
+    class core
+    user system
+    group system
+    disabled
+
+on property:init.svc.vendor.per_mgr=running
+    start vendor.per_proxy
+
+on property:sys.shutdown.requested=*
+    write /sys/kernel/qcom_rproc/shutdown_in_progress 1
+    stop vendor.per_proxy

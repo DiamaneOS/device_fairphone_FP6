@@ -80,13 +80,17 @@ include device/fairphone/FP6-kernel/BoardConfigKernel.mk
 
 # Reviewed source policy belongs to the device tree, not generated stock files.
 BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common vendor-attributes qva-common vendor-volcano qva-volcano)
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/modem
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
 PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
+# Vendor users of the remote-processor services (tqftpserv, pd-mapper).
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 # Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
+
 # AVB is enabled. Release signing replaces the test identities.
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem

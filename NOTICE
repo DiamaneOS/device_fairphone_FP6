@@ -1,0 +1,31 @@
+DiamaneOS Fairphone 6 device configuration
+
+Original integration files: Copyright 2026 The DiamaneOS Project, Apache-2.0.
+
+boot/fstab.qcom derives from Fairphone vendor/fairphone/fps
+revision 51648f54c2a7d31fc24833adcae3758cb251966f, default/fstab.qcom,
+and the corresponding FP6.QREL.16.100.0 EU vendor ramdisk configuration.
+Upstream: https://gerrit-public.fairphone.software/vendor/fairphone/fps
+Copyright (c) 2019-2020 The Linux Foundation. All rights reserved.
+The full upstream redistribution conditions and disclaimer are preserved in
+boot/fstab.qcom and apply to that file; LICENSE does not relicense it.
+
+Downstream changes: retain the shipped early /odm/persist mount, identify the
+FP6 configuration and remove the optional Google GSI public-key fallback list.
+Partition paths, filesystem options and encryption parameters retain their
+upstream meaning. No upstream author attribution has been removed.
+
+boot/init.recovery.qcom.rc adapts the Linux Foundation recovery initialization
+published in CalyxOS/device_fairphone_FP6 at
+ d2c4950eff6d99fc6473419fbbd0b55d42ec9035,
+rootdir/etc/init.recovery.qcom.rc. The original BSD redistribution notice is
+retained. The adaptation selects the matched FP6 USB controller, bounds waits,
+uses the platform recovery's gadget compositions and leaves brightness control
+to the recovery UI. Recovery UI geometry and pixel-format settings were compared
+with that same device configuration; runtime validation remains required.
+
+The recovery package/property selection in device.mk is derived from
+build/make/target/product/base_vendor.mk at GrapheneOS platform_build commit
+7f0398241bc8c4ef5255a8063befa5045e5cfab4. Copyright (C) 2018 The Android
+Open Source Project, Apache License 2.0 (see LICENSE). The selection omits the
+unrelated vendor group and adds fastbootd for dynamic-partition recovery.

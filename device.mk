@@ -445,6 +445,9 @@ PRODUCT_PACKAGES += fp6_kernel_notice
 # Source-built protected VM firmware for the FP6 pvmfw partitions.
 PRODUCT_BUILD_PVMFW_IMAGE := true
 
+# Recovery applies update packages from adb sideload with this tool.
+PRODUCT_PACKAGES += update_engine_sideload
+
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \

@@ -1008,8 +1008,8 @@ without it. Denials covered in the sections above are not repeated.
   service is not installed, and CamX continues without it.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it only probes them at start.
-- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service` and
-  `netstats_service` (and `content_capture` for the bridge): lookups every app
+- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service`,
+  `netstats_service` and `content_capture_service`: lookups every app
   process makes at start.
   - These two domains have no graphics and keep no traffic statistics, and the
     framework continues when the lookup returns nothing.

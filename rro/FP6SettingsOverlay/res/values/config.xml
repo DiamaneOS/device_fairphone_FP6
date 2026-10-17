@@ -21,6 +21,11 @@
          FP6 has no secure decoders. -->
     <bool name="config_hardware_video_decoding_protected_video">false</bool>
 
+    <!-- No remote key provisioning choice: the FP6's secure world refuses the certificate
+         request while the phone boots locked with our key (yellow), so the choice changes
+         nothing. -->
+    <bool name="config_remote_key_provisioning_choice">false</bool>
+
     <!-- Labels for the colour modes in the framework's config_availableColorModes
          (0, 256, 257). Settings pairs this list, by position, with its own
          translated config_color_mode_options_strings: Natural, Boosted,

@@ -58,6 +58,11 @@ may access, and why. It describes the policy of a release (`user`) build.
 - No Qualcomm perf HAL domain or client grants (see [Power](#power)).
 - The peripheral manager has no binder call into the WLAN service domain. That
   service is not installed.
+- Drop the QSEECom AIDL proxy (`vendor.qti.hardware.qseecom@1.0-service`):
+  `hal_qseecom.te` and its file and service contexts are removed, and the
+  service is not selected. No installed file looks it up; KeyMint, Gatekeeper,
+  the fingerprint module and `qseecomd` use `libQSEEComAPI` directly. The
+  kernel `qseecom_proxy.ko` is a different component and stays.
 - Label the FP6 fingerprint service (`android.hardware.biometrics.
   fingerprint-service.fp6`) `hal_fingerprint_default_exec`, the domain of the
   stock wrapper it replaces.
@@ -323,10 +328,45 @@ For each upstream refresh:
 This preserves upstream traceability without importing unused policy. A shared
 DiamaneOS policy repository becomes useful when multiple devices genuinely share
 this maintained subset; it is not required merely to reduce this folder's size.
+- No label or ueventd rule for `/dev/qseecom`: the legacy QSEECom driver is
+  not shipped. `/dev/smcinvoke` is the only TEE node, and no node carries the
+  platform's `tee_device` label (see "TEE node").
+- The imported `tee_device` grants of `qseecomd` and KeyMint are removed.
+  Their grants on the node are in `fp6/tee_node.te`.
+- No label for the HDCP level node (`/sys/devices/virtual/hdcp/msm_hdcp`): the
+  display driver is built without HDCP, so the node does not exist.
+- Not imported for `qseecomd` (`tee`), because nothing on the FP6 matches:
+  - The SOTER and `qdutils` display client lines: the policy has no server
+    for either interface, and no rule uses those client attributes.
+  - The user-contig heap: the device tree defines no such heap.
+  - `vendor_qfp-daemon_data_file` and `vendor_sysfs_sectouch`: no file
+    context or genfs entry assigns these labels.
+- `qseecomd` has no secure-display grants: no framebuffer nodes, no graphics
+  allocator client rules and no vndbinder access. No secure-display listener
+  is installed.
+  - It stays a composer client: its output-protection listener links the
+    composer's display config interface.
+- The fingerprint HAL may open, read, write and ioctl that node
+  (`fingerprint.te`) and the TEE node (`tee_node.te`), and open, read and
+  ioctl the two QSEECom heaps (`fingerprint.te`).
+- `qseecomd` has no grant on Qualcomm fingerprint data
+  (`/mnt/vendor/persist/qti_fp`): the sensor and its trusted app are
+  FocalTech's.
+### TEE node
+
+- `/dev/smcinvoke` is `vendor_smcinvoke_device`, the type Qualcomm's public
+  policy declares for it, not the platform's `tee_device`.
+  - The platform grants `tee_device` to its reference DRM, CAS, Keymaster,
+    KeyMint, Gatekeeper, AuthGraph, Secretkeeper and hwcrypto HAL domains.
+    With no node under that label, those grants reach nothing.
 - Only `qseecomd`, KeyMint, Gatekeeper and the fingerprint HAL may open,
   read, write or send commands to the node. A neverallow keeps every other
   domain off it (`tee_node.te`).
 - The four may send two commands: invoke (`0x9801`) and create a callback
+  server (`0x9803`).
+  - The limit covers the opened node. SELinux does not check commands on
+    the object and server descriptors the driver hands out.
+
 - The touch controller's wake-gesture switch (`gesture_wakeup`) is
   `vendor_sysfs_touch_gesture` and its tap report (`wake_gesture`) is
   `vendor_sysfs_touch_wake_gesture`. The rest of the touch device keeps the
@@ -374,41 +414,50 @@ this maintained subset; it is not required merely to reduce this folder's size.
 
 ## Audio
 
-`audio/adsprpcd.te` and `audio/hal_audio_default.te` are downstream-authored
-adaptations of the matching Qualcomm `sepolicy_vndr` files published by Fairphone
-at `67fa928299a49374a55281969fee357884c86890`. Their original licence headers,
-source hashes and derived hashes are retained in `provenance.json`. The audio
-file contexts and init-directory rules are authored by DiamaneOS.
+- `audio/adsprpcd.te` and `audio/hal_audio_default.te` are reduced from the
+  Qualcomm files of the same name (`provenance.json`).
+- The audio file contexts and init-directory rules are DiamaneOS's.
+- The primary HAL, PAL and AGM are built from source (device
+  `audio/provenance.json`) and keep the stock domains and labels.
+- The policy confines device access to the audio service domains.
 
-The policy deliberately omits upstream diagnostic-device access, sensor persist
-writes, voice-UI sockets, QTR SDK access, broad HAL-attribute grants, vendor
-Binder use and DSP restart controls (`vendor.audio.crash.trigger` is unset). QRTR
-is granted narrowly: `hal_audio_default` may create and use its own
-`qipcrtr_socket` (create, read, write, getattr, setopt; no ioctl, bind or
-connect) for the audio-PD lookup and restart notifications of GPR and GSL.
-SELinux cannot filter QRTR by service, so the HAL can send QMI to any service.
-AGM and PAL open the sound-card state node read-write, so the HAL may also write
-it. PAL's wake locks (sound trigger only, not shipped) stay denied. The audio
-policy confines device access to the audio service domains, keeps amplifier
-factory calibration read-only and restricts the PAL sleep-monitor extended ioctl
-grant to activity reporting (`0x5201`). AudioReach receives its AGM device,
-runtime audio directory, selected allocator and sound-card state access. The
-FastRPC listener receives only its DSP transport, firmware/RFSA, audio-DSP state
-and DSP-service lookup.
+### `hal_audio_default`
 
-The primary HAL, PAL and AGM are built from source (`audio/provenance.json`)
-and keep the stock domains and labels. The HAL registers the AGM HIDL service
-(`IAGM`) in its own process and no PAL HIDL service (`IPAL` keeps its label).
-`qva-common/hwservice_contexts` labels both `vendor_hal_audio_internal_hwservice`
-(`audio/hwservice.te`) instead of `hal_audio_hwservice`, so only
-`hal_audio_default` may register and look them up; audioserver, system_server
-and the Bluetooth stack, which are hal_audio clients, cannot reach them.
-The kernel may not search `/mnt/vendor` (a platform neverallow) and does not
-need to: the amplifier driver leaves calibration to userspace. At each speaker
-start the audio HAL's PAL reads the per-unit calibration from persist and writes
-it to the DSP (logged as "Awinic set cali re success"; checked on the phone, as
-on stock). These rules are not yet runtime-qualified under enforcing mode;
-collect denials on the device before adding any grant.
+- AGM device, ION and system DMA-BUF heap, the runtime audio directory
+  (`/data/vendor/audio`) and the audio properties.
+- Sound-card state node: read and write. AGM and PAL open it read-write.
+  Without write no audio comes up.
+- ADSP sleep monitor: only the activity-reporting ioctl (`0x5201`).
+- QRTR: its own `qipcrtr_socket` with create, read, write, getattr and setopt
+  (no ioctl, bind or connect).
+  - GPR and GSL use it for the audio-PD lookup and restart notifications.
+  - SELinux cannot filter QRTR by service, so the HAL can send QMI to any
+    service.
+- Amplifier factory calibration on persist: read-only.
+  - At each speaker start PAL reads the per-unit calibration and writes it to
+    the DSP.
+  - The kernel needs no access to `/mnt/vendor`, which a platform neverallow
+    forbids.
+- HIDL: the HAL registers the AGM service (`IAGM`) in its own process, and no
+  PAL service.
+  - `qva-common/hwservice_contexts` labels `IAGM` and `IPAL`
+    `vendor_hal_audio_internal_hwservice` (`audio/hwservice.te`).
+  - A neverallow lets only `hal_audio_default` look them up. audioserver,
+    system_server and the Bluetooth stack cannot reach them.
+- Not granted, unlike upstream: diagnostic devices, sensor persist writes,
+  voice-UI sockets, QTR SDK access, broad HAL-attribute grants, vendor Binder
+  use and DSP restart controls (`vendor.audio.crash.trigger` is not set).
+- PAL's wake locks stay denied (see
+  [Not granted on purpose](#not-granted-on-purpose)).
+
+### `vendor_adsprpcd`
+
+The FastRPC listener, audioadsprpcd.
+
+- Its DSP transport nodes and the system DMA-BUF heap.
+- Firmware and RFSA files, read-only.
+- Audio-DSP state in `/data/vendor/audio_dsp`.
+- A lookup of the DSP manager hwservice.
 
 ## Modem
 

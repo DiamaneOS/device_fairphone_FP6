@@ -41,8 +41,6 @@ allow tee vendor_bsg_device:chr_file rw_file_perms;
 allow tee vendor_ufs_lun4_bsg_device:chr_file rw_file_perms;
 
 allow tee mnt_vendor_file:dir r_dir_perms;
-allow tee vendor_persist_drm_file:dir create_dir_perms;
-allow tee vendor_persist_drm_file:file create_file_perms;
 allow tee vendor_persist_data_file:dir create_dir_perms;
 allow tee vendor_persist_data_file:file create_file_perms;
 
@@ -51,13 +49,7 @@ allow tee vendor_persist_data_file:file create_file_perms;
 allow tee vendor_data_tzstorage_file:dir create_dir_perms;
 allow tee vendor_data_tzstorage_file:file create_file_perms;
 
-hal_client_domain(tee, vendor_hal_qdutils_disp);
-hal_client_domain(tee, hal_graphics_allocator);
-vndbinder_use(tee);
-allow tee vendor_qdisplay_service:service_manager find;
 hal_client_domain(tee, hal_graphics_composer);
-allow tee vendor_sysfs_sectouch:file rw_file_perms;
-allow tee graphics_device:chr_file rw_file_perms;
 
 #OPS Listener
 allow tee vendor_sysfs_graphics:dir r_dir_perms;

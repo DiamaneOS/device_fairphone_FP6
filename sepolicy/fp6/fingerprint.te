@@ -2,14 +2,13 @@
 # Copyright 2026 The DiamaneOS Project
 # FocalTech fingerprint sensor node and the QSEECom path to its trusted app,
 # bound to the fingerprint HAL (stock ff_device label). Each grant is the set
-# the stock module used on permissive boots before these rules existed: open,
-# read, write and ioctl on the node and on QSEECom; open, read and ioctl on
-# the read-only (0444) QSEECom heaps. Templates live in
+# the stock module uses: open, read, write and ioctl on the node and on
+# QSEECom. Open, read and ioctl on the read-only (0444) QSEECom heaps. The
+# grant on the TEE node itself is in tee_node.te. Templates live in
 # /data/vendor_de/<user>/fpdata (fingerprint_vendor_data_file, created by
 # vold), which the platform hal_fingerprint rules already cover.
 type ff_device, dev_type;
 allow hal_fingerprint_default ff_device:chr_file { open read write ioctl };
-allow hal_fingerprint_default tee_device:chr_file { open read write ioctl };
 allow hal_fingerprint_default { vendor_dmabuf_qseecom_heap_device vendor_dmabuf_qseecom_ta_heap_device }:chr_file { open read ioctl };
 
 # The module also registers a factory/debug binder service,

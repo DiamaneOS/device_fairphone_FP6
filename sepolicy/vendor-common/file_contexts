@@ -81,7 +81,6 @@
 /dev/cvp*                                       u:object_r:video_device:s0
 /dev/media([0-9])+                              u:object_r:video_device:s0
 /dev/v4l-subdev.*                               u:object_r:vendor_camera_subdev_device:s0
-/dev/qseecom                                    u:object_r:tee_device:s0
 /dev/qti-smmu-proxy                             u:object_r:vendor_smmu_proxy_device:s0
 /dev/qsee_ipc_irq_spss                          u:object_r:vendor_qsee_ipc_irq_spss_device:s0
 /dev/seemplog                                   u:object_r:vendor_seemplog_device:s0
@@ -287,6 +286,9 @@
 
 # data files
 /data/vendor/pddump(/.*)?              u:object_r:vendor_pddump_data_file:s0
+# QTEE secure file storage on /data (qseecomd writes it for the TEE; tee.te
+# grants it). Upstream generic/vendor/common/file_contexts line 459.
+/data/vendor/tzstorage(/.*)?           u:object_r:vendor_data_tzstorage_file:s0
 # Remote-processor dumps only: the whole tree would shadow the platform
 # tombstones/wifi label (tombstone_wifi_data_file) the Wi-Fi HAL writes.
 /data/vendor/tombstones/rfs(/.*)?   u:object_r:vendor_tombstone_data_file:s0
@@ -381,7 +383,6 @@
 /sys/devices/virtual/graphics/fb([0-3])+/ad                         u:object_r:vendor_sysfs_graphics:s0
 /sys/devices/virtual/graphics/fb([0-3])+/pp_bl_event                u:object_r:vendor_sysfs_graphics:s0
 /sys/devices/virtual/rotator/mdss_rotator/caps                      u:object_r:vendor_sysfs_graphics:s0
-/sys/devices/virtual/hdcp/msm_hdcp/min_level_change                 u:object_r:vendor_sysfs_graphics:s0
 /sys/class/lcd_bias/secure_mode                                     u:object_r:vendor_sysfs_graphics:s0
 /sys/class/leds/wled/secure_mode                                    u:object_r:vendor_sysfs_graphics:s0
 

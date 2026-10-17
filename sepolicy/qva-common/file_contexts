@@ -82,12 +82,11 @@
 /dev/socket/qvrservice_vndr_camera              u:object_r:vendor_qvrd_vndr_camera_socket:s0
 /dev/socket/sxrservice_vndr                     u:object_r:vendor_sxrd_vndr_socket:s0
 
-/dev/smcinvoke                                  u:object_r:tee_device:s0
+/dev/smcinvoke                                  u:object_r:vendor_smcinvoke_device:s0
 ###################################
 # System files
 #
 
-/vendor/bin/hw/vendor\.qti\.hardware\.qseecom@1\.0-service                         u:object_r:vendor_hal_qseecom_default_exec:s0
 /vendor/bin/hw/vendor\.qti\.hardware\.vibrator\.service                            u:object_r:hal_vibrator_default_exec:s0
 /vendor/bin/hw/android\.hardware\.health-service\.qti                              u:object_r:hal_health_default_exec:s0
 /vendor/bin/hw/android\.hardware\.usb(\@1\.[0-3])?-service[.-]qti                  u:object_r:vendor_hal_usb_qti_exec:s0

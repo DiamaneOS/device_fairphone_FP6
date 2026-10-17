@@ -34,6 +34,13 @@ PRODUCT_PACKAGES += hwservicemanager
 # does not inherit base_vendor.mk.
 PRODUCT_PACKAGES += vndservicemanager
 
+# OEM unlocking, as stock: Android's persistent data block service manages the
+# bootloader's unlock-ability flag, the last byte of the frp partition (edk2
+# FastbootCmds.c ReadAllowUnlockValue), and Settings shows the toggle.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.frp.pst=/dev/block/bootdevice/by-name/frp \
+    ro.oem_unlock_supported=1
+
 # Remote key provisioning, as stock: without a hostname keystore2 treats it as
 # off, and stock declares the TEE KeyMint RKP-only (no factory attestation
 # key). The hostname only switches it on. The server rkpd talks to is set by

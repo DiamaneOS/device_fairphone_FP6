@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The TEE node (/dev/smcinvoke) has its own label, vendor_smcinvoke_device
+# (qva-common/file_contexts), not the platform's tee_device. The platform
+# grants tee_device to its reference DRM, CAS, Keymaster, KeyMint, Gatekeeper,
+# AuthGraph, Secretkeeper and hwcrypto HAL domains. With no node under that
+# label, those grants reach nothing, whatever service is installed later.
+#
+# Its four users are qseecomd (tee), KeyMint, Gatekeeper and the fingerprint
+# HAL. Every grant on the node is in this file: the platform's rules for
+# tee_device supply none of them.
+allow tee vendor_smcinvoke_device:chr_file rw_file_perms;
+allow vendor_hal_keymint_qti vendor_smcinvoke_device:chr_file rw_file_perms;
+allow vendor_hal_gatekeeper_qti vendor_smcinvoke_device:chr_file rw_file_perms;
+allow hal_fingerprint_default vendor_smcinvoke_device:chr_file { open read write ioctl };
+
+# Commands on the node. The four send two: invoke on the root object (0x9801)
+# and create a callback server (0x9803). The driver has three more: accept
+# (0x9802) and acknowledge (0x9804), which belong to server descriptors, and a
+# log call (0x98ff) that none of the four sends.
+#
+# These rules limit the opened node only. SELinux does not check commands on
+# the object and server descriptors that the driver hands out.
+allowxperm tee vendor_smcinvoke_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm vendor_hal_keymint_qti vendor_smcinvoke_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm vendor_hal_gatekeeper_qti vendor_smcinvoke_device:chr_file ioctl { 0x9801 0x9803 };
+allowxperm hal_fingerprint_default vendor_smcinvoke_device:chr_file ioctl { 0x9801 0x9803 };
+
+# Nobody else, apps and platform services included. This replaces the
+# platform's neverallows on tee_device, which do not cover the node.
+neverallow {
+  domain
+  -tee
+  -vendor_hal_keymint_qti
+  -vendor_hal_gatekeeper_qti
+  -hal_fingerprint_default
+} vendor_smcinvoke_device:chr_file { open read write append ioctl map };

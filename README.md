@@ -46,9 +46,11 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
   - A kernel change to `modules.load` needs the same change here, or the image
     checks fail.
 - AVB chain as on stock. Rollback index locations: recovery 28, vbmeta_system
-  29, boot 30, init_boot 31.
-  - Stock uses 1 to 4, so the indices DiamaneOS stores never limit a stock
-    relock.
+  29, boot 30, init_boot 31. The top-level vbmeta uses 0. Each index is the
+  platform patch date.
+  - Stock uses 1 to 4 for its chains and stores 0 at location 0. A return to
+    stock after a locked DiamaneOS boot needs `fastboot oem reset-rollback`
+    while unlocked, before relocking.
   - vbmeta_system covers pvmfw too: the bootloader rejects a slot without it.
   - dm-verity uses SHA-256.
 - Boot control: Fairphone's `hardware/qcom/bootctrl` and `recovery-ext`, with

@@ -59,15 +59,12 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 r_dir_file(hal_vibrator_default, sysfs_leds)
-allow hal_vibrator_default sysfs_leds:file rw_file_perms;
+# FP6: no write access to every LED node; the Awinic nodes the HAL writes
+# have their own type (fp6/vibrator.te).
 
-# read/write permissions to haptics sysfs node
-r_dir_file(hal_vibrator_default, vendor_sysfs_haptics)
-allow hal_vibrator_default vendor_sysfs_haptics:file w_file_perms;
+# FP6: no qcom-haptics sysfs node (/sys/class/qcom-haptics) and no haptics
+# calibration in persist, so neither is granted.
 
-# read-only permission to obtain the calibration data
-r_dir_file(hal_vibrator_default, vendor_persist_haptics_file)
-allow hal_vibrator_default mnt_vendor_file:dir search;
-
-# default permissions for qc_aon_node
+# default permissions for qc_aon_node (the HAL reads ro.vendor.qc_aon_presence
+# at start)
 get_prop(hal_vibrator_default, vendor_qc_aon_prop)

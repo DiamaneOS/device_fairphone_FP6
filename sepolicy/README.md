@@ -111,6 +111,21 @@ may access, and why. It describes the policy of a release (`user`) build.
     whole (only `rfs/`), so the platform `tombstones/wifi` label for the HAL's
     ring-buffer logs applies.
   - The genfs lines for these tuning nodes are in `fp6/genfs_contexts`.
+  - Touch: the controller's double-tap wake switch (`gesture_wakeup`) is
+    `vendor_sysfs_touch_gesture`, not `fp_mmitest_sysfs` like the rest of the
+    touch device. Only the power HAL writes it (Mode::DOUBLE_TAP_TO_WAKE); it
+    may search the device directory but not use its factory-test files.
+  - Vibrator: the Awinic haptics nodes the vibrator HAL writes (`activate`,
+    `brightness`, `duration`, `gain`, `loop`, `seq`) are
+    `vendor_sysfs_aw_vibrator`. The imported `hal_vibrator_default.te` no
+    longer lets the HAL write every `sysfs_leds` file, so raw waveform
+    streaming (`rtp`), calibration and the other LEDs stay read-only to it.
+    The imported files also lose the HAL's `input_device` access (it no
+    longer probes `/dev/input` when the Awinic chip is present, and its
+    service drops the `input` group), so it can neither read touch and key
+    events nor drive the chip's force-feedback input node. The grants for the
+    absent `qcom-haptics` sysfs node and persist haptics calibration are
+    removed too.
   Not granted: `qseecomd` on the raw UFS LUN 0 node (a platform neverallow on
   `device`; RPMB and LUN 4 have their own labels) and `fsck` on `vm-bootsys`
   (its fstab line is gone: nothing on the FP6 mounts `/product/vm-system`). The modem's `study` partition has

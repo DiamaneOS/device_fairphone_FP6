@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- Automatic brightness, from the FP6.QREL.16.100.0 factory
+         FrameworksResCommon_Sys overlay. The ambient light sensor comes from
+         the sensors multi-HAL. -->
+    <bool name="config_automatic_brightness_available">true</bool>
+
+    <!-- Ambient light (lux) thresholds and the display brightness (nits)
+         wanted between them. One more nits value than lux levels. The last
+         value is the top of the range: from 20000 lux the panel runs at
+         level 3480. Values above 757 nits need the high-brightness mode of
+         display/display_port_130.xml (10000 lux or more). -->
+    <integer-array name="config_autoBrightnessLevels">
+        <item>2</item>
+        <item>4</item>
+        <item>10</item>
+        <item>20</item>
+        <item>40</item>
+        <item>100</item>
+        <item>200</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>4000</item>
+        <item>5000</item>
+        <item>6000</item>
+        <item>8000</item>
+        <item>10000</item>
+        <item>20000</item>
+    </integer-array>
+    <array name="config_autoBrightnessDisplayValuesNits">
+        <item>3</item>
+        <item>7</item>
+        <item>10</item>
+        <item>24</item>
+        <item>64</item>
+        <item>82</item>
+        <item>90</item>
+        <item>100</item>
+        <item>120</item>
+        <item>170</item>
+        <item>280</item>
+        <item>350</item>
+        <item>400</item>
+        <item>450</item>
+        <item>500</item>
+        <item>580</item>
+        <item>650</item>
+        <item>1151</item>
+    </array>
+
+    <!-- Brightness range of display/display_port_130.xml, as backlight
+         (panel level = 1 + backlight * 4093): level 10 (2.0 nits) to level
+         3480 (1151 nits). Both must be set, or neither is used. The minimum
+         must equal the first backlight point of that file. -->
+    <item name="config_screenBrightnessSettingMinimumFloat" format="float" type="dimen">0.002199</item>
+    <item name="config_screenBrightnessSettingMaximumFloat" format="float" type="dimen">0.85</item>
+
+    <!-- Loads the evenDimmer brightness map of that file, which makes
+         brightness linear in nits. It has no points below the panel floor, so
+         nothing is dimmed in software. Android offers no Extra dim switch
+         while this is on. -->
+    <bool name="config_evenDimmerEnabled">true</bool>
+
+    <!-- Brightness values (0 = 2.0 nits, 1 = 1151 nits, linear in nits):
+         default 100 nits, which boot/init.qcom.rc also sets at boot (as 822).
+         Dimmed before the screen times out 16 nits, and at least 5.7 nits
+         below the current brightness. -->
+    <item name="config_screenBrightnessSettingDefaultFloat" format="float" type="dimen">0.0853</item>
+    <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.0122</item>
+    <item name="config_screenBrightnessMinimumDimAmountFloat" format="float" type="dimen">0.005</item>
+
+    <!-- How much the light must change before automatic brightness follows,
+         and for how long (ms). Values of the Pixel 9, which GrapheneOS keeps.
+         Stock FP6 uses Android's 10 % up and 20 % down with 1000 ms both
+         ways, so indoors every tilt or hand shadow set a new target. Below
+         10 lux the light now has to rise about 3 to 5 times or fall by about
+         two thirds. Per mille, one more threshold than lux levels. -->
+    <integer name="config_autoBrightnessBrighteningLightDebounce">1000</integer>
+    <integer name="config_autoBrightnessDarkeningLightDebounce">2000</integer>
+    <integer-array name="config_ambientThresholdLevels">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        <item>200</item>
+        <item>300</item>
+        <item>400</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>4000</item>
+    </integer-array>
+    <integer-array name="config_ambientBrighteningThresholds">
+        <item>5186</item>
+        <item>4333</item>
+        <item>3666</item>
+        <item>2999</item>
+        <item>2759</item>
+        <item>2519</item>
+        <item>2279</item>
+        <item>2039</item>
+        <item>1799</item>
+        <item>799</item>
+        <item>527</item>
+        <item>499</item>
+        <item>470</item>
+        <item>517</item>
+        <item>565</item>
+        <item>612</item>
+        <item>660</item>
+        <item>708</item>
+        <item>742</item>
+        <item>636</item>
+        <item>582</item>
+        <item>549</item>
+        <item>369</item>
+        <item>294</item>
+        <item>269</item>
+        <item>220</item>
+        <item>220</item>
+    </integer-array>
+    <integer-array name="config_ambientDarkeningThresholds">
+        <item>525</item>
+        <item>683</item>
+        <item>666</item>
+        <item>650</item>
+        <item>640</item>
+        <item>630</item>
+        <item>620</item>
+        <item>610</item>
+        <item>600</item>
+        <item>500</item>
+        <item>500</item>
+        <item>440</item>
+        <item>385</item>
+        <item>382</item>
+        <item>379</item>
+        <item>376</item>
+        <item>373</item>
+        <item>371</item>
+        <item>367</item>
+        <item>387</item>
+        <item>397</item>
+        <item>403</item>
+        <item>380</item>
+        <item>345</item>
+        <item>333</item>
+        <item>283</item>
+        <item>283</item>
+    </integer-array>
+</resources>

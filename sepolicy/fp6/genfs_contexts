@@ -19,6 +19,15 @@ genfscon proc /sys/vm/min_free_kbytes u:object_r:vendor_proc_vm_tuning:s0
 genfscon proc /sys/vm/compaction_proactiveness u:object_r:vendor_proc_compaction:s0
 # TCP small-queue limit tuned by the Wi-Fi HAL (platform.te).
 genfscon proc /sys/net/ipv4/tcp_limit_output_bytes u:object_r:vendor_proc_tcp_limit_output_bytes:s0
+# Awinic haptics nodes the vibrator HAL writes (vibrator.te). genfs matches
+# path prefixes, so "activate" also labels activate_mode. That node is not
+# chowned to system, so the HAL still cannot write it.
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/activate u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/brightness u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/duration u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/gain u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/loop u:object_r:vendor_sysfs_aw_vibrator:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_1_geni_se/880000.i2c/i2c-7/7-005a/leds/aw_vibrator/seq u:object_r:vendor_sysfs_aw_vibrator:s0
 # Extcon cable names and states that system_server reads for DisplayPort
 # (HDMI) and wired-headset detection (platform sysfs_extcon). They replace the
 # imported per-index vendor_sysfs_graphics lines, which matched whichever

@@ -12,3 +12,15 @@ license {
     license_text: ["LICENSE"],
 }
 
+
+// Display configuration of the built-in panel: the measured brightness table,
+// the manual range and the high-brightness limits. The display HAL reports its
+// own display ID, so the framework finds the file through the port-based name
+// (port 130).
+prebuilt_etc {
+    name: "fp6_displayconfig_port130",
+    vendor: true,
+    src: "display/display_port_130.xml",
+    sub_dir: "displayconfig",
+    filename: "display_port_130.xml",
+}

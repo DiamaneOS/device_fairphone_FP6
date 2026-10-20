@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- The display HAL supports the doze power state on the built-in panel,
+         as in the factory SystemUIResCommon_Sys overlay. Without this,
+         SystemUI keeps the panel in full power mode while it shows the
+         always-on display, and does not listen to the proximity sensor.
+         Doze-suspend stays unsupported, as in stock: the panel has no LP2
+         command set. -->
+    <bool name="doze_display_state_supported">true</bool>
+
+    <!-- The FP6 volume buttons are on the left edge (the power button with the
+         fingerprint sensor is on the right). Show the volume dialog next to
+         them, as stock FP6 does. Needs the DiamaneOS SystemUI change that adds
+         this resource. Without it the overlay has no effect. -->
+    <bool name="config_volumeDialogOnLeft">true</bool>
+
+    <!-- The front camera's lens for the Tally lens ring and the location lamp by the
+         lens (SystemUI's tally_lens.xml): the hole measured on the panel, centred on the
+         display's horizontal centre, 64 px below the top edge, radius 37 px (36.8 px
+         measured, rounded out), in the same pixels as config_mainBuiltInDisplayCutout. -->
+    <dimen name="tally_lens_center_x">0px</dimen>
+    <dimen name="tally_lens_center_y">64px</dimen>
+    <dimen name="tally_lens_radius">37px</dimen>
+</resources>

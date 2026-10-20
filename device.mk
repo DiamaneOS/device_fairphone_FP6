@@ -170,14 +170,46 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     debug.angle.feature_overrides_enabled=preferLinearFilterForYUV:mapUnspecifiedColorSpaceToPassThrough
 
+# The FP6 panel is 1116x2484 at 480 dpi on stock Android 16. Without an
+# explicit density, Android 17 chooses 213 dpi and renders the UI too small.
+# A panel property, so it belongs to the vendor partition.
+PRODUCT_VENDOR_PROPERTIES += ro.sf.lcd_density=480
+
+# Framework and Settings hardware configuration (rro/): display cutout, corners,
+# status bar, 120 Hz refresh rate and the Smooth display switch.
+# cutout, corners, status bar, navigation bar, colour modes and their names,
+# 120 Hz refresh rate, the Smooth display switch, always-on display and
+# double-tap to wake (both off by default) and the side fingerprint sensor
+# description.
+PRODUCT_PACKAGES += \
+    FP6FrameworksOverlay \
+    FP6SettingsOverlay
+
+# Measured brightness table, manual range and high-brightness limits
+# (display/display_port_130.xml, Android.bp).
+PRODUCT_PACKAGES += fp6_displayconfig_port130
+
+# The stock fingerprint HAL is installed as fingerprint.fp6 so it cannot collide
+# with AOSP's reference fingerprint modules; hw_get_module finds it through this.
+PRODUCT_VENDOR_PROPERTIES += ro.hardware.fingerprint=fp6
+
 # Display composition settings the selected Qualcomm composer and SurfaceFlinger
-# expect (identical to the stock vendor build.prop).
+# expect, from the stock vendor build.prop, with three exceptions:
+# - no touch timer override: stock's 3500000 ms keeps touch boost active for
+#   about 58 minutes and blocks idle refresh-rate drops. SurfaceFlinger's
+#   default (200 ms, as in Qualcomm's display config) applies instead.
+# - the idle timer is 1500 ms instead of stock's 3500 ms, so a still screen
+#   drops to the panel's idle refresh rate 2 s sooner. Touch still raises the
+#   rate at once through the touch timer.
+# - debug.sf.hw, debug.sf.latch_unsignaled and
+#   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
+#   platform, the display HAL or the stock vendor files reads them
+#   (unsignaled latching is debug.sf.auto_latch_unsignaled).
 PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.use_color_management=true \
     ro.surface_flinger.protected_contents=true \
     ro.surface_flinger.use_content_detection_for_refresh_rate=true \
-    ro.surface_flinger.set_touch_timer_ms=3500000 \
-    ro.surface_flinger.set_idle_timer_ms=3500 \
+    ro.surface_flinger.set_idle_timer_ms=1500 \
     ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
     ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
     ro.surface_flinger.max_virtual_display_dimension=4096 \
@@ -187,19 +219,15 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.surface_flinger.has_HDR_display=true \
     ro.surface_flinger.wcg_composition_dataspace=143261696 \
     persist.sys.sf.color_saturation=1.0 \
-    persist.sys.sf.color_mode=9 \
-    debug.sf.hw=0 \
-    debug.sf.latch_unsignaled=1 \
     debug.sf.auto_latch_unsignaled=1 \
     debug.sf.disable_client_composition_cache=0 \
     debug.sf.enable_gl_backpressure=1 \
-    debug.sf.enable_advanced_sf_phase_offset=1 \
     debug.sf.use_phase_offsets_as_durations=1 \
-    debug.sf.late.app.duration=13666666 \
-    debug.sf.early.app.duration=13666666 \
-    debug.sf.earlyGl.app.duration=13666666 \
-    debug.sf.early.sf.duration=10500000 \
-    debug.sf.earlyGl.sf.duration=10500000 \
+    debug.sf.late.app.duration=16600000 \
+    debug.sf.early.app.duration=16600000 \
+    debug.sf.earlyGl.app.duration=16600000 \
+    debug.sf.early.sf.duration=16600000 \
+    debug.sf.earlyGl.sf.duration=16600000 \
     debug.sf.late.sf.duration=10500000 \
     debug.sf.predict_hwc_composition_strategy=0 \
     debug.sf.treat_170m_as_sRGB=1 \

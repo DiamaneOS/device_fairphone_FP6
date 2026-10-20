@@ -46,6 +46,11 @@ on fs
     start vendor.modprobe_crypto
     start vendor.modprobe_media
     exec_start vendor.modprobe_display
+    # The display driver starts the backlight at its maximum and applies it
+    # when the boot animation first draws. Android holds its default during
+    # boot (config_screenBrightnessSettingDefaultFloat, 100 nits, written as
+    # 822) and expects the boot brightness to match it.
+    write /sys/class/backlight/panel0-backlight/brightness 822
     start vendor.modprobe_touch
     wait_for_prop init.svc.vendor.modprobe_system stopped
     wait_for_prop init.svc.vendor.modprobe_wireless stopped
@@ -159,22 +164,24 @@ on post-fs-data
     mkdir /data/vendor/tombstones 0771 system system
     # Unlike stock, no /data/vendor/tombstones/rfs: remote-processor error logs
     # are not written to /data (tqftpserv serves no ramdump paths).
-    # Vibrator control for the vibrator HAL (matches stock).
-    chown system system /sys/class/leds/aw_vibrator/trigger
+    # The Awinic haptics nodes the vibrator HAL writes to play the chip's RAM
+    # waveforms (vendor_sysfs_aw_vibrator). Unlike stock, raw waveform
+    # streaming (rtp) and the unused trigger, state, index and activate_mode
+    # nodes stay root-owned.
     chown system system /sys/class/leds/aw_vibrator/activate
     chown system system /sys/class/leds/aw_vibrator/brightness
     chown system system /sys/class/leds/aw_vibrator/duration
-    chown system system /sys/class/leds/aw_vibrator/state
+    chown system system /sys/class/leds/aw_vibrator/gain
     chown system system /sys/class/leds/aw_vibrator/loop
     chown system system /sys/class/leds/aw_vibrator/seq
-    chown system system /sys/class/leds/aw_vibrator/index
-    chown system system /sys/class/leds/aw_vibrator/enable
-    chown system system /sys/class/leds/aw_vibrator/rtp
-    chown system system /sys/class/leds/aw_vibrator/activate_mode
-    chown system system /sys/class/leds/aw_vibrator/gain
 
 on early-boot
     verity_update_state
+
+# The source-built composer runs as system and writes this node for panel
+# brightness. Match the stock FP6 boot-time ownership.
+on boot
+    chown system system /sys/class/backlight/panel0-backlight/brightness
 
 # Remote processors (matches stock init.qti.kernel.rc and init.target.rc): the
 # ADSP provides USB role detection, charging and audio, the CDSP compute.

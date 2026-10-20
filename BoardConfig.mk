@@ -91,16 +91,20 @@ TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 BOARD_AVB_ENABLE := true
 BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_ALGORITHM := SHA256_RSA4096
+# The top-level vbmeta covers vendor, odm, the dlkm images, dtbo and
+# vendor_boot. It uses location 0, as on Pixels. Stock stores 0 there, so a
+# return to stock needs `fastboot oem reset-rollback` before relocking.
+BOARD_AVB_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 
 # Chains as on stock, at the top rollback index locations (the bootloader keeps
-# 32). Stock uses 1 to 4, so the indices we store never limit a stock relock.
+# 32). Stock uses 1 to 4 for its chains.
 # The kernel follows the selected vendor source baseline. The generic ramdisk
 # follows the platform. Header zeros must not erase their AVB version metadata.
 BOOT_SECURITY_PATCH := $(VENDOR_SECURITY_PATCH)
 INIT_BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 BOARD_AVB_RECOVERY_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_RECOVERY_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 28
 BOARD_AVB_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)

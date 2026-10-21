@@ -229,9 +229,6 @@ $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 $(call inherit-product, device/fairphone/FP6/gnss/gnss.mk)
 $(call inherit-product, device/fairphone/FP6/telephony/telephony.mk)
 
-# Factory reset offers "Erase eSIMs" as a choice, as on Pixels, instead of erasing them without
-# asking. It shows while eSIM support is on and an eSIM was downloaded on the phone.
-PRODUCT_PRODUCT_PROPERTIES += masterclear.allow_retain_esim_profiles_after_fdr=true
 $(call inherit-product, device/fairphone/FP6/camera/camera.mk)
 # Video recording and hardware video codecs (media/media.mk).
 $(call inherit-product, device/fairphone/FP6/media/media.mk)

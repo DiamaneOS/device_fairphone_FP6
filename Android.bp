@@ -24,6 +24,17 @@ install_symlink {
     symlink_target: "/vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini",
 }
 
+// The supplicant copies this template to /data/vendor/wifi/wpa on first use.
+// Generated from wpa_supplicant_8's own template, as AOSP does.
+prebuilt_etc {
+    name: "fp6_wpa_supplicant_conf",
+    src: ":wpa_supplicant_conf_gen",
+    filename: "wpa_supplicant.conf",
+    sub_dir: "wifi",
+    vendor: true,
+    licenses: ["external_wpa_supplicant_8_license"],
+}
+
 // The stock fingerprint module is installed under its own SONAME
 // (libfingerprint.default.so). hw_get_module("fingerprint") with
 // ro.hardware.fingerprint=fp6 opens this link.

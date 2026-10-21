@@ -13,8 +13,8 @@
 - `device.mk` installs them to `/vendor/etc/wifi/`, where wpa_supplicant looks
   for overlays.
 - The base template, `wpa_supplicant.conf`, has one provider: the
-  `wpa_supplicant.conf` module in `hardware/qcom/wlan/qcwcn/config`
-  (DiamaneOS/hardware_qcom_wlan).
+  `fp6_wpa_supplicant_conf` module in the device's `Android.bp`, generated from
+  wpa_supplicant_8's template.
 - The supplicant, its services and the permission file come from
   `vendor/diamaneos/config/wifi.mk`.
 - `init.qcom.rc` creates `/data/vendor/wifi/wpa/sockets`.

@@ -210,12 +210,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.wifi.direct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.direct.xml \
     frameworks/native/data/etc/android.hardware.wifi.aware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.aware.xml
 PRODUCT_VENDOR_PROPERTIES += wifi.aware.interface=wifi-aware0
-# User builds keep hostapd at info level, like the supplicant
-# (vendor/diamaneos/config/wifi.mk): with Wi-Fi verbose logging its debug lines
-# carry the hotspot's and its clients' addresses.
-ifeq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_VENDOR_PROPERTIES += log.tag.hostapd=I
-endif
 
 # Audio: the AudioReach HAL, PAL and AGM from source with AOSP adapters (audio/audio.mk).
 $(call inherit-product, device/fairphone/FP6/audio/audio.mk)

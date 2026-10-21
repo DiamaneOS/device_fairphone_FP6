@@ -12,7 +12,8 @@ may access, and why. It describes the policy of a release (`user`) build.
 - The selection covers the declared boot, display, credential, power, thermal,
   USB and basic hardware services.
 - Not imported: manufacturing applications, diagnostics, unselected radio and
-  camera services, and their test exceptions.
+  camera services, and their test exceptions. Service types and contexts of
+  Qualcomm system services the FP6 does not ship are left out too.
 - A shared type declaration does not mean that the service is installed.
 - This file explains the DiamaneOS-written rules. `dontaudit` rules inside
   imported files are not listed here.

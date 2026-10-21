@@ -883,7 +883,7 @@
       "source": "generic/public/service.te",
       "source_sha256": "f7b2da15d97c1f2b603c3a7cc00e66dfd1661af55b9032d61f7b6eef580aa056",
       "path": "system-ext-public/service.te",
-      "sha256": "cd74c1779d660fa686d0dd35943ea3869b61c55f19c0a1bfab0d09e42894ae34"
+      "sha256": "4af44c7a9f0103b4cfaecca8a7429f6e8da4e267efd2feb17a70f4c7163fb47e"
     },
     {
       "project": "qualcomm-sepolicy",
@@ -984,18 +984,10 @@
     {
       "project": "qualcomm-sepolicy",
       "revision": "fea28791cc44cce15c7bd4cd94722796e4644735",
-      "source": "generic/private/service.te",
-      "source_sha256": "01ec3f728e40407043a606b815b115f19b67434b0dcaa8eec4a589ca5278d5a9",
-      "path": "system-ext-private/service.te",
-      "sha256": "cbfcc2507b12cd0bcf08e9b70be3ca5c78194228b679cbd8f9f010145c9b230c"
-    },
-    {
-      "project": "qualcomm-sepolicy",
-      "revision": "fea28791cc44cce15c7bd4cd94722796e4644735",
       "source": "generic/private/service_contexts",
       "source_sha256": "71aeec0535437f9c10a4d7d1644a4165024018b09c915f90928c91ac8c64e5ea",
       "path": "system-ext-private/service_contexts",
-      "sha256": "71aeec0535437f9c10a4d7d1644a4165024018b09c915f90928c91ac8c64e5ea"
+      "sha256": "aa53dfb9ff68de3cfec822f4466486393a7792a94e619b14fca384536f696717"
     },
     {
       "project": "qualcomm-sepolicy",

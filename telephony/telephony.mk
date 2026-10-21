@@ -70,15 +70,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     DiamaneOSEuicc
 
-# The framework's eUICC transport logs every ES10 command and response in full
-# at verbose level, on every build (TransmitApduLogicalChannelInvocation
-# "Send:"/"Response:", ApduSender "Full APDU response"): profile lists with
-# ICCIDs and, during a download, the activation code's matching ID, the IMEI
-# and the eUICC certificate with the EID. Keep these tags at info.
-PRODUCT_VENDOR_PROPERTIES += \
-    log.tag.TransApdu=I \
-    log.tag.ApduSender-0=I \
-    log.tag.ApduSender-1=I
+# The eUICC transport's log level (vendor/diamaneos/config/euicc.mk).
+$(call inherit-product, vendor/diamaneos/config/euicc.mk)
 
 # QCRIL directories and database (init.fp6.telephony.rc), and the
 # ro.boot.vendor.qspa.modem gate without which the stock IMS app is not parsed

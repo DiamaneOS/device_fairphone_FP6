@@ -359,13 +359,6 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   every lens (`camera/camera.mk`).
   - The rule names the `hal_camera_server` attribute, because the property's
     type is private to this partition. The provider is its only member here.
-- `system-ext-private/vold_adoptable.te`: vold may list `/data/misc_ce` and
-  `/data/misc_de`.
-  - It finds there the users whose keys it destroys when an adopted microSD
-    card is forgotten.
-- `system-ext-private/fsck_untrusted.te`: `fsck_untrusted` may use the
-  bootstrap libraries and two read-only block ioctls, for the e2fsck run on an
-  adopted card before it is mounted.
 - `telephony-system-ext/property_contexts`: gives a telephony polling
   property and public `Build.VERSION` properties existing platform types, so
   apps are never granted `default_prop`.

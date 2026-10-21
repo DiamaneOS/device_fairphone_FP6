@@ -17,6 +17,10 @@ get_prop({ appdomain -isolated_app_all zygote system_server bootanim surfaceflin
 get_prop({ appdomain -isolated_app_all zygote system_server bootanim surfaceflinger mediaswcodec
            hal_graphics_allocator_default hal_graphics_composer_default }, vendor_public_vendor_default_prop)
 
+# Fairphone's lens distortion correction runs on the GPU inside the camera
+# service, so the Adreno driver reads the same five graphics properties there.
+get_prop(hal_camera_default, vendor_public_vendor_default_prop)
+
 # Composer state in /data/vendor/display (mode merge data), as in stock.
 allow hal_graphics_composer_default vendor_display_vendor_data_file:dir create_dir_perms;
 allow hal_graphics_composer_default vendor_display_vendor_data_file:file create_file_perms;

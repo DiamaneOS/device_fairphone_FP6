@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+runtime_resource_overlay {
+    name: "FP6CameraDeviceConfig",
+    vendor: true,
+    sdk_version: "current",
+    resource_dirs: ["res"],
+}

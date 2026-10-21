@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.diamaneos.fp6.camera.config">
+    <application android:hasCode="false" />
+    <overlay
+        android:targetPackage="app.grapheneos.camera"
+        android:targetName="CameraDeviceConfig"
+        android:isStatic="true"
+        android:priority="1" />
+</manifest>

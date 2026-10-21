@@ -218,6 +218,15 @@ are not repeated.
   starts and checks are not installed.
 - `vendor_nicmd`, `netlink_route_socket` `nlmsg_readpriv`: seen after a Wi-Fi
   change; stock does not grant it either.
+- `vendor_nicmd`, `rawip_socket` `create`: seen after a Wi-Fi change; stock does
+  not grant it either, and Wi-Fi calling works without it.
+- `fp6_iwlan_app` (qtidataservices) and `mediacodec` (the Codec2 image-texture
+  filter), reads of `default_prop` and `zygote_config_prop`: generic platform
+  properties (verified-boot partition info, build UUIDs, runtime flags) a
+  denied read returns as unset; neither needs them.
+- `hal_camera_default`, finding `vendor.tcl.camera.algoservice.ITctCameraAlgoService`
+  (`vendor_tct_camera_algo_service`): once per camera open; the TCL algorithm
+  service is not installed (see Camera), and CamX continues without it.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it probes them at start; stock grants read on
   the block devices but never open, and labels none of those BSG nodes.
@@ -301,6 +310,11 @@ this maintained subset; it is not required merely to reduce this folder's size.
 - `system-ext-private/system_server.te`: the system server reads enabled
   kernel-console metadata for the serial-console warning. It receives no
   access to serial devices or console control.
+- `system-ext-private/camera_table.te`: the camera provider may read
+  `ro.vendor.qti.va_aosp.support`, which selects the stock camera table with
+  every lens (`camera/camera.mk`).
+  - The rule names the `hal_camera_server` attribute, because the property's
+    type is private to this partition. The provider is its only member here.
 
 ## Audio
 
@@ -523,62 +537,103 @@ Shared device labels (`vendor-common/file_contexts`):
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.
 ## Telephony
 
-`telephony/rild.te`, `telephony/nicmd.te` and `telephony/qtelephony.te` are downstream
-reductions of the Qualcomm `sepolicy_vndr` files published by Fairphone at
-`67fa928299a49374a55281969fee357884c86890` (`generic/vendor/common/rild.te`,
-`qva/vendor/common/rild.te`, `generic/vendor/volcano/rild.te`,
-`generic/vendor/common/hal_telephony.te`, `generic/vendor/common/nicmd.te`,
-`generic/vendor/common/qtelephony.te`); `telephony-system-ext/vendor_qtelephony.te` and
-`telephony-system-ext/seapp_contexts` reduce `generic/private/qtelephony.te`,
-`generic/private/seapp_contexts` and `generic/product/private/seapp_contexts` of
-`device/qcom/sepolicy` at `fea28791cc44cce15c7bd4cd94722796e4644735`. The file contexts
-are the stock labels. `telephony/service.te`, `fp6_callaudio_app.te`, the
-`fp6_*_app` domains and the relabelling of IQcRilAudio and IUimLpa in
-`vendor-common/service_contexts` are downstream.
+Sources:
 
-The stock radio daemon runs in the platform `rild` domain. It may add only the four
-Qualcomm radio services the device declares (IMS and radio config under
-`vendor_hal_telephony_service2`, call audio and LPA under their own types). It is not
-a `binderservicedomain`; each selected app client has an explicit binder grant. The
-secure-element HAL, unrelated data-factory services, diag, the legacy
-IPC-router ioctls, the QCRIL client socket and executing vendor tools are not granted.
-The radio daemon and nicmd may use TIPC sockets with each other, as on stock: the data
-module's DSI layer waits for nicmd over TIPC before it allows any data call. No other
-domain may create a TIPC socket (neverallow in `telephony/rild.te`), and the kernel builds
-TIPC for local IPC with network bearer creation blocked, without UDP, crypto or diag modules.
-nicmd keeps its netlink, QRTR, rmnet ioctl and network-wrapper access, datagram sockets
-for interface ioctls and its init-created recovery file. Its XFRM netlink access is
-needed for Wi-Fi calling, where the modem negotiates the ePDG tunnel and nicmd installs
-the ESP states and policies it receives (write requests); to remove them at teardown or
-rekey it dumps all states and deletes those whose protocol and SPI match, the only read
-request it sends (`telephony/nicmd.te`). That dump covers every IPsec state on the
-device, with the keys zeroed by lockdown and the kernel's own XFRM redaction. It may `node_bind` TCP and UDP
-sockets, to reserve the ephemeral ports the modem's embedded clients use, and read the
-public SoC id for data target detection. It is not a `netdomain` (no TCP connect, no
-`name_bind`); its remote-processor probe (`vendor_sysfs_ssr`) stays denied because the
-result is unused on this SoC. The SHS, QMI-priority and performance helpers are not
-installed and not granted.
+- `telephony/rild.te`, `nicmd.te` and `qtelephony.te` are reduced from
+  Qualcomm's vendor policy. `telephony-system-ext/vendor_qtelephony.te` and
+  `seapp_contexts` from Qualcomm's system policy.
+  - Each file's header names its upstream files and revision.
+- The file contexts are the stock labels.
+- DiamaneOS's own: `telephony/service.te`, the `fp6_*_app` domains, and the
+  relabelling of IQcRilAudio and IUimLpa in `vendor-common/service_contexts`.
 
-The stock IMS and IWLAN/certificate apps retain Fairphone's signature and a
-signer-specific seinfo, with privileged placement and package/process selectors.
-The IMS app runs in `vendor_qtelephony`; the coupled IWLAN/certificate frontend
-runs in `fp6_iwlan_app` with explicit radio Binder and certificate QRTR access.
-Package selectors label its data separately from the shared-process selector.
-The inactive LPA, its download grants and app-domain policy are omitted; the
-native IUimLpa interface remains because the selected radio binary depends on it.
-These presigned apps retain OEM update trust; release signing and update policy
-remain separate trust decisions. Collect denials before adding any grant.
-Our own call-audio bridge (`de.diamaneos.callaudio`, `callaudio/`) replaces the stock
-QtiTelephonyService. Its signer, package name and privileged placement select the domain, and it runs in
-`fp6_callaudio_app`: it may find only IQcRilAudio, the audio server and the activity
-manager, make binder calls with the radio daemon, and create no network or QRTR sockets.
+Radio daemon (`telephony/rild.te`):
+
+- The stock radio daemon runs in the platform `rild` domain.
+- It may add only the Qualcomm radio services the device declares: IMS and
+  radio config under `vendor_hal_telephony_service2`, call audio and LPA
+  under their own types.
+- It is not a `binderservicedomain`. Each selected app client has an explicit
+  binder grant.
+- Not granted: the secure-element HAL, unrelated data-factory services, diag,
+  the legacy IPC-router ioctls, the QCRIL client socket and executing vendor
+  tools.
+- The radio daemon and nicmd may use TIPC sockets with each other, as on
+  stock: the data module's DSI layer waits for nicmd over TIPC before it
+  allows any data call.
+  - No other domain may create a TIPC socket (neverallow in `rild.te`).
+  - The kernel builds TIPC for local IPC with network bearer creation blocked,
+    without UDP, crypto or diag modules.
+
+nicmd (`telephony/nicmd.te`):
+
+- It keeps its netlink, QRTR, rmnet ioctl and network-wrapper access,
+  datagram sockets for interface ioctls and its init-created recovery file.
+- XFRM netlink access is needed for Wi-Fi calling: the modem negotiates the
+  ePDG tunnel, and nicmd installs the ESP states and policies it receives
+  (write requests).
+  - To remove them at teardown or rekey, it dumps all states and deletes those
+    whose protocol and SPI match. That dump is the only read request it sends.
+  - The dump covers every IPsec state on the device, with the keys zeroed by
+    lockdown and the kernel's own XFRM redaction.
+- It may `node_bind` TCP and UDP sockets, to reserve the ephemeral ports the
+  modem's embedded clients use.
+- It reads the public SoC id, for data target detection.
+- It is not a `netdomain`: no TCP connect and no `name_bind`.
+- Capabilities: `net_admin` and `net_raw`. A neverallow forbids setuid,
+  setgid, setpcap and kill.
+- Its remote-processor probe (`vendor_sysfs_ssr`) stays denied: the result is
+  unused on this SoC.
+- `dontaudit vendor_nicmd kernel:system module_request`: kernel module
+  requests that nicmd triggers stay denied without an audit record. Nothing
+  grants nicmd module loading.
 - `dontaudit` for its link dump (`netlink_route_socket` `nlmsg_readpriv`) and
   raw ICMPv6 socket (`rawip_socket` `create`) during Wi-Fi calling setup.
   - Stock denies both too, and calls and handover work without them.
   - The link dump would show every interface's MAC address.
+- The SHS, QMI-priority and performance helpers are not installed and not
+  granted.
 
+Apps:
+
+- The stock IMS and IWLAN/certificate apps keep Fairphone's signature and a
+  signer-specific seinfo, with privileged placement and package or process
+  selectors.
+- The IMS app runs in `vendor_qtelephony`.
+- The coupled IWLAN/certificate frontend runs in `fp6_iwlan_app`, with
+  explicit radio Binder and certificate QRTR access.
+  - Package selectors label its data separately from the shared-process
+    selector.
+- No policy for the stock LPA app: no app domain and no download grants. The
+  native IUimLpa interface remains, because the selected radio binary depends
+  on it.
+- These presigned apps retain OEM update trust: a same-signature update of one
+  of them still matches its selector.
+- DiamaneOS's call-audio bridge (`de.diamaneos.callaudio`, `callaudio/`)
+  replaces the stock QtiTelephonyService and runs in `fp6_callaudio_app`.
+  - Its signer, package name and privileged placement select the domain.
+  - It may find only IQcRilAudio, the audio server and the activity manager,
+    and make binder calls with the radio daemon.
+  - Neverallow: no network or QRTR sockets.
+
+QRTR inventory (`telephony/qrtr.te`):
+
+- A neverallow names every domain that may create a QRTR socket.
+- QRTR has no per-service access control, so adding a domain needs a
+  trust-boundary review.
+
+## Camera
+
+`camera/` holds the policy for the stock CamX/CHI provider
+(`vendor.qti.camera.provider-service_64`, platform domain `hal_camera_default`). The
+grants are drafted from the stock FP6 compiled vendor policy and bound to
+`hal_camera_default`, not to the `hal_camera` attributes. They cover the ToF node, UBWC-P,
+FastRPC with read-only opens (the secure node for the ADSP sensors PD of the CamX sensor
+direct channel, the non-secure node for the CDSP offloads, `/vendor/dsp`), Qualcomm
+DMA-BUF heaps (display heap allocation ioctl only), SoC/camera/JPEG/DDR identification,
+QRTR sockets without ioctls for the gyro QMI client, the thermal-engine client socket, the
 provider's own vndbinder open, `/data/vendor/camera`, read-only factory calibration in
-service. For streaming the provider is a client of the graphics allocator (buffer
+`/mnt/vendor/persist/camera` and vendor camera properties. For streaming the provider is a client of the graphics allocator (buffer
 allocation and IMapper) through `hal_client_domain`, the only form the platform
 neverallows allow for the allocator service lookups. The membership also lets it find the
 mapper services, execute `same_process_hal_file` (the passthrough IMapper), call
@@ -592,5 +647,29 @@ search `/sys/devices/soc0` for the per-part files (`num_subset_parts` is labelle
 `camera/genfs_contexts`). Denied: the display QService and display-config lookups
 (IDisplayConfig would expose brightness, power mode and writeback capture),
 IPostProcService registration and the property-area listing CamX does at start (silent
-under enforcing). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
+under enforcing), and the offline camera service registration (in no VINTF manifest, not
+audited). Unlike the sensors HAL, the camera may need the non-secure FastRPC node:
 the kernel runs the CDSP as a non-secure channel. Only one of the two FastRPC grants is
+expected in use; drop the other after the first permissive run.
+
+`vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module serial numbers
+the stock CamX tries to publish; nothing may set or read it. `vendor_init` may chmod the
+stock 0777 `/mnt/vendor/persist/camera` and `cam_cali` directories.
+
+Omitted: the TCL algorithm service and its data and dump directories, secure camera
+(QSEECom/TEE, protected heaps, VM memory-buffer nodes, ssgtzd), the AON service, factory
+OTP/OIS sysfs (`fp_mmitest_sysfs`), persist writes and QRTR ioctls. The file contexts restore
+three upstream `generic/vendor/common/file_contexts` entries (lines 317, 348, 440). The
+upstream files to reduce from are not imported, so there is no provenance entry.
+These rules are not yet runtime-qualified under enforcing mode.
+- FastRPC with read-only opens: the secure node only (the ADSP sensors PD of
+  the CamX sensor direct channel and the CDSP offloads) and `/vendor/dsp`.
+- `dontaudit` on looking up the ODM's camera algorithm service and Qualcomm's
+  post-processing HAL: neither is in the image, and the provider asks at every
+  session.
+- `hal_bluetooth_default` and `vendor_hal_gnss_qti`,
+  `ro.vendor.qti.va_aosp.support`: the property is set for the camera provider
+  alone (`system-ext-private/camera_table.te`). A denied read returns the
+  default these two had before it was set.
+  `ro.vendor.qti.va_odm.support`: not set on this build, so a denied read
+  returns the same default.

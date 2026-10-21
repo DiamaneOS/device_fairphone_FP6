@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 2048x1536 runs at 30 fps indoors and at the same rate as 1600x1200 in dim light. -->
+    <integer name="config_camera_preview_target_short_edge">1536</integer>
+    <integer name="config_camera_default_preview_fps">30</integer>
+    <integer name="config_camera_preview_noise_reduction">1</integer>
+    <integer name="config_camera_preview_temporal_retention">65</integer>
+    <integer name="config_camera_video_preview_luma_denoise">100</integer>
+    <bool name="config_camera_prefer_capture_quality">false</bool>
+    <bool name="config_camera_prefer_physical_main">true</bool>
+    <!-- Eight-frame RAW + YUV acquisition works on both rear sensors. -->
+    <bool name="config_camera_direct_raw_burst">true</bool>
+    <!-- With the full vendor tuning (camera/init.camera.rc) the HAL JPEG is cleaner and
+         sharper than our RAW and JPEG bursts on both rear lenses, so Photo uses it. -->
+    <bool name="config_camera_ultra_wide_burst">false</bool>
+    <bool name="config_camera_main_raw_burst">false</bool>
+    <bool name="config_camera_ultra_wide_jpeg_denoise">false</bool>
+    <bool name="config_camera_ultra_wide_jpeg_exposure_compensation">false</bool>
+    <!-- JPEG with RAW in one request has no ultra-wide noise reduction (noise 53 to 58
+         against 1.5 when split). -->
+    <bool name="config_camera_ultra_wide_split_raw_jpeg">true</bool>
+    <bool name="config_camera_edge_aware_demosaic">true</bool>
+    <!-- Night merges the HAL's own JPEGs: its colour and detail beat our RAW finishing. -->
+    <bool name="config_camera_night_isp_jpeg">true</bool>
+    <!-- The ultra-wide HAL JPEG loses its noise reduction above about 100 ms (125 ms measured). -->
+    <integer name="config_camera_night_isp_jpeg_max_exposure_ms">100</integer>
+    <bool name="config_camera_night_frequency_denoise">true</bool>
+    <!-- Longest Night frames by hand and on a steady phone. -->
+    <integer name="config_camera_night_handheld_max_exposure_ms">125</integer>
+    <integer name="config_camera_night_steady_max_exposure_ms">500</integer>
+    <bool name="config_camera_jpeg_high_quality_noise_reduction">true</bool>
+    <!-- Repeating site artifact measured in the exposed rear ultra-wide RAW geometry.
+         Internal processed photos only; DNG sensor data is never changed. -->
+    <string name="config_camera_ultra_wide_raw_correction_grid" translatable="false">4208,3120,3,8,4,6,2</string>
+</resources>

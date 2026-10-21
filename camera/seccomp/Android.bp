@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+// Seccomp loader for the stock CamX camera provider (camxjail.c). The tools
+// renderer renames the provider's libhardware.so dependency to libcamxjail.so,
+// so the dynamic linker loads it, and runs its filter installation, before the
+// provider's main(). camera-provider.policy lists the allowed system calls.
+//
+// Calls outside the policy are trapped (SIGSYS) and the provider dies with a
+// tombstone. Building with -DCAMXJAIL_LOG_ONLY logs them instead (kernel audit
+// record type 1326, read with seccomp_audit.py) and allows them. Use that to
+// collect the profile again after a vendor update.
+cc_library_shared {
+    name: "libcamxjail",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: ["camxjail.c"],
+    // The provider links this library in place of libhardware.
+    shared_libs: [
+        "libhardware",
+        "liblog",
+    ],
+    static_libs: ["libminijail"],
+    // Exports nothing: the static minijail symbols must not interpose on
+    // anything CamX loads into the provider later.
+    version_script: "libcamxjail.map.txt",
+    required: ["camera-provider.policy"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+prebuilt_etc {
+    name: "camera-provider.policy",
+    vendor: true,
+    sub_dir: "seccomp_policy",
+    src: "camera-provider.arm64.policy",
+    filename: "camera-provider.policy",
+}

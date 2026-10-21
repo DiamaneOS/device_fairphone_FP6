@@ -32,6 +32,16 @@
     <integer name="config_defaultRefreshRate">0</integer>
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
+    <!-- Pin the panel to 60 Hz while the camera app is in front:
+         - photo mode's 4:3 preview (1600x1200) is over the display's
+           1088-line rotation limit, so the GPU composes it (~10 ms a frame).
+         - at 90/120 Hz that misses every deadline, at 60 Hz it fits.
+         - frameworks_base 89ac1c80 caps only the render rate. This list is
+           the knob that caps the physical mode, for listed apps only. -->
+    <string-array name="config_highRefreshRateBlacklist" translatable="false">
+        <item>app.grapheneos.camera</item>
+    </string-array>
+
     <!-- FP6.QREL.16.100.0 factory FrameworksResTarget_Vendor overlay. -->
     <dimen name="rounded_corner_radius">20dp</dimen>
     <string name="config_mainDisplayShape" translatable="false">M20 0h1040s20 0 20 20v2360s0 20 -20 20h-1040s-20 0 -20 -20v-2360s0 -20 20 -20</string>

@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+/vendor/bin/hw/vendor\.qti\.camera\.provider-service_64      u:object_r:hal_camera_default_exec:s0
+/data/vendor/camera(/.*)?                                    u:object_r:vendor_camera_data_file:s0
+# Loaded by the source-built gralloc/mapper in app processes (stock label).
+/vendor/lib64/libcamxexternalformatutils\.so                 u:object_r:same_process_hal_file:s0

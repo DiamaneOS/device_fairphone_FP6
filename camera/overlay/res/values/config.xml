@@ -24,6 +24,9 @@
     <bool name="config_camera_night_isp_jpeg">true</bool>
     <!-- The ultra-wide HAL JPEG loses its noise reduction above about 100 ms (125 ms measured). -->
     <integer name="config_camera_night_isp_jpeg_max_exposure_ms">100</integer>
+    <!-- The ultra-wide viewfinder shows its stills' near-white about ten levels darker
+         (stills 248 against viewfinder 241, window scene). -->
+    <integer name="config_camera_night_ultra_wide_highlight_level">240</integer>
     <bool name="config_camera_night_frequency_denoise">true</bool>
     <!-- Longest Night frames by hand and on a steady phone. -->
     <integer name="config_camera_night_handheld_max_exposure_ms">125</integer>

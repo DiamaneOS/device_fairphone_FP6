@@ -37,8 +37,8 @@ vendor.qti.hardware.radio.ims.IImsRadio/imsradio0                     u:object_r
 vendor.qti.hardware.radio.ims.IImsRadio/imsradio1                     u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.qtiradio.IQtiRadioStable/slot1              u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.qtiradio.IQtiRadioStable/slot2              u:object_r:vendor_hal_telephony_service2:s0
-vendor.qti.hardware.radio.am.IQcRilAudio/slot1                        u:object_r:vendor_hal_telephony_service2:s0
-vendor.qti.hardware.radio.am.IQcRilAudio/slot2                        u:object_r:vendor_hal_telephony_service2:s0
+vendor.qti.hardware.radio.am.IQcRilAudio/slot1                        u:object_r:fp6_hal_qcrilaudio_service:s0
+vendor.qti.hardware.radio.am.IQcRilAudio/slot2                        u:object_r:fp6_hal_qcrilaudio_service:s0
 vendor.qti.hardware.display.config.IDisplayConfig/default             u:object_r:vendor_hal_vnddisplayconfig_service:s0
 vendor.qti.hardware.radio.qcrilhook.IQtiOemHook/oemhook0              u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.qcrilhook.IQtiOemHook/oemhook1              u:object_r:vendor_hal_telephony_service2:s0
@@ -49,8 +49,8 @@ vendor.qti.hardware.radio.uim_remote_client.IUimRemoteServiceClient/uimRemoteCli
 vendor.qti.hardware.radio.uim_remote_client.IUimRemoteServiceClient/uimRemoteClient1              u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.uim_remote_server.IUimRemoteServiceServer/uimRemoteServer0              u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.uim_remote_server.IUimRemoteServiceServer/uimRemoteServer1              u:object_r:vendor_hal_telephony_service2:s0
-vendor.qti.hardware.radio.lpa.IUimLpa/UimLpa0                         u:object_r:vendor_hal_telephony_service2:s0
-vendor.qti.hardware.radio.lpa.IUimLpa/UimLpa1                         u:object_r:vendor_hal_telephony_service2:s0
+vendor.qti.hardware.radio.lpa.IUimLpa/UimLpa0                         u:object_r:fp6_hal_uimlpa_service:s0
+vendor.qti.hardware.radio.lpa.IUimLpa/UimLpa1                         u:object_r:fp6_hal_uimlpa_service:s0
 vendor.qti.hardware.radio.uim.IUim/Uim0                               u:object_r:vendor_hal_telephony_service2:s0
 vendor.qti.hardware.radio.uim.IUim/Uim1                               u:object_r:vendor_hal_telephony_service2:s0
 android.hardware.camera.provider.ICameraProvider/vendor.qti/0         u:object_r:hal_camera_service:s0

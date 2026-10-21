@@ -84,6 +84,10 @@ firmware_directories /mnt/vendor/wlan_mac/
 /dev/qseecom              0660   system     drmrpc
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
+# The traceability partition: imeiprovd (vendor_imeiprov, no capabilities)
+# reads the two IMEIs from it. SELinux allows it nothing else. Stock reads it
+# from tctd as root.
+/dev/block/platform/soc/1d84000.ufshc/by-name/traceability   0440   root   vendor_imeiprov
 # The boot control HAL (vendor_bootctl, CAP_SYS_RAWIO only, stock runs it as
 # root) reads and writes the slot attributes in the GPTs of the LUNs with A/B
 # partitions (sdb: xbl_a, sdc: xbl_b, sde: the rest, stock rawprogram1, 2, 4),
@@ -182,3 +186,7 @@ firmware_directories /mnt/vendor/wlan_mac/
 # boot). The FM/codec nodes (btfmcodec_dev, bt_cp_ctrl, btfmslim) stay root-only.
 /dev/btpower              0660   bluetooth  system
 /dev/ttyHS0               0660   bluetooth  net_bt
+
+# QCRIL reads the system health monitor (stock ueventd.rc line 230 uses
+# 0644 radio system, only the radio daemon opens it here).
+/dev/system_health_monitor 0600   radio      radio

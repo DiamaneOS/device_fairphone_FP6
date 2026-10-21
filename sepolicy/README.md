@@ -517,9 +517,37 @@ Shared device labels (`vendor-common/file_contexts`):
   - the location daemons' sockets (loc_launcher, XTRA, LOWI, Wi-Fi
     crowdsourcing, sensor, correction, engine and Skyhook services)
   - RIL and SSG sockets, MHI sysfs and QMS/AON properties.
+
     SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
     DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
     `sched_boost` values, the GPU wake trigger and uclamp on session threads.
+## Telephony
+
+`telephony/rild.te`, `telephony/nicmd.te` and `telephony/qtelephony.te` are downstream
+reductions of the Qualcomm `sepolicy_vndr` files published by Fairphone at
+`67fa928299a49374a55281969fee357884c86890` (`generic/vendor/common/rild.te`,
+`qva/vendor/common/rild.te`, `generic/vendor/volcano/rild.te`,
+`generic/vendor/common/hal_telephony.te`, `generic/vendor/common/nicmd.te`,
+`generic/vendor/common/qtelephony.te`); `telephony-system-ext/vendor_qtelephony.te` and
+`telephony-system-ext/seapp_contexts` reduce `generic/private/qtelephony.te`,
+`generic/private/seapp_contexts` and `generic/product/private/seapp_contexts` of
+`device/qcom/sepolicy` at `fea28791cc44cce15c7bd4cd94722796e4644735`. The file contexts
+are the stock labels. `telephony/service.te`, `qcril_audio.te`, `qti_lpa.te`, the two
+are the stock labels. `telephony/service.te`, `fp6_callaudio_app.te`, the
+`fp6_*_app` domains and the relabelling of IQcRilAudio and IUimLpa in
+`vendor-common/service_contexts` are downstream.
+
+The stock radio daemon runs in the platform `rild` domain. It may add only the four
+Qualcomm radio services the device declares (IMS and radio config under
+`vendor_hal_telephony_service2`, audio messenger and LPA under their own types). It is not
+a `binderservicedomain`; each selected app client has an explicit binder grant. The
+secure-element HAL, unrelated data-factory services, diag, the legacy
+IPC-router ioctls, the QCRIL client socket and executing vendor tools are not granted.
+The radio daemon and nicmd may use TIPC sockets with each other, as on stock: the data
+module's DSI layer waits for nicmd over TIPC before it allows any data call. No other
+domain may create a TIPC socket (neverallow in `telephony/rild.te`), and the kernel builds
+TIPC for local IPC with network bearer creation blocked, without UDP, crypto or diag modules.
+nicmd keeps its netlink, QRTR, rmnet ioctl and network-wrapper access, datagram sockets
 for interface ioctls and its init-created recovery file. Its XFRM netlink access is
 needed for Wi-Fi calling, where the modem negotiates the ePDG tunnel and nicmd installs
 the ESP states and policies it receives (write requests); to remove them at teardown or
@@ -530,6 +558,29 @@ sockets, to reserve the ephemeral ports the modem's embedded clients use, and re
 public SoC id for data target detection. It is not a `netdomain` (no TCP connect, no
 `name_bind`); its remote-processor probe (`vendor_sysfs_ssr`) stays denied because the
 result is unused on this SoC. The SHS, QMI-priority and performance helpers are not
+installed and not granted.
+
+The stock IMS app, QCRIL audio messenger and eSIM LPA keep their stock Fairphone
+signature. They are selected through a dedicated seinfo (`fp6_stock_platform`,
+`telephony-system-ext/mac_permissions.xml`), their package or process name and
+`isPrivApp=true`, never through our platform key. Each has its own domain: the IMS app
+(`vendor_qtelephony`) may call the radio daemon and find the IMS and radio-config
+services; the audio messenger (`fp6_qcril_audio_app`) only IQcRilAudio and the audio
+APIs; the LPA (`fp6_qti_lpa_app`) only IUimLpa, the telephony and connectivity APIs and
+The stock IMS and IWLAN/certificate apps retain Fairphone's signature and a
+signer-specific seinfo, with privileged placement and package/process selectors.
+The IMS app runs in `vendor_qtelephony`; the coupled IWLAN/certificate frontend
+runs in `fp6_iwlan_app` with explicit radio Binder and certificate QRTR access.
+Package selectors label its data separately from the shared-process selector.
+The inactive LPA, its download grants and app-domain policy are omitted; the
+native IUimLpa interface remains because the selected radio binary depends on it.
+These presigned apps retain OEM update trust; release signing and update policy
+remain separate trust decisions. Collect denials before adding any grant.
+QtiTelephonyService. Its signer, package name and privileged placement select the domain, and it runs in
+- `dontaudit` for its link dump (`netlink_route_socket` `nlmsg_readpriv`) and
+  raw ICMPv6 socket (`rawip_socket` `create`) during Wi-Fi calling setup.
+  - Stock denies both too, and calls and handover work without them.
+  - The link dump would show every interface's MAC address.
 provider's own vndbinder open, `/data/vendor/camera`, read-only factory calibration in
 service. For streaming the provider is a client of the graphics allocator (buffer
 allocation and IMapper) through `hal_client_domain`, the only form the platform

@@ -83,12 +83,15 @@ BOARD_VENDOR_SEPOLICY_DIRS += $(addprefix $(DEVICE_PATH)/sepolicy/,vendor-common
 # Device-owned grants for the FP6 services, reviewed per denial.
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fp6
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/audio
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/gnss
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/nfc
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/bluetooth
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/modem
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext-public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
 PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 
@@ -96,6 +99,11 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-private
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 # Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
+
+# Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
+include hardware/diamaneos/ims/ims-board.mk
+include hardware/diamaneos/ims/wlan-board.mk
+include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 
 # AVB is enabled. Release signing replaces the test identities.
 BOARD_AVB_ENABLE := true

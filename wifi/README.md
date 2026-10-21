@@ -13,7 +13,7 @@
 - `device.mk` installs them to `/vendor/etc/wifi/`, where wpa_supplicant looks
   for overlays.
 - The base template, `wpa_supplicant.conf`, has one provider: the
-  `fp6_wpa_supplicant_conf` module in the device's `Android.bp`, generated from
+  `fp6_wpa_supplicant_conf` module in `wifi/Android.bp`, generated from
   wpa_supplicant_8's template.
 - The supplicant, its services and the permission file come from
   `vendor/diamaneos/config/wifi.mk`.

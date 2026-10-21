@@ -187,6 +187,7 @@ PRODUCT_PACKAGES += libtxml2v34
 # fork, Soong-converted). The HAL signals driver readiness through /dev/wlan
 # (BoardConfig.mk). The stock cnss-daemon is not selected.
 PRODUCT_SOONG_NAMESPACES += \
+    device/fairphone/FP6/wifi \
     hardware/qcom/wlan/cld80211-lib \
     hardware/qcom/wlan/qcwcn
 $(call inherit-product, vendor/diamaneos/config/wifi.mk)

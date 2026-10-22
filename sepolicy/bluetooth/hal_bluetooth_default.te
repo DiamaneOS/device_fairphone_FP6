@@ -43,6 +43,11 @@ get_prop(hal_bluetooth_default, vendor_soc_id_prop)
 allow hal_bluetooth_default vendor_sysfs_soc:dir search;
 allow hal_bluetooth_default vendor_sysfs_public:file r_file_perms;
 
+# The service runs with no_new_privs under its seccomp filter, so debuggerd
+# writes its tombstones and stack dumps through the in-process fallback
+# handler, which needs these rules.
+crash_dump_fallback(hal_bluetooth_default)
+
 # Not granted (stock grants them): write to persist, QRTR sockets (only for
 # the modem-NV address query, off), /data/vendor/bluetooth, diag, the FM radio
 # device, the ssgtzd socket, the TPI and Xpan service registrations and HSUART

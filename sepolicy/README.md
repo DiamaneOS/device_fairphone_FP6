@@ -537,6 +537,9 @@ Qualcomm's `ssr_setup.te` (`provenance.json`).
     `vendor_bluetooth_hal_state_prop`, so no platform domain or app can read
     the address.
 - Gets the HCI UART (`hci_attach_dev`) from platform policy, as in stock.
+- `crash_dump_fallback`: the service runs with no_new_privs under its seccomp
+  filter (`bluetooth/seccomp`), so debuggerd writes its tombstones and stack
+  dumps through the in-process fallback handler.
 
 Factory address:
 

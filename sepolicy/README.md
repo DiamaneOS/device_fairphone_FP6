@@ -298,8 +298,9 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   through the charger firmware's
   `/sys/class/qcom-battery/charge_disable` (`charge_limit.te`).
   - The node is `vendor_sysfs_charge_disable` (`fp6/genfs_contexts`).
-  - The service may open and write it, nothing more. vendor_init hands it to
-    system at boot (`boot/init.qcom.rc`).
+  - The service may open, read and write it, nothing more. It reads the
+    node back to set a pause again that the firmware lost. vendor_init hands
+    it to system at boot (`boot/init.qcom.rc`).
 - The service keeps its state in `persist.vendor.charge_limit`
   (`vendor_charge_limit_prop`, off, on or paused).
   - At early-boot, vendor_init writes the pause again from it, as stock does.

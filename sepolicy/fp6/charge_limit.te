@@ -3,11 +3,12 @@
 # Charge limit. The health service (vendor.health-default, hal_health_default)
 # pauses and resumes charging through /sys/class/qcom-battery/charge_disable,
 # a class attribute of qti_battery_charger (its line in fp6/genfs_contexts).
-# It only writes "0" or "1" and never reads the node. Off-mode charging
-# (charger_vendor) and recovery do not use it.
+# It writes "0" or "1" and reads the node back from the charger firmware, to
+# set a pause again that the firmware lost. Off-mode charging (charger_vendor)
+# and recovery do not use it.
 type vendor_sysfs_charge_disable, sysfs_type, fs_type;
 
-allow hal_health_default vendor_sysfs_charge_disable:file { open write };
+allow hal_health_default vendor_sysfs_charge_disable:file { open read write };
 # vendor_init hands the node to system, stats it for init's wait and writes
 # the pause early in boot (boot/init.qcom.rc).
 allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr open write };

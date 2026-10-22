@@ -866,8 +866,10 @@ Grants:
 
 Denied on purpose:
 
-- The display QService and display-config lookups: IDisplayConfig would expose
-  brightness, power mode and writeback capture.
+- The display QService lookup and the display-config lookup
+  (`vendor_hal_vnddisplayconfig_service`, once per `hal_camera_default`
+  start): IDisplayConfig would expose brightness, power mode and writeback
+  capture.
 - IPostProcService registration.
 - `dontaudit hal_camera_default default_prop:file read`: the property-area
   listing CamX does at start.
@@ -985,8 +987,12 @@ without it. Denials covered in the sections above are not repeated.
   build. Platform policy grants it only on userdebug and eng, where the
   emulation exists.
 - `system_server` (InputReader), `max_brightness` of the haptics LED device
-  (`sysfs_leds`): reading it would let InputReader treat the vibrator as a
-  light.
+  (`sysfs_leds`) and its `brightness` node (`vendor_sysfs_aw_vibrator`):
+  InputReader lists the haptics chip's LED node as a light of its input
+  device. The vibrator is not a light, and only the input lights API and its
+  dump read these nodes.
+  - `dumpsys input` reads `brightness`, also in bug reports. The dump then
+    shows -1.
 - `hal_camera_default`, `ro.vendor.qti.soc_id` (`vendor_soc_id_prop`): not
   set on this build. CamX uses the public SoC id file.
 - `hal_bluetooth_default` and `vendor_hal_gnss_qti`,
@@ -1015,11 +1021,11 @@ without it. Denials covered in the sections above are not repeated.
   service is not installed, and CamX continues without it.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it only probes them at start.
-- `fp6_callaudio_app` and `fp6_iwlan_app`, `find` of `gpu_service`,
-  `netstats_service` and `content_capture_service`: lookups every app
-  process makes at start.
-  - These two domains have no graphics and keep no traffic statistics, and the
-    framework continues when the lookup returns nothing.
+- `fp6_callaudio_app`, `fp6_iwlan_app` and the Wi-Fi observer
+  (`diamaneos_wlan_observer`), `find` of `gpu_service`, `netstats_service`
+  and `content_capture_service`: lookups every app process makes at start.
+  - These three domains have no graphics and keep no traffic statistics, and
+    the framework continues when the lookup returns nothing.
 - `hal_audio_default`, `read append` on `/sys/power/wake_lock`
   (`sysfs_wake_lock`): PAL opens the wake-lock nodes at start, but only sound
   trigger, which is not shipped, takes wake locks.
@@ -1029,6 +1035,12 @@ without it. Denials covered in the sections above are not repeated.
 - `platform_app` (SystemUI), `read` of `bluetooth_lea_prop`: the property is
   not set on this build, so the denied read returns the same default.
   - This is platform app policy, as on other GrapheneOS devices.
+- `isolated_app` (the Vanadium and WebView renderers), `getattr` of the
+  WebView's data directory and `setattr` on the browser's CRLSet files it
+  holds open (`app_data_file`), and `find` of `content_capture_service`:
+  isolated processes get none of these by design, and the renderers continue.
+  - This is platform policy, as on other GrapheneOS devices. AOSP tracks the
+    directory lookup as b/120394782.
 - `untrusted_app`, probes of the device (adb properties, `/proc`, `/sys`,
   `selinuxfs`, the root and `/dev` directories, the wallet property, cgroups):
   intended.

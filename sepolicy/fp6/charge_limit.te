@@ -5,12 +5,13 @@
 # a class attribute of qti_battery_charger (its line in fp6/genfs_contexts).
 # It writes "0" or "1" and reads the node back from the charger firmware, to
 # set a pause again that the firmware lost. Off-mode charging (charger_vendor)
-# and recovery do not use it.
+# does the same. Recovery does not use it.
 type vendor_sysfs_charge_disable, sysfs_type, fs_type;
 
 allow hal_health_default vendor_sysfs_charge_disable:file { open read write };
+allow charger_vendor vendor_sysfs_charge_disable:file { open read write };
 # vendor_init hands the node to system, stats it for init's wait and writes
-# the pause early in boot (boot/init.qcom.rc).
+# the pause early in boot and in charger mode (boot/init.qcom.rc).
 allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr open write };
 
 # Nothing else may write the node: a later rule that adds a writer fails the
@@ -18,9 +19,27 @@ allow vendor_init vendor_sysfs_charge_disable:file { getattr setattr open write 
 neverallow {
   domain
   -hal_health_default
+  -charger_vendor
   -vendor_init
   -ueventd
 } vendor_sysfs_charge_disable:file { write append };
+
+# The copy of the user's choice for off-mode charging, which has neither /data
+# nor the persist properties: /metadata/vendor_charge_limit
+# (fp6/file_contexts). vendor_init writes it from persist.vendor.charge_limit
+# (boot/init.qcom.rc). The platform already lets it create such files.
+type vendor_charge_limit_file, file_type;
+
+allow charger_vendor vendor_charge_limit_file:dir search;
+allow charger_vendor vendor_charge_limit_file:file { open read };
+
+# Only init and vendor_init may change it.
+neverallow { domain -init -vendor_init } vendor_charge_limit_file:file {
+  create write append setattr rename unlink link
+};
+neverallow { domain -init -vendor_init } vendor_charge_limit_file:dir {
+  write add_name remove_name rename reparent rmdir setattr
+};
 
 # persist.vendor.charge_limit: off, on or paused (fp6/property_contexts). The
 # health service keeps its state there, and init pauses charging from it at

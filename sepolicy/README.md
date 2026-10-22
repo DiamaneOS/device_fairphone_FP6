@@ -305,8 +305,15 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   (`vendor_charge_limit_prop`, off, on or paused).
   - At early-boot, vendor_init writes the pause again from it, as stock does.
   - A neverallow leaves setting it to the service, init and vendor_init.
-- A neverallow keeps every other domain from writing it, except vendor_init
-  and ueventd, which the platform lets write all of sysfs.
+- Off-mode charging (`charger_vendor`) holds the limit from a copy of the
+  user's choice, `/metadata/vendor_charge_limit/enabled`
+  (`vendor_charge_limit_file`). Recovery charges fully.
+  - vendor_init writes it from the property.
+  - `charger_vendor` reads the copy and opens, reads and writes the node.
+  - Neverallows leave changing the copy to init and vendor_init.
+- A neverallow keeps every other domain but the health service in its two
+  domains from writing the node, except vendor_init and ueventd, which the
+  platform lets write all of sysfs.
 
 ### Embedded USB debugger
 

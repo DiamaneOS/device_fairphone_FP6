@@ -22,3 +22,6 @@
 # the qcom_stats sleep counter device it reads.
 /vendor/bin/hw/android\.hardware\.power\.stats-service\.fp6 u:object_r:hal_power_stats_default_exec:s0
 /dev/stats                              u:object_r:vendor_qcom_stats_device:s0
+# Charge limit: the copy of the user's choice for off-mode charging
+# (charge_limit.te).
+/metadata/vendor_charge_limit(/.*)?     u:object_r:vendor_charge_limit_file:s0

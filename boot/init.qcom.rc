@@ -262,7 +262,7 @@ on early-boot
 # charger firmware is up, so wait for it after the ADSP boot above, and chown
 # again at boot if it came later. A pause the service kept in
 # persist.vendor.charge_limit is set again here, before the framework is up,
-# as stock does. Charger mode never runs it.
+# as stock does.
 on early-boot
     wait /sys/class/qcom-battery/charge_disable 5
     chown system system /sys/class/qcom-battery/charge_disable
@@ -271,6 +271,34 @@ on early-boot && property:persist.vendor.charge_limit=paused
     write /sys/class/qcom-battery/charge_disable 1
 
 on boot
+    chown system system /sys/class/qcom-battery/charge_disable
+
+# Off-mode charging has neither /data nor the persist properties. It holds
+# the limit from a copy of the user's choice on /metadata: 1 with the limit,
+# 0 without. It follows the property, also when the persist properties load
+# at boot. Factory reset erases it with the setting. Recovery charges fully.
+on post-fs
+    mkdir /metadata/vendor_charge_limit 0750 root system
+
+on property:persist.vendor.charge_limit=off
+    write /metadata/vendor_charge_limit/enabled 0
+    chmod 0640 /metadata/vendor_charge_limit/enabled
+    chown root system /metadata/vendor_charge_limit/enabled
+
+on property:persist.vendor.charge_limit=on
+    write /metadata/vendor_charge_limit/enabled 1
+    chmod 0640 /metadata/vendor_charge_limit/enabled
+    chown root system /metadata/vendor_charge_limit/enabled
+
+on property:persist.vendor.charge_limit=paused
+    write /metadata/vendor_charge_limit/enabled 1
+    chmod 0640 /metadata/vendor_charge_limit/enabled
+    chown root system /metadata/vendor_charge_limit/enabled
+
+# Off-mode charging: the health service pauses and resumes from the copy, so
+# hand it the node once the charger firmware is up, as at early-boot.
+on charger
+    wait /sys/class/qcom-battery/charge_disable 5
     chown system system /sys/class/qcom-battery/charge_disable
 
 # pd-mapper (linux-msm, modem/modem.mk) answers the protection-domain lookups

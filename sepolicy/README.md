@@ -980,6 +980,10 @@ without it. Denials covered in the sections above are not repeated.
 
 - `system_server`, extcon cable names of the EUD debug port (`sysfs`): no
   cable type the framework uses.
+- `system_server`, `read` of `persist.debug.user_mode_emulation`
+  (`system_user_mode_emulation_prop`): `dumpsys user` reads it on every
+  build. Platform policy grants it only on userdebug and eng, where the
+  emulation exists.
 - `system_server` (InputReader), `max_brightness` of the haptics LED device
   (`sysfs_leds`): reading it would let InputReader treat the vibrator as a
   light.
@@ -995,6 +999,12 @@ without it. Denials covered in the sections above are not repeated.
 - `hal_audio_default` and `rild`, `persist.vendor.pd_locater_debug`
   (`vendor_pd_locater_dbg_prop`): a debug switch, off when unreadable. No
   domain reads it here.
+- `rild`, `add` of the Qualcomm IDataConnection service
+  (`vendor_hal_dataconnection_aidl_service`), once per SIM slot at boot: it
+  reports bearer allocations to a Qualcomm `system_server` client that
+  DiamaneOS does not have.
+  - The service is not declared in the vendor VINTF manifest either. Mobile
+    data uses the radio HAL.
 - `vendor_nicmd`, `property_socket` write and an `init.svc.*` read: the SHS
   and QMI-priority helpers it would start and check are not installed.
 - `fp6_iwlan_app` and `mediacodec`, reads of `default_prop` and

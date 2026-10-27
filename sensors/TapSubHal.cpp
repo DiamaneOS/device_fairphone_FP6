@@ -8,12 +8,20 @@
 // config_dozeDoubleTapSensorType for Display > Tap to wake) and wakes the
 // screen after a proximity check.
 //
-// While a sensor is armed, its gesture is on in the controller (gesture_wakeup
+// Activating a sensor turns its gesture on in the controller (gesture_wakeup
 // 1 for the tap, 2 for the double tap). The touch driver reports gestures
 // through wake_gesture: reading it returns the gestures seen since the last
 // read (1 single tap, 2 double tap, as bits), and the driver wakes poll()
-// readers. Both sensors are one-shot: after its gesture a sensor disarms itself
-// and turns the gesture off in the controller until SystemUI asks again.
+// readers. Both sensors are one-shot. Taps go out only while a sensor is active.
+//
+// SystemUI activates the sensors about 0.7 s after the screen goes off and
+// releases them at screen on. The gesture stays on after that, so at the next
+// screen off the controller goes straight into gesture mode. Turned on from
+// deep sleep instead, it misses taps for a second or more. A gesture goes off
+// once the controller has been in low power for kIdleNs with its sensor
+// inactive, which is how a setting turned off shows here. From the next screen
+// off the controller sleeps deeply again. A long call with the screen off by
+// proximity looks the same, so the screen off after it is slow once.
 //
 // One thread does all node I/O. activate() only records what is wanted.
 
@@ -67,6 +75,14 @@ constexpr char kReportPath[] = "/sys/bus/spi/devices/spi0.0/wake_gesture";
 constexpr char kPermission[] = "android.permission.DEVICE_POWER";
 // Values of an event: no touch position (SystemUI ignores negative ones).
 constexpr size_t kEventValues = 16;
+// How long the controller stays in low power with a gesture on but its sensor
+// inactive before the gesture goes off. Much longer than a doze pulse, which
+// releases the tap sensors while it shows, and than most calls.
+constexpr int64_t kIdleNs = 5 * 60'000'000'000LL;
+// How often the thread checks the controller while a gesture is on with its
+// sensor inactive. The timer runs on the monotonic clock and never wakes the
+// system.
+constexpr int kIdleCheckMs = 10'000;
 
 struct TapSensor {
     int32_t handle;
@@ -76,11 +92,12 @@ struct TapSensor {
     const char* on;      // gesture_wakeup values
     const char* off;
     int reportBit;       // wake_gesture bit
+    int modeBit;         // gesture_wakeup mode bit
 };
 
 constexpr std::array<TapSensor, 2> kSensors = {{
-        {1, "Single tap", "de.diamaneos.sensor.single_tap", 1, "1", "-1", 1},
-        {2, "Double tap", "de.diamaneos.sensor.double_tap", 2, "2", "-2", 2},
+        {1, "Single tap", "de.diamaneos.sensor.single_tap", 1, "1", "-1", 1, 1 << 1},
+        {2, "Double tap", "de.diamaneos.sensor.double_tap", 2, "2", "-2", 2, 1 << 2},
 }};
 
 SensorType typeOf(const TapSensor& sensor) {
@@ -119,6 +136,24 @@ bool readReport(int fd, int* gestures) {
     if (n <= 0) return false;
     *gestures = atoi(buf);
     return true;
+}
+
+// Reads the driver's gesture mode from gesture_wakeup ("enable mode[5]"): the
+// gestures on (modeBit), and bit 0 while the controller waits for them in low
+// power, that is with the panel off or in always-on mode.
+bool readMode(unsigned long* mode) {
+    unique_fd fd(TEMP_FAILURE_RETRY(open(kGesturePath, O_RDONLY | O_CLOEXEC)));
+    if (fd < 0) return false;
+    char buf[32] = {};
+    if (TEMP_FAILURE_RETRY(read(fd, buf, sizeof(buf) - 1)) <= 0) return false;
+    const char* start = strstr(buf, "mode[");
+    if (start == nullptr) return false;
+    *mode = strtoul(start + strlen("mode["), nullptr, 16);
+    return true;
+}
+
+bool anyOf(const std::array<bool, kSensors.size()>& flags) {
+    return std::any_of(flags.begin(), flags.end(), [](bool f) { return f; });
 }
 
 class TapSubHal : public ISensorsSubHal {
@@ -165,7 +200,7 @@ class TapSubHal : public ISensorsSubHal {
     Return<Result> initialize(const sp<IHalProxyCallback>& halProxyCallback) override {
         {
             std::lock_guard<std::mutex> lock(mMutex);
-            // Called again when the sensor service restarts: start disarmed.
+            // Called again when the sensor service restarts: start inactive.
             mCallback = halProxyCallback;
             mWantArmed.fill(false);
             mMode = OperationMode::NORMAL;
@@ -186,8 +221,8 @@ class TapSubHal : public ISensorsSubHal {
         if (fd.getNativeHandle() == nullptr || fd->numFds < 1) return Void();
         std::lock_guard<std::mutex> lock(mMutex);
         for (size_t i = 0; i < kSensors.size(); i++) {
-            dprintf(fd->data[0], "%s: armed %d, reported %u\n", kSensors[i].typeString,
-                    mWantArmed[i], mReported[i]);
+            dprintf(fd->data[0], "%s: active %d, gesture on %d, reported %u\n",
+                    kSensors[i].typeString, mWantArmed[i], mArmed[i], mReported[i]);
         }
         return Void();
     }
@@ -261,10 +296,9 @@ class TapSubHal : public ISensorsSubHal {
         }
     }
 
-    // Arms or disarms one gesture in the controller. Arming the first one opens
-    // the report and drops gestures reported before.
-    bool apply(size_t index, bool arm, bool anyArmed) {
-        if (!arm) return writeNode(kGesturePath, kSensors[index].off);
+    // Turns one gesture on in the controller. The first one opens the report
+    // and drops gestures reported before.
+    bool arm(size_t index, bool anyArmed) {
         if (mReportFd < 0) {
             mReportFd.reset(TEMP_FAILURE_RETRY(open(kReportPath, O_RDONLY | O_CLOEXEC)));
             if (mReportFd < 0) {
@@ -288,7 +322,7 @@ class TapSubHal : public ISensorsSubHal {
             if (mMode != OperationMode::NORMAL) return;
             for (size_t i = 0; i < kSensors.size(); i++) {
                 if (!(gestures & kSensors[i].reportBit) || !mWantArmed[i]) continue;
-                // One-shot: disarm before the event goes out.
+                // One-shot: inactive before the event goes out. The gesture stays on.
                 mWantArmed[i] = false;
                 mReported[i]++;
 
@@ -309,40 +343,81 @@ class TapSubHal : public ISensorsSubHal {
     }
 
     void run() {
+        // After a crash of this process the gestures are still as it left them.
+        // Take them over, and the rule below turns off what stays unused.
         Flags armed{};
+        unsigned long mode = 0;
+        if (readMode(&mode)) {
+            for (size_t i = 0; i < kSensors.size(); i++) {
+                if ((mode & kSensors[i].modeBit) && arm(i, anyOf(armed))) armed[i] = true;
+            }
+        }
+        // When a gesture was first seen on in low power with its sensor
+        // inactive, else 0.
+        std::array<int64_t, kSensors.size()> idleSince{};
+        bool lowPowerFailed = false;
         for (;;) {
             Flags want;
             {
                 std::unique_lock<std::mutex> lock(mMutex);
-                mCondition.wait(lock, [&] {
-                    return mStop || mWantArmed != armed ||
-                           std::any_of(armed.begin(), armed.end(), [](bool a) { return a; });
-                });
+                mCondition.wait(lock, [&] { return mStop || anyOf(mWantArmed) || anyOf(armed); });
                 if (mStop) break;
                 want = mWantArmed;
             }
 
-            if (want != armed) {
-                for (size_t i = 0; i < kSensors.size(); i++) {
-                    if (want[i] == armed[i]) continue;
-                    const bool anyArmed =
-                            std::any_of(armed.begin(), armed.end(), [](bool a) { return a; });
-                    if (apply(i, want[i], anyArmed)) {
-                        armed[i] = want[i];
-                    } else if (want[i]) {
-                        // No touch node: give up until SystemUI asks again.
-                        std::lock_guard<std::mutex> lock(mMutex);
-                        mWantArmed[i] = false;
+            for (size_t i = 0; i < kSensors.size(); i++) {
+                if (!want[i] || armed[i]) continue;
+                if (arm(i, anyOf(armed))) {
+                    armed[i] = true;
+                } else {
+                    // No touch node: give up until SystemUI asks again.
+                    std::lock_guard<std::mutex> lock(mMutex);
+                    mWantArmed[i] = false;
+                }
+            }
+
+            bool idle = false;
+            bool lowPower = false;
+            bool lowPowerRead = false;
+            const int64_t now = ::android::elapsedRealtimeNano();
+            for (size_t i = 0; i < kSensors.size(); i++) {
+                if (!armed[i] || want[i]) {
+                    idleSince[i] = 0;
+                    continue;
+                }
+                if (!lowPowerRead) {
+                    lowPowerRead = true;
+                    unsigned long current = 0;
+                    if (readMode(&current)) {
+                        lowPower = current & 1;
+                    } else if (!lowPowerFailed) {
+                        LOG(ERROR) << "Cannot read the mode from " << kGesturePath;
+                        lowPowerFailed = true;
                     }
                 }
-                continue;
+                if (!lowPower) {
+                    idleSince[i] = 0;
+                } else if (idleSince[i] == 0) {
+                    idleSince[i] = now;
+                } else if (now - idleSince[i] >= kIdleNs) {
+                    writeNode(kGesturePath, kSensors[i].off);
+                    armed[i] = false;
+                    idleSince[i] = 0;
+                    continue;
+                }
+                idle = true;
             }
+            {
+                std::lock_guard<std::mutex> lock(mMutex);
+                mArmed = armed;
+            }
+            if (!anyOf(armed)) continue;
 
             pollfd fds[] = {
                     {mWakeFd.get(), POLLIN, 0},
                     {mReportFd.get(), POLLPRI | POLLERR, 0},
             };
-            if (TEMP_FAILURE_RETRY(poll(fds, 2, -1)) < 0) {
+            if (TEMP_FAILURE_RETRY(poll(fds, 2, idle ? kIdleCheckMs : -1)) < 0) {
                 PLOG(ERROR) << "poll";
                 continue;
             }
@@ -365,7 +440,8 @@ class TapSubHal : public ISensorsSubHal {
     std::mutex mMutex;
     std::condition_variable mCondition;
     sp<IHalProxyCallback> mCallback;              // guarded by mMutex
-    Flags mWantArmed{};                           // guarded by mMutex
+    Flags mWantArmed{};                           // guarded by mMutex, sensor active
+    Flags mArmed{};                               // guarded by mMutex, gesture on
     std::array<unsigned, kSensors.size()> mReported{};  // guarded by mMutex
     bool mStop = false;                           // guarded by mMutex
     OperationMode mMode = OperationMode::NORMAL;  // guarded by mMutex

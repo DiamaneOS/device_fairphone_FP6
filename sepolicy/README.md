@@ -256,6 +256,8 @@ of the same name (`provenance.json`).
   - Only the sensors HAL uses them, for Tap to wake (double tap) and Tap to
     check phone (single tap): it writes the switch and reads the report
     (`fp6/touch.te`).
+  - It also reads the switch, which shows whether the controller is in low
+    power.
   - The HAL may search the device directory but not use its factory-test
     files.
   - The power HAL has no access.

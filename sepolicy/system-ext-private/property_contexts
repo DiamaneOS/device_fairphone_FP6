@@ -120,6 +120,8 @@ diamaneos.privacy_switch.enforced          u:object_r:privacy_switch_prop:s0 exa
 # Camera privacy disconnects apps instead of muting (camera/camera.mk). AOSP's
 # type for the ro.camera.* settings cameraserver reads: only vendor_init sets it.
 ro.camera.disableCameraMute                u:object_r:camera_config_prop:s0 exact bool
+# The node cameraserver writes the flashlight strength to (camera/camera.mk).
+ro.camera.torchStrengthNode.0              u:object_r:camera_config_prop:s0 exact string
 
 # Hardware video decoding: the user's choice, applied at the next boot
 # (hw_video_decode.te). Settings stores "0" (never) or "1" (all video).

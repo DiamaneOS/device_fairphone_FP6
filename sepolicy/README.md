@@ -900,6 +900,14 @@ Denied on purpose:
   serial numbers CamX tries to publish. Nothing may set or read it, and the
   denials stay audited.
 
+Flashlight strength (`torch_level.te`):
+
+- cameraserver writes the torch level to the camera kernel module
+  (`/sys/module/camera/parameters/torch_level`, `vendor_sysfs_camera_torch_level`).
+  CamX lights the torch at one current for every level.
+- A neverallow leaves only cameraserver, ueventd and vendor_init able to write
+  it.
+
 Other:
 
 - `vendor_init` may create the camera data directory, set the camera

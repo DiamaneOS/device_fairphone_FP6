@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# Flashlight strength: cameraserver writes the torch level to the camera kernel
+# module (camera/camera.mk, genfs line in genfs_contexts).
+type vendor_sysfs_camera_torch_level, sysfs_type, fs_type;
+
+allow cameraserver vendor_sysfs_camera_torch_level:file { open write };
+
+# Nothing else may write it. The platform lets ueventd and vendor_init write all
+# of sysfs.
+neverallow {
+  domain
+  -cameraserver
+  -ueventd
+  -vendor_init
+} vendor_sysfs_camera_torch_level:file { write append };

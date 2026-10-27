@@ -5,3 +5,5 @@
 # identifier. Without this line it inherits vendor_sysfs_soc, which also covers
 # serial_number. Only camera.qcom.so reads it (hal_camera_default.te).
 genfscon sysfs /devices/soc0/num_subset_parts u:object_r:vendor_sys_nonsp_comp:s0
+# The flashlight strength level that cameraserver writes (torch_level.te).
+genfscon sysfs /module/camera/parameters/torch_level u:object_r:vendor_sysfs_camera_torch_level:s0

@@ -56,6 +56,12 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     ro.camera.disableCameraMute=true
 
+# Flashlight strength: CamX lights the torch at one current for every level,
+# so cameraserver writes the level to the camera kernel module, which sets the
+# torch current. Labelled in sepolicy/system-ext-private/property_contexts.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.camera.torchStrengthNode.0=/sys/module/camera/parameters/torch_level
+
 # Stock (system build.prop): the CamX provider takes the tuning path Fairphone
 # shipped and validated. vendor_init may set it (sepolicy/camera/vendor_init.te).
 PRODUCT_VENDOR_PROPERTIES += \

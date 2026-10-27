@@ -177,6 +177,9 @@ firmware_directories /mnt/vendor/wlan_mac/
 /sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg80   0400   root   root
 /sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:*   vpd_pg83   0400   root   root
 
+# Flashlight strength (camera/camera.mk): cameraserver writes the torch level.
+/sys/module/camera   parameters/torch_level   0644   cameraserver   cameraserver
+
 # Display power control for the composer (matches stock).
 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp power/control 0664 system graphics
 

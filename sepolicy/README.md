@@ -325,6 +325,13 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
 - Reads stay as the platform grants them: the value only tells whether EUD is
   on.
 
+### FastRPC
+
+- A neverallow keeps every app domain and the app zygote off the FastRPC
+  nodes (`vendor_qdsp_device`, `vendor_xdsp_device`, `vendor_dsp_device`),
+  opened or passed in (`fastrpc.te`). Stock lets apps use them.
+- shell keeps the platform's `getattr` on every device node.
+
 ### Other grants
 
 - The peripheral manager and its proxy read the remote-processor names

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# FastRPC nodes (vendor-common/file_contexts). Apps and the app zygote, which
+# runs app code, get none of them, opened or passed in, and a later rule that
+# grants one fails the build. shell keeps the getattr the platform gives it on
+# every device node.
+neverallow { appdomain app_zygote } {
+  vendor_qdsp_device
+  vendor_xdsp_device
+  vendor_dsp_device
+}:chr_file { open read write append ioctl map };

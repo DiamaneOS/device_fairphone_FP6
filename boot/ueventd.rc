@@ -262,14 +262,11 @@ firmware_directories /mnt/vendor/wlan_mac/
 /dev/media*               0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
 /dev/ubwcp                0660   root       camera
-# Non-secure FastRPC node. The kernel serves the CDSP (a non-secure channel)
-# through it. The camera offloads (FastCV, BitML, HME, MCTF, ML-AWB) use it when
-# libcdsprpc falls back from the secure node. Stock makes it 0664 system system
-# (line 222). Only the camera group needs it here, read-only (the stock
-# provider, uid cameraserver, can only open it through the read bit). The
-# secure node keeps its 0640 system media rule. The camera provider reaches it
-# through its media group (the provider's rc).
-/dev/adsprpc-smd          0640   system     camera
+# Non-secure FastRPC node. Stock makes it 0664 system system (line 222). Only
+# the DSP daemon (uid system) and thermal-engine (root) use it, and no app may
+# (sepolicy/fp6/fastrpc.te). The camera provider uses the secure node, through
+# its media group (the provider's rc).
+/dev/adsprpc-smd          0640   system     system
 # VL53L1 time-of-flight ranging for laser autofocus. Stock init.target.rc makes
 # it 0666 system. Only the camera group needs it.
 /dev/stmvl53l1_ranging    0660   system     camera

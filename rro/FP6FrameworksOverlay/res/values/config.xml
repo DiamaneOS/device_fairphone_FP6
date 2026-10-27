@@ -32,6 +32,12 @@
     <integer name="config_defaultRefreshRate">0</integer>
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
+    <!-- At least 30 Hz while the screen is on. Content that starts moving
+         without a touch then begins at 30 Hz instead of the panel's 10 Hz idle
+         mode. Measured on a still screen, 30 Hz costs nothing over 10 Hz. Doze,
+         the always-on display and battery saver keep 10 Hz. -->
+    <integer name="config_screenOnMinRefreshRate">30</integer>
+
     <!-- Pin the panel to 60 Hz while the camera app is in front:
          - photo mode's 4:3 preview (1600x1200) is over the display's
            1088-line rotation limit, so the GPU composes it (~10 ms a frame).

@@ -318,8 +318,9 @@ PRODUCT_PACKAGES += fwrelease
 #   about 58 minutes and blocks idle refresh-rate drops. SurfaceFlinger's
 #   default (200 ms, as in Qualcomm's display config) applies instead.
 # - the idle timer is 1500 ms instead of stock's 3500 ms, so a still screen
-#   drops to the panel's idle refresh rate 2 s sooner. Touch still raises the
-#   rate at once through the touch timer.
+#   drops to the idle refresh rate 2 s sooner: 30 Hz while the screen is on
+#   outside battery saver (config_screenOnMinRefreshRate), the panel's 10 Hz
+#   otherwise. Touch still raises the rate at once through the touch timer.
 # - debug.sf.hw, debug.sf.latch_unsignaled and
 #   debug.sf.enable_advanced_sf_phase_offset are left out: nothing in this
 #   platform, the display HAL or the stock vendor files reads them

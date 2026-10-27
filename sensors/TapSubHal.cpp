@@ -12,7 +12,11 @@
 // 1 for the tap, 2 for the double tap). The touch driver reports gestures
 // through wake_gesture: reading it returns the gestures seen since the last
 // read (1 single tap, 2 double tap, as bits), and the driver wakes poll()
-// readers. Both sensors are one-shot. Taps go out only while a sensor is active.
+// readers. Both sensors are one-shot. A double tap seen while its sensor is
+// inactive is held (the latest only). If it is at most kEarlyNs old when the
+// sensor is activated, it goes out kEarlyDelayNs later, which covers the taps
+// before SystemUI listens. Single taps are never held, as lifting a thumb from
+// the power button can count as one.
 //
 // SystemUI activates the sensors about 0.7 s after the screen goes off and
 // releases them at screen on. The gesture stays on after that, so at the next
@@ -37,6 +41,7 @@
 #include <condition_variable>
 #include <cstring>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>
@@ -66,6 +71,7 @@ using ::android::hardware::sensors::V2_1::SensorInfo;
 using ::android::hardware::sensors::V2_1::SensorType;
 using ::android::hardware::sensors::V2_1::implementation::IHalProxyCallback;
 using ::android::hardware::sensors::V2_1::implementation::ISensorsSubHal;
+using ScopedWakelock = ::android::hardware::sensors::V2_0::implementation::ScopedWakelock;
 
 constexpr char kGesturePath[] = "/sys/bus/spi/devices/spi0.0/gesture_wakeup";
 constexpr char kReportPath[] = "/sys/bus/spi/devices/spi0.0/wake_gesture";
@@ -83,6 +89,11 @@ constexpr int64_t kIdleNs = 5 * 60'000'000'000LL;
 // sensor inactive. The timer runs on the monotonic clock and never wakes the
 // system.
 constexpr int kIdleCheckMs = 10'000;
+// Longest a held double tap waits for its sensor.
+constexpr int64_t kEarlyNs = 1'000'000'000;
+// SystemUI starts its proximity listener with the tap sensors and checks a tap
+// against a reading at most 200 ms old. The delay gives it a first reading.
+constexpr int64_t kEarlyDelayNs = 300'000'000;
 
 struct TapSensor {
     int32_t handle;
@@ -93,11 +104,12 @@ struct TapSensor {
     const char* off;
     int reportBit;       // wake_gesture bit
     int modeBit;         // gesture_wakeup mode bit
+    bool holdEarly;      // a tap while inactive waits for activation
 };
 
 constexpr std::array<TapSensor, 2> kSensors = {{
-        {1, "Single tap", "de.diamaneos.sensor.single_tap", 1, "1", "-1", 1, 1 << 1},
-        {2, "Double tap", "de.diamaneos.sensor.double_tap", 2, "2", "-2", 2, 1 << 2},
+        {1, "Single tap", "de.diamaneos.sensor.single_tap", 1, "1", "-1", 1, 1 << 1, false},
+        {2, "Double tap", "de.diamaneos.sensor.double_tap", 2, "2", "-2", 2, 1 << 2, true},
 }};
 
 SensorType typeOf(const TapSensor& sensor) {
@@ -203,6 +215,8 @@ class TapSubHal : public ISensorsSubHal {
             // Called again when the sensor service restarts: start inactive.
             mCallback = halProxyCallback;
             mWantArmed.fill(false);
+            mEarlyAt.fill(0);
+            mEarlyDue.fill(0);
             mMode = OperationMode::NORMAL;
             if (!mThread.joinable()) {
                 mWakeFd.reset(eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK));
@@ -314,6 +328,61 @@ class TapSubHal : public ISensorsSubHal {
         return writeNode(kGesturePath, kSensors[index].on);
     }
 
+    // With mMutex held. One-shot: inactive before the event goes out. The
+    // gesture stays on.
+    void fire(size_t index, std::vector<Event>* events) {
+        mWantArmed[index] = false;
+        mReported[index]++;
+        mEarlyAt[index] = 0;
+        mEarlyDue[index] = 0;
+
+        Event event;
+        event.timestamp = ::android::elapsedRealtimeNano();
+        event.sensorHandle = kSensors[index].handle;
+        event.sensorType = typeOf(kSensors[index]);
+        float* values = event.u.data.data();
+        std::fill(values, values + kEventValues, 0.0f);
+        values[0] = -1.0f;  // no x
+        values[1] = -1.0f;  // no y
+        events->push_back(event);
+    }
+
+    // With mMutex held: schedules held taps whose sensor is active now, queues
+    // those that are due and drops stale ones. Returns the next due time or 0.
+    int64_t fireEarly(std::vector<Event>* events) {
+        const int64_t now = ::android::elapsedRealtimeNano();
+        int64_t next = 0;
+        for (size_t i = 0; i < kSensors.size(); i++) {
+            if (!mWantArmed[i] || mEarlyAt[i] == 0 || mMode != OperationMode::NORMAL) {
+                mEarlyDue[i] = 0;
+                if (mWantArmed[i]) mEarlyAt[i] = 0;
+                continue;
+            }
+            if (mEarlyDue[i] == 0) {
+                if (now - mEarlyAt[i] > kEarlyNs) {
+                    mEarlyAt[i] = 0;
+                    continue;
+                }
+                mEarlyDue[i] = now + kEarlyDelayNs;
+            }
+            if (now - mEarlyDue[i] > kEarlyDelayNs) {
+                // Late after all: the system slept.
+                mEarlyAt[i] = 0;
+                mEarlyDue[i] = 0;
+            } else if (now >= mEarlyDue[i]) {
+                fire(i, events);
+            } else if (next == 0 || mEarlyDue[i] < next) {
+                next = mEarlyDue[i];
+            }
+        }
+        return next;
+    }
+
+    void post(const sp<IHalProxyCallback>& callback, const std::vector<Event>& events) {
+        if (events.empty() || callback == nullptr) return;
+        callback->postEvents(events, callback->createScopedWakelock(true));
+    }
+
     void report(int gestures) {
         sp<IHalProxyCallback> callback;
         std::vector<Event> events;
@@ -321,25 +390,17 @@ class TapSubHal : public ISensorsSubHal {
             std::lock_guard<std::mutex> lock(mMutex);
             if (mMode != OperationMode::NORMAL) return;
             for (size_t i = 0; i < kSensors.size(); i++) {
-                if (!(gestures & kSensors[i].reportBit) || !mWantArmed[i]) continue;
-                // One-shot: inactive before the event goes out. The gesture stays on.
-                mWantArmed[i] = false;
-                mReported[i]++;
-
-                Event event;
-                event.timestamp = ::android::elapsedRealtimeNano();
-                event.sensorHandle = kSensors[i].handle;
-                event.sensorType = typeOf(kSensors[i]);
-                float* values = event.u.data.data();
-                std::fill(values, values + kEventValues, 0.0f);
-                values[0] = -1.0f;  // no x
-                values[1] = -1.0f;  // no y
-                events.push_back(event);
+                if (!(gestures & kSensors[i].reportBit)) continue;
+                if (mWantArmed[i]) {
+                    fire(i, &events);
+                } else if (kSensors[i].holdEarly) {
+                    mEarlyAt[i] = ::android::elapsedRealtimeNano();
+                    mEarlyDue[i] = 0;
+                }
             }
             callback = mCallback;
         }
-        if (events.empty() || callback == nullptr) return;
-        callback->postEvents(events, callback->createScopedWakelock(true));
+        post(callback, events);
     }
 
     void run() {
@@ -356,13 +417,26 @@ class TapSubHal : public ISensorsSubHal {
         // inactive, else 0.
         std::array<int64_t, kSensors.size()> idleSince{};
         bool lowPowerFailed = false;
+        // Keeps the system awake while a held tap waits to go out.
+        std::optional<ScopedWakelock> earlyWakelock;
         for (;;) {
             Flags want;
+            sp<IHalProxyCallback> callback;
+            std::vector<Event> early;
+            int64_t earlyDue = 0;
             {
                 std::unique_lock<std::mutex> lock(mMutex);
                 mCondition.wait(lock, [&] { return mStop || anyOf(mWantArmed) || anyOf(armed); });
                 if (mStop) break;
+                earlyDue = fireEarly(&early);
                 want = mWantArmed;
+                callback = mCallback;
+            }
+            post(callback, early);
+            if (earlyDue == 0) {
+                earlyWakelock.reset();
+            } else if (!earlyWakelock && callback != nullptr) {
+                earlyWakelock.emplace(callback->createScopedWakelock(true));
             }
 
             for (size_t i = 0; i < kSensors.size(); i++) {
@@ -417,7 +491,13 @@ class TapSubHal : public ISensorsSubHal {
                     {mWakeFd.get(), POLLIN, 0},
                     {mReportFd.get(), POLLPRI | POLLERR, 0},
             };
-            if (TEMP_FAILURE_RETRY(poll(fds, 2, idle ? kIdleCheckMs : -1)) < 0) {
+            int timeoutMs = idle ? kIdleCheckMs : -1;
+            if (earlyDue != 0) {
+                const int64_t waitMs =
+                        (earlyDue - ::android::elapsedRealtimeNano()) / 1'000'000 + 1;
+                timeoutMs = static_cast<int>(std::clamp<int64_t>(waitMs, 0, kIdleCheckMs));
+            }
+            if (TEMP_FAILURE_RETRY(poll(fds, 2, timeoutMs)) < 0) {
                 PLOG(ERROR) << "poll";
                 continue;
             }
@@ -442,6 +522,8 @@ class TapSubHal : public ISensorsSubHal {
     sp<IHalProxyCallback> mCallback;              // guarded by mMutex
     Flags mWantArmed{};                           // guarded by mMutex, sensor active
     Flags mArmed{};                               // guarded by mMutex, gesture on
+    std::array<int64_t, kSensors.size()> mEarlyAt{};   // guarded by mMutex, held tap seen, or 0
+    std::array<int64_t, kSensors.size()> mEarlyDue{};  // guarded by mMutex, held tap goes out, or 0
     std::array<unsigned, kSensors.size()> mReported{};  // guarded by mMutex
     bool mStop = false;                           // guarded by mMutex
     OperationMode mMode = OperationMode::NORMAL;  // guarded by mMutex

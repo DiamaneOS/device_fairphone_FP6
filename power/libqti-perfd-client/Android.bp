@@ -28,6 +28,11 @@ cc_library_shared {
     // The forwarding thread runs this library's code for the life of the
     // camera provider, so a dlclose must never unmap it.
     ldflags: ["-Wl,-z,nodelete"],
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
     cflags: [
         "-Wall",
         "-Werror",

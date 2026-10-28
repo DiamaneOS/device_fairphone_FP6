@@ -17,6 +17,7 @@ cc_defaults {
     ],
     sanitize: {
         integer_overflow: true,
+        misc_undefined: ["bounds"],
     },
     cflags: [
         "-Wall",
@@ -30,6 +31,10 @@ cc_binary {
     defaults: ["fwrelease_defaults"],
     vendor: true,
     init_rc: ["fwrelease.rc"],
+    // CFI is device only, so it is not in the defaults the host test shares.
+    sanitize: {
+        cfi: true,
+    },
     srcs: ["main.cpp"],
     shared_libs: ["liblog"],
 }

@@ -45,6 +45,11 @@ cc_library_shared {
         "GraphicBufferV34.cpp",
     ],
     version_script: "libuiv34.map.txt",
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
     cflags: [
         "-Wall",
         "-Werror",
@@ -67,6 +72,11 @@ cc_library_shared {
     vendor: true,
     compile_multilib: "64",
     srcs: ["GraphicBufferSourceV34.cpp"],
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
     cflags: [
         "-Wall",
         "-Werror",

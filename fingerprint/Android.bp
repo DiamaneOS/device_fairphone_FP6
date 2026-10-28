@@ -27,6 +27,7 @@ cc_defaults {
     sanitize: {
         cfi: true,
         integer_overflow: true,
+        misc_undefined: ["bounds"],
     },
     cflags: [
         "-Wall",

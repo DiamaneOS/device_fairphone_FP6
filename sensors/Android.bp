@@ -28,6 +28,11 @@ cc_library_shared {
         "liblog",
         "libutils",
     ],
+    sanitize: {
+        cfi: true,
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
     cflags: [
         "-Wall",
         "-Werror",

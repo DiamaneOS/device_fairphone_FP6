@@ -50,7 +50,7 @@ std::string line(const std::string& name, const std::string& release, const std:
 
 // A partition at a release: the image, then whatever follows it.
 struct Partition {
-    android::base::TemporaryFile file;
+    TemporaryFile file;
     explicit Partition(const std::string& contents) {
         EXPECT_TRUE(android::base::WriteStringToFd(contents, file.fd));
         EXPECT_EQ(0, lseek(file.fd, 0, SEEK_SET));

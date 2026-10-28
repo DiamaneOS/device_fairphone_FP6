@@ -29,6 +29,11 @@ cc_library_shared {
     // anything CamX loads into the provider later.
     version_script: "libcamxjail.map.txt",
     required: ["camera-provider.policy"],
+    // No cfi: it has no indirect calls and runs once in a constructor.
+    sanitize: {
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
     cflags: [
         "-Wall",
         "-Werror",

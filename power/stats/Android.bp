@@ -28,7 +28,9 @@ cc_binary {
         "libbinder_ndk",
     ],
     sanitize: {
+        cfi: true,
         integer_overflow: true,
+        misc_undefined: ["bounds"],
     },
     cflags: [
         "-Wall",

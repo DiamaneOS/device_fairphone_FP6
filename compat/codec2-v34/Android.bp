@@ -45,8 +45,9 @@ cc_library_shared {
         "GraphicBufferV34.cpp",
     ],
     version_script: "libuiv34.map.txt",
+    // No cfi: Fairphone's closed distortion node calls into this library
+    // through a pointer, and the cross-library check rejects that call.
     sanitize: {
-        cfi: true,
         integer_overflow: true,
         misc_undefined: ["bounds"],
     },

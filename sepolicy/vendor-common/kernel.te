@@ -43,6 +43,8 @@ r_dir_file(kernel, firmware_file)
 
 # access vendor_firmware_file
 r_dir_file(kernel, vendor_firmware_file)
+# Kernels from 6.13 check firmware_load on each file a driver loads as firmware, 6.1 does not.
+allow kernel vendor_firmware_file:system firmware_load;
 
 dontaudit kernel kernel:system module_request;
 dontaudit kernel self:capability  { dac_read_search dac_override };

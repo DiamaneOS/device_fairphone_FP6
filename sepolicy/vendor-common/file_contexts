@@ -218,6 +218,8 @@
 # files in /vendor
 /vendor/firmware(/.*)?          u:object_r:vendor_firmware_file:s0
 /vendor/bt_firmware(/.*)?       u:object_r:vendor_firmware_file:s0
+# The Wi-Fi driver loads it as firmware through /vendor/firmware/wlan/qca_cld/qca6750
+/vendor/etc/wifi/qca6750/WCNSS_qcom_cfg\.ini    u:object_r:vendor_firmware_file:s0
 
 /vendor/bin/thermal-engine-v2      u:object_r:vendor_thermal-engine_exec:s0
 /vendor/bin/hw/android.hardware.thermal-service.qti      u:object_r:hal_thermal_default_exec:s0

@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "9f60c2166afacaf29582764efc51d026d18d9e037caf7bbf2e8959c559c22442"
+      "sha256": "1696556b5135b0e6fb241eb346dd5eb0edbcf4aba7b3d32188fe87d93f834fbe"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -211,7 +211,7 @@
       "source": "generic/vendor/common/kernel.te",
       "source_sha256": "d31fb7ac2c746cdb03cb61a4031acd29b1b1f5c443fde89a37635cf51a59aa33",
       "path": "vendor-common/kernel.te",
-      "sha256": "b9e964542c6f999179312b466c7f1c8d00bf48c7a4469b290c05667ea3563cb9"
+      "sha256": "d8d14e86a80ae52d3020bf7db405151e683f4dd4cbdbeecee1b53c39756af86f"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

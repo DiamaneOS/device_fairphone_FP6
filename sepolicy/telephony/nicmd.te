@@ -30,6 +30,17 @@ allow vendor_nicmd vendor_nicm_data_file:file rw_file_perms;
 allow vendor_nicmd self:udp_socket create_socket_perms;
 allow vendor_nicmd self:tcp_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlmsg_read nlmsg_write };
+# Kernels from 6.13 (policycap netlink_xperm) check each message type instead:
+# its rmnet links, their addresses, routes and policy rules, as seen on the FP6
+# with 6.18 across data call setup and teardown, and the gateway route of
+# Wi-Fi calling through the modem. RTM_GETLINK stays denied as on 6.1, where it
+# needed nlmsg_readpriv (dontaudit below).
+allow vendor_nicmd self:netlink_route_socket nlmsg;
+allowxperm vendor_nicmd self:netlink_route_socket nlmsg {
+    RTM_NEWLINK RTM_DELLINK RTM_NEWADDR RTM_DELADDR RTM_GETADDR
+    RTM_NEWROUTE RTM_DELROUTE RTM_GETROUTE RTM_NEWRULE RTM_DELRULE
+};
+dontauditxperm vendor_nicmd self:netlink_route_socket nlmsg RTM_GETLINK;
 # Wi-Fi calling through the modem: the modem negotiates the ePDG tunnel and
 # hands nicmd the ESP security associations (QMI WDS IPsec SA indications,
 # libnicm_modemproxy installSecurity), which nicmd installs in the kernel so
@@ -42,6 +53,9 @@ allow vendor_nicmd self:netlink_route_socket { create_socket_perms_no_ioctl nlms
 # only nicmd's own, with its keys zeroed (lockdown and the kernel's own XFRM
 # redaction). Stock grants the same (vendor_sepolicy.cil 6074).
 allow vendor_nicmd self:netlink_xfrm_socket { create_socket_perms_no_ioctl nlmsg_write nlmsg_read };
+# The same five requests for kernels from 6.13.
+allow vendor_nicmd self:netlink_xfrm_socket nlmsg;
+allowxperm vendor_nicmd self:netlink_xfrm_socket nlmsg { XFRM_MSG_NEWSA XFRM_MSG_DELSA XFRM_MSG_GETSA XFRM_MSG_NEWPOLICY XFRM_MSG_DELPOLICY };
 allow vendor_nicmd self:netlink_generic_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:netlink_socket create_socket_perms_no_ioctl;
 allow vendor_nicmd self:qipcrtr_socket create_socket_perms_no_ioctl;

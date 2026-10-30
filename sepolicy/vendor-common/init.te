@@ -62,6 +62,10 @@ allow init vendor_dcp_file:dir { mounton };
 allow init vendor_dcp_file:filesystem { relabelfrom mount unmount relabelto };
 
 dontaudit init kernel:system module_request;
+# Kernels from 6.6 build tracing event directories on demand (eventfs). init's
+# O_CREAT write of error_report_end/enable meets a dir write check, and the
+# event is enabled all the same.
+dontaudit init debugfs_bootreceiver_tracing:dir write;
 
 allow init sysfs_leds:lnk_file r_file_perms;
 

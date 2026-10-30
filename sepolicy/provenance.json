@@ -187,7 +187,7 @@
       "source": "generic/vendor/common/init.te",
       "source_sha256": "2f9c4bd78c7b2bda8e3a5c688e935fd67832408f892917db1d021d618045a696",
       "path": "vendor-common/init.te",
-      "sha256": "2f9c4bd78c7b2bda8e3a5c688e935fd67832408f892917db1d021d618045a696"
+      "sha256": "9c8ef3dd9a7c2a004b6d2d0369609df32c12134eaa5482fbfe51f94e8bf7e824"
     },
     {
       "project": "qualcomm-sepolicy-vendor",

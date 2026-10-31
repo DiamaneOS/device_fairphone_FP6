@@ -366,10 +366,12 @@ triggers in `boot/init.qcom.usb.rc` (`usb_port_security.te`).
   - The platform grants that property to shell, keystore and vendor_init only.
 - `system-ext-private/privacy_switch.te`: the kernel block of the Moments
   privacy switch.
-  - init writes `/sys/kernel/privacy_switch/policy` once per boot. The kernel
-    refuses later writes.
+  - init writes `/sys/kernel/privacy_switch/policy` at boot. The kernel
+    refuses any later write that drops a sensor, and system_server writes
+    additions at once.
   - Neverallows keep every domain but init, vendor_init and ueventd from
-    writing the switch's sysfs files.
+    writing the switch's sysfs files, and system_server from writing any but
+    the policy.
   - system_server reads the kernel's state. Only it and init set
     `privacy_switch_prop`. Settings reads it.
 - `system-ext-private/camera_table.te`: the camera provider may read

@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 # The Moments switch's kernel floor (privacy switch driver, diamaneos_privsw).
-# - The kernel learns once per boot which sensors the switch blocks: init
-#   writes /sys/kernel/privacy_switch/policy (init.privacy_switch.rc) and the
-#   kernel refuses every later write. Only init may write it here too. The
-#   platform also lets vendor_init and ueventd write all sysfs.
+# - The kernel learns at boot which sensors the switch blocks: init writes
+#   /sys/kernel/privacy_switch/policy (init.privacy_switch.rc). The kernel
+#   refuses any later write that drops a sensor. Only init and system_server
+#   may write it here, system_server to add a sensor at once. The platform
+#   also lets vendor_init and ueventd write all sysfs.
 # - system_server reads the kernel's state (what it enforces, what it blocks
 #   now, the state and enforced files), keeps the policy property
 #   for the next boot equal to the user's choice and shows the kernel's mask
@@ -15,14 +16,18 @@ type sysfs_privacy_switch_policy, fs_type, sysfs_type;
 system_internal_prop(privacy_switch_prop)
 
 allow init sysfs_privacy_switch:dir search;
-allow init sysfs_privacy_switch_policy:file { open write };
+# setattr for the chown that hands the file to system_server.
+allow init sysfs_privacy_switch_policy:file { open write setattr };
 
 allow system_server sysfs_privacy_switch:dir search;
 allow system_server sysfs_privacy_switch:file r_file_perms;
+allow system_server sysfs_privacy_switch_policy:file { open write };
 set_prop(system_server, privacy_switch_prop)
 
 get_prop(system_app, privacy_switch_prop)
 
-neverallow { domain -init -vendor_init -ueventd } sysfs_privacy_switch_policy:file no_w_file_perms;
+neverallow { domain -init -vendor_init -ueventd -system_server } sysfs_privacy_switch_policy:file no_w_file_perms;
+# Of the write permissions, system_server keeps only write.
+neverallow system_server sysfs_privacy_switch_policy:file { append create link unlink relabelfrom rename setattr };
 neverallow { domain -init -vendor_init -ueventd } sysfs_privacy_switch:file no_w_file_perms;
 neverallow { domain -init -system_server } privacy_switch_prop:property_service set;

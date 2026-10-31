@@ -2,9 +2,6 @@
 <!-- Copyright 2026 The DiamaneOS Project -->
 <!-- Remaining selected HAL declarations are installed with their providers. -->
 <manifest version="7.0" type="device" target-level="8">
-    <!-- The 6.18 kernel meets the kernel requirements of FCM 202604, while the
-         vendor image keeps its own level 8. -->
-    <kernel target-level="202604"/>
     <!-- Stock certificate helper for the modem AUTH requests used by IWLAN. -->
     <hal format="hidl">
         <name>vendor.qti.hardware.cacert</name>

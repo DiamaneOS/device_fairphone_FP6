@@ -1,4 +1,3 @@
-snd-usb-audio-qmi.ko
 q6_notifier_dlkm.ko
 spf_core_dlkm.ko
 audpkt_ion_dlkm.ko

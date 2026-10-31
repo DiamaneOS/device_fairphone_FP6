@@ -118,12 +118,14 @@ on zygote-start
 # config_usbPortSecuritySupported is true.
 # - Data: dwc3-msm data_path_enable takes GrapheneOS's three commands. 1
 #   allows USB data, 0 stops it and refuses later connections, -1 keeps the
-#   current connection and refuses later ones. Alt modes are ignored unless
-#   it is 1. Type-C and PD stay with the ADSP firmware.
-# - Off (ports_disabled) also suspends the charger input in the ADSP charger
-#   firmware (qcom-battery suspend_input_current), cut after the data: the
-#   phone draws no current from the port and runs on its battery. Every other
-#   state turns the input back on before data.
+#   current connection and refuses later ones. Unless it is 1, a running
+#   alt mode stays and later ones are refused. Type-C and PD stay with the
+#   ADSP firmware. -2 is 0 and also ends the running alt mode now.
+# - Off (ports_disabled) writes -2, so it takes the whole port down. It also
+#   suspends the charger input in the ADSP charger firmware (qcom-battery
+#   suspend_input_current), cut after the data: the phone draws no current
+#   from the port and runs on its battery. Every other state turns the input
+#   back on before data.
 # - User builds start every normal boot with USB data and charging off, as
 #   GrapheneOS starts Pixels with the port off from first-stage init, until
 #   the framework applies the stored mode.
@@ -164,7 +166,7 @@ on shutdown
     write /sys/class/qcom-battery/suspend_input_current 0
 
 on property:sys.port_security_mode=ports_disabled
-    write /sys/devices/platform/soc/a600000.ssusb/data_path_enable 0
+    write /sys/devices/platform/soc/a600000.ssusb/data_path_enable -2
     write /sys/class/qcom-battery/suspend_input_current 1
 
 on property:sys.port_security_mode=charging-only_immediate

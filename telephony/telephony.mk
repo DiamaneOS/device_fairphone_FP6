@@ -120,6 +120,12 @@ DIAMANEOS_IMS_SLOTS := 2
 $(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
 $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 
+# The open data daemon instead of nicmd, behind DIAMANEOS_DATAD (BoardConfig.mk). The product file
+# checks the closed peers it was written against and that the stock nicm files are out of the tree.
+ifeq ($(DIAMANEOS_DATAD),true)
+$(call inherit-product,hardware/diamaneos/datad/android/datad-product.mk)
+endif
+
 # APNs come from the authenticated stock XML in vendor/fairphone/FP6. Keep
 # IMS/emergency rows, MVNO filters and ordering intact instead of appending
 # overlapping entries to the sample database. Users can still add APNs in

@@ -833,6 +833,8 @@ QRTR inventory (`telephony/qrtr.te`):
 - A neverallow names every domain that may create a QRTR socket.
 - QRTR has no per-service access control, so adding a domain needs a
   trust-boundary review.
+- The inventory names `diamaneos_datad` (the open data daemon, which replaces
+  `vendor_nicmd`) while `DIAMANEOS_DATAD` is true, as it is by default.
 
 ## Camera
 

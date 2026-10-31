@@ -125,6 +125,20 @@ TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk
+
+# The open data daemon (hardware/diamaneos/datad) in place of the stock nicmd and its libraries.
+# On by default. DIAMANEOS_DATAD=false keeps the stock data stack, file for file, and the policy
+# without the datad domain (the only change in the sources is under ifdef(`datad_enabled')).
+# The project tools make the vendor tree for the same choice (diamaneos build vendor, with
+# --no-datad for the stock nicmd). With the switch on, the product refuses a tree that still has
+# the stock nicm files.
+DIAMANEOS_DATAD ?= true
+ifneq ($(filter-out true false,$(DIAMANEOS_DATAD)),)
+$(error DIAMANEOS_DATAD must be true or false)
+endif
+ifeq ($(DIAMANEOS_DATAD),true)
+include hardware/diamaneos/datad/android/datad-board.mk
+endif
 include hardware/diamaneos/ims/wlan-board.mk
 include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 

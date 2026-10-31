@@ -17,6 +17,7 @@ neverallow {
   -rild
   -vendor_hal_gnss_qti
   -vendor_nicmd
+  ifdef(`datad_enabled', `-diamaneos_datad')
   -vendor_pd_mapper
   -vendor_per_mgr
   -vendor_qrtr

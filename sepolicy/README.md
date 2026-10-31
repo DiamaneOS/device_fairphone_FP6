@@ -84,6 +84,9 @@ may access, and why. It describes the policy of a release (`user`) build.
 - The FP6 fingerprint service
   (`android.hardware.biometrics.fingerprint-service.fp6`) is
   `hal_fingerprint_default_exec` (`vendor-common/file_contexts`).
+- `/proc/asound/cards` keeps Android's `proc_asound` label, not
+  `vendor_proc_audiod`. system_server reads it to find USB audio cards, and the
+  platform policy grants that read.
 
 ## Device grants (`fp6/`)
 
@@ -419,6 +422,8 @@ installed Fairphone firmware release to Settings.
 - The primary HAL, PAL and AGM are built from source (device
   `audio/provenance.json`) and keep the stock domains and labels.
 - The policy confines device access to the audio service domains.
+- The AOSP USB audio HAL runs in the audio service process. The platform's
+  ALSA node and `/proc/asound` grants cover the USB card.
 
 ### `hal_audio_default`
 

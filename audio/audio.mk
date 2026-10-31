@@ -61,12 +61,14 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/audio/init.audio.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.audio.rc \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml
 
-# Stock audio properties, except features whose libraries are not included
-# (battery listener, FM, Bluetooth hands-free and Bluetooth offload) and legacy
-# names outside the vendor namespace that duplicate the vendor ones.
+# Stock audio properties, except features whose libraries or drivers are not
+# included (battery listener, FM, Bluetooth hands-free, Bluetooth and USB
+# offload) and legacy names outside the vendor namespace that duplicate the
+# vendor ones.
 PRODUCT_VENDOR_PROPERTIES += \
     ro.hardware.audio.primary=volcano \
     aaudio.hw_burst_min_usec=2000 \
@@ -160,8 +162,8 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.audio.feature.spkr_prot.enable=true \
     vendor.audio.feature.src_trkn.enable=true \
     vendor.audio.feature.ssrec.enable=true \
-    vendor.audio.feature.usb_offload.enable=true \
-    vendor.audio.feature.usb_offload_burst_mode.enable=true \
+    vendor.audio.feature.usb_offload.enable=false \
+    vendor.audio.feature.usb_offload_burst_mode.enable=false \
     vendor.audio.feature.usb_offload_sidetone_volume.enable=false \
     vendor.audio.feature.vbat.enable=true \
     vendor.audio.feature.wsa.enable=false

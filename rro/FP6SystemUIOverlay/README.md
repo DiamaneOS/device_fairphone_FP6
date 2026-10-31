@@ -26,3 +26,10 @@
   drop taps while it is covered.
   - The touch controller reports taps through a pocket too.
   - The resource comes from a DiamaneOS SystemUI change.
+- `proximity_sensor_threshold`: 5 cm, so SystemUI's proximity sensor reads far
+  as far. The sensor's far value (131.6) is just below its maximum range
+  (131.60072), and without a threshold SystemUI compares against the maximum
+  range, so falsing, doze and pickup saw the sensor as always covered.
+- `proximity_sensor_type`: `android.sensor.proximity`. SystemUI uses the
+  threshold only when a sensor type is set. This type picks the same wake-up
+  proximity sensor SystemUI falls back to without one.

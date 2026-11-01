@@ -2,8 +2,8 @@
 # Copyright 2026 The DiamaneOS Project
 
 # Power HAL: LineageOS's maintained libperfmgr power HAL (IPower v7, ADPF),
-# built from hardware/lineage/interfaces and hardware/google/pixel (both pinned
-# unmodified in the manifest) and driven by powerhint.json. It replaces the
+# built from hardware/lineage/interfaces and hardware/google/pixel (both
+# pinned in the manifest) and driven by powerhint.json. It replaces the
 # CodeLinaro power HAL and Qualcomm's closed perf2 daemon, which run as root:
 # this HAL runs as system with CAP_SYS_NICE only (init.fp6.power.rc) in a
 # narrow hal_power_default domain (sepolicy/fp6/power.te).
@@ -51,6 +51,10 @@ PRODUCT_VENDOR_PROPERTIES += vendor.powerhal.disp.idle_support=false
 # Let SurfaceFlinger and HWUI open ADPF hint sessions, as on Pixels. Both are
 # off otherwise: HWUI defaults to off, and SurfaceFlinger falls back to a
 # Google server flag this build does not have.
+# ADPF uses sched_setattr uclamp/PID controls. Disable session scheduler
+# task profiles because the FP6 lacks the Pixel vendor scheduler QoS
+# interface expected by SCHED_QOS_*.
 PRODUCT_VENDOR_PROPERTIES += \
+    vendor.powerhal.adpf_task_profiles=false \
     debug.sf.enable_adpf_cpu_hint=true \
     debug.hwui.use_hint_manager=true

@@ -702,6 +702,11 @@ not imported.
     setsched requires equal levels, and apps run with categories.
   - setsched is its only access to app processes.
   - It is a thermal HAL client, for the throttling state.
+  - `vendor.powerhal.adpf_task_profiles=false` selects the supported uclamp/PID
+    path without the Pixel scheduler's `SCHED_QOS_*` profiles. This is a typed
+    boolean under the existing read-only-to-HAL `vendor_power_prop` label;
+    vendor init supplies the value. The HAL caches it at startup so profile
+    application and removal stay paired. No additional grants are needed.
 - `libqti-perfd-client` (`power/libqti-perfd-client`) is a source stand-in for
   the closed client library that the stock camera and SDM extension load by
   name.

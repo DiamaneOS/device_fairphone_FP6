@@ -15,6 +15,10 @@ type vendor_sysfs_usb_data_path, sysfs_type, fs_type;
 
 allow vendor_init vendor_sysfs_usb_data_path:file { getattr open write };
 
+# The FunctionFS monitor only observes whether a new pullup is allowed. Keep
+# all writes confined to vendor_init/ueventd by the neverallow below.
+allow vendor_hal_usb_qti vendor_sysfs_usb_data_path:file { getattr open read };
+
 # Nothing else may write it: a later rule that adds a writer fails the build.
 neverallow {
   domain

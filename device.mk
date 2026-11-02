@@ -469,6 +469,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     vendor.usb.controller=a600000.dwc3 \
     vendor.usb.use_ffs_mtp=1 \
     vendor.usb.use_gadget_hal=1 \
+    ro.vendor.usb.gadget.pullup_policy=/sys/devices/platform/soc/a600000.ssusb/data_path_enable \
     vendor.usb.rndis.func.name=rndis \
     vendor.usb.ncm.func.name=ncm
 

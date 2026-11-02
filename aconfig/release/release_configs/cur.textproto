@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+name: "cur"
+aconfig_value_sets: "fp6_windowing_bugfix_values"

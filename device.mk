@@ -19,6 +19,11 @@ PRODUCT_BUILD_USERDATA_IMAGE := false
 # ext4 for an encrypted userdata, so the computer would write the wrong
 # filesystem. Never ship a build that turns this back off.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+
+# Use the maintained transition-surface cleanup in the selected FP6 release.
+PRODUCT_RELEASE_CONFIG_MAPS += \
+    device/fairphone/FP6/aconfig/release/release_config_map.textproto
+
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 # Compressed Virtual A/B, as stock and Pixels: OTAs write lz4-compressed
 # snapshots that the userspace snapshot daemon merges (the kernel has dm-user

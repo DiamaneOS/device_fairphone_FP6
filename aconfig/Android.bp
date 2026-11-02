@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+aconfig_values {
+    name: "fp6_windowing_bugfix_flags",
+    package: "com.android.window.flags",
+    srcs: ["windowing_flags.textproto"],
+}
+
+aconfig_value_set {
+    name: "fp6_windowing_bugfix_values",
+    values: ["fp6_windowing_bugfix_flags"],
+}

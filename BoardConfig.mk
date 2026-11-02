@@ -228,6 +228,7 @@ CFI_INCLUDE_PATHS += \
 # Wi-Fi (QCA6750, qcacld-3.0). The HAL writes ON/OFF to the driver's /dev/wlan
 # node and waits for the driver to finish probing before bringing up wlan0.
 BOARD_WLAN_DEVICE := qcwcn
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_qcwcn
 WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
 WIFI_DRIVER_STATE_ON := "ON"
 WIFI_DRIVER_STATE_OFF := "OFF"
@@ -236,7 +237,7 @@ WIFI_DRIVER_STATE_OFF := "OFF"
 # in that same mode (the legacy STA/AP default modes cannot be re-selected).
 WIFI_HAL_INTERFACE_COMBINATIONS := {{{STA}, 1}, {{AP}, 1}, {{P2P, NAN}, 1}}
 # Hotspot: AOSP's hostapd (external/wpa_supplicant_8) for nl80211, with
-# 802.11ax like stock's. As for the supplicant, no driver command library is
-# set, so it uses AOSP's stub.
+# 802.11ax like stock's. Supplicant driver commands use the Qualcomm backend
+# selected above; hostapd uses the standard nl80211 implementation.
 BOARD_HOSTAPD_DRIVER := NL80211
 WIFI_FEATURE_HOSTAPD_11AX := true

@@ -43,7 +43,7 @@
       "source": "generic/vendor/common/file.te",
       "source_sha256": "08c0a083c2ced3dbf2a8306dfbe7acee3a9158e9e539fa3dd592dc60ed4529f5",
       "path": "vendor-common/file.te",
-      "sha256": "9075903aac51ae0cbfe2c2f792b1a0011b723558508abecb9e52020b1a31510f"
+      "sha256": "f67050a654521e1d29be3258c5535c46070d7ae0db78654e4119da3e97bc86b4"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -51,7 +51,7 @@
       "source": "generic/vendor/common/file_contexts",
       "source_sha256": "286e44fc49eb3aa079b9d90e1c88a444b84422cfe6c22c283a17da8f71e1ef1d",
       "path": "vendor-common/file_contexts",
-      "sha256": "1696556b5135b0e6fb241eb346dd5eb0edbcf4aba7b3d32188fe87d93f834fbe"
+      "sha256": "b14cc3aeb2763b99a8066ff7aec17ce3f7df549d5cdb0829b8102069a879251e"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -275,7 +275,7 @@
       "source": "generic/vendor/common/te_macros",
       "source_sha256": "ba07abc756a1eb1c0cf57c6821173c37a67fad8cf5e58fb2e19ba2a209979f7c",
       "path": "vendor-common/te_macros",
-      "sha256": "6c3beedd9751709ab4bca9d16ee2c93998642279d6ac71878b281e89ca72d92b"
+      "sha256": "3a8c83125002f5ed25fb4a3a48be883b110f644f1d1b353cc935fb1b1f2922b8"
     },
     {
       "project": "qualcomm-sepolicy-vendor",
@@ -979,7 +979,7 @@
       "source": "generic/private/property_contexts",
       "source_sha256": "be8f1623c027264299137373a9567c515a720ed03b2b2a67be031c6be95109b2",
       "path": "system-ext-private/property_contexts",
-      "sha256": "d2791893806a8b42faf5e9c5d671e3b1f132ff573b0b5c9d356ca710b63952ef"
+      "sha256": "7dbea519e5f5c6f95b07e1c5fcbeb4fa1c25ec3c97d7e70133a8e7f351768f89"
     },
     {
       "project": "qualcomm-sepolicy",

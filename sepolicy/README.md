@@ -756,7 +756,7 @@ not imported.
 
 Sources:
 
-- `telephony/rild.te`, `nicmd.te` and `qtelephony.te` are reduced from
+- `telephony/rild.te` and `qtelephony.te` are reduced from
   Qualcomm's vendor policy. `telephony-system-ext/vendor_qtelephony.te` and
   `seapp_contexts` from Qualcomm's system policy.
   - Each file's header names its upstream files and revision.
@@ -775,41 +775,8 @@ Radio daemon (`telephony/rild.te`):
 - Not granted: the secure-element HAL, unrelated data-factory services, diag,
   the legacy IPC-router ioctls, the QCRIL client socket and executing vendor
   tools.
-- The radio daemon and nicmd may use TIPC sockets with each other, as on
-  stock: the data module's DSI layer waits for nicmd over TIPC before it
-  allows any data call.
-  - No other domain may create a TIPC socket (neverallow in `rild.te`).
-  - The kernel builds TIPC for local IPC with network bearer creation blocked,
-    without UDP, crypto or diag modules.
-
-nicmd (`telephony/nicmd.te`):
-
-- It keeps its netlink, QRTR, rmnet ioctl and network-wrapper access,
-  datagram sockets for interface ioctls and its init-created recovery file.
-- XFRM netlink access is needed for Wi-Fi calling: the modem negotiates the
-  ePDG tunnel, and nicmd installs the ESP states and policies it receives
-  (write requests).
-  - To remove them at teardown or rekey, it dumps all states and deletes those
-    whose protocol and SPI match. That dump is the only read request it sends.
-  - The dump covers every IPsec state on the device, with the keys zeroed by
-    lockdown and the kernel's own XFRM redaction.
-- It may `node_bind` TCP and UDP sockets, to reserve the ephemeral ports the
-  modem's embedded clients use.
-- It reads the public SoC id, for data target detection.
-- It is not a `netdomain`: no TCP connect and no `name_bind`.
-- Capabilities: `net_admin` and `net_raw`. A neverallow forbids setuid,
-  setgid, setpcap and kill.
-- Its remote-processor probe (`vendor_sysfs_ssr`) stays denied: the result is
-  unused on this SoC.
-- `dontaudit vendor_nicmd kernel:system module_request`: kernel module
-  requests that nicmd triggers stay denied without an audit record. Nothing
-  grants nicmd module loading.
-- `dontaudit` for its link dump (`netlink_route_socket` `nlmsg_readpriv`) and
-  raw ICMPv6 socket (`rawip_socket` `create`) during Wi-Fi calling setup.
-  - Stock denies both too, and calls and handover work without them.
-  - The link dump would show every interface's MAC address.
-- The SHS, QMI-priority and performance helpers are not installed and not
-  granted.
+- No domain may create a TIPC socket (neverallow in `rild.te`). The open data
+  daemon replaced both ends.
 
 Apps:
 
@@ -838,8 +805,7 @@ QRTR inventory (`telephony/qrtr.te`):
 - A neverallow names every domain that may create a QRTR socket.
 - QRTR has no per-service access control, so adding a domain needs a
   trust-boundary review.
-- The inventory names `diamaneos_datad` (the open data daemon, which replaces
-  `vendor_nicmd`) while `DIAMANEOS_DATAD` is true, as it is by default.
+- The inventory names `diamaneos_datad`, the open data daemon.
 
 ## Camera
 
@@ -1050,8 +1016,6 @@ without it. Denials covered in the sections above are not repeated.
   DiamaneOS does not have.
   - The service is not declared in the vendor VINTF manifest either. Mobile
     data uses the radio HAL.
-- `vendor_nicmd`, `property_socket` write and an `init.svc.*` read: the SHS
-  and QMI-priority helpers it would start and check are not installed.
 - `fp6_iwlan_app` and `mediacodec`, reads of `default_prop` and
   `zygote_config_prop`: generic platform properties that a denied read
   returns as unset. Neither needs them.

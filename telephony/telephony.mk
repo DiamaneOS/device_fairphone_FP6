@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 The DiamaneOS Project
 
-# Telephony: the stock Qualcomm radio daemon (qcrilNrd), its data module and
-# nicmd, the stock IMS app (org.codeaurora.ims) and the native modem services
+# Telephony: the stock Qualcomm radio daemon (qcrilNrd) and its data module, the
+# stock IMS app (org.codeaurora.ims) and the native modem services
 # come from the selected stock files (vendor/fairphone/FP6). The call-audio
 # bridge between the radio daemon and the audio HAL is built here (callaudio/,
 # replacing the stock QtiTelephonyService). The radio interface libraries, the
@@ -120,7 +120,7 @@ DIAMANEOS_IMS_SLOTS := 2
 $(call inherit-product,hardware/diamaneos/ims/ims-product.mk)
 $(call inherit-product,hardware/diamaneos/ims/wlan-product.mk)
 
-# The open data daemon instead of nicmd, behind DIAMANEOS_DATAD (BoardConfig.mk). The product file
+# The open data daemon instead of nicmd (BoardConfig.mk). The product file
 # checks the closed peers it was written against and that the stock nicm files are out of the tree.
 ifeq ($(DIAMANEOS_DATAD),true)
 $(call inherit-product,hardware/diamaneos/datad/android/datad-product.mk)

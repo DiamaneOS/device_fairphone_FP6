@@ -38,14 +38,8 @@ r_dir_file(rild, vendor_mbn_data_file)
 # QMI to the modem over QRTR.
 allow rild self:qipcrtr_socket create_socket_perms_no_ioctl;
 
-# The data module's DSI layer waits for nicmd's answer over TIPC (libnicm
-# RequestTIPCMessenger/EventTIPCMessenger) before it allows any data call.
-# Without it every call fails at once with cause 0x1004. Same as stock
-# (vendor_sepolicy.cil line 6576). No TIPC bearer is configured and the kernel
-# builds TIPC without the UDP bearer and crypto. Only rild and nicmd may
-# create TIPC sockets.
-allow rild self:tipc_socket create_socket_perms_no_ioctl;
-neverallow { domain -rild -vendor_nicmd } self:tipc_socket create;
+# The open data daemon replaced both TIPC ends. No domain may create a TIPC socket.
+neverallow domain self:tipc_socket create;
 
 # Modem vote through the peripheral manager (libperipheral_client, vndbinder).
 vndbinder_use(rild)

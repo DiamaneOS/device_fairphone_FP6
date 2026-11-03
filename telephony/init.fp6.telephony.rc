@@ -2,8 +2,8 @@
 # Copyright 2026 The DiamaneOS Project
 # QCRIL runtime directories and database, matching the stock init.qcom.rc
 # (lines 159-164, 323-328, 386-407 and 756) and init.qcom.sh (lines 432-451).
-# qcrilNrd.rc and nicmd.rc (stock, from the generated vendor tree) define the
-# services, their sockets and nicmd's data directory.
+# qcrilNrd.rc (stock, from the generated vendor tree) defines the service and
+# its sockets.
 
 on boot
     # QCRIL internal IPC sockets (libqcrilNrQtiBus.so: /dev/socket/qmux_radio/ril_ipc).

@@ -288,9 +288,6 @@ type vendor_tlpd_data_file, file_type, data_file_type;
 
 type vendor_dlsc_data_file, file_type, data_file_type;
 
-# NICM service
-type vendor_nicmd_socket, file_type;
-type vendor_nicm_data_file, file_type, data_file_type;
 
 #CPSK service
 type vendor_sysfs_cpsk_power, sysfs_type, fs_type;

@@ -32,6 +32,6 @@ allow fp6_iwlan_app self:qipcrtr_socket create_socket_perms_no_ioctl;
 r_dir_file(fp6_iwlan_app, vendor_file)
 allow fp6_iwlan_app vendor_file:file { execute map };
 
-neverallow fp6_iwlan_app self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+neverallow fp6_iwlan_app self:{ tcp_socket udp_socket rawip_socket packet_socket } create;
 neverallow fp6_iwlan_app self:global_capability_class_set *;
 neverallow fp6_iwlan_app self:global_capability2_class_set *;

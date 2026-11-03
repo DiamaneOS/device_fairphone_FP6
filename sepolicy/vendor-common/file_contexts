@@ -138,7 +138,6 @@
 /dev/socket/shsusrd(/.*)?                       u:object_r:vendor_shsusrd_socket:s0
 /dev/socket/port-bridge(/.*)?                   u:object_r:vendor_port-bridge_socket:s0
 /dev/socket/tlpd(/.*)?                          u:object_r:vendor_tlpd_socket:s0
-/dev/socket/nicmd(/.*)?                         u:object_r:vendor_nicmd_socket:s0
 /dev/socket/qti_dpm_uds_file                    u:object_r:vendor_dataqti_socket:s0
 /dev/socket/location(/.*)?                      u:object_r:vendor_location_socket:s0
 /dev/socket/qsap_location(/.*)?                 u:object_r:vendor_qsap_location_socket:s0

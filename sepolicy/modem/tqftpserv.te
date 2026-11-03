@@ -16,7 +16,7 @@ init_daemon_domain(vendor_tqftpserv)
 
 neverallow vendor_tqftpserv self:global_capability_class_set *;
 neverallow vendor_tqftpserv self:global_capability2_class_set *;
-neverallow vendor_tqftpserv self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+neverallow vendor_tqftpserv self:{ tcp_socket udp_socket rawip_socket packet_socket } create;
 
 # QRTR, without ioctls: one socket publishes TFTP service 4096 (its address
 # through getsockname, getattr) and receives requests. Each transfer opens

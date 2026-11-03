@@ -18,7 +18,7 @@ init_daemon_domain(vendor_pd_mapper)
 
 neverallow vendor_pd_mapper self:global_capability_class_set *;
 neverallow vendor_pd_mapper self:global_capability2_class_set *;
-neverallow vendor_pd_mapper self:{ tcp_socket udp_socket rawip_socket packet_socket tipc_socket } create;
+neverallow vendor_pd_mapper self:{ tcp_socket udp_socket rawip_socket packet_socket } create;
 
 # QRTR, without ioctls: publish service 0x40 (its address through
 # getsockname, getattr) and answer domain-list requests from the same socket.

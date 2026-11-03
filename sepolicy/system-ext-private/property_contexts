@@ -126,3 +126,7 @@ ro.camera.torchStrengthNode.0              u:object_r:camera_config_prop:s0 exac
 # Hardware video decoding: the user's choice, applied at the next boot
 # (hw_video_decode.te). Settings stores "0" (never) or "1" (all video).
 persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1
+
+# Read by the AOSP USB audio HAL (alsa_utils) through hal_audio's read of this
+# type. Not set on this device, so the 5 ms default applies.
+ro.audio.usb.period_us                     u:object_r:audio_config_prop:s0 exact int

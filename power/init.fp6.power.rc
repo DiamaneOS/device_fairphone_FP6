@@ -32,21 +32,3 @@ on boot
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/min_freq
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/devfreq/3d00000.qcom,kgsl-3d0/max_freq
     chown system system /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/touch_wake
-
-# WALT sched_boost for the LAUNCH (1, full throttle) and INTERACTION
-# (2, conservative) hints. /proc/sys/walt/sched_boost is root-only and a sysctl
-# cannot be chowned, so the HAL sets vendor.powerhal.sched_boost and init writes
-# one of these fixed values. Writing 0 clears every boost level first, because
-# the kernel counts each level's requests. A/B test without a rebuild:
-# setprop vendor.powerhal.sched_boost.enable false (the hints keep their CPU
-# floors and only skip sched_boost).
-on property:vendor.powerhal.sched_boost=0
-    write /proc/sys/walt/sched_boost 0
-
-on property:vendor.powerhal.sched_boost=1
-    write /proc/sys/walt/sched_boost 0
-    write /proc/sys/walt/sched_boost 1
-
-on property:vendor.powerhal.sched_boost=2
-    write /proc/sys/walt/sched_boost 0
-    write /proc/sys/walt/sched_boost 2

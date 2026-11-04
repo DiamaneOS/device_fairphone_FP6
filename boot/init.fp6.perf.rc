@@ -5,52 +5,13 @@
 # LPDDR5). Values follow the stock Qualcomm volcano scripts
 # (init.kernel.post_boot-volcano_default_4_3_1.sh, init.kernel.post_boot-memory.sh
 # and init.qti.kernel.rc). Without them the kernel stays on its defaults: the
-# performance governor at maximum clocks, sched_boost 1, deep CPU sleep
-# disabled and no swap. Stock's SMEM image-version writes and console settings
-# are left out.
-
-on post-fs
-    # Task placement: colocate the foreground app's threads, keep the stock
-    # boost overrides.
-    write /dev/cpuctl/foreground/cpu.uclamp.sched_boost_no_override 1
-    write /dev/cpuctl/top-app/cpu.uclamp.sched_boost_no_override 1
-    write /dev/cpuctl/background/cpu.uclamp.colocate 0
-    write /dev/cpuctl/foreground/cpu.uclamp.colocate 0
-    write /dev/cpuctl/top-app/cpu.uclamp.colocate 1
+# performance governor at maximum clocks, deep CPU sleep disabled and no swap.
+# Stock's SMEM image-version writes and console settings are left out.
 
 on property:sys.boot_completed=1
     # Real-time throttling window.
     write /proc/sys/kernel/sched_rt_period_us 1350000
     write /proc/sys/kernel/sched_rt_runtime_us 1250000
-
-    # Core parking: silver always on, gold keeps two cores, prime parks.
-    write /sys/devices/system/cpu/cpu0/core_ctl/nrrun_cpu_mask 0xFF
-    write /sys/devices/system/cpu/cpu0/core_ctl/nrrun_cpu_misfit_mask 0x00
-    write /sys/devices/system/cpu/cpu0/core_ctl/assist_cpu_mask 0x00
-    write /sys/devices/system/cpu/cpu0/core_ctl/assist_cpu_misfit_mask 0x00
-    write /sys/devices/system/cpu/cpu4/core_ctl/min_cpus 2
-    write /sys/devices/system/cpu/cpu4/core_ctl/busy_up_thres 60
-    write /sys/devices/system/cpu/cpu4/core_ctl/busy_down_thres 30
-    write /sys/devices/system/cpu/cpu4/core_ctl/offline_delay_ms 100
-    write /sys/devices/system/cpu/cpu4/core_ctl/task_thres 3
-    write /sys/devices/system/cpu/cpu4/core_ctl/not_preferred "0 0 0"
-    write /sys/devices/system/cpu/cpu4/core_ctl/nrrun_cpu_mask 0xF0
-    write /sys/devices/system/cpu/cpu4/core_ctl/nrrun_cpu_misfit_mask 0x0F
-    write /sys/devices/system/cpu/cpu4/core_ctl/assist_cpu_mask 0x00
-    write /sys/devices/system/cpu/cpu4/core_ctl/assist_cpu_misfit_mask 0x00
-    write /sys/devices/system/cpu/cpu7/core_ctl/min_cpus 0
-    write /sys/devices/system/cpu/cpu7/core_ctl/busy_up_thres 60
-    write /sys/devices/system/cpu/cpu7/core_ctl/busy_down_thres 30
-    write /sys/devices/system/cpu/cpu7/core_ctl/offline_delay_ms 100
-    write /sys/devices/system/cpu/cpu7/core_ctl/task_thres 1
-    write /sys/devices/system/cpu/cpu7/core_ctl/not_preferred 1
-    write /sys/devices/system/cpu/cpu7/core_ctl/nrrun_cpu_mask 0x80
-    write /sys/devices/system/cpu/cpu7/core_ctl/nrrun_cpu_misfit_mask 0x70
-    write /sys/devices/system/cpu/cpu7/core_ctl/assist_cpu_mask 0x70
-    write /sys/devices/system/cpu/cpu7/core_ctl/assist_cpu_misfit_mask 0x0F
-    write /sys/devices/system/cpu/cpu0/core_ctl/enable 0
-    write /sys/devices/system/cpu/cpu4/core_ctl/enable 1
-    write /sys/devices/system/cpu/cpu7/core_ctl/enable 1
 
     # Frequency governor: boot runs on performance, and 6.18 has schedutil.
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil

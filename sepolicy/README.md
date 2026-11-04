@@ -220,9 +220,8 @@ of the same name (`provenance.json`).
   init only (`storage.te`).
 - The wakeup sources of the fingerprint, hall, privacy-switch and NFC devices
   are `sysfs_wakeup`, which the suspend service reads.
-- `init.fp6.perf.rc` writes WALT and VM sysctls that the platform does not
-  label. Each has its own type, and only vendor_init writes them (`perf.te`):
-  - `/proc/sys/walt`: `vendor_proc_walt`
+- `init.fp6.perf.rc` writes VM sysctls that the platform does not label. Each
+  has its own type, and only vendor_init writes them (`perf.te`):
   - `swappiness` and `min_free_kbytes`: `vendor_proc_vm_tuning`
   - `compaction_proactiveness`: `vendor_proc_compaction`.
 - vendor_init also writes the platform `proc_sched` and
@@ -687,15 +686,8 @@ not imported.
     engine has no `dac_override`, so it cannot write them.
 - system_server keeps read on the CPU limit nodes, as under the platform
   label.
-- `sched_boost`: `/proc/sys/walt/sched_boost` is root-only, and a sysctl
-  cannot be chowned.
-  - The HAL may set only `vendor.powerhal.sched_boost`
-    (`vendor_power_sched_boost_prop`, values 0, 1 and 2). Vendor init writes
-    the matching fixed value.
-  - The other `vendor.powerhal.*` properties (`vendor_power_prop`) are
-    switches the HAL reads and vendor init sets.
-  - `vendor.powerhal.sched_boost.enable=false` turns the `sched_boost` part of
-    the hints off.
+- The `vendor.powerhal.*` properties (`vendor_power_prop`) are switches the HAL
+  reads and vendor init sets.
 - ADPF: `setsched` on apps, SurfaceFlinger and system_server, with
   CAP_SYS_NICE, to set uclamp on hint-session threads.
   - The domain is an `mlstrustedsubject`: the platform MLS constraint on
@@ -721,7 +713,7 @@ not imported.
     SUSTAINED_PERFORMANCE or EXPENSIVE_RENDERING, and ADPF hint sessions.
     DOUBLE_TAP_TO_WAKE does nothing: double tap goes through the sensors HAL.
   - Their effects stay within the grants above: frequency floors and caps, the
-    `sched_boost` values, the GPU wake trigger and uclamp on session threads.
+    GPU wake trigger and uclamp on session threads.
 - Not granted:
   - reads of the nodes (dumpsys shows request indexes, not values)
   - the debug configuration in `/data/vendor/etc`

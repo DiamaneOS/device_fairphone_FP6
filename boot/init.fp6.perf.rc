@@ -22,7 +22,6 @@ on property:sys.boot_completed=1
     # Real-time throttling window.
     write /proc/sys/kernel/sched_rt_period_us 1350000
     write /proc/sys/kernel/sched_rt_runtime_us 1250000
-    write /proc/sys/walt/sched_max_freq_partial_halt 1190400
 
     # Core parking: silver always on, gold keeps two cores, prime parks.
     write /sys/devices/system/cpu/cpu0/core_ctl/nrrun_cpu_mask 0xFF
@@ -53,50 +52,10 @@ on property:sys.boot_completed=1
     write /sys/devices/system/cpu/cpu4/core_ctl/enable 1
     write /sys/devices/system/cpu/cpu7/core_ctl/enable 1
 
-    # WALT scheduler thresholds.
-    write /proc/sys/walt/sched_downmigrate "65 85"
-    write /proc/sys/walt/sched_upmigrate "71 95"
-    write /proc/sys/walt/sched_group_downmigrate 85
-    write /proc/sys/walt/sched_group_upmigrate 100
-    write /proc/sys/walt/sched_walt_rotate_big_tasks 1
-    write /proc/sys/walt/sched_min_task_util_for_boost 51
-    write /proc/sys/walt/sched_min_task_util_for_colocation 35
-    write /proc/sys/walt/sched_coloc_busy_hysteresis_enable_cpus 0
-    write /proc/sys/walt/sched_util_busy_hyst_cpu_ns "8500000 8500000 8500000 8500000 5000000 5000000 5000000 2000000"
-    write /proc/sys/walt/sched_util_busy_hysteresis_enable_cpus 255
-    write /proc/sys/walt/sched_util_busy_hyst_cpu_util "1 1 1 1 15 15 15 15"
-    write /proc/sys/walt/sched_cluster_util_thres_pct 40
-    write /proc/sys/walt/sched_idle_enough 30
-    write /proc/sys/walt/sched_pipeline_cpus 112
-    write /proc/sys/walt/walt_low_latency_task_threshold 325
-    write /proc/sys/walt/sched_fmax_cap "1708800 2208000 2147483647"
-    write /proc/sys/walt/sched_boost 0
-    write /proc/sys/walt/input_boost/input_boost_freq "1113600 0 0 0 0 0 0 0"
-    write /proc/sys/walt/input_boost/input_boost_ms 120
-
-    # Frequency governor: boot runs on performance. 6.18 has no WALT, schedutil
-    # is the governor it has. The other WALT paths in this file do not exist on it.
+    # Frequency governor: boot runs on performance, and 6.18 has schedutil.
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil
     write /sys/devices/system/cpu/cpufreq/policy4/scaling_governor schedutil
     write /sys/devices/system/cpu/cpufreq/policy7/scaling_governor schedutil
-    write /sys/devices/system/cpu/cpufreq/policy0/walt/down_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy0/walt/up_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/down_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/up_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/down_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/up_rate_limit_us 0
-    write /sys/devices/system/cpu/cpufreq/policy0/walt/pl 0
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/pl 0
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/pl 0
-    write /proc/sys/walt/sched_conservative_pl 1
-    write /sys/devices/system/cpu/cpufreq/policy0/walt/rtg_boost_freq 595200
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/rtg_boost_freq 0
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/rtg_boost_freq 0
-    write /sys/devices/system/cpu/cpufreq/policy0/walt/hispeed_freq 1113600
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/hispeed_freq 1190400
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/hispeed_freq 1459200
-    write /sys/devices/system/cpu/cpufreq/policy4/walt/hispeed_load 85
-    write /sys/devices/system/cpu/cpufreq/policy7/walt/hispeed_load 85
     # The minimum frequencies (stock 595200, 633600, 633600) are the power
     # HAL's defaults in power/powerhint.json. It owns scaling_min_freq.
     write /proc/sys/kernel/sched_util_clamp_min_rt_default 0
@@ -155,5 +114,5 @@ on property:sys.boot_completed=1
     write /sys/block/dm-2/queue/read_ahead_kb 512
 
     # Last: let the power HAL start writing its nodes (power/init.fp6.power.rc),
-    # after the governor and WALT settings above.
+    # after the governor settings above.
     setprop vendor.powerhal.init 1

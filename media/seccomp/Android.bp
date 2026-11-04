@@ -9,8 +9,9 @@ package {
 // The tools renderer renames the service's libavservices_minijail.so
 // dependency to libc2hwjail_avservices.so (same length). The library defines
 // the two functions the service's main() calls through its dependencies,
-// android::SetUpMinijail and the Codec2 HIDL ComponentStore constructor (see
-// c2hwjail.cpp). The service always registers its store.
+// android::SetUpMinijail and the Codec2 HIDL ComponentStore constructor, and
+// the one the Qualcomm codec plugin calls (see c2hwjail.cpp). The service
+// always registers its store.
 //
 // C2HWJAIL_LOG_ONLY: calls outside the policy are logged (kernel audit record
 // type 1326) and allowed, to collect a profile. Without it they fail with
@@ -54,9 +55,12 @@ cc_library_shared {
         "libjsoncpp",
         "liblog",
     ],
-    // Exports only the two functions above: the static minijail symbols must
+    // Exports only the three functions above: the static minijail symbols must
     // not interpose on anything the service loads later.
     version_script: "libc2hwjail.map.txt",
+    // The Qualcomm plugin is loaded with dlopen: only DF_1_GLOBAL libraries
+    // come before its own dependencies.
+    ldflags: ["-Wl,-z,global"],
     required: ["codec2-service.policy"],
 }
 

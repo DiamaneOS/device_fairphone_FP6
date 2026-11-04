@@ -20,6 +20,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <android-base/file.h>
@@ -239,6 +240,26 @@ TEST(FilterStore, NothingAllowedIsAnEmptyStore) {
         EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.encoder", &component));
     }
     EXPECT_TRUE(fake->created.empty());
+}
+
+TEST(KeepAllowedCodecs, LeavesOnlyAllowedCodecs) {
+    std::unordered_set<std::string> codecs(kEncoders.begin(), kEncoders.end());
+    codecs.insert(kDecoders.begin(), kDecoders.end());
+    codecs.insert(kSecureDecoders.begin(), kSecureDecoders.end());
+    c2hwjail::KeepAllowedCodecs(&codecs, kEncoders);
+    EXPECT_EQ(std::set<std::string>(codecs.begin(), codecs.end()), kEncoders);
+}
+
+TEST(KeepAllowedCodecs, NothingAllowedIsNeverAnEmptySet) {
+    std::unordered_set<std::string> codecs(kDecoders.begin(), kDecoders.end());
+    c2hwjail::KeepAllowedCodecs(&codecs, {});
+    ASSERT_EQ(codecs.size(), 1u);
+    EXPECT_EQ(kDecoders.count(*codecs.begin()), 0u);
+    EXPECT_EQ(kEncoders.count(*codecs.begin()), 0u);
+
+    std::unordered_set<std::string> none;
+    c2hwjail::KeepAllowedCodecs(&none, kEncoders);
+    EXPECT_EQ(none.size(), 1u);
 }
 
 TEST(TrapsToErrno, RewritesOnlyTrapResults) {

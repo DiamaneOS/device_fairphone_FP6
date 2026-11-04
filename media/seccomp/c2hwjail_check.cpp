@@ -192,6 +192,16 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
     return allowed;
 }
 
+void KeepAllowedCodecs(std::unordered_set<std::string>* codecs,
+                       const std::set<std::string>& allowed) {
+    for (auto it = codecs->begin(); it != codecs->end();) {
+        it = allowed.count(*it) != 0 ? std::next(it) : codecs->erase(it);
+    }
+    if (codecs->empty()) {
+        codecs->insert("c2hwjail.none");
+    }
+}
+
 size_t TrapsToErrno(struct sock_fprog* prog) {
     size_t changed = 0;
     for (unsigned short i = 0; i < prog->len; ++i) {

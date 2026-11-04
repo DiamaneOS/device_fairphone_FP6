@@ -20,17 +20,17 @@
 # IComponentStore/default). The tools renderer derives two pinned
 # configurations from the stock codec list and target specification:
 # - _volcano_v1 (never): the target specification names the five encoders and
-#   no decoder ("codecs-available", libqcodec2_v4l2codec registers only the
-#   codecs listed), and the codec list has no decoder section, so MediaCodec
-#   cannot pick a hardware decoder even if the service listed one.
+#   no decoder ("codecs-available"), and the codec list has no decoder section,
+#   so MediaCodec cannot pick a hardware decoder even if the service listed one.
 # - _volcano_v1_hwdec (all video): the same plus the three clear decoders, in
 #   both files.
 # The decoder node /dev/video32 is root-only when the choice is never
 # (boot/ueventd.rc, media/init.fp6.media.rc), and only the codec service may
 # open the two codec nodes (sepolicy/media).
-# The Qualcomm library enables every codec if it cannot read its target
-# specification, so the codec service loads libc2hwjail_avservices, which
-# checks this boot's state and offers only the allowed codecs, or none (see
+# The Qualcomm library adds its built-in codec list to the target
+# specification and enables every codec if it cannot read the specification,
+# so the codec service loads libc2hwjail_avservices, which checks this boot's
+# state, registers only the allowed codecs and offers only those, or none (see
 # media/seccomp/c2hwjail.cpp).
 # Not included: the Codec2 audio service (c2audio), the OMX core, Wi-Fi
 # display, VPP and video power optimisation.

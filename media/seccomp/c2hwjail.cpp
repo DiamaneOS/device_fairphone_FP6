@@ -21,6 +21,16 @@
 //   non-secure hardware decoders when the user chose them, and nothing if the
 //   check fails or the filter could not be installed.
 //
+// - qc2::TargetSpec::getSupportedCodecs (when the Qualcomm codec plugin loads):
+//   leaves only the allowed codecs in the set the plugin registers from.
+//   libqcodec2_platform adds its built-in list for this SoC to what the target
+//   specification names, so without this every decoder variant is registered
+//   and probed. The first probe of the encoders-only state waits 4.9 s for a
+//   decoder node it may not open (QC2V4L2DriverNode::openVideoDevice), which
+//   holds back every client of the store, and system_server through the camera
+//   service. The library has the DF_1_GLOBAL flag (Android.bp) so that this
+//   definition also reaches the libraries the service loads with dlopen.
+//
 // The service always registers, so every Codec2 client (MediaCodec,
 // MediaCodecList, system_server's checks at boot) gets an answer. Nothing
 // here runs from an ELF constructor, nothing aborts on a failed check, and
@@ -37,6 +47,7 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <unordered_set>
 
 #include <C2Component.h>
 #include <log/log.h>
@@ -58,6 +69,8 @@ constexpr char kSetUpMinijail[] =
         "_ZN7android13SetUpMinijailERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_"
         "9allocatorIcEEEES8_";
 constexpr char kHidlLibrary[] = "libcodec2_hidl@1.2.so";
+constexpr char kPlatformLibrary[] = "libqcodec2_platform.so";
+constexpr char kGetSupportedCodecs[] = "_ZN3qc210TargetSpec18getSupportedCodecsEv";
 #define C2HWJAIL_STORE_CTOR \
     "_ZN7android8hardware5media2c24V1_25utils14ComponentStoreC1ERKNSt3__110shared_ptrI16C2ComponentStoreEE"
 
@@ -116,6 +129,34 @@ void SetUpMinijail(const std::string& base_policy_path, const std::string& addit
 }
 
 }  // namespace android
+
+namespace qc2 {
+
+// Only the name matters. The one object comes from libqcodec2_platform.
+class TargetSpec {
+  public:
+    std::unordered_set<std::string> getSupportedCodecs();
+};
+
+std::unordered_set<std::string> TargetSpec::getSupportedCodecs() {
+    std::unordered_set<std::string> codecs;
+    // On AArch64 a member function takes `this` in x0 and the result's address
+    // in x8, as this declaration does.
+    using Fn = std::unordered_set<std::string> (*)(TargetSpec*);
+    auto real = reinterpret_cast<Fn>(RealSymbol(kPlatformLibrary, kGetSupportedCodecs));
+    if (real != nullptr) {
+        codecs = real(this);
+    }
+    std::string reason;
+    const std::set<std::string> allowed =
+            c2hwjail::AllowedCodecs(c2hwjail::DevicePlatform(), &reason);
+    const size_t known = codecs.size();
+    c2hwjail::KeepAllowedCodecs(&codecs, allowed);
+    ALOGI("codec plugin list (%s): %zu of %zu codecs kept", reason.c_str(), codecs.size(), known);
+    return codecs;
+}
+
+}  // namespace qc2
 
 // android::hardware::media::c2::V1_2::utils::ComponentStore::ComponentStore(
 //     const std::shared_ptr<C2ComponentStore>&), complete-object constructor.

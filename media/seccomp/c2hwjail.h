@@ -11,6 +11,7 @@
 #include <functional>
 #include <set>
 #include <string>
+#include <unordered_set>
 
 struct sock_fprog;
 
@@ -35,6 +36,13 @@ Platform DevicePlatform();
 // specification the Qualcomm library reads or the decoder node differ from
 // what this boot expects, none, and *reason says why. Never aborts.
 std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason);
+
+// Removes everything but the allowed codecs from the set the Qualcomm codec
+// plugin registers from. The plugin registers every codec it knows when the
+// set is empty, so the result is never empty: with nothing left it holds only
+// a name no codec has.
+void KeepAllowedCodecs(std::unordered_set<std::string>* codecs,
+                       const std::set<std::string>& allowed);
 
 // Rewrites every "trap" result of a compiled filter to "fail with EPERM", so a
 // call outside the policy fails instead of killing the service. Returns the

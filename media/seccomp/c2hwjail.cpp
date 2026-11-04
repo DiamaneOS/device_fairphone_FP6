@@ -106,6 +106,15 @@ void* RealSymbol(const char* library, const char* symbol) {
     return address;
 }
 
+using StoreCtor = void (*)(void*, const std::shared_ptr<C2ComponentStore>&);
+
+// C++ has no pointer type for a constructor, so its call through this pointer
+// has no type CFI could match. Every other indirect call here stays checked.
+__attribute__((no_sanitize("cfi-icall")))
+void CallStoreCtor(StoreCtor ctor, void* self, const std::shared_ptr<C2ComponentStore>& store) {
+    ctor(self, store);
+}
+
 }  // namespace
 
 namespace android {
@@ -183,11 +192,10 @@ void c2hwjailStoreCtor(void* self, const std::shared_ptr<C2ComponentStore>& stor
         ALOGI("codec configuration checked (%s): the store offers %zu components", reason.c_str(),
               offered);
     }
-    using Ctor = void (*)(void*, const std::shared_ptr<C2ComponentStore>&);
-    auto real = reinterpret_cast<Ctor>(RealSymbol(kHidlLibrary, C2HWJAIL_STORE_CTOR));
+    auto real = reinterpret_cast<StoreCtor>(RealSymbol(kHidlLibrary, C2HWJAIL_STORE_CTOR));
     // The service links libcodec2_hidl@1.2 for this very constructor, so the
     // lookup cannot fail on a booting system. Without it there is no store
     // to build at all.
     LOG_ALWAYS_FATAL_IF(real == nullptr, "cannot build the Codec2 store");
-    real(self, filtered);
+    CallStoreCtor(real, self, filtered);
 }

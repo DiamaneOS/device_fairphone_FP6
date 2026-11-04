@@ -23,7 +23,6 @@ cc_defaults {
         "c2hwjail_store.cpp",
     ],
     static_libs: ["libminijail"],
-    // No cfi: the library casts dlsym results to other function types.
     sanitize: {
         integer_overflow: true,
         misc_undefined: ["bounds"],
@@ -62,6 +61,10 @@ cc_library_shared {
     // come before its own dependencies.
     ldflags: ["-Wl,-z,global"],
     required: ["codec2-service.policy"],
+    // c2hwjail.cpp names the one call CFI cannot check.
+    sanitize: {
+        cfi: true,
+    },
 }
 
 prebuilt_etc {

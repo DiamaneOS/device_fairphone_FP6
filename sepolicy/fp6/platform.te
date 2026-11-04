@@ -48,3 +48,8 @@ set_prop(vendor_init, vendor_dataqdp_prop)
 # persist.vendor.sensors.enable.mag_filter and support_direct_channel
 # (device.mk), as stock.
 set_prop(vendor_init, vendor_sensors_prop)
+
+# Stay denied, known cause, see "Not granted on purpose" in README.md.
+dontaudit vendor_modprobe self:key write;
+dontaudit hal_sensors_default vendor_sysfs_info:dir search;
+dontaudit vendor_hal_usb_qti sysfs_udc:dir read;

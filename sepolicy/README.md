@@ -1023,6 +1023,21 @@ without it. Denials covered in the sections above are not repeated.
 - `hal_camera_default`, finding
   `vendor.tcl.camera.algoservice.ITctCameraAlgoService`: the TCL algorithm
   service is not installed, and CamX continues without it.
+- `vendor_modprobe`, `write` on its own key (`dontaudit`): the cfg80211 module
+  loads its regulatory database certificates from module init, in modprobe's
+  context, and the load fails with -13. The phone ships no `regulatory.db`, so
+  nothing checks a signature with them.
+- `hal_sensors_default`, `search` of `/sys/emkit/info` (`vendor_sysfs_info`,
+  `dontaudit`): factory information nodes of the sensors, one try per sensor at
+  HAL start. No domain here is granted them, and every sensor opens without them.
+- `vendor_hal_usb_qti`, `read` of `/sys/class/udc` (`dontaudit`): when the UDC
+  goes away for host mode, the HAL lists the class to see whether another is
+  left. A refused list means none is left, which is true with this phone's one
+  controller.
+- `system_server` (InputReader), `read` of `country` of a USB HID device
+  (`vendor_sysfs_usb_node`): a keyboard layout hint. The label covers the whole
+  USB device tree, so the read stays denied and audited, and the user picks the
+  layout.
 - `tee` (qseecomd), opening the GPT, XBL and boot block devices and the BSG
   nodes of the other UFS LUNs: it only probes them at start.
 - `fp6_callaudio_app`, `fp6_iwlan_app` and the Wi-Fi observer

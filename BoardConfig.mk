@@ -193,6 +193,10 @@ BOARD_AVB_SYSTEM_DLKM_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
 # fstab.qcom.
 BOARD_BOOTCONFIG += androidboot.hardware=qcom
 
+# First stage init loads its modules in parallel, in the order their
+# dependencies allow.
+BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
+
 # The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
 SOONG_CONFIG_NAMESPACES += ufsbsg
 SOONG_CONFIG_ufsbsg += ufsframework

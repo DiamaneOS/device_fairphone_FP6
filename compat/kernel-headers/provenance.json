@@ -1,91 +1,91 @@
 {
   "schema_version": 1,
-  "kernel_workspace": "FP6 CodeLinaro kernel workspace (kernel_manifest-fp6): msm-kernel is kernel_qcom_msm-6.1 50d0244, display-drivers kernel_qcom_display 9574dc7, securemsm-kernel kernel_qcom_securemsm 1ee0ba2",
-  "note": "First generated from the pre-migration trees (msm-kernel kernel_fairphone_qcom 61e9f54, display-drivers a3519ad, securemsm-kernel 171b160). Regenerated from the pins above on 2026-09-26: every header is byte-identical. The UAPI sources and headers_install.sh are the same blobs; unifdef.c only renames a variable (msm-kernel d8780220, 'scripts/unifdef: avoid constexpr keyword'). Regenerate and compare at every kernel intake.",
+  "kernel_workspace": "The FP6 6.18 kernel: kernel_qcom-6.18 b0ad40c and kernel_common-6.18 d49ac8a",
+  "note": "Generated from the pins above with the common kernel's headers_install.sh. The moves from the 6.1 trees are additions, comment changes, three longer syncobj structs and one struct rename, none used here. Regenerate and compare at every kernel intake.",
   "generator": {
-    "script": "kernel_platform/msm-kernel/scripts/headers_install.sh",
-    "script_sha256": "cc16bac502ab20fa4774c8fe8da5f47afc485115902ffde296a361839521f361",
+    "repository": "kernel_common-6.18",
+    "revision": "d49ac8a6360052b913988f3d136f933dbcaef9ea",
+    "script": "scripts/headers_install.sh",
+    "script_sha256": "c2be0a948b4cb631b24bd7ee4128639b8aabde71d562fb529253c87d4181c586",
     "unifdef_source_sha256": "3d3523b648e4f8a76d443e8b3e0bc9b1a286a24736dc12c21c6d8379ff265dde"
   },
   "files": [
     {
       "path": "include/display/drm/msm_drm_pp.h",
-      "kernel_tree": "vendor/qcom/opensource/display-drivers",
-      "revision": "9574dc7f8daad0fc98266f434be35e87f65b6d4d",
-      "source": "include/uapi/display/drm/msm_drm_pp.h",
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/display/display-drivers/include/uapi/display/drm/msm_drm_pp.h",
       "sha256": "481b8e1b35508a37a83b1e6f8900e60a2f9043a7d3a35f804f02cc7f86445588"
     },
     {
       "path": "include/display/drm/sde_drm.h",
-      "kernel_tree": "vendor/qcom/opensource/display-drivers",
-      "revision": "9574dc7f8daad0fc98266f434be35e87f65b6d4d",
-      "source": "include/uapi/display/drm/sde_drm.h",
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/display/display-drivers/include/uapi/display/drm/sde_drm.h",
       "sha256": "d4a230cb9899a5e34d88fcd2e06f79705476e6b4c43f4e67c610db7ab6a4b254"
     },
     {
       "path": "include/display/media/mmm_color_fmt.h",
-      "kernel_tree": "vendor/qcom/opensource/display-drivers",
-      "revision": "9574dc7f8daad0fc98266f434be35e87f65b6d4d",
-      "source": "include/uapi/display/media/mmm_color_fmt.h",
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/display/display-drivers/include/uapi/display/media/mmm_color_fmt.h",
       "sha256": "754c6cc59440f41c41c999d2d25f7d2ba86c0ea5d1ed57553a3a4efbfa301534"
     },
     {
       "path": "include/display/media/msm_sde_rotator.h",
-      "kernel_tree": "vendor/qcom/opensource/display-drivers",
-      "revision": "9574dc7f8daad0fc98266f434be35e87f65b6d4d",
-      "source": "include/uapi/display/media/msm_sde_rotator.h",
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/display/display-drivers/include/uapi/display/media/msm_sde_rotator.h",
       "sha256": "89999df2c996ac8161367e2f45ea2cd4c3b5a8a7c4becc189b366c60060e8579"
     },
     {
       "path": "include/drm/drm.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "revision": "50d02443304a5d0932346beebe25f1a192c86c73",
+      "repository": "kernel_common-6.18",
+      "revision": "d49ac8a6360052b913988f3d136f933dbcaef9ea",
       "source": "include/uapi/drm/drm.h",
-      "sha256": "e51ac82cadfd341809db83f4f1c81c574e44013c7b039a02dc9cc9cf21053f2f"
+      "sha256": "f9eadbfa0f9e1aeacc27f5c931ca3bd7b46974dbad817cd02fe601ccb5cdf08d"
     },
     {
       "path": "include/drm/drm_mode.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "revision": "50d02443304a5d0932346beebe25f1a192c86c73",
+      "repository": "kernel_common-6.18",
+      "revision": "d49ac8a6360052b913988f3d136f933dbcaef9ea",
       "source": "include/uapi/drm/drm_mode.h",
-      "sha256": "90efb544d80e159a66486ead7d8361c73834342d6b57db641c820496eb67b04a"
+      "sha256": "d05ebad55fc3d3639dca75d58fd7a149e2efdd5ef8aaaf3c8e673e779fd6b39b"
     },
     {
       "path": "include/drm/msm_drm.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "revision": "50d02443304a5d0932346beebe25f1a192c86c73",
+      "repository": "kernel_common-6.18",
+      "revision": "d49ac8a6360052b913988f3d136f933dbcaef9ea",
       "source": "include/uapi/drm/msm_drm.h",
-      "sha256": "5ae18671260526b5a429150b8d57899e535ae603a7903510c90d52b9712f1cae"
+      "sha256": "3a09c8ec494ef2554ec2d75e02ada555231a3b4bf2bc4b609102e2cfd7972325"
     },
     {
       "path": "include/linux/msm_ion.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "revision": "50d02443304a5d0932346beebe25f1a192c86c73",
-      "source": "include/uapi/linux/msm_ion.h",
-      "sha256": "019750b6d29633f94b869ecc6994c97f537e5fd5e3d710ae749f82b28c600aac"
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/base/include/uapi/linux/msm_ion.h",
+      "sha256": "f2fd0894bd69ca4b78fdbc26ad875203babb4413b1b03fdae664226c25cd897a"
     },
     {
       "path": "include/linux/msm_ion_ids.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "revision": "50d02443304a5d0932346beebe25f1a192c86c73",
-      "source": "include/uapi/linux/msm_ion_ids.h",
-      "sha256": "d5f7f5c3b6676bc6fce031e359517a546f628161d55664cb9f7ede703a30b899"
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/base/include/uapi/linux/msm_ion_ids.h",
+      "sha256": "f17d9c702f710e38175ec74219239c2a65214f31fc72b6b45db6cb554d497ec9"
     },
     {
       "path": "include/linux/qti-smmu-proxy.h",
-      "kernel_tree": "vendor/qcom/opensource/securemsm-kernel",
-      "revision": "1ee0ba29a2f578d4c2c6c0105219d082f7d595d8",
-      "source": "smmu-proxy/include/uapi/linux/qti-smmu-proxy.h",
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/camera-video/securemsm-kernel/smmu-proxy/include/uapi/linux/qti-smmu-proxy.h",
       "sha256": "54fffbdc53205074fdedb5e9517ca9327f3eb25dc3642f13b338245848fa0946"
     },
     {
       "path": "include/misc/adsp_sleepmon.h",
-      "kernel_tree": "kernel_platform/msm-kernel",
-      "repository": "kernel_qcom-6.1",
-      "revision": "2d006c35354ff1be1aef4cd1066b3f4967a0a457",
-      "source": "kernel_platform/msm-kernel/include/uapi/misc/adsp_sleepmon.h",
-      "sha256": "2048c4a192c76402b820330ef8ecdf451b8b9f60496c67eb06b4c05688526f92",
-      "note": "Added 2026-10-06 for the source-built PAL (ADSP sleep monitor ioctl). headers_install.sh leaves it byte-identical. kernel_qcom-6.1 is the kernel repository the builds use."
+      "repository": "kernel_qcom-6.18",
+      "revision": "b0ad40c9850851bab2d680ddf0c79281655e6fa7",
+      "source": "modules/base/include/uapi/misc/adsp_sleepmon.h",
+      "sha256": "7a8d60a4e96ee229aea306ee2ae134a453171298d2c6ece5166038abcba59a3c"
     }
   ]
 }

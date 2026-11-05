@@ -16,3 +16,11 @@ allow vendor_init { vendor_proc_vm_tuning vendor_proc_compaction }:file write;
 allow vendor_init proc_sched:file write;
 # Reclaim watermark for zram swap (platform proc_watermark_scale_factor).
 allow vendor_init proc_watermark_scale_factor:file write;
+
+# Memory-bus DCVS tunables. Their live DDR and L3 frequencies are a side channel,
+# so they leave sysfs_devices_system_cpu, which every domain may read. Only
+# vendor_init writes them, at boot. No closed vendor binary names them.
+type vendor_sysfs_bus_dcvs, fs_type, sysfs_type;
+allow vendor_init vendor_sysfs_bus_dcvs:dir search;
+allow vendor_init vendor_sysfs_bus_dcvs:file { open write };
+neverallow { untrusted_app_all isolated_app_all ephemeral_app } vendor_sysfs_bus_dcvs:file *;

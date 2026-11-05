@@ -17,6 +17,9 @@
   wpa_supplicant_8's template.
 - The supplicant, its services and the permission file come from
   `vendor/diamaneos/config/wifi.mk`.
+- The supplicant uses Qualcomm's driver-command library `lib_driver_cmd_qcwcn`
+  (`hardware/qcom/wlan`), so suspend requests reach the driver. hostapd stays on
+  nl80211.
 - `init.qcom.rc` creates `/data/vendor/wifi/wpa/sockets`.
 
 ## Hardware address

@@ -85,10 +85,15 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
 
 - Thermal, lights, vibrator, USB and health: the Qualcomm HALs listed in
   `device.mk`, built from source.
-- Power: LineageOS libperfmgr (unmodified) with `power/powerhint.json`, as
-  system with CAP_SYS_NICE.
+- Power: LineageOS libperfmgr (unmodified mirror) and power HAL
+  (`hardware/lineage/interfaces`), with `power/powerhint.json`, as system with
+  CAP_SYS_NICE.
+  - The HAL's optional ADPF task profiles are off here, so it uses Uclamp.
   - Camera hints reach it through `libqti-perfd-client`.
   - Qualcomm's perf daemon is not installed.
+- Mobile data: `datad` and `wlantunneld` from `hardware/diamaneos/datad`, in
+  place of the stock nicmd. `DIAMANEOS_DATAD` must be true, as the device has no
+  policy for the stock one.
 - Power stats: DiamaneOS's own HAL.
   - It reports SoC and subsystem sleep times from `/dev/stats`.
   - There are no energy meters: the phone has no on-device power monitor.

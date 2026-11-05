@@ -23,7 +23,7 @@
   camera's lens position and radius, for SystemUI's `tally_lens.xml`.
 - `doze_proximity_check_before_tap`: Tap to wake and Tap to check phone check
   the proximity sensor before a double or single tap wakes the screen, and
-  drop taps while it is covered.
+  drop taps while it is covered, unless the user turns off Pocket check.
   - The touch controller reports taps through a pocket too.
   - The resource comes from a DiamaneOS SystemUI change.
 - `proximity_sensor_threshold`: 5 cm, so SystemUI's proximity sensor reads far

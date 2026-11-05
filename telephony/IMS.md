@@ -28,6 +28,9 @@ call-audio bridge (`callaudio/`).
   without platform-signing the apps (`fp6-iwlan-sysconfig.xml`).
 - The AOSP IWLAN alternative must not be selected at the same time, and
   `telephony.mk` stops the build if it is.
+- `wlantunneld` (`hardware/diamaneos/datad`) carries the tunnel the modem
+  negotiates: reverse links, ESP states and policies, `rmnet_wlan` and the ports
+  the modem asks for. It has its own user and SELinux domain.
 
 ## Wi-Fi reporter
 

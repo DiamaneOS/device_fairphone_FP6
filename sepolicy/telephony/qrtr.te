@@ -16,8 +16,8 @@ neverallow {
   -kernel
   -rild
   -vendor_hal_gnss_qti
-  ifdef(`datad_enabled', `-diamaneos_datad')
-  ifdef(`datad_enabled', `-diamaneos_wlantunnel')
+  -diamaneos_datad
+  -diamaneos_wlantunnel
   -vendor_pd_mapper
   -vendor_per_mgr
   -vendor_qrtr

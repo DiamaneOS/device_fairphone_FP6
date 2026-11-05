@@ -127,15 +127,9 @@ TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 include hardware/diamaneos/ims/ims-board.mk
 
 # The open data daemon (hardware/diamaneos/datad) in place of the stock nicmd and its libraries.
-# The device has no policy for the stock nicmd, so DIAMANEOS_DATAD stays true. The project tools
-# make the vendor tree without the stock nicm files, and the product refuses a tree that has them.
-DIAMANEOS_DATAD ?= true
-ifneq ($(DIAMANEOS_DATAD),true)
-$(error DIAMANEOS_DATAD must be true: the device has no policy for the stock nicmd)
-endif
-ifeq ($(DIAMANEOS_DATAD),true)
+# The project tools make the vendor tree without the stock nicm files, and the product refuses a
+# tree that has them.
 include hardware/diamaneos/datad/android/datad-board.mk
-endif
 include hardware/diamaneos/ims/wlan-board.mk
 include packages/apps/ImsServiceEntitlement/diamaneos/board.mk
 

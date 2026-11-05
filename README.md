@@ -92,8 +92,7 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
   - Camera hints reach it through `libqti-perfd-client`.
   - Qualcomm's perf daemon is not installed.
 - Mobile data: `datad` and `wlantunneld` from `hardware/diamaneos/datad`, in
-  place of the stock nicmd. `DIAMANEOS_DATAD` must be true, as the device has no
-  policy for the stock one.
+  place of the stock nicmd.
 - Power stats: DiamaneOS's own HAL.
   - It reports SoC and subsystem sleep times from `/dev/stats`.
   - There are no energy meters: the phone has no on-device power monitor.

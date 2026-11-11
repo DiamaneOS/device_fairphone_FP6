@@ -1,0 +1,76 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+// Android 14 sized GraphicBuffer for Fairphone's camera algorithm stack (the
+// stock TCL algoservice, libtctcameraalgo.so and its distortion plugin, all
+// built against Android 14). The tools renderer renames each consumer's
+// libui.so dependency to uicam.so and its android::GraphicBuffer imports to
+// android::GraphicBufCam (NEEDED_REWRITES, same lengths, input and output
+// hashes pinned). See GraphicBufferCam.cpp. Separate from uiv34 so that the
+// codec and the camera provider keep their reviewed behaviour: every object
+// here is backed by an AHardwareBuffer, and no libui code is linked.
+//
+// uicam links libfpcjail (camera/fpcamera/seccomp), the service's seccomp
+// loader. Only the service process loads uicam, so it never runs without its
+// filter. The test below compiles the source instead of linking uicam, so that
+// it does not run under the service's filter.
+cc_library_shared {
+    name: "uicam",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: ["GraphicBufferCam.cpp"],
+    version_script: "libuicam.map.txt",
+    // No cfi: the closed stock binaries call into this library.
+    sanitize: {
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    header_libs: [
+        "libnativebase_headers",
+        "libui_headers",
+    ],
+    shared_libs: [
+        "libcutils",
+        "libfpcjail",
+        "liblog",
+        "libnativewindow",
+        "libutils",
+    ],
+}
+
+// Exercises every exported entry point under its renamed name, on the phone.
+cc_test {
+    name: "uicam_test",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: [
+        "GraphicBufferCam.cpp",
+        "uicam_test.cpp",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    header_libs: [
+        "libnativebase_headers",
+        "libsystem_headers",
+        "libui_headers",
+    ],
+    shared_libs: [
+        "libcutils",
+        "liblog",
+        "libnativewindow",
+        "libutils",
+    ],
+    test_suites: ["device-tests"],
+}

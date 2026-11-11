@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* uicam exports exactly the Android 14 GraphicBuffer entry points the three */
+/* stock camera algorithm binaries import from it (see Android.bp). Everything */
+/* else stays local. */
+{
+  global:
+    _ZN7android13GraphicBufCamC1EPK13native_handleNS0_16HandleWrapMethodEjjijmj;
+    _ZN7android13GraphicBufCamC1EjjijNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE;
+    _ZN7android13GraphicBufCam9lockAsyncEjPPviPiS3_;
+    _ZN7android13GraphicBufCam14lockAsyncYCbCrEjP13android_ycbcri;
+    _ZN7android13GraphicBufCam9lockYCbCrEjP13android_ycbcr;
+    _ZN7android13GraphicBufCam6unlockEv;
+    _ZNK7android13GraphicBufCam9initCheckEv;
+    _ZN7android13GraphicBufCam17toAHardwareBufferEv;
+    _ZN7android13GraphicBufCam19fromAHardwareBufferEP15AHardwareBuffer;
+  local:
+    *;
+};

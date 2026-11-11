@@ -1,0 +1,10 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- The TCL camera algorithm service of the Fairphone Camera app (fpcamera.rc). -->
+<manifest version="1.0" type="device">
+    <hal format="aidl">
+        <name>vendor.tcl.camera.algoservice</name>
+        <version>2</version>
+        <fqname>ITctCameraAlgoService/default</fqname>
+    </hal>
+</manifest>

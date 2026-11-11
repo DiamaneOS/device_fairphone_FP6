@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The Fairphone Camera gets the rules of an ordinary untrusted app, except
+# network: no net_domain, so neither the app nor the vendor code it loads can
+# open a network socket, whatever its permissions say.
+typeattribute fpcamera_app coredomain;
+app_domain(fpcamera_app)
+untrusted_app_domain(fpcamera_app)
+
+# The TCL camera algorithm service: only this app finds it.
+allow fpcamera_app fpcamera_algo_service:service_manager find;
+binder_call(fpcamera_app, fpcamera_algo_server)
+
+# The service is a vendor client of cameraserver (camera NDK). Its listeners
+# take calls from cameraserver.
+binder_call(cameraserver, fpcamera_algo_server)
+
+# Not granted, not audited: the cgroup tree, which the app looks at. Every
+# mode works without it. The vendor types the app looks at are in
+# fpcamera-vendor.
+dontaudit fpcamera_app cgroup_v2:dir search;

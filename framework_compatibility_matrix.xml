@@ -81,4 +81,22 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Fairphone Camera (App Store, FP6): the TCL camera algorithm service (camera/fpcamera). -->
+    <hal format="aidl">
+        <name>vendor.tcl.camera.algoservice</name>
+        <version>2</version>
+        <interface>
+            <name>ITctCameraAlgoService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <!-- Qualcomm's camera post-processing HAL, for that service only. -->
+    <hal format="hidl" optional="true">
+        <name>vendor.qti.hardware.camera.postproc</name>
+        <version>1.0</version>
+        <interface>
+            <name>IPostProcService</name>
+            <instance>camerapostprocservice</instance>
+        </interface>
+    </hal>
 </compatibility-matrix>

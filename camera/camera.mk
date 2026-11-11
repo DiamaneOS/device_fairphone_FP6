@@ -10,9 +10,13 @@
 # is selected too: the combined cameras of the stock table need it. It was
 # built against Android 14 and binds its GraphicBuffer calls to the uiv34
 # compat library (compat/codec2-v34, installed by media/media.mk).
-# Not included: the TCL camera algorithm service and its models, third-party
-# (ANC/TCL) algorithms, the other Fairphone com.fp.node.* feature nodes,
-# QNN/SNPE, the always-on (AON) camera and factory (MTF) tuning.
+# Not included in the camera provider: the TCL camera algorithm service and
+# its models, the ANC/TCL algorithms, the other Fairphone com.fp.node.* feature
+# nodes, QNN/SNPE, the always-on (AON) camera and factory (MTF) tuning. The
+# TCL service and its algorithms are installed for the Fairphone Camera app
+# only (camera/fpcamera/fpcamera.mk), and CamX does not use them.
+
+include device/fairphone/FP6/camera/fpcamera/fpcamera.mk
 
 PRODUCT_COPY_FILES += \
     device/fairphone/FP6/camera/init.camera.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.fp6.camera.rc

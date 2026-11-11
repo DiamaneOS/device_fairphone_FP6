@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Fairphone Camera: the algorithm service, and the libraries stock labels same_process_hal_file
+# (the image engine and the libraries it loads, which the app opens itself).
+/(vendor|system/vendor)/bin/hw/cameraalgoservice  u:object_r:fpcamera_algoservice_exec:s0
+/(vendor|system/vendor)/lib64/libMNN\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libTclAISuperfine\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libTclImage_ImageEngine\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libc\+\+_shared\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libopencv_core\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libopencv_imgcodecs\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libopencv_imgproc\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libtclSceneDetector\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libtcl_dualcam_bokeh_cap\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libtcltflitev2\.so  u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib64/libtclyuv\.so  u:object_r:same_process_hal_file:s0
+
+# The Adreno OpenCL runtime and compiler, for the algorithm service only. The
+# loader is installed as fpcOpenCL.so, the name only the service looks for.
+/vendor/lib64/fpcOpenCL\.so                u:object_r:fpcamera_opencl_file:s0
+/vendor/lib64/libOpenCL_adreno\.so         u:object_r:fpcamera_opencl_file:s0
+/vendor/lib64/libllvm-qcom\.so             u:object_r:fpcamera_opencl_file:s0
+/vendor/lib64/libadreno_compiler_cl\.so    u:object_r:fpcamera_opencl_file:s0

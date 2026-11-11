@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The stock TCL camera algorithm service of the Fairphone Camera app. Stock
+# starts it at boot as system:system. Here servicemanager starts it when the app
+# (the only client that can find it) asks for it. Its own user, group media for
+# the camera's FastRPC node.
+service fpcamera_algoservice /vendor/bin/hw/cameraalgoservice
+    interface aidl vendor.tcl.camera.algoservice.ITctCameraAlgoService/default
+    class hal
+    user vendor_fpcamera
+    group vendor_fpcamera media
+    disabled
+    oneshot
+    task_profiles CameraServiceCapacity MaxPerformance
+
+# The service registers only once debug.camera.ready is set, which Fairphone's
+# camera server does. Stock also sets vendor.tct.camera.bootcompleted.
+on property:sys.boot_completed=1
+    setprop debug.camera.ready 1
+    setprop vendor.tct.camera.bootcompleted 1

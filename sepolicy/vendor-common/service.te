@@ -53,8 +53,4 @@ type vendor_aidl_imsfactory_service,   hal_service_type, protected_service, serv
 type vendor_hal_iwlan_service, hal_service_type, protected_service, service_manager_type;
 type vendor_hal_trustedui_aidl_service, hal_service_type, protected_service, service_manager_type;
 
-# Begin added by juting.huang for cameraalgoservice porting
-type vendor_tct_camera_algo_service, hal_service_type, protected_service, service_manager_type;
-# End added by juting.huang for cameraalgoservice porting
-
 type vendor_hal_dspmanager_aidlservice, hal_service_type, service_manager_type;

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- This build has the camera algorithm service the Fairphone Camera needs.
+     The App Store offers that app only on a build that declares this. -->
+<permissions>
+    <feature name="de.diamaneos.fairphone_camera" />
+</permissions>

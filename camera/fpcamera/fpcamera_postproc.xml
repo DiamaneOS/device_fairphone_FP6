@@ -1,0 +1,17 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 The DiamaneOS Project -->
+<!-- Qualcomm's camera post-processing HAL, registered by the camera provider.
+     The Fairphone Camera's algorithm service converts RAW frames to YUV on the
+     ISP through it (super night). Only that service may find it
+     (sepolicy/fpcamera-vendor). -->
+<manifest version="1.0" type="device">
+    <hal format="hidl">
+        <name>vendor.qti.hardware.camera.postproc</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IPostProcService</name>
+            <instance>camerapostprocservice</instance>
+        </interface>
+    </hal>
+</manifest>

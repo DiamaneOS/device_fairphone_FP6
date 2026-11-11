@@ -1,0 +1,2 @@
+# Fairphone Camera from the App Store: only com.fps.camera signed by TCL's key.
+user=_app seinfo=fpcamera name=com.fps.camera domain=fpcamera_app type=app_data_file levelFrom=all

@@ -76,8 +76,9 @@ allow hal_camera_default hal_graphics_composer_default:fd use;
 hal_client_domain(hal_camera_default, hal_power)
 
 # Left denied: the display-config camera hint (IDisplayConfig would also expose
-# brightness, power mode and writeback capture), IPostProcService registration
-# (in no VINTF manifest) and the fstat of /proc/meminfo (stdio falls back).
+# brightness, power mode and writeback capture) and the fstat of /proc/meminfo
+# (stdio falls back). The provider registers IPostProcService for the Fairphone
+# Camera's algorithm service only (sepolicy/fpcamera-vendor).
 
 # Gyro/sensor samples for EIS and OIS through the ADSP sensors QMI service
 # (libsnsapi/libqmi_cci). The stock ioctl range 0xc300-0xc305 is not granted.
@@ -114,9 +115,13 @@ dontaudit hal_camera_default default_prop:file read;
 dontaudit hal_camera_default vendor_hal_offlinecamera_service:service_manager add;
 
 # At every session the provider also looks up the ODM's camera algorithm
-# service (ITctCameraAlgoService) and Qualcomm's post-processing HAL. Neither is
-# in the image, so both lookups stay denied. Not audited: about 20 a session.
-dontaudit hal_camera_default vendor_tct_camera_algo_service:service_manager find;
+# service (ITctCameraAlgoService) and Qualcomm's post-processing HAL. Both are
+# only for the Fairphone Camera app (camera/fpcamera): the algorithm service is
+# its own, and the post-processing HAL, which the provider registers, serves
+# that service's RAW conversions. CamX itself never reaches either, so its
+# sessions run as for every other app. Both lookups stay denied. Not audited:
+# about 20 a session.
+dontaudit hal_camera_default fpcamera_algo_service:service_manager find;
 dontaudit hal_camera_default vendor_hal_camera_postproc_hwservice:hwservice_manager find;
 
 # Fairphone's distortion library (libundistort) carries OpenCV, which at load

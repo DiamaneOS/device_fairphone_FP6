@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# The stock TCL camera algorithm service of the Fairphone Camera app
+# (camera/fpcamera/fpcamera.rc). servicemanager starts it for the app's first
+# lookup. It runs as its own user, under its own seccomp filter (libfpcjail),
+# and only the app may find it (fpcamera_algo_service).
+type fpcamera_algoservice, domain;
+type fpcamera_algoservice_exec, exec_type, vendor_file_type, file_type;
+# The Adreno OpenCL runtime and compiler (file_contexts), installed for this
+# service only. Apps may not load them (stock labels them same_process_hal_file,
+# which every app may load). A platform neverallow lets other vendor processes
+# load any vendor library, so the loader is installed as fpcOpenCL.so, the name
+# only this service's ANC HDR adapters look for (tools STRING_REWRITES): CamX's
+# libraries look for libOpenCL.so and keep running without OpenCL.
+type fpcamera_opencl_file, vendor_file_type, file_type;
+init_daemon_domain(fpcamera_algoservice)
+typeattribute fpcamera_algoservice fpcamera_algo_server;
+
+binder_use(fpcamera_algoservice)
+add_service(fpcamera_algoservice, fpcamera_algo_service)
+binder_call(fpcamera_algoservice, fpcamera_app)
+
+# Camera NDK for vendor clients: reads camera characteristics from cameraserver.
+allow fpcamera_algoservice fwk_camera_service:service_manager find;
+binder_call(fpcamera_algoservice, cameraserver)
+
+# Graphics allocator client: the service allocates its working buffers and maps
+# the app's. hal_client_domain is the only form the platform neverallows allow
+# for the allocator service lookups. As for the camera provider, the membership
+# also lets it find the mapper services and call hwservicemanager.
+hal_client_domain(fpcamera_algoservice, hal_graphics_allocator)
+
+# The lens distortion plugin (libundistort) and the AI superfine library
+# process photos on the GPU through EGL and GLES: the GPU device and its sysfs,
+# as for apps. The graphics loader reads its configuration (ro.graphics.*,
+# persist.graphics.egl).
+gpu_sphal_use(fpcamera_algoservice)
+get_prop(fpcamera_algoservice, graphics_config_prop)
+get_prop(fpcamera_algoservice, graphics_config_writable_prop)
+
+# The RAW fusion and HDR libraries run their models on the GPU through OpenCL,
+# with their buffers from the DMA-BUF system heap (as apps have it).
+allow fpcamera_algoservice fpcamera_opencl_file:file { r_file_perms execute map };
+allow fpcamera_algoservice dmabuf_system_heap_device:chr_file r_file_perms;
+
+# The in-process buffer mapper's settings (vendor.gralloc.*), the vendor camera
+# properties the TCL code reads (vendor.camera.*, persist.vendor.camera.*) and
+# the platform camera configuration (ro.camera.*). Reads only.
+get_prop(fpcamera_algoservice, vendor_gralloc_prop)
+get_prop(fpcamera_algoservice, vendor_camera_prop)
+get_prop(fpcamera_algoservice, camera_config_prop)
+
+# RAW to YUV on the ISP (super night): Qualcomm's post-processing HAL, which
+# the camera provider registers for this service only. The service calls it
+# and takes its callbacks. Only this service may find it (CamX's own lookup
+# stays denied, hal_camera_default.te), so it opens no path into the provider
+# for any other process.
+hwbinder_use(fpcamera_algoservice)
+allow fpcamera_algoservice vendor_hal_camera_postproc_hwservice:hwservice_manager find;
+binder_call(fpcamera_algoservice, hal_camera_default)
+binder_call(hal_camera_default, fpcamera_algoservice)
+add_hwservice(hal_camera_default, vendor_hal_camera_postproc_hwservice)
+
+# The public SoC id (the algorithm pool chooses its code paths by it).
+# serial_number (vendor_sysfs_soc) stays unreadable.
+allow fpcamera_algoservice vendor_sysfs_soc:dir search;
+allow fpcamera_algoservice vendor_sysfs_public:file { open read };
+
+# The service runs with no_new_privs under its seccomp filter (libfpcjail,
+# camera/fpcamera/seccomp), so debuggerd writes its tombstones and stack dumps
+# through the in-process fallback handler, which needs these rules.
+crash_dump_fallback(fpcamera_algoservice)
+
+# Not granted: the DSP (FastRPC). Nothing the service loads uses it.
+#
+# Not granted, not audited:
+# - setting vendor camera properties (vendor.camera.siq.*, a status the ANC
+#   libraries publish at each start).
+# - /data/local/tmp and /data: tracing and dump folders the TCL code looks for.
+#   The service must never load or read anything from shell or app data.
+# - the graphics loader's ro.zygote.disable_gl_preload, which is not set here.
+# - the public vendor defaults (vendor_public_vendor_default_prop) and the ANC
+#   libraries' log level overrides (default_prop): every mode works without
+#   them. (Its read of the platform's 16 KB page compatibility property stays
+#   audited: the type is private to the platform policy.)
+dontaudit fpcamera_algoservice vendor_camera_prop:property_service set;
+dontaudit fpcamera_algoservice property_socket:sock_file write;
+dontaudit fpcamera_algoservice init:unix_stream_socket connectto;
+dontaudit fpcamera_algoservice { shell_data_file system_data_file }:dir { getattr search };
+dontaudit fpcamera_algoservice zygote_config_prop:file read;
+dontaudit fpcamera_algoservice vendor_public_vendor_default_prop:file read;
+dontaudit fpcamera_algoservice default_prop:file read;
+
+
+# The Fairphone Camera app (system_ext policy) looks at the vendor camera
+# properties and polls the SoC sysfs thousands of times per session. Neither is
+# granted (platform rules keep vendor properties from app domains), every mode
+# works without them, and neither is audited.
+dontaudit fpcamera_app vendor_camera_prop:file read;
+dontaudit fpcamera_app vendor_sysfs_soc:dir search;

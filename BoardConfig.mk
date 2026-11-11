@@ -19,6 +19,8 @@ TARGET_BOOTLOADER_BOARD_NAME := fps
 # Keep the authenticated device bootloader. This product builds Android images.
 TARGET_NO_BOOTLOADER := true
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/camera/fpcamera/fpcamera_algoservice.xml
+DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/camera/fpcamera/fpcamera_postproc.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/framework_compatibility_matrix.xml
 
 TARGET_COPY_OUT_VENDOR := vendor
@@ -109,6 +111,10 @@ BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/firmware
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/media
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/system-ext-private
+# Fairphone Camera (camera/fpcamera): the app's domain and the algorithm service.
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fpcamera-system-ext-public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fpcamera-system-ext-private
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/fpcamera-vendor
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext-public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/telephony-system-ext
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/product-public
@@ -120,6 +126,8 @@ TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/modem/config.fs
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/power/config.fs
 # Vendor user of fwrelease. boot/ueventd.rc gives it the firmware partitions.
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/firmware/config.fs
+# Fairphone Camera's algorithm service user (camera/fpcamera/config.fs).
+TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/camera/fpcamera/config.fs
 # Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
 

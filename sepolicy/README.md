@@ -25,6 +25,7 @@ may access, and why. It describes the policy of a release (`user`) build.
 | `fp6/` | device grants, each bound to one service |
 | `audio/`, `bluetooth/`, `camera/`, `firmware/`, `gnss/`, `media/`, `modem/`, `nfc/`, `telephony/`, `timekeep/` | vendor policy of one subsystem each |
 | `telephony-system-ext/`, `telephony-system-ext-public/` | system_ext side of the telephony apps |
+| `fpcamera-system-ext-public/`, `fpcamera-system-ext-private/`, `fpcamera-vendor/` | the Fairphone Camera app and its TCL algorithm service (see [Fairphone Camera](#fairphone-camera)) |
 
 ## Rules for changes
 
@@ -84,6 +85,10 @@ may access, and why. It describes the policy of a release (`user`) build.
 - The FP6 fingerprint service
   (`android.hardware.biometrics.fingerprint-service.fp6`) is
   `hal_fingerprint_default_exec` (`vendor-common/file_contexts`).
+- The ODM camera algorithm service type of `vendor-common/service.te` is
+  replaced by `fpcamera_algo_service`, which only the Fairphone Camera may find
+  (see [Fairphone Camera](#fairphone-camera)). Its `service_contexts` entry
+  maps to the new type.
 - `/proc/asound/cards` keeps Android's `proc_asound` label, not
   `vendor_proc_audiod`. system_server reads it to find USB audio cards, and the
   platform policy grants that read.
@@ -866,9 +871,10 @@ Denied on purpose:
 - `dontaudit` on adding the offline camera service: it is in no VINTF
   manifest and nothing uses it. The provider retries at every start and
   carries on.
-- `dontaudit` on looking up the ODM's camera algorithm service and Qualcomm's
-  post-processing HAL: neither is in the image, and the provider asks at every
-  session.
+- `dontaudit` on CamX's own lookups of the TCL algorithm service and
+  Qualcomm's post-processing HAL. Both serve only the Fairphone Camera's
+  algorithm service. CamX asks at every session, and its sessions run as for
+  every other app.
 - `vendor_camera_sn_prop` labels `vendor.fp.camera_*`, the camera module
   serial numbers CamX tries to publish. Nothing may set or read it, and the
   denials stay audited.
@@ -886,10 +892,56 @@ Other:
 - `vendor_init` may create the camera data directory, set the camera
   properties and change the mode of the persist `camera` and `cam_cali`
   directories.
-- Not granted, unlike the stock policy: the TCL algorithm service and its data
+- Not granted, unlike the stock policy: the TCL algorithm service's data
   and dump directories, secure camera (QSEECom/TEE, protected heaps, VM
   memory-buffer nodes, ssgtzd), the AON service, factory OTP/OIS sysfs
   (`fp_mmitest_sysfs`), persist writes and QRTR ioctls.
+
+## Fairphone Camera
+
+Fairphone's own camera app (`com.fps.camera`, signed by TCL) is offered in the
+App Store only on builds that declare the system feature
+`de.diamaneos.fairphone_camera`. It needs the stock TCL camera algorithm
+service (`camera/fpcamera`), which only those builds have. Its policy is in `fpcamera-system-ext-public/`,
+`fpcamera-system-ext-private/` and `fpcamera-vendor/`.
+
+The app, `fpcamera_app` (seapp entry by TCL's certificate and the package
+name):
+
+- An ordinary untrusted app (`app_domain`, `untrusted_app_domain`), without
+  `net_domain`. Neither the app nor the vendor code it loads can create a
+  network socket, whatever its permissions say.
+- It alone may find the algorithm service (`fpcamera_algo_service`, a vendor
+  service type) and call it.
+- Not granted, not audited: the vendor camera properties, the SoC sysfs (polled
+  thousands of times per session) and the cgroup tree. Every mode works
+  without them.
+
+The algorithm service, `fpcamera_algoservice` (`/vendor/bin/hw/cameraalgoservice`):
+
+- servicemanager starts it for the app's first lookup (lazy, `fpcamera.rc`). It
+  runs as its own user (`vendor_fpcamera`) under its own seccomp filter
+  (`camera/fpcamera/seccomp`), so `crash_dump_fallback` applies.
+- Camera NDK client of cameraserver, graphics allocator client, GPU (the lens
+  distortion and AI superfine libraries) and the DMA-BUF system heap.
+- The Adreno OpenCL runtime and compiler for its RAW fusion and HDR libraries,
+  with their own label `fpcamera_opencl_file`. A platform neverallow lets any
+  vendor process load a vendor library, so the loader is installed as
+  `fpcOpenCL.so`, the name only this service's ANC HDR adapters look for
+  (tools `STRING_REWRITES`). CamX looks for `libOpenCL.so` and keeps running
+  without OpenCL.
+- Qualcomm's post-processing HAL (`IPostProcService`), which the camera
+  provider registers for it: RAW to YUV on the ISP for super night. Only this
+  service may find it. It calls the provider, and the provider calls it back.
+- The public SoC id and its gralloc, vendor camera and camera configuration
+  properties, read only. The SoC serial number stays unreadable.
+- Not granted, not audited: setting vendor camera properties, `/data` and
+  `/data/local/tmp`, the graphics loader's zygote property, the public vendor
+  defaults and the ANC log level overrides. Not granted: the DSP (FastRPC).
+
+Image checks pin who may call, find and register the algorithm service and
+the post-processing HAL, that neither domain may create a network socket, the
+OpenCL label and name, and the service's trap-mode filter in release builds.
 
 ## Media
 

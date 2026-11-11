@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+
+# Fairphone Camera (com.fps.camera signed by TCL, from the App Store, FP6 only).
+# Its domain, and the service type and server attribute of the TCL camera
+# algorithm service it uses. Public so that the vendor policy can name them.
+type fpcamera_app, domain;
+type fpcamera_algo_service, hal_service_type, service_manager_type;
+attribute fpcamera_algo_server;

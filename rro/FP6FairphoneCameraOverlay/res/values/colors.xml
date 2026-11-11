@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- Fairphone green, the colour of the app's own camera glyph. -->
+    <color name="ic_launcher_background">#FF004137</color>
+</resources>

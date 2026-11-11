@@ -64,3 +64,12 @@ runtime_resource_overlay {
     manifest: "FP6NfcOverlay/AndroidManifest.xml",
     resource_dirs: ["FP6NfcOverlay/res"],
 }
+
+// Fairphone Camera (App Store, FP6): its name and launcher icon tile
+// (camera/fpcamera). Static, applies once the app is installed.
+runtime_resource_overlay {
+    name: "FP6FairphoneCameraOverlay",
+    vendor: true,
+    manifest: "FP6FairphoneCameraOverlay/AndroidManifest.xml",
+    resource_dirs: ["FP6FairphoneCameraOverlay/res"],
+}

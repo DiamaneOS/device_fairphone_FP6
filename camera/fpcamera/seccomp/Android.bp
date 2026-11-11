@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 The DiamaneOS Project
+
+package {
+    default_applicable_licenses: ["fp6_device_license"],
+}
+
+// Seccomp loader for the stock TCL camera algorithm service (fpcjail.c). uicam
+// links it, and only the service loads uicam, so the filter is installed
+// before the service's main(). fpcamera-algoservice.policy lists the allowed
+// system calls.
+//
+// Calls outside the policy are trapped (SIGSYS) and the service dies with a
+// tombstone. Building with -DFPCJAIL_LOG_ONLY logs them instead (kernel audit
+// record type 1326, read with camera/seccomp/seccomp_audit.py --service
+// fpcamera) and allows them. Use that to collect the profile again after a
+// vendor update.
+cc_library_shared {
+    name: "libfpcjail",
+    vendor: true,
+    compile_multilib: "64",
+    srcs: ["fpcjail.c"],
+    shared_libs: ["liblog"],
+    static_libs: ["libminijail"],
+    // Exports nothing: the static minijail symbols must not interpose on
+    // anything the service loads later.
+    version_script: "libfpcjail.map.txt",
+    required: ["fpcamera-algoservice.policy"],
+    // No cfi: it has no indirect calls and runs once in a constructor.
+    sanitize: {
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+prebuilt_etc {
+    name: "fpcamera-algoservice.policy",
+    vendor: true,
+    sub_dir: "seccomp_policy",
+    src: "fpcamera-algoservice.arm64.policy",
+    filename: "fpcamera-algoservice.policy",
+}

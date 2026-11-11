@@ -41,6 +41,8 @@ SERVICES = {
                '/vendor/bin/hw/vendor.qti.camera.provider-service_64', 'u:r:hal_camera_default:s0'),
     'bluetooth': (HERE.parent.parent / 'bluetooth/seccomp/bluetooth-hci.arm64.policy',
                   '/vendor/bin/hw/android.hardware.bluetooth@1.1-service.fp6', 'u:r:hal_bluetooth_default:s0'),
+    'fpcamera': (HERE.parent / 'fpcamera/seccomp/fpcamera-algoservice.arm64.policy',
+                 '/vendor/bin/hw/cameraalgoservice', 'u:r:fpcamera_algoservice:s0'),
 }
 AUDIT_ARCH_AARCH64 = 'c00000b7'
 ACTIONS = {'0x7ffc0000': 'logged and allowed (RET_LOG)', '0x80000000': 'process killed (RET_KILL_PROCESS)',

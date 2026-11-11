@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+#
+# System calls the stock TCL camera algorithm service may make (arm64, minijail
+# syntax), installed as /vendor/etc/seccomp_policy/fpcamera-algoservice.policy
+# and compiled by libfpcjail before the service's main(). Whether a call outside
+# this list is logged or trapped is set in Android.bp (FPCJAIL_LOG_ONLY), not
+# here. Duplicate entries are an error.
+#
+# Sources: a trace of the running service (photos at every zoom, macro, front
+# camera, portrait, PRO, panorama, super night with OpenCL and the
+# post-processing HAL, every video setting), the log-only builds' audit records
+# (the calls before a trace can attach and the OpenCL path), and the
+# calls the debuggerd fallback handler needs to write a tombstone from a
+# no_new_privs process. Ordered by observed frequency, most frequent first.
+
+# No mapping may be writable and executable at once.
+mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+munmap: 1
+openat: 1
+write: 1
+# 0x53564d41 PR_SET_VMA (bionic names anonymous mappings), 3 PR_GET_DUMPABLE,
+# 15 PR_SET_NAME, 16 PR_GET_NAME, 39 PR_GET_NO_NEW_PRIVS, 54 PR_PAC_RESET_KEYS
+# (pthread_create), 56 PR_GET_TAGGED_ADDR_CTRL, 61 PR_PAC_GET_ENABLED_KEYS.
+prctl: arg0 == 0x53564d41 || arg0 == 3 || arg0 == 15 || arg0 == 16 || arg0 == 39 || arg0 == 54 || arg0 == 56 || arg0 == 61
+read: 1
+close: 1
+fstat: 1
+mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+writev: 1
+# ioctl requests are filtered by the SELinux policy.
+ioctl: 1
+madvise: 1
+gettid: 1
+newfstatat: 1
+futex: 1
+rt_sigprocmask: 1
+lseek: 1
+readlinkat: 1
+faccessat: 1
+fcntl: 1
+pread64: 1
+fstatfs: 1
+sigaltstack: 1
+mremap: 1
+# Threads only (0x10000 CLONE_THREAD): no fork, no child processes.
+clone: arg0 & 0x10000
+getdents64: 1
+# 1 AF_UNIX only (logd, the property service): no network or QRTR socket.
+socket: arg0 == 1
+connect: 1
+inotify_init1: 1
+inotify_add_watch: 1
+eventfd2: 1
+dup: 1
+ppoll: 1
+# Thread nice values. PRIO_PROCESS only: no process-group or per-user changes.
+setpriority: arg0 == 0
+# Algorithm worker threads pin themselves to cores, and the OpenCL HDR path
+# yields while it waits for the GPU.
+sched_setaffinity: 1
+sched_yield: 1
+getrlimit: 1
+getrandom: 1
+set_tid_address: 1
+nanosleep: 1
+clock_gettime: 1
+getpid: 1
+getuid: 1
+
+# Never returning, so absent from the trace's counts.
+exit: 1
+exit_group: 1
+rt_sigreturn: 1
+restart_syscall: 1
+
+# debuggerd fallback handler (system/core debuggerd/seccomp_policy/
+# crash_dump.arm64.policy), less the calls already listed.
+getppid: 1
+recvmsg: 1
+recvfrom: 1
+setsockopt: 1
+sysinfo: 1
+uname: 1
+process_vm_readv: 1
+tgkill: 1
+rt_sigaction: 1
+rt_tgsigqueueinfo: 1

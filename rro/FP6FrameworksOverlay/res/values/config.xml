@@ -151,4 +151,10 @@
          factory reset. GrapheneOS clears factory reset protection at every
          boot, so nothing reads it. -->
     <bool name="config_enableCredentialFactoryResetProtection">false</bool>
+
+    <!-- A SIM can be added or removed while the phone runs, as the factory
+         FrameworksResCommon_Sys overlay says. Android's default is false: it
+         then asks for a restart at every SIM change, with one more prompt on
+         top of the last each time. -->
+    <bool name="config_hotswapCapable">true</bool>
 </resources>

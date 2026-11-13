@@ -49,18 +49,22 @@ on fs
     # platform stream (clocks, regulators, buses, USB, thermal, remote
     # processors) loads alone first. Then every subsystem loads its own stream
     # at the same time. Touch starts once display is done, since its driver
-    # needs the panel and its backlight. init goes on only when all streams
-    # are done, except touch: its driver takes about a second to probe, and
-    # nothing uses the touchscreen before system_server, which picks it up
-    # when it appears.
+    # needs the panel and its backlight. Media (camera, video) starts once
+    # display is done too: when the camera driver binds its parts before the
+    # display's resource coordinator has probed, every driver start crawls
+    # until the camera is through, and the phone starts 5 to 9 s later. With
+    # both streams started together that happened in half of all starts.
+    # init goes on only when all streams are done, except touch: its driver
+    # takes about a second to probe, and nothing uses the touchscreen before
+    # system_server, which picks it up when it appears.
     start vendor.modprobe_system
     exec_start vendor.modprobe_platform
     start vendor.modprobe_wireless
     start vendor.modprobe_audio
     start vendor.modprobe_data
     start vendor.modprobe_crypto
-    start vendor.modprobe_media
     exec_start vendor.modprobe_display
+    start vendor.modprobe_media
     # The display driver starts the backlight at its maximum and applies it
     # when the boot animation first draws. Android holds its default during
     # boot (config_screenBrightnessSettingDefaultFloat, 100 nits, written as

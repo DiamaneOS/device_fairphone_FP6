@@ -11,6 +11,14 @@
 # Their GraphicBuffer calls bind uicam (compat/tcl-camera-v34). The portrait
 # mode's two-camera live bokeh node runs in the camera provider.
 #
+# The APK that fits those files is the one the same stock release ships. The
+# vendor step therefore declares a second feature in the tree it generates
+# (/vendor/etc/permissions/de.diamaneos.fairphone_camera.app.xml), named after
+# that APK: de.diamaneos.fairphone_camera.apk_ and the first 16 hex characters
+# of its SHA-256. The name is never written here, so it always follows the
+# stock files in the image. A catalog version of the app lists both features
+# (README.md, Fairphone Camera).
+#
 # The RAW fusion and HDR libraries (super night, HDR) run on the GPU through
 # the Adreno OpenCL runtime, installed as fpcOpenCL.so, the name only the
 # service's ANC HDR adapters look for. They convert RAW to YUV on the ISP

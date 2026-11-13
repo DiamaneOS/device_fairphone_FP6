@@ -905,6 +905,11 @@ App Store only on builds that declare the system feature
 service (`camera/fpcamera`), which only those builds have. Its policy is in `fpcamera-system-ext-public/`,
 `fpcamera-system-ext-private/` and `fpcamera-vendor/`.
 
+The build declares a second feature, named after the APK its stock release
+ships, and a catalog version of the app lists both. So an APK is offered only
+on a build whose stock files it fits
+([README.md](../README.md#fairphone-camera)).
+
 The app, `fpcamera_app` (seapp entry by TCL's certificate and the package
 name):
 

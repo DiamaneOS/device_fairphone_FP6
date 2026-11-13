@@ -97,6 +97,49 @@ GrapheneOS workspace. Shared DiamaneOS configuration is in `vendor/diamaneos`.
   - It reports SoC and subsystem sleep times from `/dev/stats`.
   - There are no energy meters: the phone has no on-device power monitor.
 
+## Fairphone Camera
+
+Fairphone's own camera app (`com.fps.camera`, signed by TCL) is not part of
+the image. The App Store installs it. The app loads Fairphone's closed camera
+libraries and calls the stock camera algorithm service, which are part of the
+image and come from the build's stock release (`camera/fpcamera`).
+
+- The APK that fits those files is the one the same stock release ships, so
+  the build declares two system features:
+  - `de.diamaneos.fairphone_camera`: the image has the algorithm service and
+    the libraries (`camera/fpcamera/de.diamaneos.fairphone_camera.xml`).
+  - `de.diamaneos.fairphone_camera.apk_` followed by the first 16 hex
+    characters of that APK's SHA-256: the files in the image are the ones this
+    APK was shipped with.
+- The tools write the second feature into the generated vendor tree
+  (`/vendor/etc/permissions/de.diamaneos.fairphone_camera.app.xml`).
+  - They pin the APK of the stock release by size and SHA-256, check it
+    against the stock image and name the feature after it.
+  - It is never written by hand.
+- The image checks require exactly one such feature, the one of the APK
+  pinned for the build's stock release.
+- A catalog version of the app lists both features, the second one for its own
+  APK. The App Store offers a version only on a build that declares every
+  feature the version lists.
+
+Moving the OS to another stock release includes the app:
+
+- The tools pin the camera APK of the new stock package together with the new
+  vendor files. The vendor step stops when the stock image holds another APK
+  than the pinned one.
+- Test the app on the phone with the new OS build, also when the APK is the
+  same as before:
+  - photo, video and 60 fps video,
+  - the modes that use the algorithm service (portrait, night and HDR),
+  - no network access for the app, as before.
+- Collect the algorithm service's system call profile again
+  (`camera/fpcamera/seccomp`), as after any change of the stock files.
+- The same APK in the new stock release keeps its feature and needs no new
+  catalog version.
+- Another APK gets its own catalog version, tied to its own hash and published
+  together with that OS release. The earlier catalog version stays tied to the
+  earlier APK.
+
 ## Licence
 
 Apache-2.0 ([LICENSE](LICENSE)). Third-party notices: [NOTICE](NOTICE) and

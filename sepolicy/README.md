@@ -916,6 +916,9 @@ name):
 - An ordinary untrusted app (`app_domain`, `untrusted_app_domain`), without
   `net_domain`. Neither the app nor the vendor code it loads can create a
   network socket, whatever its permissions say.
+- Its Network permission is fixed off as well
+  (`config_networkPermissionFixedOffPackages` in `rro/FP6FrameworksOverlay`),
+  so its permission page shows Network as not allowed and not changeable.
 - It alone may find the algorithm service (`fpcamera_algo_service`, a vendor
   service type) and call it.
 - Not granted, not audited: the vendor camera properties, the SoC sysfs (polled

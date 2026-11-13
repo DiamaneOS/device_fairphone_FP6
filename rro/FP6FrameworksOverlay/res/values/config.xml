@@ -157,4 +157,12 @@
          then asks for a restart at every SIM change, with one more prompt on
          top of the last each time. -->
     <bool name="config_hotswapCapable">true</bool>
+
+    <!-- Fairphone Camera (com.fps.camera, from the App Store) asks for the
+         Network permission, but its SELinux domain (fpcamera_app) can open no
+         network socket. The permission is fixed off, so the app's permission
+         page shows what is true: not allowed, and not changeable. -->
+    <string-array name="config_networkPermissionFixedOffPackages" translatable="false">
+        <item>com.fps.camera</item>
+    </string-array>
 </resources>

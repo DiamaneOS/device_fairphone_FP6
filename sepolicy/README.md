@@ -187,6 +187,15 @@ of the same name (`provenance.json`).
   - The limit covers the opened node. SELinux does not check commands on
     the object and server descriptors the driver hands out.
 
+### Hypervisor nodes
+
+- Android virtual machines are off. No domain has a grant on `/dev/gunyah`
+  (the Gunyah VM manager, `vendor_gunyah_dev`) or `/dev/qgunyah` (Qualcomm's
+  VM loader, `vendor_gunyah_chr_device`).
+- Neverallows keep every domain off both nodes (`gunyah.te`). crosvm is the
+  one exception for `/dev/gunyah`, since the platform grants it every VM
+  manager node. The FP6 does not ship crosvm.
+
 ### Hardware identifiers
 
 - `/sys/devices/soc0/serial_number` is `vendor_sysfs_soc_serial`

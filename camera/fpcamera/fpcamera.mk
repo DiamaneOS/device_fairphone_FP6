@@ -58,3 +58,8 @@ PRODUCT_COPY_FILES += \
 # take the normal path, as without RAW fusion.
 PRODUCT_VENDOR_PROPERTIES += \
     vendor.fp.camera.suprsphoto.thresholdx10=1000
+
+# 50 MP: the camera provider accepts a stream of the sensor's full size (8192x6144) only
+# with this property, which makes it publish that size for Android's maximum resolution mode.
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.camera.capability_ultrahigh=1

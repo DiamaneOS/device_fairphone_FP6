@@ -118,6 +118,13 @@ Fake GoodOn() {
     return f;
 }
 
+// State 3: the clear decoders for selected apps. The boot is set up as for 1.
+Fake GoodSelected() {
+    Fake f = GoodOn();
+    f.props["ro.vendor.diamaneos.hw_video_decode"] = "3";
+    return f;
+}
+
 std::set<std::string> Allowed(Fake f, std::string* reason = nullptr) {
     std::string r;
     auto allowed = c2hwjail::AllowedCodecs(f.platform(), &r);
@@ -135,6 +142,26 @@ TEST(AllowedCodecs, ConsistentStatesOfferTheirCodecs) {
     Fake missing = GoodOff();
     missing.nodeError = ENOENT;
     EXPECT_EQ(kEncoders, Allowed(missing));
+}
+
+// Only state 3 checks the decoders per caller. The encoders never are.
+TEST(AllowedCodecs, OnlySelectedAppsStateChecksTheDecodersPerCaller) {
+    std::string reason;
+    std::set<std::string> checked = {"stale"};
+    Fake selected = GoodSelected();
+    EXPECT_EQ(Union(kEncoders, kDecoders), c2hwjail::AllowedCodecs(selected.platform(), &reason, &checked));
+    EXPECT_EQ(kDecoders, checked);
+    for (Fake f : {GoodOff(), GoodOn()}) {
+        checked = {"stale"};
+        EXPECT_FALSE(c2hwjail::AllowedCodecs(f.platform(), &reason, &checked).empty());
+        EXPECT_TRUE(checked.empty());
+    }
+    // A state 3 boot that is not set up as 1 offers nothing, and checks nothing.
+    Fake f = GoodSelected();
+    f.props["vendor.media.target_variant"] = "_volcano_v1";
+    checked = {"stale"};
+    EXPECT_TRUE(c2hwjail::AllowedCodecs(f.platform(), &reason, &checked).empty());
+    EXPECT_TRUE(checked.empty());
 }
 
 TEST(AllowedCodecs, EveryInconsistencyOffersNothing) {
@@ -162,6 +189,10 @@ TEST(AllowedCodecs, EveryInconsistencyOffersNothing) {
     f = GoodOff(); f.mode = S_IFCHR | 0660; f.gid = 1046; cases.emplace_back("off, node open to group", f);
     f = GoodOff(); f.uid = 1000; cases.emplace_back("off, node owned by system", f);
     f = GoodOn(); f.mode = S_IFCHR | 0600; f.gid = 0; cases.emplace_back("on, node root-only", f);
+    f = GoodSelected(); f.mode = S_IFCHR | 0600; f.gid = 0; cases.emplace_back("selected, node root-only", f);
+    f = GoodSelected(); f.files[kOnSpec] = Spec({}, kEncoders); cases.emplace_back("selected, spec without decoders", f);
+    f = GoodSelected(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "4"; cases.emplace_back("mode 4", f);
+    f = GoodSelected(); f.props["ro.vendor.diamaneos.hw_video_decode"] = "3 "; cases.emplace_back("mode \"3 \"", f);
     f = GoodOff(); f.mode = S_IFREG | 0600; cases.emplace_back("node not a device", f);
     f = GoodOff(); f.nodeError = EACCES; cases.emplace_back("node unreadable", f);
     for (auto& [name, fake] : cases) {
@@ -190,6 +221,7 @@ class FakeStore : public C2ComponentStore {
             auto traits = std::make_shared<C2Component::Traits>();
             traits->name = name;
             if (std::string(name) == "c2.qti.avc.encoder") traits->aliases = {"OMX.qcom.video.encoder.avc"};
+            if (std::string(name) == "c2.qti.avc.decoder") traits->aliases = {"OMX.qcom.video.decoder.avc"};
             list.push_back(traits);
         }
         return list;
@@ -240,6 +272,148 @@ TEST(FilterStore, NothingAllowedIsAnEmptyStore) {
         EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.encoder", &component));
     }
     EXPECT_TRUE(fake->created.empty());
+}
+
+// The caller check, with the caller UID injected (no binder). Fake::props
+// holds the per-UID properties system_server would set.
+constexpr uid_t kSelectedApp = 10109;
+constexpr uid_t kOtherApp = 10110;
+constexpr uid_t kSecondUserSelected = 1010109;  // user 10, app ID 10109
+
+Fake WithSelection() {
+    Fake f = GoodSelected();
+    f.props["diamaneos.hw_video_decode.uid.10109"] = "1";
+    f.props["diamaneos.hw_video_decode.uid.10110"] = "0";
+    f.props["diamaneos.hw_video_decode.uid.1010109"] = "1";
+    // Not app UIDs: their properties never count.
+    f.props["diamaneos.hw_video_decode.uid.1000"] = "1";
+    f.props["diamaneos.hw_video_decode.uid.1013"] = "1";
+    f.props["diamaneos.hw_video_decode.uid.1046"] = "1";
+    f.props["diamaneos.hw_video_decode.uid.99000"] = "1";
+    f.props["diamaneos.hw_video_decode.uid.20109"] = "1";
+    return f;
+}
+
+TEST(MayUseDecoders, OnlySelectedAppUidsCreateDecoders) {
+    Fake f = WithSelection();
+    const auto p = f.platform();
+    using c2hwjail::Use;
+    EXPECT_TRUE(c2hwjail::MayUseDecoders(kSelectedApp, Use::kComponent, p));
+    EXPECT_TRUE(c2hwjail::MayUseDecoders(kSelectedApp, Use::kList, p));
+    EXPECT_TRUE(c2hwjail::MayUseDecoders(kSecondUserSelected, Use::kComponent, p));
+    struct Case { uid_t uid; const char* what; };
+    for (const Case& c : {Case{kOtherApp, "app set to 0"}, Case{10111, "app without property"},
+                          Case{1010110, "second user, other app"},
+                          Case{1010111, "second user, no property"},
+                          Case{1110109, "selected app ID in user 11"},
+                          Case{1000, "system"}, Case{1013, "media"}, Case{1046, "mediacodec"},
+                          Case{1047, "cameraserver"}, Case{0, "root"}, Case{2000, "shell"},
+                          Case{99000, "isolated"}, Case{20109, "SDK sandbox"},
+                          Case{9999, "below the app range"}, Case{static_cast<uid_t>(-1), "-1"}}) {
+        EXPECT_FALSE(c2hwjail::MayUseDecoders(c.uid, Use::kComponent, p)) << c.what;
+    }
+    for (const char* value : {"", "0", "2", "true", "1 ", " 1", "11"}) {
+        Fake g = WithSelection();
+        g.props["diamaneos.hw_video_decode.uid.10109"] = value;
+        EXPECT_FALSE(c2hwjail::MayUseDecoders(kSelectedApp, Use::kComponent, g.platform())) << value;
+    }
+    // A platform that cannot read properties allows nothing.
+    c2hwjail::Platform none;
+    EXPECT_FALSE(c2hwjail::MayUseDecoders(kSelectedApp, Use::kComponent, none));
+}
+
+TEST(MayUseDecoders, MediaListsAndReadsInterfacesOnly) {
+    Fake f = WithSelection();
+    const auto p = f.platform();
+    using c2hwjail::Use;
+    EXPECT_TRUE(c2hwjail::MayUseDecoders(1013, Use::kList, p));
+    EXPECT_TRUE(c2hwjail::MayUseDecoders(1013, Use::kInterface, p));
+    EXPECT_FALSE(c2hwjail::MayUseDecoders(1013, Use::kComponent, p));
+    // Media in another user is not mediaserver.
+    EXPECT_FALSE(c2hwjail::MayUseDecoders(1001013, Use::kList, p));
+    for (uid_t uid : {1000u, 1046u, kOtherApp}) {
+        EXPECT_FALSE(c2hwjail::MayUseDecoders(uid, Use::kList, p)) << uid;
+        EXPECT_FALSE(c2hwjail::MayUseDecoders(uid, Use::kInterface, p)) << uid;
+    }
+}
+
+std::vector<std::string> Names(const std::vector<std::shared_ptr<const C2Component::Traits>>& list) {
+    std::vector<std::string> names;
+    for (const auto& traits : list) names.push_back(traits->name);
+    return names;
+}
+
+TEST(FilterStore, DecodersOnlyForTheCallersTheCheckAllows) {
+    Fake f = WithSelection();
+    uid_t caller = kOtherApp;
+    auto fake = std::make_shared<FakeStore>();
+    auto store = c2hwjail::FilterStore(fake, Union(kEncoders, kDecoders), kDecoders,
+                                       c2hwjail::SelectedAppsCheck(f.platform(), [&caller] { return caller; }));
+    std::shared_ptr<C2Component> component;
+    std::shared_ptr<C2ComponentInterface> interface;
+    const std::vector<std::string> both = {"c2.qti.avc.encoder", "c2.qti.avc.decoder"};
+    const std::vector<std::string> encoderOnly = {"c2.qti.avc.encoder"};
+
+    // Not selected: the encoders as before, no decoder by name or alias.
+    EXPECT_EQ(encoderOnly, Names(store->listComponents()));
+    EXPECT_EQ(C2_OK, store->createComponent("c2.qti.avc.encoder", &component));
+    EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.decoder", &component));
+    EXPECT_EQ(C2_NOT_FOUND, store->createComponent("OMX.qcom.video.decoder.avc", &component));
+    EXPECT_EQ(C2_NOT_FOUND, store->createInterface("c2.qti.avc.decoder", &interface));
+    EXPECT_EQ(std::vector<std::string>{"c2.qti.avc.encoder"}, fake->created);
+    fake->created.clear();
+
+    // Selected: the decoder too. The check runs on every call.
+    caller = kSelectedApp;
+    EXPECT_EQ(both, Names(store->listComponents()));
+    EXPECT_EQ(C2_OK, store->createComponent("c2.qti.avc.decoder", &component));
+    EXPECT_EQ(C2_OK, store->createComponent("OMX.qcom.video.decoder.avc", &component));
+    EXPECT_EQ(C2_OK, store->createComponent("c2.qti.avc.encoder", &component));
+    // Never what the Qualcomm store has but this boot does not allow.
+    EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.encoder.secure", &component));
+    EXPECT_EQ((std::vector<std::string>{"c2.qti.avc.decoder", "OMX.qcom.video.decoder.avc",
+                                        "c2.qti.avc.encoder"}),
+              fake->created);
+    fake->created.clear();
+
+    // mediaserver's list generator: the list and interfaces, no component.
+    caller = 1013;
+    EXPECT_EQ(both, Names(store->listComponents()));
+    EXPECT_EQ(C2_OK, store->createInterface("c2.qti.avc.decoder", &interface));
+    EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.decoder", &component));
+    EXPECT_EQ(C2_OK, store->createComponent("c2.qti.avc.encoder", &component));
+
+    // The service itself (calls outside a transaction) and the same app ID
+    // in another user without a selection.
+    for (uid_t uid : {1046u, 1010110u}) {
+        caller = uid;
+        EXPECT_EQ(encoderOnly, Names(store->listComponents())) << uid;
+        EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.decoder", &component)) << uid;
+    }
+
+    // The selection is removed (uninstall): refused at once.
+    caller = kSelectedApp;
+    f.props["diamaneos.hw_video_decode.uid.10109"] = "0";
+    EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.decoder", &component));
+    EXPECT_EQ(encoderOnly, Names(store->listComponents()));
+}
+
+TEST(FilterStore, CheckedDecodersWithoutACheckAreForNobody) {
+    auto fake = std::make_shared<FakeStore>();
+    Fake f = WithSelection();
+    for (auto store : {c2hwjail::FilterStore(fake, Union(kEncoders, kDecoders), kDecoders, nullptr),
+                       c2hwjail::FilterStore(fake, Union(kEncoders, kDecoders), kDecoders,
+                                             c2hwjail::SelectedAppsCheck(f.platform(), nullptr))}) {
+        std::shared_ptr<C2Component> component;
+        EXPECT_EQ(std::vector<std::string>{"c2.qti.avc.encoder"}, Names(store->listComponents()));
+        EXPECT_EQ(C2_NOT_FOUND, store->createComponent("c2.qti.avc.decoder", &component));
+        EXPECT_EQ(C2_OK, store->createComponent("c2.qti.avc.encoder", &component));
+    }
+    // All video: no caller check at all, even for a caller that is no app.
+    auto all = c2hwjail::FilterStore(fake, Union(kEncoders, kDecoders), {},
+                                     [](c2hwjail::Use) { return false; });
+    EXPECT_EQ((std::vector<std::string>{"c2.qti.avc.encoder", "c2.qti.avc.decoder"}),
+              Names(all->listComponents()));
 }
 
 TEST(KeepAllowedCodecs, LeavesOnlyAllowedCodecs) {

@@ -22,14 +22,14 @@
 // (hgbp_createFromHandle, CLONE_HANDLE) and uses them only through inline
 // accessors (the Android 14 offsets checked below), initCheck, the
 // AHardwareBuffer pointer casts and RefBase.
-// - No hardware decoder this boot (ro.vendor.diamaneos.hw_video_decode is not
-//   "1"): the encoders write to linear buffers and never use that pool, so
-//   the constructors fail closed: the object holds no buffer and reports
-//   NO_INIT. Every caller in C2BqBuffer.cpp checks initCheck() (or the
+// - No hardware decoder this boot (ro.vendor.diamaneos.hw_video_decode is
+//   neither "1" nor "3"): the encoders write to linear buffers and never use
+//   that pool, so the constructors fail closed: the object holds no buffer
+//   and reports NO_INIT. Every caller in C2BqBuffer.cpp checks initCheck() (or the
 //   requestBuffer result built from it) and returns an error, so a client
 //   that attaches a Surface to a hardware codec gets an error.
-// - Hardware decoders this boot ("1"): the decoders render into the app's
-//   Surface through that pool. The handle constructor accepts only
+// - Hardware decoders this boot ("1" for all video, "3" for selected apps):
+//   the decoders render into the app's Surface through that pool. The handle constructor accepts only
 //   CLONE_HANDLE, the one method the library passes: it imports a clone of
 //   the producer's handle with the Android 17 mapper (which validates it
 //   against the description) and the destructor frees that clone, as
@@ -281,8 +281,11 @@ GraphicBufferV34::~GraphicBufferV34() {
 // The hardware decoders are offered this boot: media/init.fp6.media.rc sets
 // the read-only property at zygote-start, before the codec service starts.
 bool surfaceOutputAllowed() {
-    static const bool allowed =
-            android::base::GetProperty("ro.vendor.diamaneos.hw_video_decode", "") == "1";
+    static const bool allowed = [] {
+        const std::string state =
+                android::base::GetProperty("ro.vendor.diamaneos.hw_video_decode", "");
+        return state == "1" || state == "3";
+    }();
     return allowed;
 }
 

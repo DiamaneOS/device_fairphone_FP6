@@ -42,8 +42,11 @@ namespace c2hwjail {
 namespace {
 
 // Set once per boot by media/init.fp6.media.rc from the user's choice in
-// Settings: "0" no hardware decoder, "1" hardware decoders for all video.
+// Settings: "0" no hardware decoder, "1" hardware decoders for all video, "3"
+// hardware decoders for the apps the user selected.
 constexpr char kModeProperty[] = "ro.vendor.diamaneos.hw_video_decode";
+// One per selected app UID, "1" while selected (MayUseDecoders).
+constexpr char kAppPropertyPrefix[] = "diamaneos.hw_video_decode.uid.";
 // Read by libqcodec2_platform (qc2::TargetSpec::readTargetVariant), which
 // opens /vendor/etc/media<variant>/video_system_specs.json.
 constexpr char kVariantProperty[] = "vendor.media.target_variant";
@@ -100,15 +103,20 @@ Platform DevicePlatform() {
     return platform;
 }
 
-std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason) {
+std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason,
+                                    std::set<std::string>* callerChecked) {
+    if (callerChecked != nullptr) {
+        callerChecked->clear();
+    }
     const std::string mode = platform.getProperty(kModeProperty);
-    if (!mode.empty() && mode != "0" && mode != "1") {
+    if (!mode.empty() && mode != "0" && mode != "1" && mode != "3") {
         *reason = std::string(kModeProperty) + " is \"" + mode + "\"";
         return {};
     }
     // Unset counts as "0": the rc always sets the state, so without one no
-    // decoder is offered.
-    const bool decoders = mode == "1";
+    // decoder is offered. "3" sets up the boot as "1" does.
+    const bool decoders = mode == "1" || mode == "3";
+    const bool selectedApps = mode == "3";
     const std::string expected = decoders ? kDecodersVariant : kEncodersOnlyVariant;
     const std::string variant = platform.getProperty(kVariantProperty);
     if (variant != expected) {
@@ -188,8 +196,42 @@ std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reaso
             return {};
         }
     }
-    *reason = decoders ? "hardware encoders and decoders" : "hardware encoders only";
+    if (selectedApps && callerChecked != nullptr) {
+        callerChecked->insert(std::begin(kDecoders), std::end(kDecoders));
+    }
+    *reason = selectedApps ? "hardware encoders, and decoders for selected apps"
+              : decoders   ? "hardware encoders and decoders"
+                           : "hardware encoders only";
     return allowed;
+}
+
+bool MayUseDecoders(uid_t uid, Use use, const Platform& platform) {
+    // mediaserver's codec list generator reads the decoders' capabilities.
+    // An interface decodes nothing.
+    if (use != Use::kComponent && uid == AID_MEDIA) {
+        return true;
+    }
+    // Apps only: never media, system, cameraserver, this service, isolated
+    // or SDK sandbox processes. The user ID is part of the UID, so a
+    // selection holds for one user.
+    const uid_t appId = uid % AID_USER_OFFSET;
+    if (appId < AID_APP_START || appId > AID_APP_END) {
+        return false;
+    }
+    if (!platform.getProperty) {
+        return false;
+    }
+    const std::string name = kAppPropertyPrefix + std::to_string(uid);
+    return platform.getProperty(name.c_str()) == "1";
+}
+
+CallerCheck SelectedAppsCheck(Platform platform, std::function<uid_t()> callingUid) {
+    if (!callingUid) {
+        return nullptr;
+    }
+    return [platform = std::move(platform), callingUid = std::move(callingUid)](Use use) {
+        return MayUseDecoders(callingUid(), use, platform);
+    };
 }
 
 void KeepAllowedCodecs(std::unordered_set<std::string>* codecs,

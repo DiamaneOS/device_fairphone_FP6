@@ -19,7 +19,11 @@
 //   and builds the real HIDL store around a filtering store
 //   (c2hwjail_store.cpp). That store offers the hardware encoders, the three
 //   non-secure hardware decoders when the user chose them, and nothing if the
-//   check fails or the filter could not be installed.
+//   check fails or the filter could not be installed. When the user chose
+//   them for selected apps, the store checks each call's binder caller UID
+//   (set by the kernel) and offers the decoders only to the selected apps.
+//   The stock HIDL library calls the store on the binder thread of the
+//   incoming transaction (seen on the phone, 2026-11-15).
 //
 // - qc2::TargetSpec::getSupportedCodecs (when the Qualcomm codec plugin loads):
 //   leaves only the allowed codecs in the set the plugin registers from.
@@ -50,6 +54,7 @@
 #include <unordered_set>
 
 #include <C2Component.h>
+#include <hwbinder/IPCThreadState.h>
 #include <log/log.h>
 
 #include "c2hwjail.h"
@@ -166,22 +171,31 @@ void c2hwjailStoreCtor(void* self, const std::shared_ptr<C2ComponentStore>& stor
 void c2hwjailStoreCtor(void* self, const std::shared_ptr<C2ComponentStore>& store) {
     EnsureFilter();
     std::set<std::string> allowed;
+    std::set<std::string> callerChecked;
     std::string reason;
     if (!gFilterInstalled) {
         reason = "no seccomp filter";
     } else if (store == nullptr) {
         reason = "no Qualcomm store";
     } else {
-        allowed = c2hwjail::AllowedCodecs(c2hwjail::DevicePlatform(), &reason);
+        allowed = c2hwjail::AllowedCodecs(c2hwjail::DevicePlatform(), &reason, &callerChecked);
     }
-    std::shared_ptr<C2ComponentStore> filtered = c2hwjail::FilterStore(store, allowed);
+    // The UID of the binder transaction this thread serves. Outside one it is
+    // this service's own UID, which is never allowed.
+    c2hwjail::CallerCheck check = c2hwjail::SelectedAppsCheck(c2hwjail::DevicePlatform(), [] {
+        return static_cast<uid_t>(android::hardware::IPCThreadState::self()->getCallingUid());
+    });
+    std::shared_ptr<C2ComponentStore> filtered =
+            c2hwjail::FilterStore(store, allowed, callerChecked, check);
+    // Called outside a transaction: this counts what every caller gets.
     const size_t offered = filtered->listComponents().size();
     if (allowed.empty()) {
         ALOGE("codec configuration differs (%s): the store offers no hardware codec",
               reason.c_str());
     } else {
-        ALOGI("codec configuration checked (%s): the store offers %zu components", reason.c_str(),
-              offered);
+        ALOGI("codec configuration checked (%s): the store offers %zu components to every "
+              "caller and %zu to selected apps only",
+              reason.c_str(), offered, callerChecked.size());
     }
     using Ctor = void (*)(void*, const std::shared_ptr<C2ComponentStore>&);
     auto real = reinterpret_cast<Ctor>(RealSymbol(kHidlLibrary, C2HWJAIL_STORE_CTOR));

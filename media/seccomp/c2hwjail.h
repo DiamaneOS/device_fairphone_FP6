@@ -7,6 +7,7 @@
 #pragma once
 
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include <functional>
 #include <set>
@@ -32,10 +33,30 @@ Platform DevicePlatform();
 
 // The Qualcomm codecs the store may offer this boot: the five hardware
 // encoders, plus the three non-secure hardware decoders when hardware video
-// decoding is for all video. If the mode, the target variant, the target
-// specification the Qualcomm library reads or the decoder node differ from
-// what this boot expects, none, and *reason says why. Never aborts.
-std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason);
+// decoding is for all video or for selected apps. If the mode, the target
+// variant, the target specification the Qualcomm library reads or the decoder
+// node differ from what this boot expects, none, and *reason says why. Never
+// aborts. For selected apps, *callerChecked (if given) gets the three
+// decoders, which the store offers only to the callers SelectedAppsCheck
+// allows. Empty in every other state.
+std::set<std::string> AllowedCodecs(const Platform& platform, std::string* reason,
+                                    std::set<std::string>* callerChecked = nullptr);
+
+// What a store client does with a decoder, for the selected-apps check.
+enum class Use { kList, kInterface, kComponent };
+
+// Whether a caller may use the hardware decoders when they are for selected
+// apps. A component (the decoder that gets the video) only for an app UID the
+// user selected: diamaneos.hw_video_decode.uid.<uid> is "1" (system_server
+// sets it, sepolicy/system-ext-private/hw_video_decode.te). The list and an
+// interface also for media (1013), which builds the system codec list. Every
+// other UID, and anything unexpected, is no.
+bool MayUseDecoders(uid_t uid, Use use, const Platform& platform);
+
+// The check FilterStore runs on each call. The device passes the binder
+// caller's UID (c2hwjail.cpp). The host test passes its own.
+using CallerCheck = std::function<bool(Use use)>;
+CallerCheck SelectedAppsCheck(Platform platform, std::function<uid_t()> callingUid);
 
 // Removes everything but the allowed codecs from the set the Qualcomm codec
 // plugin registers from. The plugin registers every codec it knows when the

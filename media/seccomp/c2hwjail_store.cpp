@@ -11,19 +11,22 @@ namespace {
 
 class FilteringStore final : public C2ComponentStore {
   public:
-    FilteringStore(std::shared_ptr<C2ComponentStore> store, std::set<std::string> allowed)
-        : mStore(std::move(store)), mAllowed(std::move(allowed)) {
+    FilteringStore(std::shared_ptr<C2ComponentStore> store, std::set<std::string> allowed,
+                   std::set<std::string> callerChecked, CallerCheck check)
+        : mStore(std::move(store)), mAllowed(std::move(allowed)), mCheck(std::move(check)) {
         if (mStore == nullptr || mAllowed.empty()) {
             mAllowed.clear();
             return;
         }
         // A listed alias creates the same component, so it is allowed with its
-        // component. Nothing else is added.
+        // component, and checked like it. Nothing else is added.
         for (const auto& traits : mStore->listComponents()) {
             if (traits != nullptr && mAllowed.count(traits->name) != 0) {
-                mListed.push_back(traits);
-                mNames.insert(traits->name);
-                mNames.insert(traits->aliases.begin(), traits->aliases.end());
+                const bool checked = callerChecked.count(traits->name) != 0;
+                mListed.push_back({traits, checked});
+                std::set<std::string>& names = checked ? mCheckedNames : mNames;
+                names.insert(traits->name);
+                names.insert(traits->aliases.begin(), traits->aliases.end());
             }
         }
     }
@@ -32,7 +35,7 @@ class FilteringStore final : public C2ComponentStore {
 
     c2_status_t createComponent(C2String name,
                                 std::shared_ptr<C2Component>* const component) override {
-        if (mNames.count(name) == 0) {
+        if (!offers(name, Use::kComponent)) {
             return C2_NOT_FOUND;
         }
         return mStore->createComponent(std::move(name), component);
@@ -40,14 +43,26 @@ class FilteringStore final : public C2ComponentStore {
 
     c2_status_t createInterface(C2String name,
                                 std::shared_ptr<C2ComponentInterface>* const interface) override {
-        if (mNames.count(name) == 0) {
+        if (!offers(name, Use::kInterface)) {
             return C2_NOT_FOUND;
         }
         return mStore->createInterface(std::move(name), interface);
     }
 
     std::vector<std::shared_ptr<const C2Component::Traits>> listComponents() override {
-        return mListed;
+        std::vector<std::shared_ptr<const C2Component::Traits>> listed;
+        bool checked = false;
+        bool callerMay = false;
+        for (const auto& [traits, isChecked] : mListed) {
+            if (isChecked && !checked) {
+                callerMay = callerMayUse(Use::kList);
+                checked = true;
+            }
+            if (!isChecked || callerMay) {
+                listed.push_back(traits);
+            }
+        }
+        return listed;
     }
 
     c2_status_t copyBuffer(std::shared_ptr<C2GraphicBuffer> src,
@@ -96,18 +111,35 @@ class FilteringStore final : public C2ComponentStore {
     }
 
   private:
+    bool callerMayUse(Use use) const { return mCheck != nullptr && mCheck(use); }
+
+    // The name is an allowed component or alias, and the caller may use it.
+    bool offers(const std::string& name, Use use) const {
+        if (mNames.count(name) != 0) {
+            return true;
+        }
+        return mCheckedNames.count(name) != 0 && callerMayUse(use);
+    }
+
     const std::shared_ptr<C2ComponentStore> mStore;
     std::set<std::string> mAllowed;
-    // The allowed components' names and aliases, and their traits.
+    const CallerCheck mCheck;
+    // The allowed components' names and aliases: offered to every caller, or
+    // only to the callers mCheck allows.
     std::set<std::string> mNames;
-    std::vector<std::shared_ptr<const C2Component::Traits>> mListed;
+    std::set<std::string> mCheckedNames;
+    // The allowed components' traits, and whether each is checked per caller.
+    std::vector<std::pair<std::shared_ptr<const C2Component::Traits>, bool>> mListed;
 };
 
 }  // namespace
 
 std::shared_ptr<C2ComponentStore> FilterStore(std::shared_ptr<C2ComponentStore> store,
-                                              std::set<std::string> allowed) {
-    return std::make_shared<FilteringStore>(std::move(store), std::move(allowed));
+                                              std::set<std::string> allowed,
+                                              std::set<std::string> callerChecked,
+                                              CallerCheck check) {
+    return std::make_shared<FilteringStore>(std::move(store), std::move(allowed),
+                                            std::move(callerChecked), std::move(check));
 }
 
 }  // namespace c2hwjail

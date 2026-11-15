@@ -52,6 +52,8 @@ cc_library_shared {
     shared_libs: [
         "libavservices_minijail",
         "libbase",
+        // The binder caller's UID for the selected-apps check.
+        "libhidlbase",
         "libjsoncpp",
         "liblog",
     ],
@@ -74,7 +76,9 @@ prebuilt_etc {
 
 // Host test of the failure paths: the configuration check returns no codec
 // for every inconsistent state, the filtering store offers only the allowed
-// components, and the installed filter fails disallowed calls with EPERM.
+// components, the selected-apps check passes only selected app UIDs (the
+// test sets the caller UID itself, no binder), and the installed filter fails
+// disallowed calls with EPERM.
 cc_test_host {
     name: "c2hwjail_host_test",
     defaults: ["libc2hwjail_defaults"],

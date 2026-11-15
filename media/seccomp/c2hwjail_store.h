@@ -22,14 +22,21 @@
 #undef C2HWJAIL_HOST_UNUSED
 #endif
 
+#include "c2hwjail.h"
+
 namespace c2hwjail {
 
 // A C2ComponentStore that offers only the allowed components of store: it
 // lists and creates those (and their aliases) and nothing else, and forwards
 // the store-level calls. With nothing allowed it is an empty store. The
-// Codec2 core header C2Component.h is identical in the Android 14 build the
-// stock HIDL library and Qualcomm store use and in Android 17.
+// allowed components named in callerChecked (and their aliases) are listed
+// and created only for the callers check allows, on each call. Without a
+// check they are offered to nobody. The Codec2 core header C2Component.h is
+// identical in the Android 14 build the stock HIDL library and Qualcomm store
+// use and in Android 17.
 std::shared_ptr<C2ComponentStore> FilterStore(std::shared_ptr<C2ComponentStore> store,
-                                              std::set<std::string> allowed);
+                                              std::set<std::string> allowed,
+                                              std::set<std::string> callerChecked = {},
+                                              CallerCheck check = nullptr);
 
 }  // namespace c2hwjail

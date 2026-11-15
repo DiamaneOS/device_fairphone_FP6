@@ -89,6 +89,10 @@ allowxperm mediacodec vendor_video_codec_device:chr_file ioctl { 0x5600-0x56ff }
 # libc2hwjail_avservices checks the codec configuration against it, and uiv34
 # lets Codec2 output to a Surface only when the hardware decoders are offered.
 get_prop(mediacodec, vendor_diamaneos_hw_video_decode_prop)
+# The apps selected for hardware video decoding (system-ext-public
+# hw_video_decode.te): in selected-apps mode libc2hwjail_avservices creates a
+# hardware decoder only for a binder caller whose UID property is "1".
+get_prop(mediacodec, diamaneos_hw_video_decode_app_prop)
 
 # Only the codec service may use the codec nodes. ueventd (create, setattr),
 # init and vendor_init (setattr, for the decoder node's owner and mode) keep

@@ -11,3 +11,21 @@ neverallow {
   -init
   -system_app
 } diamaneos_hw_video_decode_prop:property_service set;
+
+# The apps selected for hardware video decoding (system-ext-public). Only
+# system_server sets them (com.android.server.ext.HwVideoDecodeApps), from the
+# per-app switch in Settings. mediaserver reads them to give each app a codec
+# list that matches what the codec service lets it create (frameworks/av
+# MediaCodecList), and the codec service reads them (media/mediacodec.te).
+# Apps cannot read them, so no app learns which apps are selected. A domain
+# that could set them would give any app the hardware decoders.
+set_prop(system_server, diamaneos_hw_video_decode_app_prop)
+get_prop(mediaserver, diamaneos_hw_video_decode_app_prop)
+
+neverallow {
+  domain
+  -init
+  -system_server
+} diamaneos_hw_video_decode_app_prop:property_service set;
+
+neverallow appdomain diamaneos_hw_video_decode_app_prop:file { open read map };

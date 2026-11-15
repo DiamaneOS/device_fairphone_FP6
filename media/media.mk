@@ -12,6 +12,10 @@
 #   low-latency variant). That saves battery and plays high-resolution video
 #   more smoothly, but lets every video reach closed decoder code, the video
 #   driver and the video firmware.
+# - selected apps: the same decoders, set up as for all video, but the codec
+#   service creates them only for the app UIDs the user selected in Settings
+#   (media/seccomp/c2hwjail_store.cpp). Every other app, and video played
+#   through mediaserver (MediaPlayer, thumbnails), stays in software.
 # media/init.fp6.media.rc applies the choice before the codec service and the
 # media framework start.
 #
@@ -22,8 +26,8 @@
 # - _volcano_v1 (never): the target specification names the five encoders and
 #   no decoder ("codecs-available"), and the codec list has no decoder section,
 #   so MediaCodec cannot pick a hardware decoder even if the service listed one.
-# - _volcano_v1_hwdec (all video): the same plus the three clear decoders, in
-#   both files.
+# - _volcano_v1_hwdec (all video and selected apps): the same plus the three
+#   clear decoders, in both files.
 # The decoder node /dev/video32 is root-only when the choice is never
 # (boot/ueventd.rc, media/init.fp6.media.rc), and only the codec service may
 # open the two codec nodes (sepolicy/media).

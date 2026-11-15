@@ -13,9 +13,13 @@
     <bool name="config_show_smooth_display">true</bool>
 
     <!-- Show Security & privacy > Exploit protection > Hardware video decoding:
-         the FP6 applies the choice (all video or never) at boot (device
-         media/media.mk). -->
+         the FP6 applies the choice (all video, selected apps or never) at boot
+         (device media/media.mk). -->
     <bool name="config_show_hardware_video_decoding">true</bool>
+
+    <!-- Offer Selected apps: the FP6 codec service creates the hardware decoders
+         only for the apps the user selects (device media/seccomp). -->
+    <bool name="config_hardware_video_decoding_selected_apps">true</bool>
 
     <!-- Protected video only is shown disabled and Never is the default: the
          FP6 has no secure decoders. -->

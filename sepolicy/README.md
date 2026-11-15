@@ -969,6 +969,8 @@ OpenCL label and name, and the service's trap-mode filter in release builds.
   Hardware video decoding choice allows (`media/media.mk`):
   - never, the default: none.
   - all video: the three clear decoders. No secure decoder is offered.
+  - selected apps: the same three, created only for the binder caller UIDs
+    the user selected. Everyone keeps the encoders.
 - Every app except isolated processes is a Codec2 client and can call it.
 - The platform vendor policy makes `mediacodec` the Codec2 HIDL server and a
   gralloc and GPU client, and gives it every `video_device` node.
@@ -982,13 +984,19 @@ OpenCL label and name, and the service's trap-mode filter in release builds.
   - Otherwise `vendor_init` changes its group and mode at early-boot, through
     the platform's setattr grant on every device node, and may `getattr` it.
 - `persist.diamaneos.hw_video_decode`: the user's choice. Accepts only 0
-  (never) and 1 (all video). Unset counts as 0.
+  (never), 1 (all video) and 3 (selected apps). Unset counts as 0.
   - Only Settings sets it (`system-ext-private/hw_video_decode.te`).
   - It is public and system restricted, because the vendor rc triggers on it.
 - `ro.vendor.diamaneos.hw_video_decode`: the state of the running boot.
-  Accepts only 0 and 1.
-  - Only init and `vendor_init` set it. The codec service and Settings read
-    it, and the vendor rc file triggers on it.
+  Accepts only 0, 1 and 3.
+  - Only init and `vendor_init` set it. The codec service, Settings and
+    mediaserver read it, and the vendor rc file triggers on it.
+- `diamaneos.hw_video_decode.uid.<uid>`: 1 while the user selects that app
+  UID (selected apps). Accepts only 0 and 1. Not persistent.
+  - Only `system_server` sets it (neverallow), at every boot and on every
+    change of the per-app switch, install or removal.
+  - The codec service and mediaserver read it. Apps may not (neverallow), so
+    no app learns which apps are selected.
 - No network: the platform neverallows cover tcp, udp and rawip sockets.
   - DiamaneOS's seccomp filter (`media/seccomp`) fails every socket family but
     AF_UNIX with EPERM, and the stock one has no `socket` at all.

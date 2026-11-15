@@ -124,8 +124,12 @@ ro.camera.disableCameraMute                u:object_r:camera_config_prop:s0 exac
 ro.camera.torchStrengthNode.0              u:object_r:camera_config_prop:s0 exact string
 
 # Hardware video decoding: the user's choice, applied at the next boot
-# (hw_video_decode.te). Settings stores "0" (never) or "1" (all video).
-persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1
+# (hw_video_decode.te). Settings stores "0" (never), "1" (all video) or "3"
+# (selected apps). "2" stays for protected video only, which the FP6 does
+# not offer.
+persist.diamaneos.hw_video_decode          u:object_r:diamaneos_hw_video_decode_prop:s0 exact enum 0 1 3
+# The selected apps, one property per app UID. system_server sets "1" or "0".
+diamaneos.hw_video_decode.uid.             u:object_r:diamaneos_hw_video_decode_app_prop:s0 prefix enum 0 1
 
 # Read by the AOSP USB audio HAL (alsa_utils) through hal_audio's read of this
 # type. Not set on this device, so the 5 ms default applies.

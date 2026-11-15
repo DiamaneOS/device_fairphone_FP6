@@ -2,8 +2,15 @@
 # Copyright 2026 The DiamaneOS Project
 # persist.diamaneos.hw_video_decode: the user's choice for hardware video
 # decoding (Settings > Security & privacy > Exploit protection: "0" never, "1"
-# all video, unset counts as "0"). Public and system restricted because the
-# vendor media/init.fp6.media.rc triggers on it at zygote-start, and init
-# accepts a vendor trigger only on a property vendor_init can read. Rules:
-# system-ext-private/hw_video_decode.te.
+# all video, "3" selected apps, unset counts as "0"). Public and system
+# restricted because the vendor media/init.fp6.media.rc triggers on it at
+# zygote-start, and init accepts a vendor trigger only on a property
+# vendor_init can read. Rules: system-ext-private/hw_video_decode.te.
 system_restricted_prop(diamaneos_hw_video_decode_prop)
+
+# diamaneos.hw_video_decode.uid.<uid>: "1" while the user selects the app with
+# that UID for hardware video decoding ("3", selected apps). system_server sets
+# it at every boot and on every change. Public and system restricted because
+# the vendor codec service (mediacodec) reads it. Rules:
+# system-ext-private/hw_video_decode.te.
+system_restricted_prop(diamaneos_hw_video_decode_app_prop)

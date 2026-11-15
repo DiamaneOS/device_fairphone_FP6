@@ -7,6 +7,8 @@
   protection > Hardware video decoding (device `media/media.mk`).
 - `config_hardware_video_decoding_protected_video`: off, so Protected video
   only is shown disabled and Never is the default (no secure decoders).
+- `config_hardware_video_decoding_selected_apps`: on, so Selected apps is
+  offered, with its app list (device `media/media.mk`).
 - `config_remote_key_provisioning_choice`: off, so Network & internet shows no
   remote key provisioning choice (the secure world refuses it while yellow).
 - `config_color_mode_options_values`: pairs Settings' colour-mode names with

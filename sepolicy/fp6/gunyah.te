@@ -3,12 +3,12 @@
 # The hypervisor nodes. /dev/gunyah is the kernel's Gunyah VM manager
 # (vendor_gunyah_dev, a vm_manager_device_type like /dev/kvm). /dev/qgunyah
 # is Qualcomm's own VM loader (vendor_gunyah_chr_device). Both labels are in
-# vendor-volcano. Android virtual machines are off on the FP6 and no service
-# uses either node, so no domain gets a grant on them.
+# vendor-volcano. Android's protected VMs use /dev/gunyah through crosvm, which
+# the platform policy grants. No other domain gets a grant on either node.
 #
 # The platform keeps system and app domains off VM manager nodes, except
 # crosvm. These rules extend that to vendor domains, and close Qualcomm's
 # loader node to everyone. crosvm stays excluded because the platform grants
-# it every VM manager node. The FP6 does not ship crosvm.
+# it every VM manager node. Only userdebug builds ship crosvm for now.
 neverallow { domain -crosvm_domain } vendor_gunyah_dev:chr_file { open read write append ioctl map };
 neverallow domain vendor_gunyah_chr_device:chr_file { open read write append ioctl map };

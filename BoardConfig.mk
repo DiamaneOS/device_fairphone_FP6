@@ -199,6 +199,15 @@ BOARD_BOOTCONFIG += androidboot.hardware=qcom
 # dependencies allow.
 BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
 
+# Announce Gunyah to Android's virtualization framework, with the framework
+# itself (device.mk). The FP6 hypervisor runs protected VMs only and refuses
+# ordinary ones, so vm.supported stays 0.
+ifneq ($(TARGET_BUILD_VARIANT),user)
+BOARD_BOOTCONFIG += androidboot.hypervisor.version=gunyah-fp6 \
+    androidboot.hypervisor.vm.supported=0 \
+    androidboot.hypervisor.protected_vm.supported=1
+endif
+
 # The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
 SOONG_CONFIG_NAMESPACES += ufsbsg
 SOONG_CONFIG_ufsbsg += ufsframework

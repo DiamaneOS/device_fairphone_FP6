@@ -189,12 +189,12 @@ of the same name (`provenance.json`).
 
 ### Hypervisor nodes
 
-- Android virtual machines are off. No domain has a grant on `/dev/gunyah`
-  (the Gunyah VM manager, `vendor_gunyah_dev`) or `/dev/qgunyah` (Qualcomm's
-  VM loader, `vendor_gunyah_chr_device`).
-- Neverallows keep every domain off both nodes (`gunyah.te`). crosvm is the
-  one exception for `/dev/gunyah`, since the platform grants it every VM
-  manager node. The FP6 does not ship crosvm.
+- Android's protected VMs reach `/dev/gunyah` (the Gunyah VM manager,
+  `vendor_gunyah_dev`) through crosvm, which the platform policy grants every
+  VM manager node. No other domain has a grant on it or on `/dev/qgunyah`
+  (Qualcomm's VM loader, `vendor_gunyah_chr_device`).
+- Neverallows keep every domain off both nodes (`gunyah.te`), crosvm excepted
+  for `/dev/gunyah`. Only userdebug builds ship crosvm for now (`device.mk`).
 
 ### Hardware identifiers
 

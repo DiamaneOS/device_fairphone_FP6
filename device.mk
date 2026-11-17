@@ -227,12 +227,10 @@ $(call inherit-product, device/fairphone/FP6/modem/modem.mk)
 $(call inherit-product, device/fairphone/FP6/bluetooth/bluetooth.mk)
 $(call inherit-product, device/fairphone/FP6/nfc/nfc.mk)
 $(call inherit-product, device/fairphone/FP6/gnss/gnss.mk)
-# Android's virtualization framework for protected VMs, as on Pixels. On in
-# userdebug builds for development. User builds get it with the first feature
-# that runs in a protected VM. The same rule sets the hypervisor bootconfig.
-ifneq ($(TARGET_BUILD_VARIANT),user)
+# Android's virtualization framework for protected VMs, as on Pixels, in
+# every build. BoardConfig.mk sets the hypervisor bootconfig to match. Release
+# signing makes pvmfw trust only the release AVB key (the virt APEX payload key).
 $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
-endif
 $(call inherit-product, device/fairphone/FP6/telephony/telephony.mk)
 
 $(call inherit-product, device/fairphone/FP6/camera/camera.mk)

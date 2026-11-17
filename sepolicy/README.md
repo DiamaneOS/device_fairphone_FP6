@@ -194,7 +194,7 @@ of the same name (`provenance.json`).
   VM manager node. No other domain has a grant on it or on `/dev/qgunyah`
   (Qualcomm's VM loader, `vendor_gunyah_chr_device`).
 - Neverallows keep every domain off both nodes (`gunyah.te`), crosvm excepted
-  for `/dev/gunyah`. Only userdebug builds ship crosvm for now (`device.mk`).
+  for `/dev/gunyah`. Every build ships crosvm (`device.mk`).
 
 ### Hardware identifiers
 

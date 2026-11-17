@@ -9,6 +9,6 @@
 # The platform keeps system and app domains off VM manager nodes, except
 # crosvm. These rules extend that to vendor domains, and close Qualcomm's
 # loader node to everyone. crosvm stays excluded because the platform grants
-# it every VM manager node. Only userdebug builds ship crosvm for now.
+# it every VM manager node. Every build ships crosvm.
 neverallow { domain -crosvm_domain } vendor_gunyah_dev:chr_file { open read write append ioctl map };
 neverallow domain vendor_gunyah_chr_device:chr_file { open read write append ioctl map };

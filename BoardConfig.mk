@@ -199,6 +199,12 @@ BOARD_BOOTCONFIG += androidboot.hardware=qcom
 # dependencies allow.
 BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
 
+# No loop device is ever partition-scanned. The vendor device tree passes
+# loop.max_part=7, so the kernel read a partition table from every file
+# attached to a loop device. Nothing on the FP6 needs loop partitions.
+# This comes later on the command line and wins.
+BOARD_KERNEL_CMDLINE += loop.max_part=0
+
 # Announce Gunyah to Android's virtualization framework, with the framework
 # itself (device.mk). The FP6 hypervisor runs protected VMs only and refuses
 # ordinary ones, so vm.supported stays 0.

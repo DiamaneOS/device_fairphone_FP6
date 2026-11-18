@@ -208,6 +208,18 @@ BOARD_BOOTCONFIG += androidboot.hypervisor.version=gunyah-fp6 \
     androidboot.hypervisor.protected_vm.supported=1
 endif
 
+# Memory for protected VMs, set aside at boot so that a VM's memory comes in
+# few pieces however scattered the rest gets (the FP6 resource manager refuses
+# a VM in about 20000). 432 MiB: the decode service VM (288 MiB) and one
+# typical SD card VM (up to 144 MiB). Nothing else allocates from it. The
+# kernel's Gunyah driver lends it to protected VMs only, and SELinux lets only
+# the decode service's and fsvmd's VM managers take it
+# (sepolicy/system-ext-private/gunyah_vm_pool.te). A larger card or a further
+# VM gets ordinary memory. Same rule as the hypervisor bootconfig above.
+ifneq ($(TARGET_BUILD_VARIANT),user)
+BOARD_BOOTCONFIG += kernel.reserve_mem=432M:2M:gunyah_vm_pool
+endif
+
 # The published FP6 recovery extension uses UFS BSG, not the legacy SG ABI.
 SOONG_CONFIG_NAMESPACES += ufsbsg
 SOONG_CONFIG_ufsbsg += ufsframework

@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The memory pool for protected VMs. The kernel sets it aside at boot
+# (kernel.reserve_mem in BoardConfig.mk) and hands it out through
+# /dev/gunyah_vm_pool: one ioctl returns a file holding one VM's memory, which
+# crosvm maps and binds to its VM. The kernel lends it to protected VMs only.
+#
+# The VM manager runs in a domain of its client (virtualizationservice_use),
+# so these rules decide which clients' VMs get the pool: the decode service
+# (a platform_app), fsvmd's SD card VM (fsvmd.te adds its two domains to the
+# attributes when that lands), and on userdebug builds VMs started from adb
+# for tests. Every other VM manager is refused the node and gives its VM
+# ordinary memory, so no app can take the pool or reach it by a setting.
+type gunyah_vm_pool_device, dev_type;
+# The anonymous inode of one VM's memory file.
+type gunyah_vm_pool_mem;
+
+# VM managers that may take memory from the pool.
+attribute gunyah_vm_pool_client;
+# Their crosvm, which maps the memory file the VM manager hands it.
+attribute gunyah_vm_pool_crosvm;
+
+typeattribute platform_app_all_virtualizationmanager gunyah_vm_pool_client;
+typeattribute platform_app_all_virtmgr_crosvm gunyah_vm_pool_crosvm;
+userdebug_or_eng(`
+  typeattribute shell_virtualizationmanager gunyah_vm_pool_client;
+  typeattribute shell_virtmgr_crosvm gunyah_vm_pool_crosvm;
+  typeattribute su_virtualizationmanager gunyah_vm_pool_client;
+  typeattribute su_virtmgr_crosvm gunyah_vm_pool_crosvm;
+')
+
+# One command: GH_ANDROID_CREATE_POOL_MEM_FD, _IOW('A', 0x30, 16 bytes).
+allow gunyah_vm_pool_client gunyah_vm_pool_device:chr_file { open read write ioctl };
+allowxperm gunyah_vm_pool_client gunyah_vm_pool_device:chr_file ioctl 0x4130;
+type_transition gunyah_vm_pool_client gunyah_vm_pool_client:anon_inode gunyah_vm_pool_mem "[gunyah-vm-pool]";
+allow gunyah_vm_pool_client gunyah_vm_pool_mem:anon_inode create;
+# crosvm inherits the file and maps it as the VM's RAM.
+allow gunyah_vm_pool_crosvm gunyah_vm_pool_mem:anon_inode { getattr read write map };
+
+# The VM managers of other clients try the node and fall back quietly.
+dontaudit { virtualizationmanager_domain -gunyah_vm_pool_client } gunyah_vm_pool_device:chr_file { open read write };
+
+neverallow { domain -gunyah_vm_pool_client } gunyah_vm_pool_device:chr_file { open read write append ioctl map };
+neverallowxperm gunyah_vm_pool_client gunyah_vm_pool_device:chr_file ioctl ~{ 0x4130 };
+neverallow { domain -gunyah_vm_pool_client -gunyah_vm_pool_crosvm } gunyah_vm_pool_mem:anon_inode *;

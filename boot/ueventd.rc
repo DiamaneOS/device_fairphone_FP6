@@ -81,6 +81,9 @@ firmware_directories /mnt/vendor/wlan_mac/
 # The Gunyah VM manager for crosvm, as AOSP opens /dev/kvm to everyone. SELinux
 # keeps it to crosvm (sepolicy/fp6/gunyah.te), and user builds ship no crosvm.
 /dev/gunyah               0666   root       root
+# The memory pool for protected VMs. A VM manager runs as its client's user,
+# so SELinux decides who opens it (sepolicy/system-ext-private/gunyah_vm_pool.te).
+/dev/gunyah_vm_pool       0666   root       root
 /dev/kgsl-3d0             0666   system     system
 /dev/membuf               0664   system     system
 /dev/dma_heap/qcom,*      0444   system     system

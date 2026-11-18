@@ -193,6 +193,13 @@ of the same name (`provenance.json`).
   `vendor_gunyah_dev`) through crosvm, which the platform policy grants every
   VM manager node. No other domain has a grant on it or on `/dev/qgunyah`
   (Qualcomm's VM loader, `vendor_gunyah_chr_device`).
+- `/dev/gunyah_vm_pool` hands out the memory set aside at boot for protected
+  VMs (`gunyah_vm_pool.te`: types in `system-ext-public/`, rules in
+  `system-ext-private/`). Only the VM managers of the decode service
+  (`platform_app`) and, with the SD card VM, of fsvmd may open it, and the
+  shell's and root's on userdebug builds for tests. Each may send one command,
+  and only those VM managers' crosvm may map the memory file it returns. Every
+  other VM gets ordinary memory.
 - Neverallows keep every domain off both nodes (`gunyah.te`), crosvm excepted
   for `/dev/gunyah`. Only userdebug builds ship crosvm for now (`device.mk`).
 

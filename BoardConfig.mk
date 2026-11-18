@@ -205,6 +205,14 @@ BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
 # This comes later on the command line and wins.
 BOARD_KERNEL_CMDLINE += loop.max_part=0
 
+# The kernel reads no partition table of an SD card or USB disk: the
+# filesystem VM does (vendor/diamaneos fsvm). A build without it needs the
+# kernel's scan back, or partitioned cards would not work. The tools'
+# image check fs-in-vm-kernel-scan compares this with the image.
+ifneq ($(DIAMANEOS_FS_IN_VM),true)
+BOARD_KERNEL_CMDLINE += external_part_scan=1
+endif
+
 # Announce Gunyah to Android's virtualization framework, with the framework
 # itself (device.mk). The FP6 hypervisor runs protected VMs only and refuses
 # ordinary ones, so vm.supported stays 0.

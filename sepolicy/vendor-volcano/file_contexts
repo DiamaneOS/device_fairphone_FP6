@@ -126,7 +126,9 @@
 
 # Block device for hal_bootctl
 /dev/block/sdf                                                      u:object_r:boot_block_device:s0
-/dev/block/mmcblk0                                                  u:object_r:root_block_device:s0
+# /dev/block/mmcblk0 is the SD card slot on the FP6 (its storage is UFS), not a boot device: it keeps the generic
+# block_device label, so the boot control HAL gets no raw access to the user's card. It reads the card through
+# vold's own nodes and the filesystem VM only.
 
 # Same process file
 

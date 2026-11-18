@@ -48,6 +48,9 @@
 
 ####### system_ext file ###############
 
+# The memory pool for protected VMs (gunyah_vm_pool.te).
+/dev/gunyah_vm_pool                             u:object_r:gunyah_vm_pool_device:s0
+
 ####### data files ################
 # Core NFC state (NFA storage, service event log); platform init.rc creates
 # /data/nfc and platform nfc.te already owns nfc_data_file (stock label).

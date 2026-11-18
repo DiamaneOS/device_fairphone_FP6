@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 The DiamaneOS Project
+# The memory pool for protected VMs. The rules are in
+# system-ext-private/gunyah_vm_pool.te. Declared here, before any private
+# policy, so that every system_ext directory can name them.
+type gunyah_vm_pool_device, dev_type;
+# The anonymous inode of one VM's memory file.
+type gunyah_vm_pool_mem;
+
+# VM managers that may take memory from the pool.
+attribute gunyah_vm_pool_client;
+# Their crosvm, which maps the memory file the VM manager hands it.
+attribute gunyah_vm_pool_crosvm;

@@ -130,6 +130,8 @@ TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/firmware/config.fs
 TARGET_FS_CONFIG_GEN += $(DEVICE_PATH)/camera/fpcamera/config.fs
 # Vendor user of the boot control HAL. boot/ueventd.rc gives it its nodes.
 TARGET_FS_CONFIG_GEN += hardware/qcom/bootctrl/aidl/config.fs
+# The filesystem VM's fsvmd services, one user each (vendor/diamaneos fsvm/config.fs and fsvmd.rc).
+TARGET_FS_CONFIG_GEN += vendor/diamaneos/fsvm/config.fs
 
 # Isolated source IMS data broker, its dedicated vendor UID and VINTF contract.
 include hardware/diamaneos/ims/ims-board.mk

@@ -939,7 +939,7 @@
       "source": "generic/private/file_contexts",
       "source_sha256": "42e6a2b624669996914a68cebe5046f54ca5435efb7d4323d1b094e6d62eeb4c",
       "path": "system-ext-private/file_contexts",
-      "sha256": "fd5fe4f9eee73bce03dd63ecf9095bf558de78cc34b6379e93ebb0cc6dea3e6c"
+      "sha256": "fb78ca329f5278b8d54c89288a087dabb9040d92af8537c9dc561f0c8433f19c"
     },
     {
       "project": "qualcomm-sepolicy",

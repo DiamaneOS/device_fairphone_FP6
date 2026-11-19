@@ -956,6 +956,13 @@ The algorithm service, `fpcamera_algoservice` (`/vendor/bin/hw/cameraalgoservice
   `/data/local/tmp`, the graphics loader's zygote property, the public vendor
   defaults and the ANC log level overrides. Not granted: the DSP (FastRPC).
 
+Its 50 MP photos need the provider's `persist.vendor.camera.capability_ultrahigh`
+and an exemption from cameraserver's sensor pixel mode check:
+`ro.camera.pixel_mode_exempt_apps` lists the app with TCL's certificate
+(`camera/fpcamera/fpcamera.mk`). It has AOSP's type for the `ro.camera.*`
+settings cameraserver reads, `camera_config_prop`, which only vendor_init sets
+(`system-ext-private/property_contexts`).
+
 Image checks pin who may call, find and register the algorithm service and
 the post-processing HAL, that neither domain may create a network socket, the
 OpenCL label and name, and the service's trap-mode filter in release builds.

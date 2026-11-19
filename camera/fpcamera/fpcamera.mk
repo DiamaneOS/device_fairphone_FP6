@@ -63,3 +63,12 @@ PRODUCT_VENDOR_PROPERTIES += \
 # with this property, which makes it publish that size for Android's maximum resolution mode.
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.camera.capability_ultrahigh=1
+
+# 50 MP: the app sends those captures in the default sensor pixel mode, while the provider offers the
+# size in the maximum resolution mode only, so cameraserver would reject them. It skips that check
+# for the apps listed here, each with the SHA-256 of its signing certificate (frameworks_av
+# utils/PixelModeExemption.h), as stock's camera service does for this app. The entry pins TCL's
+# certificate, the first of the app's key lineage (sepolicy/fpcamera-system-ext-private/fpcamera.x509.pem).
+# Labelled in sepolicy/system-ext-private/property_contexts.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.camera.pixel_mode_exempt_apps=com.fps.camera:0f00b338d27aa1cd1c4a00e8584501ffb36775a07af42e1cc394ca1ed0908470

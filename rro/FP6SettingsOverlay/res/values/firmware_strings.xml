@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-License-Identifier: Apache-2.0
+     Copyright 2026 The DiamaneOS Project
+-->
+<resources>
+    <!-- About phone > Android version: the firmware row's label. Settings' own is "Device
+         firmware". The German, French, Spanish and Italian texts are DiamaneOS translations.
+         [CHAR LIMIT=60] -->
+    <string name="tally_firmware_release">Fairphone firmware</string>
+</resources>

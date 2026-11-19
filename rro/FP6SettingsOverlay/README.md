@@ -16,6 +16,11 @@
   - Keep its length and order equal to Settings' own names list. A length
     mismatch crashes Settings > Display.
 
+## Strings
+
+- `tally_firmware_release` (`firmware_strings.xml`): About phone > Android version shows the firmware row as
+  "Fairphone firmware". Settings' own label is "Device firmware".
+
 ## Side fingerprint sensor education
 
 - AOSP's side-sensor animations draw a tablet with the sensor on its top edge.

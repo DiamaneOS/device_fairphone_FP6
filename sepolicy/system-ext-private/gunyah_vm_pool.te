@@ -8,17 +8,16 @@
 #
 # The VM manager runs in a domain of its client (virtualizationservice_use),
 # so these rules decide which clients' VMs get the pool: the decode service
-# (a platform_app), fsvmd's SD card VM (fsvmd.te adds its two domains to the
-# attributes when that lands), and on userdebug builds VMs started from adb
-# as shell, for tests. Every other VM manager is refused the node and gives
-# its VM ordinary memory, so no app can take the pool or reach it by a
-# setting. Root's VMs (su) get ordinary memory too: the release suite and
-# the pool's phone test start theirs as shell.
+# (its own domain, decode_service_app: decode_service_app.te in
+# vendor_diamaneos adds its two domains to the attributes), fsvmd's SD card
+# VM (fsvmd.te adds its two), and on userdebug builds VMs started from adb as
+# shell, for tests. Every other VM manager is refused the node and gives its
+# VM ordinary memory, so no platform app or other app can take the pool or
+# reach it by a setting. Root's VMs (su) get ordinary memory too: the release
+# suite and the pool's phone test start theirs as shell.
 # The types and attributes are declared in system-ext-public/gunyah_vm_pool.te,
 # so that policy in other system_ext directories (fsvmd.te) can name them.
 
-typeattribute platform_app_all_virtualizationmanager gunyah_vm_pool_client;
-typeattribute platform_app_all_virtmgr_crosvm gunyah_vm_pool_crosvm;
 userdebug_or_eng(`
   typeattribute shell_virtualizationmanager gunyah_vm_pool_client;
   typeattribute shell_virtmgr_crosvm gunyah_vm_pool_crosvm;

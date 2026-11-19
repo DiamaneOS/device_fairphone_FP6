@@ -896,6 +896,12 @@ Flashlight strength (`torch_level.te`):
 - A neverallow leaves only cameraserver, ueventd and vendor_init able to write
   it.
 
+In-sensor zoom: with its vendor tags set, CamX faulted the camera IOMMU.
+cameraserver erases the tags `ro.camera.blocked_vendor_tags` lists
+(`camera/camera.mk`) from every client's requests. The list has AOSP's type
+`camera_config_prop`, which only vendor_init sets
+(`system-ext-private/property_contexts`).
+
 Other:
 
 - `vendor_init` may create the camera data directory, set the camera

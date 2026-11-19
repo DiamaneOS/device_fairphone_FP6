@@ -125,6 +125,8 @@ ro.camera.torchStrengthNode.0              u:object_r:camera_config_prop:s0 exac
 # The apps cameraserver exempts from its sensor pixel mode check, each with its
 # certificate (camera/fpcamera/fpcamera.mk).
 ro.camera.pixel_mode_exempt_apps           u:object_r:camera_config_prop:s0 exact string
+# The vendor tags cameraserver erases from every client's requests (camera/camera.mk).
+ro.camera.blocked_vendor_tags              u:object_r:camera_config_prop:s0 exact string
 
 # Hardware video decoding: the user's choice, applied at the next boot
 # (hw_video_decode.te). Settings stores "0" (never), "1" (all video) or "3"

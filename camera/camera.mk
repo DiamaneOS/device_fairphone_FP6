@@ -66,6 +66,12 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES += \
     ro.camera.torchStrengthNode.0=/sys/module/camera/parameters/torch_level
 
+# In-sensor zoom: with these vendor tags set, CamX faulted the camera IOMMU. cameraserver
+# erases the tags listed here from every client's session parameters and capture requests
+# (frameworks_av utils/BlockedVendorTags.h). Labelled in sepolicy/system-ext-private/property_contexts.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.camera.blocked_vendor_tags=org.codeaurora.qcamera3.sessionParameters.EnableInsensorZoom,org.codeaurora.qcamera3.sessionParameters.EnableSnapshotOnlyInsensorZoom
+
 # Stock (system build.prop): the CamX provider takes the tuning path Fairphone
 # shipped and validated. vendor_init may set it (sepolicy/camera/vendor_init.te).
 PRODUCT_VENDOR_PROPERTIES += \

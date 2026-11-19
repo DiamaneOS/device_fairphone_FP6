@@ -165,4 +165,9 @@
     <string-array name="config_networkPermissionFixedOffPackages" translatable="false">
         <item>com.fps.camera</item>
     </string-array>
+
+    <!-- With AOSP's 30 Hz floor the display idles at 30 Hz while a camera app
+         previews, which halves UI and touch response and judders the preview.
+         60 gives every camera app the range [60, 60]. -->
+    <integer name="config_cameraPreviewMinRefreshRate">60</integer>
 </resources>

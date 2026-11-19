@@ -7,7 +7,8 @@
     <!-- Settings > Battery > Charging optimization, GrapheneOS's charge limit
          screen. GrapheneOS leaves these empty in Settings and Pixel builds
          fill them from the stock Pixel apps. "Off" is Settings' translated
-         switch_off_text. German, French, Spanish and Italian are our own.
+         switch_off_text. German, French, Spanish and Italian
+         were written for DiamaneOS.
          While the limit holds, Android's own translated "Charging on hold to
          protect battery" texts are shown. -->
     <string name="charging_optimization_title">Charging optimization</string>
